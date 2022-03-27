@@ -1,0 +1,69 @@
+\documentclass[12pt]{article}
+\usepackage[left=1in,right=1in,top=1.5in,bottom=1.5in]{geometry}
+\geometry{a4paper}
+
+\usepackage{times}
+
+\usepackage[utf8]{inputenc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage{tabularx,ragged2e,booktabs,caption}
+\usepackage{breqn}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{physics}
+
+\usepackage[
+backend=bibtex,
+style=ieee
+]{biblatex}
+\addbibresource{./ref/cambqcd.bib}
+\addbibresource{./ref/gbw1998.bib}
+
+
+%\include{./bibliographylist}
+
+\begin{document}
+	
+\author{Tomoki Goda}
+\title{GBW-K-S Saturation Model}
+\date{\today}
+
+%\frontmatter
+\maketitle
+	
+%\tableofcontents
+\pagenumbering{arabic}
+\numberwithin{equation}{section}
+\numberwithin{table}{section}
+
+
+\section{overall notes, general stuff etc.}
+
+for flavour $f$ and polarization $p$ \cite{cambqcd}\cite{gbw1998},
+\begin{equation}
+	\sigma_{f,\;p}=\int_{0}^{1} d z \int d^2\mathbf{r}|\Psi_{f,\;p}|^2 \sigma_{DP}.
+\end{equation}
+
+The dipole cross section $\sigma_{DP}$ is written \cite{cambqcd}%\cite{gbw1998}
+\begin{align}
+	\sigma_{DP}&=\int d\mathbf{b}(1-S(\mathbf{r_1},\mathbf{r_2})) \\
+	&=\sigma_0 (1-\mathcal{S}(\mathbf{r})),
+\end{align}
+where $\mathbf{b}=\frac{\mathbf{r_1}+\mathbf{r_2}}{2}$, and $S(\mathbf{r_1},\mathbf{r_2}) =<\tr\left( U^n(\mathbf{r_1}) U^{n\dagger}(\mathbf{r_2})\right)>/N_c$\footnote{$U ^n (\mathbf{r})=P \exp\left(i g \int^{+\infty}_{-\infty}du n\mu A^c_\mu (u n+\mathbf{r}) t^c\right)$. cf. \cite{cambqcd} p483.}.
+
+
+
+
+
+
+
+
+\newpage
+\printbibliography
+
+\end{document}

@@ -20,6 +20,7 @@
 
 \usepackage[
 backend=bibtex,
+%somehow somethimes biber works and other time bibtex works...
 style=ieee
 ]{biblatex}
 \addbibresource{./ref/cambqcd.bib}
@@ -27,7 +28,7 @@ style=ieee
 \addbibresource{./ref/nikolaev1994.bib}
 \addbibresource{./ref/xiao2017.bib}
 \addbibresource{./ref/gbk2002.bib}
-
+\addbibresource{./ref/ivanov2002.bib}
 
 
 %\include{./bibliographylist}
@@ -77,6 +78,7 @@ Nikolaev et al write\cite{nikolaev1994},
 &=\frac{4 \pi \alpha_s(r) }{3}\int\frac{d^2 \mathbf{k}}{k^4}\left(1-e^{i\mathbf{k}\cdot\mathbf{r}}\right) \frac{\partial G(x_g,k^2)}{\partial \log(k^2)}
 \label{eq:niktot}
 \end{align}
+where gluon structure function $G(x,k^2)=x g(x,k^2)$.
 
 
 where, at leading order \cite{nikolaev1994},
@@ -89,10 +91,17 @@ where, at leading order \cite{nikolaev1994},
 Which is also presented in \cite{gbk2002},
 \begin{equation}
 \sigma(x,\mathbf{r})=\frac{2\pi}{3}\int\frac{d^2 \mathbf{l}}{l^4}\alpha_s f(x,l^2) (1-e^{i \pairdot{l}{r}})(1-e^{-i \pairdot{l}{r}})
+%\label{eq:gbktot}
+\end{equation}
+which is\footnote{ cf \cite{ivanov2002} eq. 4} ,
+\begin{equation}
+=\frac{4\pi}{3}\int\frac{d^2 \mathbf{l}}{l^4}\alpha_s f(x,l^2) (1-e^{i \pairdot{l}{r}})
 \label{eq:gbktot}
 \end{equation}
+note `gluon amplitude' $f$ is related to  the gluon distribution $g$ somehow... 
+at leading order that'd be $f(x,k^2)\sim  \frac{\partial G(x_g,k^2)}{\partial \log(k^2)}$ 
+%{\color{red} Something is strange about it, $\frac{\partial G(x_g,k^2)}{\partial \log(k^2)}$ still depends on the direction of $\mathbf{k}$. How can eq. \ref{eq:gbktot} and eq. \ref{eq:niktot} be the same?}% cf. eq(11) of \cite{nikolaev1994}}
 
-{\color{red} Something is strange about it, $\frac{\partial G(x_g,k^2)}{\partial \log(k^2)}$ still depends on the direction of $\mathbf{k}$. How can eq. \ref{eq:gbktot} and eq. \ref{eq:niktot} be the same?}% cf. eq(11) of \cite{nikolaev1994}}
 
 Eq. \ref{eq:gbktot} is inverted to yield \cite{gbk2002},
 \begin{equation}

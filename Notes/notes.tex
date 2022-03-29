@@ -17,6 +17,7 @@
 \usepackage{wrapfig}
 \usepackage{physics}
 \usepackage{hyperref}
+\usepackage{ragged2e}
 
 \usepackage[
 backend=bibtex,
@@ -34,6 +35,20 @@ style=ieee
 %\include{./bibliographylist}
 
 \newcommand{\pairdot}[2]{ \mathbf{#1}\cdot\mathbf{#2}  }
+\newcommand{\defentry}[3]{
+\hrulefill
+\newline
+\Centering
+#1 \newline 
+\dotfill\newline 
+%\RaggedRight
+#2 \newline 
+\RaggedRight
+#3\newline
+\RaggedRight
+\hrulefill
+\newline
+}
 
 \begin{document}
 	
@@ -67,7 +82,7 @@ where $\mathbf{b}=\frac{\mathbf{r_1}+\mathbf{r_2}}{2}$, and $S(\mathbf{r}_1,\mat
 \newline
 Photon wave functions $\Psi_{f,\;p}$ are avaiable in \cite{gbw1998} \cite{nikolaev1994}.
 
-Now, B. W. Xiao et al \cite{xiao2017} defines 
+Now, B. W. Xiao et al \cite{xiao2017} define
 \begin{equation}
 x G^{(2)}(x, k_\perp)=\frac{q_\perp^2 N_c}{2 \pi^2 \alpha_s} S_\perp \int \frac{d^2\mathbf{r}_\perp}{(2\pi)^2} e^{-i \mathbf{k}_\perp\cdot \mathbf{r}_\perp}\frac{1}{N_c}\expval{\tr U(0)U^\dagger(\mathbf{r}_\perp)}_x
 \end{equation}
@@ -120,8 +135,20 @@ hence,
 
 
 
+\section{Xiao et al \cite{xiao2017}}
+With sudakov
+\begin{multline}
+xG^{(2)}(x,k_{\perp},\zeta_c=\mu_F=Q)\\
+=- \frac{2}{\alpha_s}\int\frac{d^2x_\perp d^2 y_\perp}{(2 \pi)^4} e^{i \pairdot{k_\perp}{r_\perp}}\mathcal{H}^{DP}(\alpha_s)e^{-\mathcal{S}_{sud}(Q^2,r^2_\perp)}
+\mathbf{\nabla}^2_{r_\perp}\mathcal{F}^{DP}_{Y=1/x}(x_\perp, y_\perp).
+\end{multline}
 
+Again $\mathcal{F}^{DP}$ is related to $\sigma_{DP}$ by 
+\begin{equation}
+\sigma_{DP}=\int d\mathbf{b}(1-\mathcal{F}(x_\perp,y_\perp))
+\end{equation} 
 
+\include{./notationetc}
 
 \newpage
 \printbibliography

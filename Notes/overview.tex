@@ -25,9 +25,11 @@ GBW-BK model introduces diple cross section $\sigma_{dp}$ in the form
 
 One important feature is,
 \begin{equation}
-\lim_{r \rightarrow 0}\sigma_{GBWBK} \simeq  -\frac{\pi^2 r^2\alpha_s(\mu^2) x g(x,\mu^2)}{3},
+\lim_{r \rightarrow 0}\sigma_{GBWBK} \simeq  \frac{\pi^2 r^2\alpha_s(\mu^2) x g(x,\mu^2)}{3},
 \end{equation}
 where $g(x,\mu^2)$ is integrated gluon density. This is the limit $r \rightarrow 0$ of \hyperlink{ugd}{ $\sigma_{dp}$ in terms of unintegrated gluon density}.
+
+The scale is proposed to be $\mu^2=\frac{C}{r^2}+{\mu^2_0}$.  
  
 
 
@@ -41,6 +43,13 @@ where $g(x,\mu^2)$ is integrated gluon density. This is the limit $r \rightarrow
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{notation, miscelaneous}
+
+$k_g$ transverse momentum of gluon.\\
+$k_q$ transverse momentum of quark.\\
+$r$  dipole size.\\
+dipole scattering amplitude dissapears
+ for $r=0$ (cf. color trnsparency), and saturates to a constant for large $r$. cf.\cite{gbw1998}.
+
 
 
 \begin{equation}
@@ -59,18 +68,23 @@ where $x_0$ and $\lambda$ to be fitted.
 Scale $\mu^2$ in GBW-BK behaves like $\frac{const}{r^2}$ in small r region, and like a constant in large $r$ region.
 
 Unintegrated gluon density\hypertarget{ugd}{$f(x,k^2)$} is related to the dipole cross section $\sigma_{dp}$ by% the fourier trransform
-\cite{gbk2002}\cite{nikolaev1994}:
+\cite{gbk2002, nikolaev1994, nikolaev2001}:
 
 \begin{equation}
-\sigma_{dp}=\frac{2 \pi}{3} \int\frac{d^2 \mathbf{k}}{k^4} \alpha_s f(x,k^2) \left(1-e^{i \pairdot{k}{r}}\right).
+\sigma_{dp}=\frac{2 \pi}{3} \int\frac{d^2 \mathbf{k_g}}{k_g^4} \alpha_s f(x,k_g^2) \left(1-e^{i \pairdot{k_g}{r}}\right).
 \end{equation}
 
 and hence the fourier transform
 \begin{align}
-\nabla^2_{\mathbf{r}} \sigma_{dp}&=\frac{2 \pi}{3} \int\frac{d^2 \mathbf{k}}{k^2} \alpha_s f(x,k^2)  e^{i \pairdot{k}{r}}
+\nabla^2_{\mathbf{r}} \sigma_{dp}&=\frac{2 \pi}{3} \int\frac{d^2 \mathbf{k_g}}{k_g^2} \alpha_s f(x,k_g^2)  e^{i \pairdot{k_g}{r}}.
 \end{align}
 
-unintegrated gluon density $f(x,k^2)$ is related to the integrated gluon density $g(x,Q^2)$ by 
+In the small $r$ limit\cite{nikolaev2001}, 
+\begin{equation}
+\sigma_{dp}(x,r)=\frac{\pi^2 r^2\alpha_s(\mu^2=\frac{C}{r^2}) x g(x,\mu^2=\frac{C}{r^2})}{3}.
+\end{equation}
+
+unintegrated gluon density $f(x,k_g^2)$ is related to the integrated gluon density $g(x,Q^2)$ by 
  \begin{equation}
-x g (x,Q^2)=\int f(x,k^2)d k^2 \theta(Q^2-k^2)/k^2.
+x g (x,Q^2)=\int d k_g^2 f(x,k_g^2) \theta(Q^2-k_g^2)/k_g^2.
 \end{equation}

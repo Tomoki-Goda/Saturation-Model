@@ -6,8 +6,7 @@ CC = gcc $(INCLUDE)
 FC = gfortran
 LD = gfortran
 
-#CUBADIR=$(HOME)/heptools/Cuba-4.2
-CUBADIR=$(HOME)/Tools/Cuba-4.2
+CUBADIR=$(HOME)/heptools/Cuba-4.2
 INCLUDE += -I$(CUBADIR)/include
 
 
@@ -39,7 +38,7 @@ HEADERS = control.h\
 
 TARGET  = main
 
-all:    testcheb main graph
+all:    testcheb main
 #all:    $(TARGET) test
 #	cp $(TARGET) $(HOME)/bin
 #	mkdir $(DIRNAME)
@@ -83,12 +82,6 @@ testcheb.o: testcheb.c $(HEADERS)
 
 testcheb: testcheb.o simps.o simps2d.o bessels.o
 	$(LD) -o testcheb testcheb.o simps.o simps2d.o bessels.o $(LFLAGS)
-
-graph.o: graph.c $(HEADERS)
-	$(CC) $(CFLAGS) graph.c 
-
-graph: graph.o simps.o simps2d.o bessels.o
-	$(LD) -o graph graph.o simps.o simps2d.o bessels.o $(LFLAGS)
 
 simps.o: simps.f 
 	$(FC) -c simps.f 

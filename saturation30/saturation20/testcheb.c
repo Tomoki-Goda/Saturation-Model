@@ -4,8 +4,7 @@
 #include "cfortran.h"
 #include "functions.h"
 
-//double func(double x, double y, double z) { return z; }
-double func(double x, double y, double z) { return exp(-z); }
+//double func(double x, double y, double z) { return x+y/z; }
 
 int main(int argc, char *argv[]) {
 
@@ -16,26 +15,23 @@ int main(int argc, char *argv[]) {
   C = 2.19;
 
   double N = 100;
-  double r1min = rmin;
-  //double r1min = 1e-3;
+  double r1min = 1e-3;
   double q2min = 5e-1;
-  xmod = 1e-7;
-  Q2 = 0.045;
+  xmod = 0.00001;
+  Q2 = 4.0;
 
-  //chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&logS_gbs);
+  chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&logS_gbs);
   //chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&func);
 
 
   for (int j=0; j<N; j++) {
     double r1 = pow(rmax/r1min,j/N)*r1min;
-    //printf("%e %e %e\n", r1, func(r1, r1, r1),
-    //       chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,r1,r1,r1));
     //printf("%e %e %e\n", r1, func(xmod, Q2, r1),
     //       chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,xmod,Q2,r1));
-    //printf("%e %e %e\n", r1, S_gbs(xmod, Q2, r1), S_gbs_cheb(xmod, Q2, r1));
     printf("%e %e %e\n", r1, logS_gbs(xmod, Q2, r1),
            chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,xmod,Q2,r1));
-    //printf("%e %e %e\n", r1, sigma_gbs_exact(r1), sigma_gbs(r1));
+    //printf("%e %e %e\n", r1, S_gbs(xmod, Q2, r1), S_gbs_cheb(xmod, Q2, r1));
+    //printf("%e %e %e\n", r1, sigma_gbs(r1), sigma_gbs_cheb(r1));
   }
 
   //double r1 = 0.3;

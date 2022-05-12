@@ -1,7 +1,8 @@
 
 /* The number of proper experimental data for total reduced cross section; 
    the number of all data is 331 */
-#define  NDATA 318   // 50
+#define NDATA 500
+//#define  NDATA 318   // 50
 //#define  NDATA 222   //10
 
 /* Global arrays with the values of experimental data */
@@ -26,7 +27,7 @@ double xmoddata[NDATA];
 
 /* Limits for Q^2 and Bjorken x used to fit */
 double q_down = 0.0;
-double q_up   = 50;
+double q_up   = 10.0;
 double x_up   = 0.01;
 
 int nf2data;
@@ -59,29 +60,32 @@ double  lambda_g;
 double  C;
 double  mu02;
 
+/*GBS-G*/
+double g1, g2;
+
+
 /* Initial condition */
 //double       beta = 9.6;
 double       beta = 6.6;
 
-/* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2 */
-//double par_start[3] = {29.12, 0.277, 0.41e-04,0,0};
-double par_start[5] = {26.41, 0.2758, 5.29e-05,  1.137,    0.0};
-//double par_start[5] = {23.58, 0.270, 2.24e-04,  0.5,    0.0};
-double par_error[5] = { 1.0,  0.05,  0.2e-04,   0.01,   0.0};
-double   par_min[5] = { 0.0,  0.00,  0.0,       0.001,  0.001};
-double   par_max[5] = {40.0,  1.00,  1.0,     100.0,   50.0};
+/* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2,g1 */
+double par_start[6]={ 23.0 ,0.29 ,3.0e-4 ,1.26 ,5.0, 0.2};
+double par_error[6] = { 1.0,  0.05,  0.1e-04 ,0.01,0.01, 0.01 };
+
+double   par_min[6] = { 0.0,  0.00,  0.0,0.01, 0.0 ,  0.0};
+double   par_max[6] = {80.0,  1.00,  1.0,20.0, 20.0,  1.0 };
 
 /* BGK Starting parameter values, errors: sigma_0, A_g, lambda_g, C, mu02 */
 
 double bgk_parst[5]  = {22.40,1.35,0.079,0.38, 1.73}; /**/
-double bgk_parer[5]  = { 1.00,  0.10,  0.05, 0.10, 0.40};
-double bgk_parmin[5] = { 0.00,  0.00,  0.01, 0.10, 0.50};
+double bgk_parer[5]  = { 1.00,  0.10,  0.05, 0.05, 0.40};
+double bgk_parmin[5] = { 0.00,  0.00,  0.01, 0.01, 0.50};
 double bgk_parmax[5] = {30.00,  5.00,  0.20, 1.00, 5.00};
 
 /* Precision parameters */
 int    simpsN       = 500;  /* was 400 */
 double sigmaEPS     = 1.0e-06;
-double eps_simps2d  = 1.0e-03; /* 1.0e-05  -  does not improve much 
+double eps_simps2d  = 1.0e-02; /* 1.0e-05  -  does not improve much 
                                   1.0e-03  -  still very accurate !  */
 double STRategy     = 0.0;
 double Rmax;
@@ -109,6 +113,8 @@ int           n_f = 3;         /* Number of avtive flavours */
 double        n_0 = 0.5;       /* Maximal singluraity of integrand */
 double         Q0 = 1.0;    
 double    Lambda2 = 0.09;    /* QCD Lambda^2 = (300)^2 GeV^2 */
+double	bmax=0.5;
+
 
 /* CERNLIB functions */
 extern  double dadmul_();  /* Adaptive quadrature integral */

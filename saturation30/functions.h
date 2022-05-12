@@ -8,7 +8,7 @@
 #include "float.h"
 #include "chebyshev.h"
 #include "chebyshev3.h"
-#include "/home/tomoki/Tools/Cuba-4.2/cuba.h"
+//#include "cuba.h"
 //#include <gsl/gsl_errno.h>
 //#include <gsl/gsl_spline.h>
 
@@ -199,37 +199,61 @@ double sigma_gbw (double r) {
 * 
 *******************************************************************************/
 double sudakov(double r, double mu2) {
+    
+    //if (1/r*r < Lambda2) return 0.0; 
+    //double bmax2 = (1.26095)/(C*C);
+    //double bmax2 = pow(bmax,2.0);
 
-    double bmax2 = C*C;
+    //double mub2 = 1.26095/(r*r/(1+r*r/bmax2));
+    double mub2=C/(pow(r,2)) + mu02;
+    //printf("sud %e %e %e\n", r, mub2, mu2);
     //double mub2 = 1.26095/(r*r);
-    double mub2 = 1.26095/(r*r/(1+r*r/bmax2));
-    if (mu2 < mub2 || mu2 < Lambda2 || mub2 < Lambda2) return 0.0; 
+    if (mu2 < Lambda2 || mub2 < Lambda2|| mu2 < mub2) {/*printf("1"); */return(0.0);}; 
+    // if (pow(r,2.0) > bmax2){/*printf("2");*/ return(0.0);}; 
+       
 
     //printf("%e %e %e\n", r, mub2, mu2);
     double CA = 3.0;
-    double b0 = (33-2*n_f)/(12*pi);
+    double b0 = (33-2*n_f)/12;
+   // double b0 = (33-2*n_f)/(12*pi);
     
-    double nll = -CA/PI*log(log(mu2/Lambda2)/log(mub2/Lambda2));
+    //printf("%e\n", sqrt(bmax2)/sqrt(bmax2*mu2-1));
 
+    //if (r>sqrt(bmax2)/sqrt(bmax2*mu2-1)) return 0.0;
+    //printf("sud");
     double val = CA/(2*b0*PI)*
                  (log(mu2/Lambda2)*log(log(mu2/Lambda2)/log(mub2/Lambda2)) - 
-	         log(mu2/mub2)) + nll;
+	         log(mu2/mub2));
+    //double nll = -CA/PI*log(log(mu2/Lambda2)/log(mub2/Lambda2));
+    //val += nll;
+    //val  = val/exp(mu02*r);
     return val;
+}
+
+/******************************************************************************
+ *non perturbative sudakov...
+ * ***************************************************************************/
+double sudakov_np(double  r,double mu2){
+	double val=g1 * pow(r,2.0)/(2.0);//+ g2 * ( log(mu2/pow(Q0,2.0)) * log((pow(bmax,2.0)+pow(r,2.0))/pow(bmax,2.0))/4.0 );
+	return(val);
 }
 
 /*******************************************************************************
 * 
 *******************************************************************************/
-double sudakov_fixed(double r, double mu2) {
+double sudakov2(double r, double mu2) {
 
-    double bmax2 = C*C;
-    double mub2 = 1.26095/(r*r/(1+r*r/bmax2));
+    //double bmax2 = C*C;
+    //double mub2 = 1.26095/(r*r/(1+r*r/bmax2));
+    double mub2=C/(pow(r,2)) + mu02;
     if (mu2 < mub2 || mu2 < Lambda2 || mub2 < Lambda2) return 0.0; 
 
     double CA = 3.0;
     double b0 = (33-2*n_f)/(12*pi);
     double as = 0.2;
-    double val = as*CA*pow(log(Q2/mub2),2)/(4*pi) - as*b0*CA*log(Q2/mub2)/pi;
+    double val = as*CA*pow(log(Q2/mub2),2)/(4*pi);
+    //double nll = - as*b0*CA*log(Q2/mub2)/pi;
+    //val += nll;
 
     return val;
 }
@@ -246,10 +270,15 @@ double S_gbs_int(double* r) {
   double gbw = 
          -r[0]*log(R4int/r[0])*exp(-Qs2*r[0]*r[0]/4)*Qs2*(Qs2*r[0]*r[0]-4)/4;
 
-  if (sudflag == 1) {
+  if (sudflag >= 1) {
     double sud = exp(-sudakov(r[0],q24int));
+    //double sud = exp(-sudakov(r[0],q24int));
     //printf("#%e %e %e\n", r[0], q24int, sud);
+    
     val = gbw*sud;
+    if(sudflag==2){
+    val*=exp(-sudakov_np(r[0],q24int));
+    }
   } else if (sudflag == 0) {
     val = gbw;
   }
@@ -274,6 +303,7 @@ double S_gbs(double x, double q2, double r) {
   R4int = r;
   x4int= x;
   q24int = q2;
+  //q24int=C/(pow(r,2.0))+mu02;
 
   //printf("%e %f %e\n", x, q2, r);
   simps_(&rmi,&r,&eps,&eps,&eps, &S_gbs_int,&dum1,&int_result,&dum2,&dum3);
@@ -300,7 +330,8 @@ double logS_gbs(double x, double q2, double r) {
 *******************************************************************************/
 double S_gbs_cheb(double x, double q2, double r) {
   
-   //printf("%e %e %e\n", xmod, q2, r);
+   //printf("%e %e %e %e\n", xmod, q2, r,
+   //       exp(chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,x,q2,r)));
    return exp(chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,x,q2,r));
 }
 
@@ -322,7 +353,12 @@ double sigma_gbs (double r) {
    //printf("%e %e %e %e\n", xmod, Q2, r, S_gbs(xmod, Q2, r));
    //printf("%e %e %e %e %e\n", xmod, Q2, r, 
    //        S_gbs(xmod, Q2, r), S_gbs_cheb(xmod, Q2, r));
-   return sigma_0*S_gbs_cheb(xmod, Q2, r);
+   return sigma_0*S_gbs(xmod, Q2, r);
+   //return sigma_0*S_gbs_cheb(xmod, Q2, r);
+
+   //if (r<0.5) return sigma_0*S_gbs_cheb(xmod, Q2, r);
+   //else return sigma_gbw(r);
+
    //if (r<3) return sigma_0*S_gbs_cheb(xmod, Q2, r);
    //else sigma_0*S_gbs(xmod, Q2, r);
 }
@@ -569,7 +605,8 @@ extern double uif_gbs_c (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisqc(x[0],x[1])*sigma_gbs(x[0]);
+    value = x[0]*psisqc(x[0],x[1])*sigma_gbw(x[0]);
+    //value = x[0]*psisqc(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
 
@@ -905,6 +942,10 @@ double sigma_x (double X, double Q, double Y, double *par) {
         sigma_0 = par[0];
         lambda  = par[1];
         x_0     = par[2];
+        C       = par[3];
+	mu02    = par[4];
+	g1      = par[5];
+
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1024,6 +1065,7 @@ double sigma_l3 (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         mu02    = par[4];
+	g1      = par[5];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1148,6 +1190,7 @@ double sigma_l (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         mu02    = par[4];
+	g1      = par[5]; 
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1270,6 +1313,7 @@ double sigma_s (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         mu02    = par[4];
+        g1      = par[5]; 
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1398,6 +1442,7 @@ double sigma_c (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         mu02    = par[4];
+	g1      = par[5];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1523,6 +1568,7 @@ double sigma_b (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         mu02    = par[4];
+	g1      = par[5]; 
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -2778,8 +2824,13 @@ void printinfo (char *out_name) {
             (action==0)?"fit ":"list", MQ, Rmax_simps2d);
     fprintf(out_file,
            "    Q^2_0:   %1.1f\n",Q0);
-    fprintf(out_file," MODEL:     %s                      m_l[GeV]:  %.3f",
-            (model==0)?"gbw":"bgk",sqrt(m_fsq));
+    //char modelname[10];
+    //if(model==0){modelname="GBW"; }else if(model==1){modelname= "BGK";}else if(model==2){modelname="GBS";}
+    fprintf(out_file," MODEL:     %s                      m_l[GeV]:  %.2f",
+		  (model==0)?"GBW":((model==1)?"BGK":((model==2)? ( (sudflag==0)?"GBS, no S":((sudflag==1)?"GBW, Spert":((sudflag==2)?"GBW, S": "N/A") )):"N/A")),
+		    sqrt(m_fsq)
+	);
+            //(model==0)?"gbw":"bgk",sqrt(m_fsq));
     fprintf(out_file,
            "     q_down:   %1.1e\n",q_down);
     fprintf(out_file," DATAFORM:  %s                      m_c[GeV]:  %.3f ",
@@ -2860,14 +2911,16 @@ void fcn (int npar, double grad[], double *fcnval,
 	x_0      = par[2];
         C        = par[3]; 
         mu02     = par[4];
+	g1	 = par[5];
+	//g2 	 = par[6];
   
-        chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&logS_gbs);
+        //chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&logS_gbs);
         //printf("chebft3 done...\n", nbins);
 	//exit(1);
 
     break;
     }
-
+     //fprintf(stdout,"Initial: %e %e %e %e %e %e %.4f\n",par[0],par[1],par[2],par[3], par[4],par[5] ,*fcnval/nf2data);
     //printf("%d\n", nbins);
 
     /* Calcualte chi^2 */
@@ -2886,7 +2939,12 @@ void fcn (int npar, double grad[], double *fcnval,
         //printf("%e\n",*fcnval);
     }
     /* Print current parameters values and chi^2 */
-    printf("%e %e %e %e %e %.4f\n",par[0],par[1],par[2],par[3],par[4],*fcnval/nf2data);
+
+   printf("%e %e %e ",par[0],par[1],par[2]);
+   if(model>=1)printf("%e %e %e ",par[3], par[4],par[5]);
+   printf("%.4f /%.4f = ",(*fcnval) ,(float) nf2data);
+   printf("%.4f",((*fcnval)/((float)nf2data)) );
+   printf("\n");
     //graphdata();
     //exit(1);
 }

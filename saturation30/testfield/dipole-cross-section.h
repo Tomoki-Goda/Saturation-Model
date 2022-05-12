@@ -6,4 +6,11 @@
 
 #include"../main.h"
 
-class
+class dipole_crosssection{
+	private:
+		sigma_gbs(duble){
+			
+		}
+	public:
+		
+};

@@ -563,10 +563,10 @@ extern double uif_gbs (int *dim, double *x) {
 
     switch (flavour) {
     case 0: /* Light  only */
-        value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+        value = x[0]*psisql(x[0],x[1])*sigma_gbs(x[0]);
         break;
     case 1: /* Light + charm */
-        value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+        value = x[0]*psisqlc(x[0],x[1])*sigma_gbs(x[0]);
         break;
     case 2:
         break;
@@ -585,7 +585,7 @@ extern double uif_gbs_l (int *dim, double *x) {
 
     double value;
     //printf("Here\n");
-    value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+    value = x[0]*psisql(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
 
@@ -595,7 +595,7 @@ extern double uif_gbs_s (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+    value = x[0]*psisqs(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
 
@@ -606,7 +606,7 @@ extern double uif_gbs_c (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisqc(x[0],x[1])*sigma_gbw(x[0]);
     //value = x[0]*psisqc(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
@@ -617,7 +617,7 @@ extern double uif_gbs_b (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+    value = x[0]*psisqb(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
 
@@ -635,10 +635,10 @@ extern double uif_gbw (int *dim, double *x) {
 
     switch (flavour) {
     case 0: /* Light  only */
-        value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+        value = x[0]*psisql(x[0],x[1])*sigma_gbw(x[0]);
         break;
     case 1: /* Light + charm */
-        value = x[0]*psisql(x[0],x[1])*sigma_gbw(x[0]);
+        value = x[0]*psisqlc(x[0],x[1])*sigma_gbw(x[0]);
         break;
     case 2:
         break;
@@ -656,7 +656,7 @@ extern double uif_gbw_l (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisql(x[0],x[1])*sigma_gbw(x[0]);
     return value;
 }
 
@@ -666,7 +666,7 @@ extern double uif_gbw_s (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisqs(x[0],x[1])*sigma_gbw(x[0]);
     return value;
 }
 
@@ -677,7 +677,7 @@ extern double uif_gbw_c (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisqc(x[0],x[1])*sigma_gbw(x[0]);
     return value;
 }
 
@@ -687,7 +687,7 @@ extern double uif_gbw_b (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisqb(x[0],x[1])*sigma_gbw(x[0]);
     return value;
 }
 
@@ -707,22 +707,22 @@ extern double uif_bgk (int *dim, double *x) {
     case 0: /* Light  only */
 	switch (cheb_approx) {
 	    case 0: /* Exact value - without Chebyshev approximation */
-	    value = x[0]*psisq(x[0],x[1])*sigma_bgk(x[0]);
+	    value = x[0]*psisql(x[0],x[1])*sigma_bgk(x[0]);
 	    break;
 	    case 1: /* With Chebyshev approximation */
-	    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+	    value = x[0]*psisql(x[0],x[1])*sigma_bgk_cheb(x[0]);
 	    break;
         } 
 	break;
     case 1: /* Light + charm */
         //value = x[0]*psisqlc(x[0],x[1])*sigma_bgk_cheb(x[0]);
         light_charm  = 0;
-        value1 = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+        value1 = x[0]*psisql(x[0],x[1])*sigma_bgk_cheb(x[0]);
         light_charm  = 1;
-        value2 = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+        value2 = x[0]*psisqc(x[0],x[1])*sigma_bgk_cheb(x[0]);
         break;
     case 2: /* Charm only */
-        value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+        value = x[0]*psisqc(x[0],x[1])*sigma_bgk_cheb(x[0]);
         break;
     default:
         printf("Error: wrong 'flavour' value");
@@ -742,7 +742,7 @@ extern double uif_bgk_l (int *dim, double *x) {
         z =  x[1]  
      */
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+    value = x[0]*psisql(x[0],x[1])*sigma_bgk_cheb(x[0]);
     return value;
 }
 
@@ -755,7 +755,7 @@ extern double uif_bgk_s (int *dim, double *x) {
         z =  x[1]  
      */
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+    value = x[0]*psisqs(x[0],x[1])*sigma_bgk_cheb(x[0]);
     return value;
 }
 
@@ -768,7 +768,7 @@ extern double uif_bgk_c (int *dim, double *x) {
         z =  x[1]  
      */
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+    value = x[0]*psisqc(x[0],x[1])*sigma_bgk_cheb(x[0]);
     return value;
 }
 
@@ -781,7 +781,7 @@ extern double uif_bgk_b (int *dim, double *x) {
         z =  x[1]  
      */
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+    value = x[0]*psisqb(x[0],x[1])*sigma_bgk_cheb(x[0]);
     return value;
 }
 

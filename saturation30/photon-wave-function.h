@@ -4,7 +4,7 @@
 #include<vector>
 #include<cmath>
 
-#include"../main.h"
+//#include"main.h"
 
 class photon_psi{
 	//photon wave function.
@@ -21,8 +21,8 @@ class photon_psi{
                 double charge_sum=5.0/6.0;
 	public:
 		//constructor, default is light flavours.
-		photon_psi(){
-		set_type('l');
+		photon_psi(char type='l'){
+		set_type(type);
 		}
 		
 		void set_type(char flavourtype){
@@ -63,7 +63,7 @@ class photon_psi{
 		
 		//MAIN FUNCTION.
 		//
-		double psisq (double r, double z)  {
+		double psisq_f (double r, double z)  {
 			//!! Q2 is somehow global variable...
 			double	z_bar =  z*z+(1-z)*(1-z);
 			//double     y_bar =  (y*y)/(1+(1-y)*(1-y));
@@ -101,7 +101,25 @@ class photon_psi{
 
 
 
+extern int  flavour, fl_beauty;
 
+double psisq(double r,double x){
+	double psi=0;
+	if(flavour==0||flavour==1){
+		photon_psi psi_l('l');
+		photon_psi psi_s('s');		
+		psi+=psi_l.psisq_f(r,x)+psi_s.psisq_f(r,x);
+	};
 
+	if(flavour<3){
+		photon_psi psi_c('c');
+		psi+=psi_c.psisq_f(r,x);
+	};
+       if(flavour==3||(fl_beauty==1)){
+                photon_psi psi_b('b');
+		psi+=psi_b.psisq_f(r,x);
+        }
 
+	return(psi);
+}
 

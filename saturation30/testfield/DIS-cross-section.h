@@ -16,13 +16,13 @@ class cross_section{
 		void set_type(char f, int model_id){
 			std::string* type_p=&type;
 			std::string * model_p=&model;
-			double * integrand_p;
-					
+			
+
+
 			switch(model_id){
 				case 0:
 					*model_p="GBW";
-					integrand_p=&()
-
+					
 					break;
 				case 1:
 					*model_p="BGK";
@@ -54,14 +54,18 @@ class cross_section{
 		void show_parameters(std::string word){
 			std::cout<< "Model: "<<model<<std::endl;
 			std::cout<< "Flavour: "<<type<<std::endl;
-			std::cout<< "Something else"<<word<<std::endl;	
+			//std::cout<< "Something else"<<word<<std::endl;	
 		}
 
 
 
 
 		double sigma_f(double X, double Q, double Y, double *par) {
-			
+			//Options are, 
+			//* Flavour
+			//* Model
+			// 	
+			// 	//
 			/* Integration limits */
 			double A[2] = {amin,0.0};/* Lower limits of integration  {r,z} */
 			double B[2] = {Rmax,0.5};       /* Upper limits of integration  {r,z} */

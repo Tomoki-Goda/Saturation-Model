@@ -37,8 +37,9 @@ int max (int a, int b) {
 *******************************************************************************/
 extern void chebft (double xmi, double xma, 
              double Qmi, double Qma, 
-             int n, int m,
-             double* c , double (*func)(double,double)) {
+             int n, int m,/*
+	     double c[MX][MQ]*/
+             double* c  , double (*func)(double,double)) {
     int    k,l,i,j;  /* Counters */
     double fac = 4.0/(n*m);
     double sum;
@@ -108,7 +109,8 @@ double chebpol (int i, double x) {
 *******************************************************************************/
 double chebev (double xmi, double xma, 
                double Qmi, double Qma, 
-               int n  , int m,
+               int n  , int m,/*
+	       double c[MX][MQ],*/
                double* c , double x, double Q) {
 
     double yxcheb[n];

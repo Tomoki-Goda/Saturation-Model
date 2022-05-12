@@ -48,11 +48,19 @@ if ((action == 0)&&(model==2)) {
 	   par_start[1],par_error[1],par_min[1],par_max[1],error_flag);
     MNPARM(3,"    x_0",
 	   par_start[2],par_error[2],par_min[2],par_max[2],error_flag);
-    MNPARM(4,"C       ",
-	   par_start[3],par_error[3],par_min[3],par_max[3],error_flag);
-    MNPARM(5,"mu02    ",
-	   par_start[4],par_error[4],par_min[4],par_max[4],error_flag);
-
+    if(sudflag>=1){
+        MNPARM(4,"     C",
+	     par_start[3],par_error[3],par_min[3],par_max[3],error_flag);
+        MNPARM(5,"   mu02",
+	       par_start[4],par_error[4],par_min[4],par_max[4],error_flag);
+    };
+    if(sudflag==2){
+	MNPARM(4,"    g1",
+			par_start[5],par_error[5],par_min[5],par_max[5],error_flag);
+       // MNPARM(7,"    g2",
+         //      par_start[6],par_error[6],par_min[6],par_max[6],error_flag);
+	
+    }; 
 
     arglist[0] = STRategy;
 
@@ -61,6 +69,13 @@ if ((action == 0)&&(model==2)) {
 
     /* Minimalization procedure MIGRAD */
     MNEXCM(fcn,"MIGRAD",0,0,error_flag,0);
+    
+    /*FILE * resfile=fopen("resultGBW.txt","w");
+    fprintf(resfile, "sigma0 = %f \n lambda=%f \n x_0 = %f \n C = %f \n mu02 = %f \n ",sigma0,lambda,x_0,C,mu02 );
+    fprintf(resfile, "Q_max = %f/n Q_min = %f/n x_max = %f/n ",q_up,q_down,x_up);
+    fclose();*/
+    
+    
 }
 
 

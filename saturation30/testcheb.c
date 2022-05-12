@@ -10,17 +10,18 @@ double func(double x, double y, double z) { return exp(-z); }
 int main(int argc, char *argv[]) {
 
   // GBS update
-  sigma_0 = 21.39;
+  sigma_0 = 1.0;
+  //sigma_0 = 21.39;
   lambda = 0.26;
   x_0 = 2.23e-4;
-  C = 2.19;
+  C = 0.5;
 
   double N = 100;
   double r1min = rmin;
   //double r1min = 1e-3;
   double q2min = 5e-1;
-  xmod = 1e-7;
-  Q2 = 0.045;
+  xmod = 1e-4;
+  Q2 = 1.0;
 
   //chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&logS_gbs);
   //chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&func);
@@ -33,9 +34,10 @@ int main(int argc, char *argv[]) {
     //printf("%e %e %e\n", r1, func(xmod, Q2, r1),
     //       chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,xmod,Q2,r1));
     //printf("%e %e %e\n", r1, S_gbs(xmod, Q2, r1), S_gbs_cheb(xmod, Q2, r1));
-    printf("%e %e %e\n", r1, logS_gbs(xmod, Q2, r1),
-           chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,xmod,Q2,r1));
+    //printf("%e %e %e\n", r1, logS_gbs(xmod, Q2, r1),
+    //       chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,xmod,Q2,r1));
     //printf("%e %e %e\n", r1, sigma_gbs_exact(r1), sigma_gbs(r1));
+    printf("%e %e %e\n", r1, sigma_gbs_exact(r1), sigma_gbw(r1));
   }
 
   //double r1 = 0.3;

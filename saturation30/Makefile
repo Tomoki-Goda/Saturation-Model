@@ -6,7 +6,7 @@ CC = gcc $(INCLUDE)
 FC = gfortran
 LD = gfortran
 
-#CUBADIR=$(HOME)/heptools/Cuba-4.2
+//CUBADIR=$(HOME)/heptools/Cuba-4.2
 CUBADIR=$(HOME)/Tools/Cuba-4.2
 INCLUDE += -I$(CUBADIR)/include
 

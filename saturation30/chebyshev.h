@@ -9,8 +9,8 @@
 double coef[MX][MQ];     /* The coefficients vector */
 double xmin =  1.0e-07;  /* x lower limit */
 double xmax =  1.0e+00;  /* x upper limit */
-double Qmin =  1.0e-01;  /* Q^2 upper limit */
-double Qmax =  1.0e+03;  /* Q^2 upper limit */
+double Qmin =  4.0e-02;  /* Q^2 upper limit */
+double Qmax =  7.0e+02;  /* Q^2 upper limit */
 
 //#define  NX 20   /* The order of polynomial in x variable */
 //#define  NR 20   /* The order of polynomial in x variable */
@@ -37,8 +37,9 @@ int max (int a, int b) {
 *******************************************************************************/
 extern void chebft (double xmi, double xma, 
              double Qmi, double Qma, 
-             int n, int m,
-             double* c , double (*func)(double,double)) {
+             int n, int m,/*
+	     double c[MX][MQ]*/
+             double* c  , double (*func)(double,double)) {
     int    k,l,i,j;  /* Counters */
     double fac = 4.0/(n*m);
     double sum;
@@ -108,7 +109,8 @@ double chebpol (int i, double x) {
 *******************************************************************************/
 double chebev (double xmi, double xma, 
                double Qmi, double Qma, 
-               int n  , int m,
+               int n  , int m,/*
+	       double c[MX][MQ],*/
                double* c , double x, double Q) {
 
     double yxcheb[n];

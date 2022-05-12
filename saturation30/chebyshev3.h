@@ -3,8 +3,8 @@
 //       Date: August 2005
 //
 
-#define  NX 10   /* The order of polynomial in x variable */
-#define  NQ 10   /* The order of polynomial in x variable */
+#define  NX 15   /* The order of polynomial in x variable */
+#define  NQ 15   /* The order of polynomial in x variable */
 #define  NR 20  /* The order of polynomial in x variable */
 //double rmin =  2.0e-00;  /* r lower limit */
 //double rmax =  2.0e+01;  /* r upper limit */
@@ -20,8 +20,9 @@ double coef3[NX][NQ][NR];     /* The coefficients vector */
 extern void chebft3 (double xmi, double xma, 
              double Qmi, double Qma, 
              double rmi, double rma, 
-             int n, int m, int o,
-             double *c , double (*func)(double,double, double)) {
+             int n, int m, int o,/*
+	     double c[NX][NQ][NR]*/
+            double *c , double (*func)(double,double, double)) {
     int    k,l,q,i,j,r;  /* Counters */
     double fac = 8.0/(n*m*o);
     double sum;
@@ -92,7 +93,8 @@ extern void chebft3 (double xmi, double xma,
 double chebev3 (double xmi, double xma, 
                double Qmi, double Qma, 
                double rmi, double rma, 
-               int n  , int m, int o,
+               int n  , int m, int o,/*
+	       double c[NX][NQ][NR],*/
                double* c , double x, double Q, double r) {
 
     double yxcheb[n];

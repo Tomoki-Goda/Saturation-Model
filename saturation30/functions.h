@@ -8,7 +8,7 @@
 #include "float.h"
 #include "chebyshev.h"
 #include "chebyshev3.h"
-#include"photon-wave-function.h"
+//#include"photon-wave-function.h"
 //#include "cuba.h"
 //#include <gsl/gsl_errno.h>
 //#include <gsl/gsl_spline.h>
@@ -27,14 +27,14 @@ extern double dzerox_();
 
 /*******************************************************************************
 *******************************************************************************/
-double determine_rmax(double (*func)(double)) {
+/*double determine_rmax(double (*func)(double)) {
   int imax = 20;
   for (int i = 0; i<imax; i++) {
     double rcut = rmin + (rmax-rmin)*i/imax;
     printf("RMAX: %e %e\n",rcut, func(rcut));
   }
 }
-
+*/
 /*******************************************************************************
 * The 'light' only photon wave function - reduction cross section and F_2 form
 *******************************************************************************/
@@ -333,7 +333,7 @@ double S_gbs_cheb(double x, double q2, double r) {
   
    //printf("%e %e %e %e\n", xmod, q2, r,
    //       exp(chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,x,q2,r)));
-   return exp(chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,x,q2,r));
+   return exp(chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,*(*coef3),x,q2,r));
 }
 
 /*******************************************************************************
@@ -412,7 +412,7 @@ double sigma_bgk_cheb (double r) {
        break;
   }
   */  
-   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2); 
+   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,(*coef),xmod,mu2); 
 
 
    exnum = 0.389379*pi*pi*r*r*alpha_s(mu2)*xgpdf_cheb;
@@ -448,7 +448,7 @@ double crit_func (double Q2s[0]) {
    double xgpdf_cheb;
    double value; 
 
-   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2); 
+   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,*coef,xmod,mu2); 
    //value = 4*0.389379*pi*pi*alpha_s(mu2)*xgpdf_cheb/(3*sigma_0*Q2s[0])+log(0.3);
    value = 4*0.389379*pi*pi*alpha_s(mu2)*xgpdf_cheb/(3*sigma_0*Q2s[0])-1.0;
    //value = 4*0.389379*pi*pi*alpha_s(mu2)/(3*sigma_0*Q2s[0])-1.0;
@@ -463,7 +463,7 @@ double crit_func_frozen (double Q2s[0]) {
    double xgpdf_cheb;
    double value; 
 
-   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2); 
+   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,*coef,xmod,mu2); 
    value = 4*0.389379*pi*pi*alpha_s(mu2)*xgpdf_cheb/(3*sigma_0*Q2s[0])-1.0;
   
    return value;
@@ -538,7 +538,7 @@ double sigma_bgk_cheb_mod (double r) {
    double exnum,cacf; /* The numerator in the exp function */
    double xgpdf_cheb;
 
-   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2); 
+   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,*coef,xmod,mu2); 
    exnum = 0.389379*pi*pi*r*r*alpha_s(mu2)*xgpdf_cheb;
   
    /* If the xgpdf is negative print the warning message */
@@ -563,10 +563,10 @@ extern double uif_gbs (int *dim, double *x) {
 
     switch (flavour) {
     case 0: /* Light  only */
-        value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+        value = x[0]*psisql(x[0],x[1])*sigma_gbs(x[0]);
         break;
     case 1: /* Light + charm */
-        value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+        value = x[0]*psisqlc(x[0],x[1])*sigma_gbs(x[0]);
         break;
     case 2:
         break;
@@ -585,7 +585,7 @@ extern double uif_gbs_l (int *dim, double *x) {
 
     double value;
     //printf("Here\n");
-    value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+    value = x[0]*psisql(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
 
@@ -595,7 +595,7 @@ extern double uif_gbs_s (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+    value = x[0]*psisqs(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
 
@@ -606,7 +606,7 @@ extern double uif_gbs_c (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisqc(x[0],x[1])*sigma_gbw(x[0]);
     //value = x[0]*psisqc(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
@@ -617,7 +617,7 @@ extern double uif_gbs_b (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbs(x[0]);
+    value = x[0]*psisqb(x[0],x[1])*sigma_gbs(x[0]);
     return value;
 }
 
@@ -635,10 +635,10 @@ extern double uif_gbw (int *dim, double *x) {
 
     switch (flavour) {
     case 0: /* Light  only */
-        value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+        value = x[0]*psisql(x[0],x[1])*sigma_gbw(x[0]);
         break;
     case 1: /* Light + charm */
-        value = x[0]*psisql(x[0],x[1])*sigma_gbw(x[0]);
+        value = x[0]*psisqlc(x[0],x[1])*sigma_gbw(x[0]);
         break;
     case 2:
         break;
@@ -656,7 +656,7 @@ extern double uif_gbw_l (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisql(x[0],x[1])*sigma_gbw(x[0]);
     return value;
 }
 
@@ -666,7 +666,7 @@ extern double uif_gbw_s (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisqs(x[0],x[1])*sigma_gbw(x[0]);
     return value;
 }
 
@@ -677,7 +677,7 @@ extern double uif_gbw_c (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisqc(x[0],x[1])*sigma_gbw(x[0]);
     return value;
 }
 
@@ -687,7 +687,7 @@ extern double uif_gbw_b (int *dim, double *x) {
         z =  x[1]  */
 
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_gbw(x[0]);
+    value = x[0]*psisqb(x[0],x[1])*sigma_gbw(x[0]);
     return value;
 }
 
@@ -707,30 +707,31 @@ extern double uif_bgk (int *dim, double *x) {
     case 0: /* Light  only */
 	switch (cheb_approx) {
 	    case 0: /* Exact value - without Chebyshev approximation */
-	    value = x[0]*psisq(x[0],x[1])*sigma_bgk(x[0]);
+	    value = x[0]*psisql(x[0],x[1])*sigma_bgk(x[0]);
 	    break;
 	    case 1: /* With Chebyshev approximation */
-	    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+	    value = x[0]*psisql(x[0],x[1])*sigma_bgk_cheb(x[0]);
 	    break;
         } 
 	break;
     case 1: /* Light + charm */
         //value = x[0]*psisqlc(x[0],x[1])*sigma_bgk_cheb(x[0]);
         light_charm  = 0;
-        value1 = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+        value1 = x[0]*psisql(x[0],x[1])*sigma_bgk_cheb(x[0]);
         light_charm  = 1;
-        value2 = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+        value2 = x[0]*psisqc(x[0],x[1])*sigma_bgk_cheb(x[0]);
+	value=value1+value2;
         break;
     case 2: /* Charm only */
-        value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+        value = x[0]*psisqc(x[0],x[1])*sigma_bgk_cheb(x[0]);
         break;
     default:
         printf("Error: wrong 'flavour' value");
         break;
     }
 
-   return value1 + value2;
-   //return value;
+  // return value1 + value2;
+   return value;
 }
 
 /*******************************************************************************
@@ -742,7 +743,7 @@ extern double uif_bgk_l (int *dim, double *x) {
         z =  x[1]  
      */
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+    value = x[0]*psisql(x[0],x[1])*sigma_bgk_cheb(x[0]);
     return value;
 }
 
@@ -755,7 +756,7 @@ extern double uif_bgk_s (int *dim, double *x) {
         z =  x[1]  
      */
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+    value = x[0]*psisqs(x[0],x[1])*sigma_bgk_cheb(x[0]);
     return value;
 }
 
@@ -768,7 +769,7 @@ extern double uif_bgk_c (int *dim, double *x) {
         z =  x[1]  
      */
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+    value = x[0]*psisqc(x[0],x[1])*sigma_bgk_cheb(x[0]);
     return value;
 }
 
@@ -781,7 +782,7 @@ extern double uif_bgk_b (int *dim, double *x) {
         z =  x[1]  
      */
     double value;
-    value = x[0]*psisq(x[0],x[1])*sigma_bgk_cheb(x[0]);
+    value = x[0]*psisqb(x[0],x[1])*sigma_bgk_cheb(x[0]);
     return value;
 }
 
@@ -2035,7 +2036,7 @@ void graphdata (void) {
     FILE *fout; 
      int i,k;
 
-    char foutname[3];
+    char foutname[5];
 
    // double pmts[5] = {sigma_0,A_g,lambda_g,C,mu02};
 
@@ -2191,7 +2192,7 @@ void graph_f_2_charm (void) {
     npoints = 12;
     flavour = 2;
 
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
 
 	fout = fopen("graph_f_2_charm.dat","w");    
 
@@ -2267,7 +2268,7 @@ void graph_f_2_charm_9 (int model_graph) {
 
         printf("BGK\n");
 	fout = fopen("f2_charm_bgk.dat","w");    
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
     break;
     }
 
@@ -2331,7 +2332,7 @@ void graph_f2ch_comp (void) {
     printf("BGK for comparision with DGLAP\n");
 
     fout = fopen("f2ch_comp.dat","w");    
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
 
     npoints = 50;
 
@@ -2413,7 +2414,7 @@ void graph_f2c9q2 (int model_graph) {
 
         printf("BGK\n");
 	fout = fopen("f2_chbgkq2.dat","w");    
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
     break;
     }
 
@@ -2490,7 +2491,7 @@ void graph_f2b9q2 (int model_graph) {
 
         printf("BGK\n");
 	fout = fopen("f2_bebgkq2.dat","w");    
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
     break;
     }
 
@@ -2570,7 +2571,7 @@ void graph_f2chf2 (void) {
         /* 1st set of parameters */
 	flavour = 1;
 	par_temp[m] = bgk_parst[m]; 
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
 	//par_temp[m] = par_start[m]; 
 	for(i=0;i<4;i++) {
 	    f2a[i][0]  = sigma(x_Bj, q2charm[i],0.0,par_temp);
@@ -2583,7 +2584,7 @@ void graph_f2chf2 (void) {
         /* 2nd set of parameters */
 	flavour = 1;
 	par_temp[m] = bgk_parst[m]/2.0; 
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
 	//par_temp[m] = par_start[m]/2.0; 
 	for(i=0;i<4;i++) {
 	    f2a[i][1]  = sigma(x_Bj, q2charm[i],0.0,par_temp);
@@ -2596,7 +2597,7 @@ void graph_f2chf2 (void) {
 	/* 3rd set of parameters */
 	flavour = 1;
 	par_temp[m] = bgk_parst[m]/10.0; 
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
 	//par_temp[m] = par_start[m]/10.0; 
 	for(i=0;i<4;i++) {
 	    f2a[i][2]  = sigma(x_Bj, q2charm[i],0.0,par_temp);
@@ -2672,7 +2673,7 @@ void graph_f_2_beauty (int model_graph) {
 
         printf("BGK\n");
 	fout = fopen("f2_beauty_bgk.dat","w");    
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
     break;
     }
 
@@ -2904,7 +2905,7 @@ void fcn (int npar, double grad[], double *fcnval,
 	C        = par[3]; 
 	mu02     = par[4];
  
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
     break;
     case 2:
 	sigma_0  = par[0]; 

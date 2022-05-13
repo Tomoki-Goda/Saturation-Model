@@ -27,7 +27,7 @@ double xmoddata[NDATA];
 
 /* Limits for Q^2 and Bjorken x used to fit */
 double q_down = 0.0;
-double q_up   = 10.0;
+double q_up   = 50.0;
 double x_up   = 0.01;
 
 int nf2data;
@@ -72,7 +72,7 @@ double       beta = 6.6;
 double par_start[6]={ 23.0 ,0.29 ,3.0e-4 ,1.26 ,5.0, 0.2};
 double par_error[6] = { 1.0,  0.05,  0.1e-04 ,0.01,0.01, 0.01 };
 
-double   par_min[6] = { 0.0,  0.00,  0.0,0.01, 0.0 ,  0.0};
+double   par_min[6] = { 0.0,  0.00,  0.0,0.01, 1.0 ,  0.0};
 double   par_max[6] = {80.0,  1.00,  1.0,20.0, 20.0,  1.0 };
 
 /* BGK Starting parameter values, errors: sigma_0, A_g, lambda_g, C, mu02 */
@@ -109,7 +109,7 @@ double       m_b  = 21.16;   /* Bottom quark mass in GeV^2 */
 
 double       norm = 0.08282813;     /* \Psi^2 normalization */
 double       hc2  = 0.389379;
-int           n_f = 3;         /* Number of avtive flavours */
+int           n_f = 5;         /* Number of avtive flavours */
 double        n_0 = 0.5;       /* Maximal singluraity of integrand */
 double         Q0 = 1.0;    
 double    Lambda2 = 0.09;    /* QCD Lambda^2 = (300)^2 GeV^2 */

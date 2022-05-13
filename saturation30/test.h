@@ -173,7 +173,7 @@ void comp_xgpdf_ec (void) {
 
 
     /* Perform chebyshev approximation for xgpdf */
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
  
 
     /* List comparison of my xpdf and K.-G.-B. xpdf */
@@ -186,7 +186,7 @@ void comp_xgpdf_ec (void) {
 
 
 	xgpdf_exact = xgpdf(xmoddata[i],q2data[i]);
-        xgpdf_cheb  = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,
+        xgpdf_cheb  = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,*coef,
                              xmoddata[i],q2data[i]);
         exact_cheb_diff = fabs(xgpdf_exact - xgpdf_cheb);
         
@@ -245,7 +245,7 @@ void comp_int (void) {
 
     /* Perform chebyshev approximation for xgpdf */
     if (model == 1)
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
 
     FILE *out_file;
     out_file = fopen("result__.txt","w");
@@ -316,7 +316,7 @@ void dadmul_test (void) {
     C        = bgk_parst[3]; 
     mu02     = bgk_parst[4];
 
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
 
     //B[0] = 1.0;
     B[0] = D[0];

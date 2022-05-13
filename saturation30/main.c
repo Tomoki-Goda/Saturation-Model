@@ -55,7 +55,7 @@ if ((action == 0)&&(model==2)) {
 	       par_start[4],par_error[4],par_min[4],par_max[4],error_flag);
     };
     if(sudflag==2){
-	MNPARM(4,"    g1",
+	MNPARM(6,"    g1",
 			par_start[5],par_error[5],par_min[5],par_max[5],error_flag);
        // MNPARM(7,"    g2",
          //      par_start[6],par_error[6],par_min[6],par_max[6],error_flag);
@@ -232,7 +232,7 @@ if (action == 1) {
 	C        = bgk_parst[3]; 
 	mu02     = bgk_parst[4]; 
 	/* Perform chebyshev approximation for xgpdf */
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
     break;
     }
 
@@ -440,7 +440,7 @@ if (action == 100) {
     mu02     = bgk_parst[4]; 
 
 
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
 
     xmod = 1.0e-02;
 

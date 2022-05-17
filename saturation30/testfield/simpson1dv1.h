@@ -1,10 +1,17 @@
+////////////////////////////////////////////////////
+//
+// Tomoki Goda
+// Simpson's approximation of 1 dimensional integration.
+// May 2022
+//
+////////////////////////////////////////////////////
 #include<stdlib.h>
 #include<stdio.h>
 #include<math.h>
 
 ////////////////////////////////////////////////////
 #define N 2 //simpsons approx with term 2*n+1. 
-#define MAX_SECTOR 10
+#define MAX_SECTOR 20
 #define MIN_SECTOR 2 
 ////////////////////////////////////////////////////
 
@@ -97,14 +104,15 @@ void sectors_summary(double *sect_res, double* sect_err,unsigned int sector_n, d
 	}
 	*posit=dpos;
 	*max_err=max;
-	fprintf(stdout,"Current result: %f\t +- %f, ( %f percent ).\t%d sectors \n",*res,*error ,(100.0*(*error)/(*res)), sector_n );
+	//fprintf(stdout,"Current result: %.3e\t +- %.2e, ( %.1e percent ).\t%d sectors \n",*res,*error ,(100.0*(*error)/(*res)), sector_n );
 	
 }
 
 void divide_sector(double(*func)(double),double* x_val,double* y_val, unsigned int position, unsigned int *sector_n, unsigned int * weight){
-	//take list of 5 points for each sector and for the position, sector will be split,
-	//resulting two sectors are stored in the original place and theo ther half will be appended to the list. 
-	//weight will be updated for the resultant sectors
+	//take list of 5 points for each sector. And at the give position, sector will be split,
+	//resulting two sectors are stored in the original place and theother half will be appended to the list.
+	//for this, resulting x_val and y_val are not in the right order after splitting. 
+	//weight will be updated for the resultant sectors to account for the halving of the step size.
 	unsigned int start=(2*N+1)*position;
 	unsigned int appen=(2*N+1)*(*sector_n);
 
@@ -138,9 +146,12 @@ void divide_sector(double(*func)(double),double* x_val,double* y_val, unsigned i
 			
 }
 
-void simpson_sector(double (*function)(double ),double x_max, double x_min, double *res, double *error ){
-	double reps=0.001;
-	double aeps=0.001;
+void simpson_sector(double (*function)(double ),double x_max, double x_min,double aeps, double reps, double *res, double *error ){
+	//main function
+	//evaluate integral by dividing in small regions and use 2*N+1 term  simpson's approximation.
+	//
+	//double reps=0.001;
+	//double aeps=0.001;
 	
 	*res=0.0;
 	*error=0.0;
@@ -157,8 +168,8 @@ void simpson_sector(double (*function)(double ),double x_max, double x_min, doub
 	unsigned int weight[MAX_SECTOR];
 	for(unsigned int i=0;i<MAX_SECTOR;i++){
 		*(weight+i)=1;
-	}//init
-	
+	}
+	///////////////initial evaluation ///////////////////////
 	simpson_evaluate(function ,x_max, x_min,*x_val, *y_val );
 	
 	double step=(x_max-x_min)/(2*N*MIN_SECTOR);
@@ -166,8 +177,9 @@ void simpson_sector(double (*function)(double ),double x_max, double x_min, doub
 	//now we have x_val and y_val which are list of 5 points, 
 	//then now convert them to the integral and error estimate.
 	//and put them in sect_res and sect_err.
-	
-	for(unsigned j =0; j<(MAX_SECTOR-MIN_SECTOR);j++){
+	//If quality is not good enough, add more sampling points by dividing sectors. 
+	//until it reaches the max recursion or aimed error.
+	for(unsigned j =0; j<=(MAX_SECTOR-MIN_SECTOR);j++){
 		for(unsigned int i=0; i< sector_n;i++){
 			simpson_error(((*x_val) +i*sector_len),((*y_val)+i*sector_len), (sect_err+i));
 			simpson_sum(  ((*y_val) +i*sector_len),      step/(*(weight+i))        , (sect_res+i));
@@ -176,29 +188,25 @@ void simpson_sector(double (*function)(double ),double x_max, double x_min, doub
 			//printf(" weight: %d\n",(*(weight+i)) );
 			//printf("\n");
 		}
-		printf("\n");
+		//printf("\n");
 		/////////////////////////////////////////////////////////////////////////////////
 		
 		sectors_summary(sect_res,sect_err, sector_n, res, error, &div_pos, &max_err);
+		//fprintf(stdout,"Current result: %.4e\t +- %.2e, ( %.1e percent ).\t%d sectors \n",*res,*error ,(100.0*(*error)/(*res)), sector_n );
 		//////////////////////////////////////////////////////////////////////////////////
-		
-		printf("Divide Sector %d\n", div_pos+1);
-		
-		divide_sector(function,*x_val, *y_val, div_pos, &sector_n, weight);
-		//printf("sector number : %d\n", sector_n);
-		//printf("new weight: %d\n",*(weight+sector_n-1));
-		
 		if((*error)<aeps){
 			break;
 		}
-		if(((*error)/(*res))< reps){
+		if( ((*error)/(*res))<  reps  ){
 			break;
 		}
+		//printf("Divide Sector %d\n", div_pos+1);
+		////////////////sector division/////////////////////////	
+		divide_sector(function,*x_val, *y_val, div_pos, &sector_n, weight);
+		if(j>=(MAX_SECTOR-MIN_SECTOR)){
+		        printf("reached limit.\n");
+		}
 	}
-
-	
-	
-	
 }
 
 

@@ -27,7 +27,7 @@ double xmoddata[NDATA];
 
 /* Limits for Q^2 and Bjorken x used to fit */
 double q_down = 0.0;
-double q_up   = 50.0;
+double q_up   = 10.0;
 double x_up   = 0.01;
 
 int nf2data;

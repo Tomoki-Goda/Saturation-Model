@@ -45,7 +45,7 @@ double sigma_gbw(double r, double x,double Q2, double * par){
 double sigma_bgk(double r, double x, double Q2, double * par){
 	double sigma_0		=par[0];
 	double A_g		=par[1];
-	double lambda_g	=par[2];
+	double lambda_g		=par[2];
 	double C		=par[3];
 	double mu02		=par[4];
 	
@@ -60,7 +60,25 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBS ////////////////////////////
 /////////////////////////////////////////////////////////////
+double sudakov(double r, double mu2,double* par) {
+	//pertubative sudakov
+	double C=*(par);
+	double mu02=*(par+1);
+
+	double mub2=C/(pow(r,2)) + mu02;
+	if (mu2 < Lambda2 || mub2 < Lambda2|| mu2 < mub2) {
+		return(0.0);
+	}
+	
+	double b0 = (11*CA-2*NF)/12;
+	double val = CA/(2*b0*PI)*(log(mu2/LQCD2)*log(log(mu2/LQCD2)/log(mub2/LQCD2))-log(mu2/mub2));
+    return val;
+}
+
 class gbs_int{
+
+//create an object gbs_int. 
+// then obj.sigma_gbs(r,x,Q2,par) return the value.
 	private:
 		double Q2;
 		double x;
@@ -69,17 +87,27 @@ class gbs_int{
 		
 		double x_0=par[2];
 		double lambda=par[1];
+		double *sudpar=(par+3);//for sudakov 4th and 5th
 
 		double Qs2 =pow(x_0/x, lambda);
 		
 		double integrand(double *r_ptr){
 			double r=*r_ptr;
 			double laplacian_sigma=-r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
-			return sudakov(r,Q2) *laplacian_sigma;
+			return( sudakov(r,Q2,sudpar) *laplacian_sigma);
 		}
 		
 	public:
-		gbs_int(double x,double Q2,double R,double *par);
+		gbs_int(double X,double q2,double r, double *param){
+				set_variables( X, q2,r,  *param)
+		}
+		void set_variables(double X,double q2,double r, double *param){
+			//set global
+			x=X;
+			Q2=q2;
+			R=r;
+			par=param;			
+		}
 	
 		double integrate(){
 			double res=0;
@@ -92,12 +120,13 @@ class gbs_int{
 				
 			return(res);
 		}
+		double sigma_gbs(double r, double x, double Q2, double * par,){
+			sigma_gbs_i.set_variables(x,Q2,r,par);
+			return(sigma_gbs_i.integrate());
+		}
+
 }; 
 
-double sigma_gbs(double r, double x, double Q2, double * par){
-	gbs_int sigma(x,Q2,r,par);
-	return(sigma.integrate());
-}
 
 ///////////////////////////////////////////////////////////
 ////////////////// all together //////////////////////////

@@ -6,7 +6,9 @@
 #define  MX 22   /* The order of polynomial in x variable */
 #define  MQ 20   /* The order of polynomial in Q^2 variable */
 
-double coef[MX][MQ];     /* The coefficients vector */
+
+//double coef[MX][MQ];     /* The coefficients vector */
+double coef[MX * MQ];     /* The coefficients vector */
 double xmin =  1.0e-07;  /* x lower limit */
 double xmax =  1.0e+00;  /* x upper limit */
 double Qmin =  4.0e-02;  /* Q^2 upper limit */

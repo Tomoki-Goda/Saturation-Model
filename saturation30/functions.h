@@ -235,7 +235,9 @@ double sudakov(double r, double mu2) {
  *non perturbative sudakov...
  * ***************************************************************************/
 double sudakov_np(double  r,double mu2){
-	double val=g1 * pow(r,2.0)/(2.0);//+ g2 * ( log(mu2/pow(Q0,2.0)) * log((pow(bmax,2.0)+pow(r,2.0))/pow(bmax,2.0))/4.0 );
+	double val=g1 * pow(r,2.0)/(2.0) + g2 * ( log(mu2/pow(Q0,2.0)) * log( 1+(mu02* pow(r,2)/C ))/4.0 );
+
+	//double val=g1 * pow(r,2.0)/(2.0) + g2 * ( log(mu2/pow(Q0,2.0)) * log((pow(bmax,2.0)+pow(r,2.0))/pow(bmax,2.0))/4.0 );
 	return(val);
 }
 
@@ -333,7 +335,7 @@ double S_gbs_cheb(double x, double q2, double r) {
   
    //printf("%e %e %e %e\n", xmod, q2, r,
    //       exp(chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,x,q2,r)));
-   return exp(chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,*(*coef3),x,q2,r));
+   return exp(chebev3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,x,q2,r));
 }
 
 /*******************************************************************************
@@ -412,7 +414,7 @@ double sigma_bgk_cheb (double r) {
        break;
   }
   */  
-   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,(*coef),xmod,mu2); 
+   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2); 
 
 
    exnum = 0.389379*pi*pi*r*r*alpha_s(mu2)*xgpdf_cheb;
@@ -448,7 +450,7 @@ double crit_func (double Q2s[0]) {
    double xgpdf_cheb;
    double value; 
 
-   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,*coef,xmod,mu2); 
+   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2); 
    //value = 4*0.389379*pi*pi*alpha_s(mu2)*xgpdf_cheb/(3*sigma_0*Q2s[0])+log(0.3);
    value = 4*0.389379*pi*pi*alpha_s(mu2)*xgpdf_cheb/(3*sigma_0*Q2s[0])-1.0;
    //value = 4*0.389379*pi*pi*alpha_s(mu2)/(3*sigma_0*Q2s[0])-1.0;
@@ -463,7 +465,7 @@ double crit_func_frozen (double Q2s[0]) {
    double xgpdf_cheb;
    double value; 
 
-   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,*coef,xmod,mu2); 
+   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2); 
    value = 4*0.389379*pi*pi*alpha_s(mu2)*xgpdf_cheb/(3*sigma_0*Q2s[0])-1.0;
   
    return value;
@@ -538,7 +540,7 @@ double sigma_bgk_cheb_mod (double r) {
    double exnum,cacf; /* The numerator in the exp function */
    double xgpdf_cheb;
 
-   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,*coef,xmod,mu2); 
+   xgpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2); 
    exnum = 0.389379*pi*pi*r*r*alpha_s(mu2)*xgpdf_cheb;
   
    /* If the xgpdf is negative print the warning message */
@@ -947,7 +949,7 @@ double sigma_x (double X, double Q, double Y, double *par) {
         C       = par[3];
 	mu02    = par[4];
 	g1      = par[5];
-
+	g2	= par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1068,6 +1070,7 @@ double sigma_l3 (double X, double Q, double Y, double *par) {
         C       = par[3]; 
         mu02    = par[4];
 	g1      = par[5];
+	g2	= par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1192,7 +1195,8 @@ double sigma_l (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         mu02    = par[4];
-	g1      = par[5]; 
+	g1      = par[5];
+       g2	= par[6];	
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1316,7 +1320,7 @@ double sigma_s (double X, double Q, double Y, double *par) {
         C       = par[3]; 
         mu02    = par[4];
         g1      = par[5]; 
-
+	g2	= par[6];
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
         //    &result, &relerr, &nfnevl, &ifail);
@@ -1445,6 +1449,7 @@ double sigma_c (double X, double Q, double Y, double *par) {
         C       = par[3]; 
         mu02    = par[4];
 	g1      = par[5];
+	g2	= par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1571,6 +1576,7 @@ double sigma_b (double X, double Q, double Y, double *par) {
         C       = par[3]; 
         mu02    = par[4];
 	g1      = par[5]; 
+	g2	= par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -2192,7 +2198,7 @@ void graph_f_2_charm (void) {
     npoints = 12;
     flavour = 2;
 
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
 
 	fout = fopen("graph_f_2_charm.dat","w");    
 
@@ -2268,7 +2274,7 @@ void graph_f_2_charm_9 (int model_graph) {
 
         printf("BGK\n");
 	fout = fopen("f2_charm_bgk.dat","w");    
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     break;
     }
 
@@ -2332,7 +2338,7 @@ void graph_f2ch_comp (void) {
     printf("BGK for comparision with DGLAP\n");
 
     fout = fopen("f2ch_comp.dat","w");    
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
 
     npoints = 50;
 
@@ -2414,7 +2420,7 @@ void graph_f2c9q2 (int model_graph) {
 
         printf("BGK\n");
 	fout = fopen("f2_chbgkq2.dat","w");    
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     break;
     }
 
@@ -2491,7 +2497,7 @@ void graph_f2b9q2 (int model_graph) {
 
         printf("BGK\n");
 	fout = fopen("f2_bebgkq2.dat","w");    
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     break;
     }
 
@@ -2571,7 +2577,7 @@ void graph_f2chf2 (void) {
         /* 1st set of parameters */
 	flavour = 1;
 	par_temp[m] = bgk_parst[m]; 
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
 	//par_temp[m] = par_start[m]; 
 	for(i=0;i<4;i++) {
 	    f2a[i][0]  = sigma(x_Bj, q2charm[i],0.0,par_temp);
@@ -2584,7 +2590,7 @@ void graph_f2chf2 (void) {
         /* 2nd set of parameters */
 	flavour = 1;
 	par_temp[m] = bgk_parst[m]/2.0; 
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
 	//par_temp[m] = par_start[m]/2.0; 
 	for(i=0;i<4;i++) {
 	    f2a[i][1]  = sigma(x_Bj, q2charm[i],0.0,par_temp);
@@ -2597,7 +2603,7 @@ void graph_f2chf2 (void) {
 	/* 3rd set of parameters */
 	flavour = 1;
 	par_temp[m] = bgk_parst[m]/10.0; 
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
 	//par_temp[m] = par_start[m]/10.0; 
 	for(i=0;i<4;i++) {
 	    f2a[i][2]  = sigma(x_Bj, q2charm[i],0.0,par_temp);
@@ -2673,7 +2679,7 @@ void graph_f_2_beauty (int model_graph) {
 
         printf("BGK\n");
 	fout = fopen("f2_beauty_bgk.dat","w");    
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     break;
     }
 
@@ -2905,7 +2911,7 @@ void fcn (int npar, double grad[], double *fcnval,
 	C        = par[3]; 
 	mu02     = par[4];
  
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     break;
     case 2:
 	sigma_0  = par[0]; 
@@ -2914,7 +2920,7 @@ void fcn (int npar, double grad[], double *fcnval,
         C        = par[3]; 
         mu02     = par[4];
 	g1	 = par[5];
-	//g2 	 = par[6];
+	g2 	 = par[6];
   
         //chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&logS_gbs);
         //printf("chebft3 done...\n", nbins);
@@ -2943,7 +2949,8 @@ void fcn (int npar, double grad[], double *fcnval,
     /* Print current parameters values and chi^2 */
 
    printf("%e %e %e ",par[0],par[1],par[2]);
-   if(model>=1)printf("%e %e %e ",par[3], par[4],par[5]);
+   if(model>=1)printf("%e %e ",par[3], par[4]);
+   if((model>=2)&&(sudflag=2)){printf("%e %e ",par[5],par[6]);}
    printf("%.4f /%.4f = ",(*fcnval) ,(float) nf2data);
    printf("%.4f",((*fcnval)/((float)nf2data)) );
    printf("\n");

@@ -171,7 +171,7 @@ void graph_fl () {
 	lambda_g = bgk_parst[2]; 
 	C        = bgk_parst[3]; 
 	mu02     = bgk_parst[4]; 
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     break;
     }
 
@@ -261,7 +261,7 @@ void graph_flq2 (int model_graph,int flavour_graph) {
         printf(" and saving it in flq2_bgk.dat\n");
 
 	out_file = fopen("flq2_bgk.dat","w");
-	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+	chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     break;
     }
  
@@ -302,7 +302,7 @@ void graph_crit_line(int model_graph) {
     printf("BGK\n");
     //out_file = fopen("crit_linel.dat","w");
     out_file = fopen("crit_linecb.dat","w");
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
  
     npoints = 25;
 
@@ -341,7 +341,7 @@ void graph_sat_scale(void) {
 
     printf("BGK\n");
     out_file = fopen("sat_scale.dat","w");
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
  
     npoints = 20;
 
@@ -381,7 +381,7 @@ void graph_sat_scale_05(void) {
 
     printf("BGK\n");
     out_file = fopen("sat_scale0.dat","w");
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
  
     npoints = 20;
 
@@ -445,7 +445,7 @@ void alpha_fpdf_graph(void) {
 
     printf("\nCalculating alpha_fpdf(x,l^2) in BGK model...\n");
 
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     for (i=0;i<NPOINTS;i++) {
         l2_g[i] = 1.0e-02*pow(10,0.1*i);
 
@@ -519,7 +519,7 @@ void graph_dipole_scaling (void) {
 
     npoints = 70;
 
-    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,*coef, &xgpdf);
+    chebft(xmin,xmax,Qmin,Qmax,MX,MQ,coef, &xgpdf);
     delta = (log10(30)-log10(rmin))/npoints; /* Logarithmic x-scale */
 
 	fout = fopen("dipol_scaling.dat","w");    

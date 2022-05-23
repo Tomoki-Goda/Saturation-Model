@@ -4,13 +4,12 @@
 #include<vector>
 #include<fstream>
 */
-#include<stdio.h>
-#include<math.h>
+//#include<stdio.h>
+//#include<math.h>
 //#include"../main.h"
-#include"./constants.h"
-#include"./intfordp.h"
+//#include"./constants.h"
+//#include"./simpson-integral.h"
 //#include"../gluons.h"
-
 
 #define BGK 0
 #define UNIFY 1 
@@ -26,6 +25,27 @@ double alpha_s(double mu2 ){
 	return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 	
 }
+
+double mod_x(double x,double Q2, unsigned char flavour){
+ double m_fsq;
+
+        switch(flavour){
+                case 'l':
+                        m_fsq=MASS_L2;
+                        break;
+                case 's':
+                        m_fsq=MASS_S2;
+                        break;
+                case 'c':
+                        m_fsq=MASS_C2;
+                        break;
+                case 'b':
+                        m_fsq=MASS_B2;
+                        break;
+        }
+        return ( x*(1+4*m_fsq/Q2) );
+}
+
 
 //in simps.f
 //extern "C" double simps_(double *, double *, double *,double *,double* ,double(*)(double*), double *  ,double *,double* ,double *);
@@ -75,7 +95,7 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 //////////////////////////// GBS ////////////////////////////
 /////////////////////////////////////////////////////////////
 double sudakov(double r, double mu2,double* par) {
-	//pertubative sudakov
+	//pertubative+non-perturbative sudakov
 	double C= (*(par));
 	double r_max=( *(par+1));
 	double g1=(*(par+2));
@@ -93,7 +113,7 @@ double sudakov(double r, double mu2,double* par) {
 }
 
 
-double integrand_gbs(double r, double **par ){
+double integrand_gbs(double r, double *par[2] ){
 	//for the integral integrand has to be in the form 
 	//func(double , double**) where integration is over the first argument. second are constants to be passed.
 	//hence the following constant  parameters.
@@ -119,6 +139,7 @@ double integrand_gbs(double r, double **par ){
 
 double sigma_gbs(double r, double x, double Q2, double * par){
 	double param[3]={r,x,Q2};
+
 	double *param_ptr[2]={param, par};
 	double result=0;
 	simpson1d(&integrand_gbs, param_ptr,0.0,r,&result);
@@ -134,20 +155,7 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 double sigma(double  r, double x, double Q2, double * par,unsigned model,unsigned char flavour){
 
 	double (*funcptr)( double , double , double , double *);
-	double m_fsq;
-
-	switch(flavour){
-		case 'l':
-			m_fsq=MASS_L2;
-			break;
-		case 'c':
-			m_fsq=MASS_C2;
-			break;
-		case 'b':
-			m_fsq=MASS_B2;
-			break;
-	}
-	double x_mod =x*(1+4*m_fsq/Q2);
+	double x_mod =mod_x(x,Q2,flavour);
 
 	switch (model){
 		case 0:

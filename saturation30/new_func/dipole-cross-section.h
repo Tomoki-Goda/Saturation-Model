@@ -24,30 +24,7 @@ double alpha_s(double mu2 ){
 	double b0= ((double)(33 -2*NF))/(12*PI);
 	return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 	
-}
-
-double mod_x(double x,double Q2, unsigned char flavour){
- double m_fsq;
-
-        switch(flavour){
-                case 'l':
-                        m_fsq=MASS_L2;
-                        break;
-                case 's':
-                        m_fsq=MASS_S2;
-                        break;
-                case 'c':
-                        m_fsq=MASS_C2;
-                        break;
-                case 'b':
-                        m_fsq=MASS_B2;
-                        break;
-        }
-        return ( x*(1+4*m_fsq/Q2) );
-}
-
-
-//in simps.f
+}//in simps.f
 //extern "C" double simps_(double *, double *, double *,double *,double* ,double(*)(double*), double *  ,double *,double* ,double *);
 
 /////////////////////////////////////////////////////////////
@@ -151,25 +128,36 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 ///////////////////////////////////////////////////////////
 ////////////////// all together //////////////////////////
 //////////////////////////////////////////////////////////
-#if UNIFY
-double sigma(double  r, double x, double Q2, double * par,unsigned model,unsigned char flavour){
+
+//#if UNIFY
+/*
+ * double sigma(double  r, double x, double Q2, double * par,unsigned model,unsigned char flavour){
 
 	double (*funcptr)( double , double , double , double *);
 	double x_mod =mod_x(x,Q2,flavour);
 
-	switch (model){
-		case 0:
-			funcptr=&sigma_gbw;
-			break;
-		case 1:
-			funcptr=&sigma_bgk;
-			break;
-		case 2:
-			funcptr=&sigma_gbs;
-			break;
-		}
+//	switch (model){
+//		case 0:
+//			funcptr=&sigma_gbw;
+//			break;
+//		case 1:
+//			funcptr=&sigma_bgk;
+//			break;
+//		case 2:
+//			funcptr=&sigma_gbs;
+//			break;
+//		}
+
+	#if MODEL==0
+	funcptr=&sigma_gbw;
+	#elif MODEL==1
+	funcptr=&sigma_bgk;
+	#elif MODEL==2
+	funcptr=&sigma_gbs;
+	#endif
+
 	return( (*funcptr)(r,x_mod,Q2,par));
 	
 }
-#endif
-
+//#endif
+*/

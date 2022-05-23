@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<math.h>
+#include<time.h>
 
 #include"./constants.h"
 #define MODEL 2 
@@ -16,6 +17,8 @@
 
 
 int main(){
+	fprintf(stdout,"started\n");
+
 	FILE* file=fopen("./sigma.m", "w");
 	fprintf(file, "{");
 	double x=1.0e-3;
@@ -24,11 +27,14 @@ int main(){
 
 	double res;
 	double q2;
+	clock_t time;
 	for(unsigned i=0;i<100;i++){
 		q2=1.0e-3+10*i;
+		time=clock();
 		res=sigma_DIS(x,q2,1,par);
+		time-=clock();
 		fprintf(file, "{%f,%f},",q2,res);
-		printf( "{%f,%f},",q2,res);
+		fprintf(stdout, "{%.3e,%.3e} : %.3e ,\n",q2,res, -((double)time)/CLOCKS_PER_SEC);
 
 	}
 	fprintf(file,"\b}");

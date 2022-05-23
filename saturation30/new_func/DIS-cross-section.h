@@ -8,6 +8,32 @@
 
 
 //#define FLAVOUR 2 
+#if MODEL==0
+#define SIGMA sigma_gbw
+#elif MODEL==1
+#define SIGMA sigma_bgk
+#elif MODEL==2
+#define SIGMA sigma_gbs
+#endif
+double mod_x(double x, double Q2, unsigned char flavour) {
+	double m_fsq;
+
+	switch (flavour) {
+	case 'l':
+		m_fsq = MASS_L2;
+		break;
+	case 's':
+		m_fsq = MASS_S2;
+		break;
+	case 'c':
+		m_fsq = MASS_C2;
+		break;
+	case 'b':
+		m_fsq = MASS_B2;
+		break;
+	}
+	return (x * (1 + 4 * m_fsq / Q2));
+}
 
 double sigma_integrand(double R,double z,double * par[2]){
 
@@ -16,28 +42,25 @@ double sigma_integrand(double R,double z,double * par[2]){
 	double jacob=pow(1-R,-2);	
 	double x=(*(*par));
 	double Q2=(*( (*par)+1 ));
-
-       	double* param=( *(par+1) );
-	double value=0;
 	
-
-	#if FLAVOUR==0
-       		value=sigma(r,x,Q2,param,MODEL,'l')*psisq_f(r,z,Q2,  'l' );
-                value+=sigma(r,x,Q2,param,MODEL,'s')*psisq_f(r,z,Q2, 's' );
-	#else 
-		#if FLAVOUR==1
-		       	value=sigma(r,x,Q2,param,MODEL,'l')*psisq_f(r,z,Q2,  'l' );
-                	value+=sigma(r,x,Q2,param,MODEL,'s')*psisq_f(r,z,Q2, 's' );
-                	value+=sigma(r,x,Q2,param,MODEL,'c')*psisq_f(r,z,Q2, 'c' );
-		#else 
-			#if FLAVOUR==2
-        		value=sigma(r,x,Q2,param,MODEL,'l')*psisq_f(r,z,Q2,  'l' );
-			value+=sigma(r,x,Q2,param,MODEL,'s')*psisq_f(r,z,Q2, 's' );
-			value+=sigma(r,x,Q2,param,MODEL,'c')*psisq_f(r,z,Q2, 'c' );
-			value+=sigma(r,x,Q2,param,MODEL,'b')*psisq_f(r,z,Q2, 'b' );
-			#endif
-		#endif
+	double* param=( *(par+1) );
+	double value=0;
+	//double x_mod[4];
+	
+	#if FLAVOUR==0	
+       		value=SIGMA(r,mod_x(x,Q2,'l'), Q2, param) * psisq_f(r, z, Q2, 'l');
+                value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_f(r, z, Q2, 's');
+	#elif FLAVOUR==1
+		       	value=SIGMA(r,mod_x(x,Q2,'l'), Q2, param) * psisq_f(r, z, Q2, 'l');
+                	value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_f(r, z, Q2, 's');
+                	value+=SIGMA(r,mod_x(x,Q2,'c'), Q2, param) * psisq_f(r, z, Q2, 'c');
+	#elif FLAVOUR==2
+        		value=SIGMA(r,mod_x(x,Q2,'l'),Q2, param) * psisq_f(r, z, Q2, 'l');
+			value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_f(r, z, Q2, 's');
+			value+=SIGMA(r,mod_x(x,Q2,'c'), Q2, param) * psisq_f(r, z, Q2, 'c');
+			value+=SIGMA(r,mod_x(x,Q2,'b'), Q2, param) * psisq_f(r, z, Q2, 'b');
 	#endif
+
 	return(jacob*r*value);
 }
 

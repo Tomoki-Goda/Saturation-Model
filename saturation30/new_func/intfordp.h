@@ -5,17 +5,27 @@
   //         double *,double *,double* ,double(*)(double*), double *  ,double *,double* ,double *);
 
 void simpson1d(double(*function)(double ,double**), double ** par ,double min, double max,double *res){
+	if(fabs(max-min)<1.0e-15){
+		*res=0.0;
+		printf("min=max %.3e\n" ,*res);
+
+	}else{
+
 	unsigned n=25;//2*n+1 terms in the sum
 	double step= (max-min)/(2*n);
 	double result=0;
 	//double func =(*function);
 
 	result+=(*function)(min,par)+(*function)(max,par);
-	
-	for(unsigned i=1;i <= n;i++){
+	//printf("init: %f\n",result);
+
+	for(unsigned i=1;i <= n;i++){	
 		(i!=n)?(  result+=4*(*function)(min+(2*i-1)*step ,par)+2*(*function)(min+2*i*step, par)  ) :( result+=4*(*function)(min+(2*i-1)*step ,par) );
+		//printf("%f\n",result);
 	}
 	*res=result*step /3;
+	//printf("%f %f %.3e\n" ,min,max,*res);
+	}
 }	
 
 unsigned simpcoeff(unsigned * pos,unsigned* len, unsigned dim){

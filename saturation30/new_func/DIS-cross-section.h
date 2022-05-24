@@ -59,6 +59,12 @@ double sigma_integrand(double R,double z,double * par[2]){
 			value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_f(r, z, Q2, 's');
 			value+=SIGMA(r,mod_x(x,Q2,'c'), Q2, param) * psisq_f(r, z, Q2, 'c');
 			value+=SIGMA(r,mod_x(x,Q2,'b'), Q2, param) * psisq_f(r, z, Q2, 'b');
+
+//	#elif FLAVOUR==100
+//			value= psisq_f(r, z, Q2, 'l');
+//                     value+= psisq_f(r, z, Q2, 's');
+//                     value+= psisq_f(r, z, Q2, 'c');
+//                     value+= psisq_f(r, z, Q2, 'b');
 	#endif
 
 	return(jacob*r*value);

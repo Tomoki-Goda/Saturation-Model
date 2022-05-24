@@ -41,7 +41,7 @@ int main(int argc, char* argv[]){
 	/* Initialize Minuit */
 	MNINIT(5,6,7);
 	/* Parameters definition */
-#if MODEL==0    
+#if ((MODEL==0)||( MODEL==2 ))  
 	MNPARM(1,"sigma_0", par_start[0],par_error[0],par_min[0],par_max[0],error_flag);
 	MNPARM(2," lambda", par_start[1],par_error[1],par_min[1],par_max[1],error_flag);
 	MNPARM(3,"    x_0", par_start[2],par_error[2],par_min[2],par_max[2],error_flag);

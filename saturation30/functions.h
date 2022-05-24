@@ -208,6 +208,7 @@ double sudakov(double r, double mu2) {
     //double mub2 = 1.26095/(r*r/(1+r*r/bmax2));
     //double mub2=C/(pow(r,2)) + mu02;
     double mub2=C*(1/pow(r,2)+1/pow(r_max,2));
+    //double mub2=C*(1/(pow(r,2)) + 1/pow(bmax,2));
     //printf("sud %e %e %e\n", r, mub2, mu2);
     //double mub2 = 1.26095/(r*r);
     if (mu2 < Lambda2 || mub2 < Lambda2|| mu2 < mub2) {/*printf("1"); */return(0.0);}; 
@@ -236,7 +237,13 @@ double sudakov(double r, double mu2) {
  *non perturbative sudakov...
  * ***************************************************************************/
 double sudakov_np(double  r,double mu2){
+
 	double val=g1 * pow(r,2.0)/(2.0)+ g2 * ( log(mu2/pow(Q0,2.0)) * log(1+pow(r/r_max,2)/*mu02*pow(r,2 )/C*/)/4.0 );
+	//double val=g1 * pow(r,2.0)/(2.0) + g2 * ( log(mu2/pow(Q0,2.0)) * log( 1+(mu02* pow(r,2)/C ))/4.0 );
+	//double val=g1 * pow(r,2.0)/(2.0) + g2 * ( log(mu2/pow(Q0,2.0)) * log( 1+(pow(r,2)/pow(bmax,2) ) )/4.0 );
+
+	//double val=g1 * pow(r,2.0)/(2.0) + g2 * ( log(mu2/pow(Q0,2.0)) * log((pow(bmax,2.0)+pow(r,2.0))/pow(bmax,2.0))/4.0 );
+
 	return(val);
 }
 
@@ -947,7 +954,9 @@ double sigma_x (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3];
 	//mu02    = par[4];
+
 	r_max	=par[4];
+	//bmax	=par[4];
 	g1      = par[5];
 	g2      = par[6];
 
@@ -1069,7 +1078,11 @@ double sigma_l3 (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         //mu02    = par[4];
+<<<<<<< HEAD
 	r_max	= par[4];
+=======
+	bmax    = par[4];
+>>>>>>> 5c56e8f61c56da62d800909f013271b2746be3fc
 	g1      = par[5];
 	g2      = par[6];
 
@@ -1197,6 +1210,8 @@ double sigma_l (double X, double Q, double Y, double *par) {
         C       = par[3]; 
         //mu02    = par[4];
 	r_max	= par[4];
+	//bmax    = par[4];
+
 	g1      = par[5];
        	g2      = par[6];	
 
@@ -1321,12 +1336,11 @@ double sigma_s (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         //mu02    = par[4];
-        mu02	= par[4];
-	g1      = par[5]; 
-	g2      = par[6];
-
-
-        /* Perform integration */
+        //mu02	= par[4];
+	r_max    = par[4];
+        g1      = par[5]; 
+	g2	= par[6];
+ 	/* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
         //    &result, &relerr, &nfnevl, &ifail);
 
@@ -1454,6 +1468,7 @@ double sigma_c (double X, double Q, double Y, double *par) {
         C       = par[3]; 
         //mu02    = par[4];
 	r_max	= par[4];
+	//bmax	= par[4];
 	g1      = par[5];
 	g2      = par[6];
 
@@ -1582,8 +1597,9 @@ double sigma_b (double X, double Q, double Y, double *par) {
         C       = par[3]; 
         //mu02    = par[4];
 	r_max 	=par[4];
-	g1      = par[5];
-       	g2      = par[6];	
+	//bmax    = par[4];
+	g1      = par[5]; 
+	g2	= par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -2927,6 +2943,7 @@ void fcn (int npar, double grad[], double *fcnval,
         C        = par[3]; 
         //mu02     = par[4];
 	r_max 	=par[4];
+//	bmax	= par[4];
 	g1	 = par[5];
 	g2 	 = par[6];
   

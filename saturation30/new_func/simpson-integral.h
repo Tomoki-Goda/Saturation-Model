@@ -11,7 +11,7 @@ void simpson1d(double(*function)(double ,double**), double ** par ,double min, d
 
 	}else{
 
-	unsigned n=25;//2*n+1 terms in the sum
+	unsigned n=50;//2*n+1 terms in the sum
 	double step= (max-min)/(2*n);
 	double result=0;
 	//double func =(*function);
@@ -42,9 +42,9 @@ unsigned simpcoeff(unsigned * pos,unsigned* len, unsigned dim){
 
 }
 
-void simpson2d(double(*function)(double,double, double*), double* par ,double xmin, double xmax,double ymin,double ymax,double *res){
-        unsigned xn=25;//2*n+1 terms in the sum
-	unsigned yn=25;
+void simpson2d(double(*function)(double,double, double**), double** par ,double xmin, double xmax,double ymin,double ymax,double *res){
+        unsigned xn=50;//2*n+1 terms in the sum
+	unsigned yn=50;
 
         double xstep= (xmax-xmin)/(2*xn);
 	double ystep= (ymax-ymin)/(2*yn);
@@ -66,7 +66,7 @@ void simpson2d(double(*function)(double,double, double*), double* par ,double xm
 					
 		}
 	}
-	*res=result;
+	*res=(xstep*ystep/9)*result;
 }
 
 

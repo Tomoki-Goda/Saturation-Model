@@ -11,7 +11,7 @@ void simpson1d(double(*function)(double ,double**), double ** par ,double min, d
 
 	}else{
 
-	unsigned n=50;//2*n+1 terms in the sum
+	unsigned n=100;//2*n+1 terms in the sum
 	double step= (max-min)/(2*n);
 	double result=0;
 	//double func =(*function);

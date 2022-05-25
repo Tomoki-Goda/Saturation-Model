@@ -59,4 +59,52 @@ double psisq_f (double r, double z, double Q2, unsigned char flavourtype/*, unsi
 	//printf("%f\n", value);
 	return (value);
 }
+double psisq_z_integrand(double z,double **par){
+	const double r=(*(*par));
+	const double Q2=(*(*par)+1);
+	unsigned char f ;//(*(par+1))
+	switch((int)(*(*(par)+2))){
+		//just anything to convert double to char 
+		case 0:
+			f='l';
+			break;
+		case 1:
+			f='s';
+			break;
+		case 2:
+			f='c';
+			break;
+		case 3:
+			f='s';
+			break;
+	}
+
+	double val=psisq_f(r,z,Q2,f);
+
+	return(val);
+}
+
+double psisq_z_int(double r,double Q2,unsigned char f){
+	double f_n;
+	switch(f){//.5 for safety when converting from double to char
+                case 'l':
+                        f_n=0.5;
+                        break;
+                case 's':
+                        f_n=1.5;
+                        break;
+                case 'c':
+                        f_n=2.5;
+                        break;
+                case 'b':
+                        f_n=3.5;
+                        break;
+        }	
+	double param[3]={r,Q2,f_n};
+	double *par[1] ={param};
+	double res=0;
+	simpson1d(&psisq_z_integrand,par,1.0e-10,1.0-1.0e-10,&res);
+	return(res);
+
+}
 

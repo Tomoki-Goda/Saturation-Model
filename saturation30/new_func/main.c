@@ -16,7 +16,7 @@
 #include"../minuit.h"
 #include"./read-and-fit.h"
 
-#define TEST 0
+//#define TEST 2
 
 double arglist[10];
 /* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2,g1 */

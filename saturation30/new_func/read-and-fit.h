@@ -53,22 +53,24 @@ void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void
 	//double * Y		rapidity
 	//unsigned N_DATA	number of data 
 	/////////////////////////////////////////
-	printf("fcn \n");
+	//printf("fcn \n");
 	double chisq=0.0;
 	double val;
 	clock_t time;
 	time=clock();
 	for(unsigned i=0;i<N_DATA;i++){
 		val=sigma_DIS( *(X_DATA +i) ,*(Q2_DATA+i) ,*(Y_DATA+i) ,par);
-		//printf(" %.3e : %.3e \n",*(CS_DATA+i), val );
+#if TEST==2
+		printf(" %.3e : %.3e \n",*(CS_DATA+i), val );
+#endif	
 		chisq+=pow( (val-(*(CS_DATA+i)))/(*(ERR_DATA+i)),2);
 	}
 	time-=clock();
 	
 	for(unsigned i=0;i<N_PAR;i++){
-		fprintf(stdout, "%.4e, ",*(par+i));
+		fprintf(stdout, "%.3e, ",*(par+i));
 	}
-	fprintf(stdout,"%.2e / %d = %.2e, in %.3e sec\n",chisq, N_DATA, chisq/N_DATA, -((double)time)/CLOCKS_PER_SEC);
+	fprintf(stdout,"%.2e / %d = %.3e, in %.2e sec\n",chisq, N_DATA, chisq/N_DATA, -((double)time)/CLOCKS_PER_SEC);
 
 	*fcnval=chisq;
 }

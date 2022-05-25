@@ -112,7 +112,7 @@ double sigma_DIS(double x,double q2,double y, double * par) {
 
 simpson1d(& sigma_r_integrand, param,1.0e-10,1.0-1.0e-10,&res);
 
-        return res/PI;
+        return res;
 }
 #elif ZINTEGRATE==0 
 double sigma_DIS(double x,double q2,double y, double * par) {
@@ -125,6 +125,6 @@ double sigma_DIS(double x,double q2,double y, double * par) {
 
 simpson2d(& sigma_integrand, param, 1.0e-10,1.0-1.0e-10,0.0,1.0,&res);
 	
-	return res/PI;
+	return res;
 }	
 #endif

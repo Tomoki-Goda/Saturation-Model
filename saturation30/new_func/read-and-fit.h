@@ -87,15 +87,16 @@ int load_data(){
 	fprintf(stdout, "HERA tot\n");
 	file=fopen("../data/hera_tot.dat","r");
 	
-	double alpha =7.297e-3;
-	double xmp0 = 0.93827;
-	
-	double units = 10.0 * pow(197.3271,2);
+	double alpha =1.0/137 ;//fine structure const 1/137;
+	double xmp0 = 0.93827;//proton mass in GeV
+	double units =389.40; //2.56819e-3; //micro-barn to GeV^-2
 	j=0;
 	while((!feof(file))&&(j<597)){
 		fscanf(file,"%lE %lE %lE %lE %lE", (Q2_DATA+i),(X_DATA+i),(wdata+i),(CS_DATA+i),(ERR_DATA+i)); 
+		/////formula in I. Abt et al 2017////////
 		fac = pow(Q2_DATA[i],2)*(1-X_DATA[i])/ (4*pow(PI,2)*alpha*(Q2_DATA[i]+pow(2*X_DATA[i]*xmp0,2)));
-		fac = fac /(units * 1.e-3);    //[mikrobarn^-1]
+		fac*=units;//change unit to GeV
+		//fac = fac /(units * 1.e-3);    //[mikrobarn^-1]
 
 		CS_DATA[i] = fac*CS_DATA[i];
 		ERR_DATA[i] = fac*ERR_DATA[i];

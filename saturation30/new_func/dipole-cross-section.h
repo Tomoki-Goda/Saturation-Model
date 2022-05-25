@@ -38,7 +38,7 @@ double sigma_gbw(double r, double x,double Q2, double * par){
 	
 	//double xm=mod_x(x);
 
-	return( sigma_0*(1-exp( -r*r * pow(x_0/x, lambda)/4)) );	
+	return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
 }
 
 

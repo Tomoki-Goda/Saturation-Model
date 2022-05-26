@@ -31,8 +31,8 @@ double alpha_s(double mu2 ){
 //////////////////////////// GBW ////////////////////////////
 /////////////////////////////////////////////////////////////
 
-double sigma_gbw(double r, double x,double Q2, double * par){
-	double sigma_0	=par[0];
+double sigma_gbw(double r,double x,double Q2, double * par){
+	double sigma_0 =par[0];
 	double lambda	=par[1];
 	double x_0	=par[2];
 	

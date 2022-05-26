@@ -89,7 +89,7 @@ int load_data(){
 	
 	double alpha =1.0/137 ;//fine structure const 1/137;
 	double xmp0 = 0.93827;//proton mass in GeV
-	double units =389.40; //2.56819e-3; //micro-barn to GeV^-2
+	double units =1.0/389.40; //2.56819e-3; //micro-barn to GeV^-2
 	j=0;
 	while((!feof(file))&&(j<597)){
 		fscanf(file,"%lE %lE %lE %lE %lE", (Q2_DATA+i),(X_DATA+i),(wdata+i),(CS_DATA+i),(ERR_DATA+i)); 

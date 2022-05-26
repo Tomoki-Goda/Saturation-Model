@@ -6,7 +6,7 @@
 
 
 void simpson1d(double(*function)(double ,double**), double ** par ,double min, double max,double *res){
-	unsigned n=100;//2*n+1 terms in the sum
+	unsigned n=50;//2*n+1 terms in the sum
 	double step= (max-min)/(2*n);
 	double result=0;
 
@@ -21,8 +21,8 @@ void simpson1d(double(*function)(double ,double**), double ** par ,double min, d
 	
 }
 
-void simpson1dA(double(*function)(double ,double**), double ** par ,double min, double max,double *res){
-	unsigned n=50;//2*n+1 terms in the sum
+void simpson1dA(double(*function)(double ,double**), double ** par ,double min, double max,unsigned n, double *res){
+	//unsigned n=50;//2*n+1 terms in the sum
 	double values[2*n+1];
 	double diff[2*n];
 	
@@ -40,14 +40,14 @@ void simpson1dA(double(*function)(double ,double**), double ** par ,double min, 
 	for(unsigned i=1;i<4;i++){
 		for(unsigned j=0;j<(2*n -i);j++){
 			*(diff+j)=(*(diff+j+1))-(*(diff+j));
-			if((i==3 )&&( maxd4<(*(diff+j))) ){ 
-				maxd4=(*(diff+j));
+			if((i==3 )&&( maxd4<fabs(*(diff+j))) ){ 
+				maxd4=fabs(*(diff+j));
 			}
 		}
 	
 	}
 	//max4d*=pow(step,-4);
-	double error= maxd4*(max-min)/180;
+	double error= maxd4*fabs(max-min)/180;
 	for(unsigned i=0;i <= 2*n;i++){
 		if((i==0)||(i==(2*n))){
 		
@@ -61,7 +61,9 @@ void simpson1dA(double(*function)(double ,double**), double ** par ,double min, 
 		}
 	}
 	result*=step /3;
-	printf("%.4e +/- %.4e\n",result,error);
+	if(((error/result)>0.5)&& (error>1.0e-3)){
+	printf("%.4e \t+/- %.4e\n",result,error);
+	}
 	*res=result;
 	
 }

@@ -7,51 +7,56 @@
 extern double dbesk0_(double*);
 extern double dbesk1_(double*);
 
-double psisq_f (double r, double z_mod, double Q2, unsigned char flavourtype/*, unsigned dataform */)  {
-	double z=exp(-z_mod/(1-z_mod));
-	double jac=z_mod/pow(1-z,2);		
+double psisq_f (double r, double z, double Q2, unsigned char flavourtype/*, unsigned dataform */)  {
+//	double z=exp(-z_mod/(1-z_mod));
+//	double jac=z_mod/pow(1-z,2);		
 	double charge_sum;
-	double mass;
+	double mass2;
 
 	switch(flavourtype){
 		case 'l':
 			charge_sum=5.0/6.0;
-			mass=MASS_L2;
+			mass2=MASS_L2;
 			break;
 		case 's':
 			charge_sum=1.0/6.0;
-			mass=MASS_S2;
+			mass2=MASS_S2;
 			break;
 		case 'c':
 			charge_sum=2.0/3.0;
-			mass=MASS_C2;
+			mass2=MASS_C2;
 			break;
 		case 'b':
 			charge_sum=1.0/6.0;
-			mass=MASS_B2;
+			mass2=MASS_B2;
 			break;
+		default:
+			printf("wrong input %c\n",flavourtype);
+			charge_sum=5.0/6.0;
+			mass2=MASS_L2;
 	}
 
 	double	z_bar =  z*z+(1-z)*(1-z);
 	//double     y_bar =  (y*y)/(1+(1-y)*(1-y));
-	double	Qsq_bar =  z*(1-z)*Q2+mass;
+	double	Qsq_bar =  z*(1-z)*Q2+mass2;
 	double	Qsq2 =  sqrt(Qsq_bar)*r;
 //	double	norm_f;
 	//external bessels functions, declared  elsewhere
-	//printf("%f,  %f,  ",r,Qsq2);
 	double	bessel_k0 = dbesk0_(&Qsq2);
 	double	bessel_k1 = dbesk1_(&Qsq2);
 	double	value;
 			
 // F_2 form
-	value = (charge_sum)*NORM*Q2*(z_bar*Qsq_bar*bessel_k1*bessel_k1 + ( mass +4*Q2*z*z*(1-z)*(1-z))*bessel_k0*bessel_k0);
-	return (jac*value);
+	//pow(r,2) is to suppress singularity at r=0, it is compensated by the sigma
+	//Q2 comes from the factor to multiply F2 to get cross-section.
+	value = pow(r,3)*Q2*  (charge_sum)*NORM*(z_bar*Qsq_bar*bessel_k1*bessel_k1 + ( mass2 +4*Q2*z*z*(1-z)*(1-z))*bessel_k0*bessel_k0);
+	return (value);
 }
 double psisq_z_integrand(double z,double **par){
 	const double r=(*(*par));
-	const double Q2=(*(*par)+1);
+	const double Q2=(*((*par)+1));
 	unsigned char f ;//(*(par+1))
-	switch((int)(*(*(par)+2))){
+	switch((int)(*((*par)+2))){
 		//just anything to convert double to char 
 		case 0:
 			f='l';
@@ -63,8 +68,11 @@ double psisq_z_integrand(double z,double **par){
 			f='c';
 			break;
 		case 3:
-			f='s';
+			f='b';
 			break;
+		default:
+		printf("wrong input %f\n",*((*par)+2));
+		f='l';
 	}
 	
 	double val=psisq_f(r,z,Q2,f);
@@ -74,19 +82,22 @@ double psisq_z_integrand(double z,double **par){
 
 double psisq_z_int(double r,double Q2,unsigned char f){
 	double f_n;
-	switch(f){//.5 for safety when converting from double to char
+	switch(f){//.2 for safety when converting from double to char
                 case 'l':
-                        f_n=0.5;
+                        f_n=0.2;
                         break;
                 case 's':
-                        f_n=1.5;
+                        f_n=1.2;
                         break;
                 case 'c':
-                        f_n=2.5;
+                        f_n=2.2;
                         break;
                 case 'b':
-                        f_n=3.5;
+                        f_n=3.2;
                         break;
+                default:
+			printf("wrong input %c\n",f);
+			f_n=0.2;
         }	
 	double param[3];//={r,Q2,f_n};
 	*(param)=r;
@@ -96,7 +107,10 @@ double psisq_z_int(double r,double Q2,unsigned char f){
 	double *par[1];// ={param};
 	*(par)=param;
 	double res=0;
-	simpson1d(&psisq_z_integrand,par,1.0e-5,1.0-1.0e-15/*1.0-1.0e-10*/,&res);
+	double ep =1.0e-6;
+	//printf("r:%f %f, Q: %f %f, %f %c\n",(*(*par)),r,(*((*par)+1)) ,Q2,(*((*par)+2)),f);
+	simpson1d(&psisq_z_integrand,par,0.0+ep,1.0-ep,&res);//1.0e-15,1.0-1.0e-15/*1.0-1.0e-10*/,&res);
+	//printf("Q2: %f, r: %f, res: %f  %c\n",Q2,r,res,f);
 	return(res);
 
 }

@@ -4,29 +4,71 @@
 //extern "C" double simps_(double * , double *,
   //         double *,double *,double* ,double(*)(double*), double *  ,double *,double* ,double *);
 
+
 void simpson1d(double(*function)(double ,double**), double ** par ,double min, double max,double *res){
-	if(fabs(max-min)<1.0e-15){
-		*res=0.0;
-		printf("min=max %.3e\n" ,*res);
-
-	}else{
-
 	unsigned n=100;//2*n+1 terms in the sum
 	double step= (max-min)/(2*n);
 	double result=0;
-	//double func =(*function);
 
 	result+=(*function)(min,par)+(*function)(max,par);
-	//printf("init: %f\n",result);
 
 	for(unsigned i=1;i <= n;i++){	
 		(i!=n)?(  result+=4*(*function)(min+(2*i-1)*step ,par)+2*(*function)(min+2*i*step, par)  ) :( result+=4*(*function)(min+(2*i-1)*step ,par) );
-		//printf("%f\n",result);
 	}
-	*res=result*step /3;
-	//printf("%f %f %.3e\n" ,min,max,*res);
+	result*=step /3;
+	//printf("%.4e +/- N/A\n",result);
+	*res=result;
+	
+}
+
+void simpson1dA(double(*function)(double ,double**), double ** par ,double min, double max,double *res){
+	unsigned n=50;//2*n+1 terms in the sum
+	double values[2*n+1];
+	double diff[2*n];
+	
+	double step= (max-min)/(2*n);
+	double result=0;
+	double maxd4=0;
+
+	for(unsigned i=0;i <= 2*n;i++){
+		*(values+i)=(*function)(min+i*step,par);	
 	}
-}	
+	
+	for(unsigned j=0;j<(2*n );j++){
+			*(diff+j)=(*(values+j+1))-(*(values+j));
+	}
+	for(unsigned i=1;i<4;i++){
+		for(unsigned j=0;j<(2*n -i);j++){
+			*(diff+j)=(*(diff+j+1))-(*(diff+j));
+			if((i==3 )&&( maxd4<(*(diff+j))) ){ 
+				maxd4=(*(diff+j));
+			}
+		}
+	
+	}
+	//max4d*=pow(step,-4);
+	double error= maxd4*(max-min)/180;
+	for(unsigned i=0;i <= 2*n;i++){
+		if((i==0)||(i==(2*n))){
+		
+		result+=(*(values+i));
+		}else if((2*(i/2))==i){
+		
+		result+=2*(*(values+i));
+		}else{
+		
+		result+=4*(*(values+i));
+		}
+	}
+	result*=step /3;
+	printf("%.4e +/- %.4e\n",result,error);
+	*res=result;
+	
+}
+
+	
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////	
 
 unsigned simpcoeff(unsigned * pos,unsigned* len, unsigned dim){
 	unsigned ctr=1;

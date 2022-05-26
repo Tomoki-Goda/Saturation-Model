@@ -32,14 +32,16 @@ double mod_x(double x, double Q2, unsigned char flavour) {
 		m_fsq = MASS_B2;
 		break;
 	}
-	return (x * (1 + 4 * m_fsq / Q2));
+	return (x * (1.0 +( 4.0 * (m_fsq/Q2)) ));
 }
 
-double sigma_integrand(double R,double z,double * par[2]){
+double sigma_integrand(double R,double z,double ** par){
 
 	//R is r/(1+r) such that integration between (0, inf) -> (0,1).
-	double r=R/(1-R);
-	double jacob=pow(1-R,-2);	
+	//double r=R/(1-R);
+	double r=R;
+	//double jacob=2.0*PI;
+	//double jacob=1.0/pow(1-R,2);	
 	double x=(*(*par));
 	double Q2=(*( (*par)+1 ));
 	
@@ -67,22 +69,24 @@ double sigma_integrand(double R,double z,double * par[2]){
 //                     value+= psisq_f(r, z, Q2, 'b');
 	#endif
 
-	return(jacob*r*value);
+	//return(value*r*/pow(1-R,2));
+	return(value*r);
 }
 
 
-double sigma_r_integrand(double R,double * par[2]){
+double sigma_r_integrand(double R,double ** par){
 
         //R is r/(1+r) such that integration between (0, inf) -> (0,1).
-        double r=R/(1-R);
-        double jacob=pow(1-R,-2);
+	double r=R/(1-R);
+//	double r=R;
+
         double x=(*(*par));
         double Q2=(*( (*par)+1 ));
 
         double* param=( *(par+1) );
         double value=0;
         //double x_mod[4];
-
+	
         #if FLAVOUR==0  
                 value=SIGMA(r,mod_x(x,Q2,'l'), Q2, param) * psisq_z_int(r, Q2, 'l');
                 value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_z_int(r, Q2, 's');
@@ -96,8 +100,12 @@ double sigma_r_integrand(double R,double * par[2]){
                         value+=SIGMA(r,mod_x(x,Q2,'c'), Q2, param) * psisq_z_int(r, Q2, 'c');
                         value+=SIGMA(r,mod_x(x,Q2,'b'), Q2, param) * psisq_z_int(r, Q2, 'b');
         #endif
-
-        return(jacob*r*value);
+	
+	//printf("Q2; %f, x; %f, r; %f-> %f:  %f\n",Q2,x,r,value,r*value/pow(1-R,2));
+	value=r*value/pow(1-R,2);
+	
+        return(value);
+//	return(r*value);
 }
 
 #if Z_INTEGRATE==1
@@ -106,11 +114,15 @@ double sigma_DIS(double x,double q2,double y, double * par) {
 
         double sigma_sum;
 
-        double var[2]={x,q2};
-        double *param[2]={var,par};
+        double var[2];//={x,q2};
+        *(var)=x;
+        *(var+1)=q2;
+        double *param[2];//={var,par};
+        *(param)=var;
+        *(param+1)=par;
         double res=0;
 
-simpson1d(& sigma_r_integrand, param,1.0e-10,1.0-1.0e-10,&res);
+simpson1dA(& sigma_r_integrand, param,1.0e-15, 0.99,&res);
 
         return res;
 }

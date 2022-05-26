@@ -7,8 +7,9 @@
 extern double dbesk0_(double*);
 extern double dbesk1_(double*);
 
-double psisq_f (double r, double z, double Q2, unsigned char flavourtype/*, unsigned dataform */)  {
-			
+double psisq_f (double r, double z_mod, double Q2, unsigned char flavourtype/*, unsigned dataform */)  {
+	double z=exp(-z_mod/(1-z_mod));
+	double jac=z_mod/pow(1-z,2);		
 	double charge_sum;
 	double mass;
 
@@ -25,7 +26,7 @@ double psisq_f (double r, double z, double Q2, unsigned char flavourtype/*, unsi
 			charge_sum=2.0/3.0;
 			mass=MASS_C2;
 			break;
-			case 'b':
+		case 'b':
 			charge_sum=1.0/6.0;
 			mass=MASS_B2;
 			break;
@@ -35,29 +36,16 @@ double psisq_f (double r, double z, double Q2, unsigned char flavourtype/*, unsi
 	//double     y_bar =  (y*y)/(1+(1-y)*(1-y));
 	double	Qsq_bar =  z*(1-z)*Q2+mass;
 	double	Qsq2 =  sqrt(Qsq_bar)*r;
-	double	norm_f;
+//	double	norm_f;
 	//external bessels functions, declared  elsewhere
 	//printf("%f,  %f,  ",r,Qsq2);
 	double	bessel_k0 = dbesk0_(&Qsq2);
 	double	bessel_k1 = dbesk1_(&Qsq2);
 	double	value;
 			
-	switch (1/*dataform*/) {
-		case 1: // F_2 form
-			value = (charge_sum)*NORM*Q2*(z_bar*Qsq_bar*bessel_k1*bessel_k1 + ( mass +4*Q2*z*z*(1-z)*(1-z))*bessel_k0*bessel_k0);
-			break;
-		case 2: // F_L form 
-			value = (charge_sum)*NORM * Q2*4*Q2*z*z*(1-z)*(1-z)*bessel_k0*bessel_k0;
-		        break;
-	}
-	/*
-	if (photo==1) {
-		norm_f = (charge_sum)*(charge_sum);
-		value = norm_f*z_bar*Qsq_bar*bessel_k1*bessel_k1;
-	}
-	*/
-	//printf("%f\n", value);
-	return (value);
+// F_2 form
+	value = (charge_sum)*NORM*Q2*(z_bar*Qsq_bar*bessel_k1*bessel_k1 + ( mass +4*Q2*z*z*(1-z)*(1-z))*bessel_k0*bessel_k0);
+	return (jac*value);
 }
 double psisq_z_integrand(double z,double **par){
 	const double r=(*(*par));
@@ -78,9 +66,9 @@ double psisq_z_integrand(double z,double **par){
 			f='s';
 			break;
 	}
-
+	
 	double val=psisq_f(r,z,Q2,f);
-
+	//printf( " r %f  z %f  q2 %f ->%f \n", r,z,Q2,val);
 	return(val);
 }
 
@@ -100,10 +88,15 @@ double psisq_z_int(double r,double Q2,unsigned char f){
                         f_n=3.5;
                         break;
         }	
-	double param[3]={r,Q2,f_n};
-	double *par[1] ={param};
+	double param[3];//={r,Q2,f_n};
+	*(param)=r;
+	*(param+1)=Q2;
+	*(param+2)=f_n;
+	
+	double *par[1];// ={param};
+	*(par)=param;
 	double res=0;
-	simpson1d(&psisq_z_integrand,par,1.0e-10,1.0-1.0e-10,&res);
+	simpson1d(&psisq_z_integrand,par,1.0e-5,1.0-1.0e-15/*1.0-1.0e-10*/,&res);
 	return(res);
 
 }

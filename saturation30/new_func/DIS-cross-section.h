@@ -37,7 +37,67 @@ double mod_x(double x, double Q2, unsigned char flavour) {
 	}
 	return (x * (1.0 +( 4.0 * (m_fsq/Q2)) ));
 }
-/*
+
+
+double sigma_r_integrand(double R,double ** par){
+        //R is r/(1+r) such that integration between (0, inf) -> (0,1).
+//	double r=R/(1-R);
+	double r=R;
+
+        double x=(*(*par));
+        double Q2=(*( (*par)+1 ));
+
+        double* param=( *(par+1) );
+        double value=0;
+        //double x_mod[4];
+	//printf("%f\n",Q2);
+        #if FLAVOUR==0  
+                value =SIGMA(r,mod_x(x,Q2,'l'), Q2, param) * psisq_z_int(r, Q2, 'l');
+                value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_z_int(r, Q2, 's');
+                value*=1.0/r; //1 from polar coordinates, -2 from compensating psi
+        #elif FLAVOUR==1
+		value =SIGMA(r,mod_x(x,Q2,'l'), Q2, param) * psisq_z_int(r, Q2, 'l');
+		value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_z_int(r, Q2, 's');
+		value+=SIGMA(r,mod_x(x,Q2,'c'), Q2, param) * psisq_z_int(r, Q2, 'c');
+		value*=1.0/r;
+        #elif FLAVOUR==2
+		value =SIGMA(r,mod_x(x,Q2,'l'),Q2, param) * psisq_z_int(r, Q2, 'l');
+		value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_z_int(r, Q2, 's');
+		value+=SIGMA(r,mod_x(x,Q2,'c'), Q2, param) * psisq_z_int(r, Q2, 'c');
+		value+=SIGMA(r,mod_x(x,Q2,'b'), Q2, param) * psisq_z_int(r, Q2, 'b');
+		value*=1.0/r;
+        #endif
+	
+	//printf("Q2; %f, x; %f, r; %f-> %f:  %f\n",Q2,x,r,value,r*value/pow(1-R,2));
+//	value=value/pow(1-R,2);
+	
+        return(value);
+//	return(r*value);
+}
+
+#if Z_INTEGRATE==1
+
+double sigma_DIS(double x,double q2,double y, double * par) {
+        double sigma_sum;
+
+        double var[2];//={x,q2};
+        *(var)=x;
+        *(var+1)=q2;
+        double *param[2];//={var,par};
+        *(param)=var;
+        *(param+1)=par;
+        double res=0;
+        //printf("x:%f , Q2: %f \t",x,q2);
+        double err=0;
+        double ep=1.0e-6;
+        simpson1dA(& sigma_r_integrand, param,0.0+ep, 30.0,200,&res,&err);
+
+        return res;
+}
+/////////////////////// 2 D integration...?///////////////////////
+//If 1D method doesn't work, alternatively there is always do 2 D as 1+1 D...
+#elif ZINTEGRATE==0 
+
 double sigma_integrand(double R,double z,double ** par){
 
 	//R is r/(1+r) such that integration between (0, inf) -> (0,1).
@@ -75,65 +135,7 @@ double sigma_integrand(double R,double z,double ** par){
 	//return(value*r*pow(1-R,-2));
 	return(value*r);
 }
-*/
 
-double sigma_r_integrand(double R,double ** par){
-
-        //R is r/(1+r) such that integration between (0, inf) -> (0,1).
-	double r=R/(1-R);
-//	double r=R;
-
-        double x=(*(*par));
-        double Q2=(*( (*par)+1 ));
-
-        double* param=( *(par+1) );
-        double value=0;
-        //double x_mod[4];
-	//printf("%f\n",Q2);
-        #if FLAVOUR==0  
-                value=SIGMA(r,mod_x(x,Q2,'l'), Q2, param) * psisq_z_int(r, Q2, 'l');
-                value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_z_int(r, Q2, 's');
-                value*=1.0/pow(r,2); //1 from polar coordinates, -2 from compensating psi
-        #elif FLAVOUR==1
-                        value=SIGMA(r,mod_x(x,Q2,'l'), Q2, param) * psisq_z_int(r, Q2, 'l');
-                        value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_z_int(r, Q2, 's');
-                        value+=SIGMA(r,mod_x(x,Q2,'c'), Q2, param) * psisq_z_int(r, Q2, 'c');
-                        value*=1.0/pow(r,2);
-        #elif FLAVOUR==2
-                        value=SIGMA(r,mod_x(x,Q2,'l'),Q2, param) * psisq_z_int(r, Q2, 'l');
-                        value+=SIGMA(r,mod_x(x,Q2,'s'), Q2, param) * psisq_z_int(r, Q2, 's');
-                        value+=SIGMA(r,mod_x(x,Q2,'c'), Q2, param) * psisq_z_int(r, Q2, 'c');
-                        value+=SIGMA(r,mod_x(x,Q2,'b'), Q2, param) * psisq_z_int(r, Q2, 'b');
-                        value*=1.0/pow(r,2);
-        #endif
-	
-	//printf("Q2; %f, x; %f, r; %f-> %f:  %f\n",Q2,x,r,value,r*value/pow(1-R,2));
-	value=value/pow(1-R,2);
-	
-        return(value);
-//	return(r*value);
-}
-
-#if Z_INTEGRATE==1
-
-double sigma_DIS(double x,double q2,double y, double * par) {
-
-        double sigma_sum;
-
-        double var[2];//={x,q2};
-        *(var)=x;
-        *(var+1)=q2;
-        double *param[2];//={var,par};
-        *(param)=var;
-        *(param+1)=par;
-        double res=0;
-        //printf("x:%f , Q2: %f \t",x,q2);
-        double ep=1.0e-6;
-        simpson1dA(& sigma_r_integrand, param,0.0+ep, 0.9 ,100,&res);
-
-        return res;
-}
-#elif ZINTEGRATE==0 
 double sigma_DIS(double x,double q2,double y, double * par) {
 
 	double sigma_sum;

@@ -42,16 +42,23 @@ double psisq_f (double r, double z, double Q2, unsigned char flavourtype/*, unsi
 	double	Qsq2 =  sqrt(Qsq_bar)*r;
 //	double	norm_f;
 	//external bessels functions, declared  elsewhere
-	double	bessel_k0 = dbesk0_(&Qsq2);
-	double	bessel_k1 = dbesk1_(&Qsq2);
+	//double	bessel_k0_2 = pow(dbesk0_(&Qsq2),2);
+	//double	bessel_k1_2 = pow(dbesk1_(&Qsq2),2);
+	double	bessel_k0_reg = 1/r    - dbesk0_(&Qsq2);
+	double	bessel_k1_reg = 1/Qsq2 - dbesk1_(&Qsq2);
+	
 	double	value;
 			
 // F_2 form
 	//pow(r,2) is to suppress singularity at r=0, it is compensated by the sigma
 	//Q2 comes from the factor to multiply F2 to get cross-section.
-	value = pow(r,3)*Q2*  (charge_sum)*NORM*(z_bar*Qsq_bar*bessel_k1*bessel_k1 + ( mass2 +4*Q2*z*z*(1-z)*(1-z))*bessel_k0*bessel_k0);
+	//value = pow(r,2) * Q2 *  (charge_sum) * NORM * (z_bar * Qsq_bar * bessel_k1_2 + ( mass2 + pow(2*z*(1-z),2)* Q2 ) * bessel_k0_2);
+	value = Q2 *  (charge_sum) * NORM * (z_bar * pow(1-Qsq2*bessel_k1_reg,2) + ( mass2 + pow(2*z*(1-z),2)* Q2 ) * pow(1-r*bessel_k0_reg,2));
 	return (value);
 }
+
+
+//////If we use this method, the following two functions will need to be improved regarding conversions of char to double etc//////////
 double psisq_z_integrand(double z,double **par){
 	const double r=(*(*par));
 	const double Q2=(*((*par)+1));
@@ -99,19 +106,44 @@ double psisq_z_int(double r,double Q2,unsigned char f){
 			printf("wrong input %c\n",f);
 			f_n=0.2;
         }	
-	double param[3];//={r,Q2,f_n};
+	double param[3];
 	*(param)=r;
 	*(param+1)=Q2;
 	*(param+2)=f_n;
 	
-	double *par[1];// ={param};
+	double *par[1];
 	*(par)=param;
 	double res=0;
 	double ep =1.0e-6;
-	//printf("r:%f %f, Q: %f %f, %f %c\n",(*(*par)),r,(*((*par)+1)) ,Q2,(*((*par)+2)),f);
-	simpson1d(&psisq_z_integrand,par,0.0+ep,1.0-ep,&res);//1.0e-15,1.0-1.0e-15/*1.0-1.0e-10*/,&res);
-	//printf("Q2: %f, r: %f, res: %f  %c\n",Q2,r,res,f);
+	double err=0;
+	simpson1dA(&psisq_z_integrand,par,0.0+ep,1.0-ep,100,&res,&err);
+	
 	return(res);
 
 }
+
+double psisq_z_int_double(double r,double Q2,double f_n){
+	///////////f_n//////////////
+	//0.5 l
+	//1.5 c
+	//2.5 s
+	//3.5 b
+	// .5 is arbitrary just to recover int.
+	////////////////////////////
+	double param[3];
+	*(param)=r;
+	*(param+1)=Q2;
+	*(param+2)=f_n;
+	
+	double *par[1];
+	*(par)=param;
+	double res=0;
+	double ep =1.0e-6;
+	double err=0;
+	simpson1dA(&psisq_z_integrand,par,0.0+ep,1.0-ep,100,&res,&err);
+	
+	return(res);
+
+}
+
 

@@ -24,7 +24,30 @@ double alpha_s(double mu2 ){
 	double b0= ((double)(33 -2*NF))/(12*PI);
 	return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 	
-}//in simps.f
+}
+double mod_x(double x, double Q2, unsigned flavour) {
+	double m_fsq;
+
+	switch (flavour) {
+	case 0:
+		m_fsq = MASS_L2;
+		break;
+	case 1:
+		m_fsq = MASS_S2;
+		break;
+	case 2:
+		m_fsq = MASS_C2;
+		break;
+	case 3:
+		m_fsq = MASS_B2;
+		break;
+	default:
+		printf("wrong input %c\n",flavour);
+		m_fsq = MASS_L2;
+	}
+	return (x * (1.0 +( 4.0 * (m_fsq/Q2)) ));
+}
+//in simps.f
 //extern "C" double simps_(double *, double *, double *,double *,double* ,double(*)(double*), double *  ,double *,double* ,double *);
 
 /////////////////////////////////////////////////////////////

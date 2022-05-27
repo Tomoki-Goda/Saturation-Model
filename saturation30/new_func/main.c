@@ -10,7 +10,7 @@
 #include"dipole-cross-section.h"
 #include"photon-wave-function.h"
 
-#include"DIS-cross-section.h"
+//#include"DIS-cross-section.h"
 
 #include"cfortran.h"
 #include"../minuit.h"
@@ -29,6 +29,8 @@ double   par_max[7] 	= {	80.0,	1.00,	1.0,		20.0,	20.0,	2.0,	2.0};
 int main(int argc, char* argv[]){
 	int error_flag = 0;
 	load_data();
+	generate_psi_set();
+	
 	
 #if TEST==1
 	double resval=0.0;	

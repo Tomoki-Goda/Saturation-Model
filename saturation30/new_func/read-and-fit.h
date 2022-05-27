@@ -5,7 +5,7 @@
 //#include"./constants.h" 
 
 //#include"./DIS-cross-section.h"
-
+//#include"./integration2.h"
 
 #define MAXN 600
 #define RESCALE 1.05
@@ -21,6 +21,80 @@ static double CS_DATA[MAXN]={0};
 static double ERR_DATA[MAXN]={0};
 static unsigned N_DATA;
 
+
+#if MODEL==0
+#define SIGMA sigma_gbw
+#elif MODEL==1
+#define SIGMA sigma_bgk
+#elif MODEL==2
+#define SIGMA sigma_gbs
+#endif
+
+#define N_SIMPS_R 200
+//////////////////GLOBAL ARRAY for DATA/////////////////////
+static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
+//static double *X_VALS;//[N_DATA];
+//static double *Q2_VALS;//[N_DATA];
+/////////////////////////////////////////////
+static const double r_int_max=30.0;
+static const double R_STEP=r_int_max/(2*N_SIMPS_R);
+static const double ep=1.0e-6;//for r==0 is divergent or unstable
+
+
+//void import_points(double * X_DATA,double *Q2_DATA){
+	//because they are static in other file...
+//	X_VALS=X_DATA;
+//	Q2_VALS=Q2_DATA;	
+//}
+
+
+
+////////////////////////////////generate grid of z-integrated psi values//////////////////////////////////
+/////////////////it writes to global PSI...
+void generate_psi_set(){
+	for(unsigned fl=0;fl<(NF-1);fl++){
+		for(unsigned i=0; i<N_DATA;i++){
+			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){			
+				*(*(*(PSI+fl )+j )+i )=psisq_z_int_double(R_STEP*j+ep, *(Q2_DATA+i), fl+0.5);
+			}
+		}
+	}
+	printf("Psi ready\n");
+}
+
+/////////////////////////////now integrate over r////////////////////////////
+
+void generate_data_set(double *par, double *csarray){
+	//csarray is counterpart of CS_DATA ...
+	//double integral[N_DATA];
+	double term ,val;
+	double r,Q2,xm;
+	for(unsigned i=0; i<N_DATA;i++){
+		val=0;
+		for(unsigned fl=0;fl<(NF-1);fl++){
+			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){	
+				r=R_STEP*j+ep;
+				Q2=*(Q2_DATA+i);
+				xm=mod_x(*(X_DATA+i), Q2,fl );
+				
+				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, par) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
+				if((j==0)||(j==2*N_SIMPS_R)){
+					
+				} else if( (j/2)*2==j ){
+					term*=2;
+				}
+				else{
+					term*=4;	
+				}
+				val+=term;
+				
+			}
+		}
+		*(csarray+i)=val*(R_STEP/3);
+		
+	}
+	printf("crosssection ready\n");
+}
 
 
 extern double sigma_DIS( double ,double, double ,double* );
@@ -58,12 +132,18 @@ void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void
 	double val;
 	clock_t time;
 	time=clock();
+	double cs[N_DATA];//computed cross-section
+	generate_data_set(par,cs);
+	
 	for(unsigned i=0;i<N_DATA;i++){
-		val=sigma_DIS( *(X_DATA +i) ,*(Q2_DATA+i) ,*(Y_DATA+i) ,par);
-#if TEST==2
-		printf(" %.3e : %.3e \n",*(CS_DATA+i), val );
-#endif	
-		chisq+=pow( (val-(*(CS_DATA+i)))/(*(ERR_DATA+i)),2);
+//		val=sigma_DIS( *(X_DATA +i) ,*(Q2_DATA+i) ,*(Y_DATA+i) ,par);
+//#if TEST==2
+//		printf(" %.3e : %.3e \n",*(CS_DATA+i), val );
+//#endif	
+//		chisq+=pow( (val-(*(CS_DATA+i)))/(*(ERR_DATA+i)),2);
+		chisq+=pow( ((*(cs+i))-(*(CS_DATA+i)))/(*(ERR_DATA+i)),2);
+
+
 	}
 	time-=clock();
 	
@@ -114,6 +194,7 @@ int load_data(){
 	
 #if NEW_DATA==1 
 	N_DATA=i;
+	//import_points(X_DATA,Q2_DATA);
 	return(0);
 #endif	
 	//////////////////////////////ZEUS 05//////////////////////////////////

@@ -36,9 +36,11 @@ static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
 //static double *X_VALS;//[N_DATA];
 //static double *Q2_VALS;//[N_DATA];
 /////////////////////////////////////////////
+static const double ep=1.0e-6;//for r==0 is divergent or unstable
+//static const double r_int_max=1.0-2*ep;
 static const double r_int_max=30.0;
 static const double R_STEP=r_int_max/(2*N_SIMPS_R);
-static const double ep=1.0e-6;//for r==0 is divergent or unstable
+
 
 
 //void import_points(double * X_DATA,double *Q2_DATA){
@@ -52,14 +54,19 @@ static const double ep=1.0e-6;//for r==0 is divergent or unstable
 ////////////////////////////////generate grid of z-integrated psi values//////////////////////////////////
 /////////////////it writes to global PSI...
 void generate_psi_set(){
+	double r;
 	for(unsigned fl=0;fl<(NF-1);fl++){
 		for(unsigned i=0; i<N_DATA;i++){
-			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){			
-				*(*(*(PSI+fl )+j )+i )=psisq_z_int_double(R_STEP*j+ep, *(Q2_DATA+i), fl+0.5);
+			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){	
+				r=R_STEP*j+ep;
+				//r=r/(1-r);
+				*(*(*(PSI+fl )+j )+i )=psisq_z_int(r, *(Q2_DATA+i), fl);
 			}
 		}
 	}
+	printf("*****************************************\n");
 	printf("Psi ready\n");
+	printf("*****************************************\n");
 }
 
 /////////////////////////////now integrate over r////////////////////////////
@@ -74,10 +81,12 @@ void generate_data_set(double *par, double *csarray){
 		for(unsigned fl=0;fl<(NF-1);fl++){
 			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){	
 				r=R_STEP*j+ep;
+				//r=r/(1-r);
 				Q2=*(Q2_DATA+i);
 				xm=mod_x(*(X_DATA+i), Q2,fl );
 				
 				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, par) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
+				//printf("%f\n",term);
 				if((j==0)||(j==2*N_SIMPS_R)){
 					
 				} else if( (j/2)*2==j ){
@@ -86,14 +95,16 @@ void generate_data_set(double *par, double *csarray){
 				else{
 					term*=4;	
 				}
+				//val+=pow(1-r,-2)*term;
 				val+=term;
 				
 			}
 		}
+		//printf("%f\n",val);
 		*(csarray+i)=val*(R_STEP/3);
 		
 	}
-	printf("crosssection ready\n");
+	//printf("crosssection ready\n");
 }
 
 

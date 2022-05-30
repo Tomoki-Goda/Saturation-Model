@@ -15,8 +15,10 @@
 #define UNIFY 1 
 
 extern  double xgpdf(double, double);
-extern double dgquad_(double (*)(double*), double*,double*,int*  );
-////////////////////////////////////////////////////////////
+extern dgquad(double(*)(double*),*double*,double*,int*);
+
+
+//////////////////////////////////////////////////////////i
 ////////////////// common functions ////////////////////////
 ////////////////////////////////////////////////////////////
 
@@ -42,7 +44,7 @@ double mod_x(double x, double Q2, unsigned flavour) {
 		m_fsq = MASS_B2;
 		break;
 	default:
-		printf("mod_x::wrong input %c\n",flavour);
+		printf("wrong input %c\n",flavour);
 		m_fsq = MASS_L2;
 	}
 	return (x * (1.0 +( 4.0 * (m_fsq/Q2)) ));
@@ -112,7 +114,7 @@ double sudakov(double r, double mu2,double* par) {
     return val;
 }
 
-#if SIMPS_GBS==1
+/*
 double integrand_gbs(double r, double *par[2] ){
 	//for the integral integrand has to be in the form 
 	//func(double , double**) where integration is over the first argument. second are constants to be passed.
@@ -124,13 +126,13 @@ double integrand_gbs(double r, double *par[2] ){
 	double x=( *(*par+1) );
 	//double xm=mod_x(x);
 	double Q2=( *(*par+2) ) ;
-	double sigma_0=(*(*(par+1) ));
+	//double sigma_0=*(*(par+1) );
 	double lambda=( *(*(par+1)+1) );
 	double x_0   =( *(*(par+1) +2) );
 	double *sudpar=( *(par+1)+3 );//whatever parameter sudakov takes...
 
 	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
-	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
+	double laplacian_sigma=r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
        double val=exp(-sudakov(r,Q2,sudpar)) *laplacian_sigma;
 	//printf("integrand return for r=%f, %f. \n",r,val);       
 	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);
@@ -142,57 +144,39 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 
 	double *param_ptr[2]={param, par};
 	double result=0;
-	double error=0;
-	simpson1dA(&integrand_gbs, param_ptr,0.0,r,100,&result,&error);
+	simpson1d(&integrand_gbs, param_ptr,0.0,r,&result);
 	//printf("\n\n");
 	return(result);
-}
-#elif SIMPS_GBS==0
-static double VAR[3];
-static double PAR[5];
+}*/
 
-double integrand_gbs(double *r_ptr){
-	//for the integral integrand has to be in the form 
-	//func(double , double**) where integration is over the first argument. second are constants to be passed.
-	//hence the following constant  parameters.
-	double r=*r_ptr;
-	if(fabs(r)<1.0e-15){
-		return(0.0);
-	}
-	double R=( *(VAR)) ;
-	double x=( *(VAR+1) );
-	//double xm=mod_x(x);
-	double Q2=( *(VAR+2) ) ;
-	double sigma_0=(*(PAR ));
-	double lambda=( *(PAR+1) );
-	double x_0   =( *(PAR +2) );
-	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
+static double Q2;
+static double R;
+static double x;
+static double C;
+static double x0;
+static double r_max;
+static double lambda;
+static double 
+static double x;
 
+
+double integrand_gbs(double r ){	
 	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
-       double val=exp(-sudakov(r,Q2,sudpar)) *laplacian_sigma;
+	double val=exp(-sudakov(r,Q2,sudpar)) *laplacian_sigma;
 	//printf("integrand return for r=%f, %f. \n",r,val);       
 	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);
 }
 
 double sigma_gbs(double r, double x, double Q2, double * par){
-	*(VAR)=r;
-	*(VAR+1)=x;
-	*(VAR+2)=Q2;
 	
-	for(unsigned i=0;i<5;i++){
-		*(PAR+i)=*(par+i);
-	}//not sure of efficiency..
-		
+	
 	double result=0;
-	double rmin=0.0;
-	int N=96;
+	simpson1d(&integrand_gbs, param_ptr,0.0,r,&result);
 	
-	result=dgquad_(&integrand_gbs,&rmin,VAR,&N);
-	//printf("\n\n");
 	return(result);
 }
-#endif
+
 ///////////////////////////////////////////////////////////
 ////////////////// all together //////////////////////////
 //////////////////////////////////////////////////////////

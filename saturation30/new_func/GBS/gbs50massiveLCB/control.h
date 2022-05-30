@@ -2,11 +2,11 @@
 /////////////////////// regular control //////////////////////////
 //////////////////////////////////////////////////////////////////
 #define X_MAX 1.0e-2
-#define Q2_MAX 1.0e+2
+#define Q2_MAX 5.0e+1
 
-#define MODEL 2 
+#define MODEL 2
 #define FLAVOUR 2
-#define SUDAKOV 0
+#define SUDAKOV 2
 
 /* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2,g1 */
 #if ((MODEL==0)||( MODEL==2 )) 
@@ -23,8 +23,8 @@ double   par_max[7] 	= {	80.0,	1.00,	1.0,		20.0,	2.0,	2.0,	2.0};
 
 
 
-#define MASS_L2 0.0
-#define MASS_S2 0.0
+#define MASS_L2 0.0196
+#define MASS_S2 0.0196
 #define MASS_C2 1.96
 #define MASS_B2 21.16
 
@@ -36,7 +36,7 @@ double   par_max[7] 	= {	80.0,	1.00,	1.0,		20.0,	2.0,	2.0,	2.0};
 #define TEST 0
 #define SIMPS_GBS 1
 
-#define N_SIMPS_R 250
+#define N_SIMPS_R 200
 
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////

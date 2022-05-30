@@ -1,18 +1,4 @@
-/*#include<cmath>
-#include<iostream>
-#include<string>
-#include<vector>
-#include<fstream>
-*/
-//#include<stdio.h>
-//#include<math.h>
-//#include"../main.h"
-//#include"./constants.h"
-//#include"./simpson-integral.h"
-//#include"../gluons.h"
-
 #define BGK 0
-#define UNIFY 1 
 
 extern  double xgpdf(double, double);
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
@@ -102,13 +88,16 @@ double sudakov(double r, double mu2,double* par) {
 	double g2=(*(par+3));
 
 	double mub2=C*( 1/(pow(r,2)) + 1/pow(r_max,2) ) ;
+	
 	if (mu2 < LQCD2 || mub2 < LQCD2|| mu2 < mub2) {
 		return(0.0);
 	}
 	
 	double b0 = (11*CA-2*NF)/12;
 	double val = CA/(2*b0*PI)*(log(mu2/LQCD2)*log(log(mu2/LQCD2)/log(mub2/LQCD2))-log(mu2/mub2));
-	val+=(g1/2) * pow(r,2) + (g2/4) * log(1+pow(r/r_max,2) )*log(pow( mu2 /Q0 ,2) );
+#if SUDAKOV>=2	
+	val+=(g1/2) * pow(r,2) + (g2/4) * log(1+pow(r/r_max,2) )*log( mu2 /pow(Q0 ,2) );
+#endif
     return val;
 }
 
@@ -131,7 +120,10 @@ double integrand_gbs(double r, double *par[2] ){
 
 	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
-       double val=exp(-sudakov(r,Q2,sudpar)) *laplacian_sigma;
+	double val=laplacian_sigma;
+#if SUDAKOV>=1
+        val*=exp(-sudakov(r,Q2,sudpar)) ;
+#endif
 	//printf("integrand return for r=%f, %f. \n",r,val);       
 	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);
 }
@@ -170,7 +162,9 @@ double integrand_gbs(double *r_ptr){
 
 	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
-       double val=exp(-sudakov(r,Q2,sudpar)) *laplacian_sigma;
+#if SUDAKOV>=1
+        val*=exp(-sudakov(r,Q2,sudpar)) ;
+#endif
 	//printf("integrand return for r=%f, %f. \n",r,val);       
 	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);
 }
@@ -193,39 +187,4 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	return(result);
 }
 #endif
-///////////////////////////////////////////////////////////
-////////////////// all together //////////////////////////
-//////////////////////////////////////////////////////////
 
-//#if UNIFY
-/*
- * double sigma(double  r, double x, double Q2, double * par,unsigned model,unsigned char flavour){
-
-	double (*funcptr)( double , double , double , double *);
-	double x_mod =mod_x(x,Q2,flavour);
-
-//	switch (model){
-//		case 0:
-//			funcptr=&sigma_gbw;
-//			break;
-//		case 1:
-//			funcptr=&sigma_bgk;
-//			break;
-//		case 2:
-//			funcptr=&sigma_gbs;
-//			break;
-//		}
-
-	#if MODEL==0
-	funcptr=&sigma_gbw;
-	#elif MODEL==1
-	funcptr=&sigma_bgk;
-	#elif MODEL==2
-	funcptr=&sigma_gbs;
-	#endif
-
-	return( (*funcptr)(r,x_mod,Q2,par));
-	
-}
-//#endif
-*/

@@ -1,16 +1,9 @@
-//#include<stdio.h>
-//#include<math.h>
-//#include<time.h>
-
-//#include"./constants.h" 
-
-//#include"./DIS-cross-section.h"
-//#include"./integration2.h"
-
 #define MAXN 600
 #define RESCALE 1.05
 
-#define NEW_DATA 1 //1 mean only reading
+#define NEW_DATA 1 //1 mean only reading new hera
+
+
 
 // ////////GLOBAL to this file...////////////////
 static double X_DATA[MAXN]={0};
@@ -21,36 +14,18 @@ static double CS_DATA[MAXN]={0};
 static double ERR_DATA[MAXN]={0};
 static unsigned N_DATA;
 
+static double FIT_RES[N_PAR];
 
-#if MODEL==0
-#define SIGMA sigma_gbw
-#elif MODEL==1
-#define SIGMA sigma_bgk
-#elif MODEL==2
-#define SIGMA sigma_gbs
-#endif
 
-#define N_SIMPS_R 200
+
 //////////////////GLOBAL ARRAY for DATA/////////////////////
 static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
-//static double *X_VALS;//[N_DATA];
-//static double *Q2_VALS;//[N_DATA];
 /////////////////////////////////////////////
 static const double ep=1.0e-6;//for r==0 is divergent or unstable
-//static const double r_int_max=1.0-2*ep;
 static const double r_int_max=30.0;
 static const double R_STEP=r_int_max/(2*N_SIMPS_R);
 
-
-
-//void import_points(double * X_DATA,double *Q2_DATA){
-	//because they are static in other file...
-//	X_VALS=X_DATA;
-//	Q2_VALS=Q2_DATA;	
-//}
-
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////generate grid of z-integrated psi values//////////////////////////////////
 /////////////////it writes to global PSI...
 void generate_psi_set(){
@@ -65,7 +40,7 @@ void generate_psi_set(){
 		}
 	}
 	printf("*****************************************\n");
-	printf("Psi ready\n");
+	printf("*            Psi ready                  *\n");
 	printf("*****************************************\n");
 }
 
@@ -121,12 +96,15 @@ double maximum (double arg1, double arg2) {
 	value = arg2;
     return value;
 }
-///////////////////////fitting////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////   fitting   ////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 void dum_func(void){
 	//do nothing
 }
-void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void (*dum)(void) ){
+
+double compute_chisq(double *par){
 	/////////////////////////////////////////
 	//for detail see MINUIT documentatin.
 	//////////////////////////////////////////
@@ -147,26 +125,41 @@ void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void
 	generate_data_set(par,cs);
 	
 	for(unsigned i=0;i<N_DATA;i++){
-//		val=sigma_DIS( *(X_DATA +i) ,*(Q2_DATA+i) ,*(Y_DATA+i) ,par);
-//#if TEST==2
-//		printf(" %.3e : %.3e \n",*(CS_DATA+i), val );
-//#endif	
-//		chisq+=pow( (val-(*(CS_DATA+i)))/(*(ERR_DATA+i)),2);
 		chisq+=pow( ((*(cs+i))-(*(CS_DATA+i)))/(*(ERR_DATA+i)),2);
-
-
 	}
 	time-=clock();
 	
 	for(unsigned i=0;i<N_PAR;i++){
 		fprintf(stdout, "%.3e, ",*(par+i));
+		*(FIT_RES+i)=*(par+i);
 	}
+	*(FIT_RES+N_PAR)=chisq;
+	
+	
 	fprintf(stdout,"%.2e / %d = %.3e, in %.2e sec\n",chisq, N_DATA, chisq/N_DATA, -((double)time)/CLOCKS_PER_SEC);
-
-	*fcnval=chisq;
+	
+	
+	return(chisq);
 }
 
-///////////////////////        READ           ///////////////////////////////////////
+void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void (*dum)(void) ){
+
+	*fcnval=compute_chisq(par);
+}
+
+/*
+void save_result( FILE* file_ptr){
+	
+	for(unsigned i=0;i<N_PAR;i++){
+		fprintf(file_ptr, "%.f\t, ",*(FIT_RES+i));
+	}
+	*(FIT_RES+N_PAR)
+	fprintf(file_ptr, "%f\t%d\n", *(FIT_RES+N_PAR),N_+DATA);
+}
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////        READ           //////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int load_data(){
 	double dum, sysup, sysdown, stat, fac;
 	

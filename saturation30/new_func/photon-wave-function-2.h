@@ -9,15 +9,22 @@ extern double dbesk1_(double*);
 
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
 
+
+
+#if SIMPS_Z_INT==0
 static double Q2;
 static double R;
 static unsigned flavourtype;
 
 double psisq_f (double *Z)  {
-//double psisq_f (double r, double z, double Q2, unsigned char flavourtype/*, unsigned dataform */)  {
+	double z=*Z;
+#else
+double psisq_f (double R, double z, double Q2, unsigned flavourtype/*, unsigned dataform */)  {
+	
+#endif
 //	double z=exp(-z_mod/(1-z_mod));
 //	double jac=z_mod/pow(1-z,2);	
-	double z=*Z;	
+		
 	double charge_sum;
 	double mass2;
 
@@ -66,7 +73,7 @@ double psisq_f (double *Z)  {
 }
 
 
-
+#if SIMPS_Z_INT==0
 double psisq_z_int(double r,double q2,unsigned f){
 	flavourtype=f;
 	R=r;
@@ -82,7 +89,36 @@ double psisq_z_int(double r,double q2,unsigned f){
 	return(2.0* res);
 
 }
+#else
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double psisq_z_integrand(double z,double **par){
+	const double r=(*(*par));
+	const double Q2=(*((*par)+1));
+	unsigned f =(unsigned) (*((*par)+2) +0.5);//(*(par+1))
+	
+	double val=psisq_f(r,z,Q2,f);
+	//printf( " r %f  z %f  q2 %f ->%f \n", r,z,Q2,val);
+	return(val);
+}
+
+double psisq_z_int(double r,double Q2,unsigned f){
+		
+	double param[3];
+	*(param)=r;
+	*(param+1)=Q2;
+	*(param+2)=(double)f;
+	
+	double *par[1];
+	*(par)=param;
+	double res=0;
+	double ep =1.0e-6;
+	double err=0;
+	simpson1dA(&psisq_z_integrand,par,0.0+ep,0.5,100,&res,&err);//zmax is 0.5 because psi is symmetric in z<->1-z!!
+	
+	return(2.0* res);
+
+}
 
 
-
+#endif
 

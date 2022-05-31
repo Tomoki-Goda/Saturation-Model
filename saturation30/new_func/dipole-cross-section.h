@@ -105,8 +105,11 @@ double sudakov(double r, double mu2,double* par) {
 #endif
     return val;
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////             INTEGRATION            ///////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 #if SIMPS_GBS==1
+//////////////////////////////// ORIGINAL SIMPSON INTEGRAL VERSION //////////////////////////////////////////
 double integrand_gbs(double r, double *par[2] ){
 	//for the integral integrand has to be in the form 
 	//func(double , double**) where integration is over the first argument. second are constants to be passed.
@@ -145,13 +148,12 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 }
 
 #elif SIMPS_GBS==0
+////////////////////////////////// CERN INTEGRATION ROUTINE VERSION ////////////////////////////////////
+/// GLOBAL ///
 static double VAR[3];
 static double *PAR;
 
 double integrand_gbs(double *r_ptr){
-	//for the integral integrand has to be in the form 
-	//func(double , double**) where integration is over the first argument. second are constants to be passed.
-	//hence the following constant  parameters.
 	double r=*r_ptr;
 	if(fabs(r)<1.0e-15){
 		return(0.0);
@@ -185,9 +187,7 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	double result=0;
 	double rmin=0.0;
 	double N=DGAUSS_PREC;
-	
 	//int N=96;
-	
 	//result=dgquad_(&integrand_gbs,&rmin,VAR,&N);
 	result=dgauss_(&integrand_gbs,&rmin,VAR,&N);
 	return(result);

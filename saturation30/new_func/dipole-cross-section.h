@@ -87,7 +87,7 @@ double sudakov(double r, double mu2,double* par) {
 	double g1=(*(par+2));
 	double g2=(*(par+3));
 
-	double mub2=C*( 1/(pow(r,2)) + 1/pow(r_max,2) ) ;
+	double mub2=C*( 1.0/(pow(r,2)) + 1.0/pow(r_max,2) ) ;
 	
 	if (mu2 < LQCD2 || mub2 < LQCD2|| mu2 < mub2) {
 		return(0.0);
@@ -135,7 +135,7 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	double *param_ptr[2]={param, par};
 	double result=0;
 	double error=0;
-	simpson1dA(&integrand_gbs, param_ptr,0.0,r,100,&result,&error);
+	simpson1dA(&integrand_gbs, param_ptr,0.0,r,200,&result,&error);
 	//printf("\n\n");
 	return(result);
 }

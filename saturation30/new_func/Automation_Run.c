@@ -8,9 +8,9 @@ int main(int argc, char** argv){
 		printf("specify directory");
 		return 1;
 	}
-	char command[500];
-	char dir[20]="";
-	char runfile[50]="";
+	char command[1000];
+	char dir[50]="";
+	char runfile[100]="";
 
 	for(unsigned i=1;i<argc;i++){
 		strcpy(dir,argv[i]);
@@ -33,16 +33,26 @@ int main(int argc, char** argv){
 	
 	
 	if(argc>2){
-		strcpy(command,"parallel -j 4 :::");
+		strcpy(command,"parallel --link -j 4 :::");
 	}else{
 		strcpy(command,"");
 	}
 	for(unsigned i=1;i<argc;i++){
+		strcpy(dir,argv[i]);
 		sprintf(runfile," %s/main",dir);
 		strcat(command, runfile);
 		//sprintf(command,"./%s/main \"%s/result.txt\"&",dir,dir);
 		//system(command);
 	}
+	strcat(command, " :::");
+	for(unsigned i=1;i<argc;i++){
+		strcpy(dir,argv[i]);
+		sprintf(runfile," %s/result.txt",dir);
+		strcat(command, runfile);
+		//sprintf(command,"./%s/main \"%s/result.txt\"&",dir,dir);
+		//system(command);
+	}
+	printf("\n\n %s \n\n",command);
 	system(command);
 	
 	return 0;

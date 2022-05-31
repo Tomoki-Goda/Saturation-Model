@@ -3,6 +3,7 @@
 #include<time.h>
 
 #include"./control_tmp.h"
+#include"./control-default.h"
 #include"./constants.h"
 
 #include"simpson-integral.h"
@@ -26,29 +27,44 @@ static unsigned N_DATA;
 
 double arglist[10];
 
+void log_printf(FILE* file,char* line){
+	if(file!=stdout){
+		fprintf(file,"%s",line);
+	}
+#if PRINT_PROGRESS==1
+	fprintf(stdout,"%s",line);
+#endif
+}
 
 
-
-
+FILE* log_file;
+FILE * out_file;
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////  main  ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[]){
 	clock_t time_measure=clock();
-	
-	FILE * out_file;
+	//FILE* logfile;
+	//FILE * out_file;
+	char resultfile[100];
+	char logfile[100];
 	if(argc>1){
 		//FILE * out_file= fopen("./results.txt","w");
-		out_file= fopen(argv[1],"w");
+		sprintf(resultfile,"%s/result.txt",argv[1]);
+		sprintf(logfile,"%s/log.txt",argv[1]);
 	}else{
-		//out_file=stdout;
-		out_file= fopen("./result.txt","w");
+		strcpy(resultfile,"./result.txt");
+		strcpy(logfile,"./log.txt");
 	}
-
+	log_file=fopen(logfile,"w");
+	out_file=fopen(resultfile,"w");
+	
+	
 	/////////////////results//////////////////////
 	char name[11];//apparently thats the max length minuit accepts
 	double res;
+	//double res_par[N_PAR];
 	double error;
 	double dum3;
 	int dum4;
@@ -80,27 +96,32 @@ int main(int argc, char* argv[]){
 	/* Minimalization procedure MIGRAD */
 	MNEXCM(fcn,"MIGRAD",0,0,error_flag,0);
 	
+	time_measure-=clock();
 	////////////////////SAVE RESULTS////////////////////////////////
-	
+	char outline[500];
 	for(unsigned i=0;i<N_PAR;i++){
-	
 		MNPOUT(i+1,name,res,error,dum3,dum3,dum4);
-		fprintf(out_file,"%s\t%.4e\t%.4e\n",name,res,error);
+		sprintf(outline,"%s\t%.4e\t%.4e\n",name,res,error);
+		log_printf(out_file,outline);
+		//*(res_par+i)=res;
 	}
 	
-	
-	
-	
 	MNSTAT(res,error,dum3,dum4,dum4,dum4);
-	fprintf(out_file,"chisq\t%.4e\t%.4e\n",res,error);
-	fprintf(out_file,"N_DATA\t%d\t%.3e\n",N_DATA,res/(N_DATA-N_PAR));
+	
+	sprintf(outline,"chisq\t%.4e\t%.4e\n",res,error);
+	log_printf(out_file,outline);
+	sprintf(outline,"N_DATA\t%d\n",N_DATA);
+	log_printf(out_file,outline);
+	sprintf(outline,"chisq/dof\t%.3e\n",res/(N_DATA-N_PAR));
+	log_printf(out_file,outline);
 	
 	
-	time_measure-=clock();
-	
-	fprintf(out_file,"\n\n");
-	fprintf(out_file,"In %.2e minutes\n", -((double)time_measure)/(60*CLOCKS_PER_SEC) );
+	sprintf(outline,"\n\n");
+	log_printf(out_file,outline);
+	sprintf(outline,"In %.2e minutes\n", -((double)time_measure)/(60*CLOCKS_PER_SEC) );
+	log_printf(out_file,outline);
 	fclose(out_file);
+	fclose(log_file);
 	return(0);
  
 }

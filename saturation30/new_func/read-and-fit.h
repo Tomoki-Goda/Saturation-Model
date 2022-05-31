@@ -1,9 +1,11 @@
 #define MAXN 600
 #define RESCALE 1.05
 
-#define NEW_DATA 1 //1 mean only reading new hera
 
 
+///////////Set in main.c//////////////////
+extern void log_printf(FILE*,char*);
+extern FILE* log_file;
 
 // ////////GLOBAL to this file...////////////////
 static double X_DATA[MAXN]={0};
@@ -16,25 +18,32 @@ static unsigned N_DATA;
 
 static double FIT_RES[N_PAR];
 
-
-
 //////////////////GLOBAL ARRAY for DATA/////////////////////
 static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
 /////////////////////////////////////////////
 static const double ep=1.0e-6;//for r==0 is divergent or unstable
+#if R_CHANGE_VAR==1
+static const double r_int_max=0.99;
+#else
 static const double r_int_max=30.0;
+#endif
+
 static const double R_STEP=r_int_max/(2*N_SIMPS_R);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////generate grid of z-integrated psi values//////////////////////////////////
+/////////////////////////////////   generate grid of z-integrated psi values        ////////////////////////////
+/////////////////////////////////              for every Q of experimental data   //////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////it writes to global PSI...
 void generate_psi_set(){
 	double r;
 	for(unsigned fl=0;fl<(NF-1);fl++){
 		for(unsigned i=0; i<N_DATA;i++){
-			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){	
+			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){
 				r=R_STEP*j+ep;
-				//r=r/(1-r);
+#if R_CHANGE_VAR==1
+				r=r/(1-r);
+#endif
 				*(*(*(PSI+fl )+j )+i )=psisq_z_int(r, *(Q2_DATA+i), fl);
 			}
 		}
@@ -44,7 +53,9 @@ void generate_psi_set(){
 	printf("*****************************************\n");
 }
 
-/////////////////////////////now integrate over r////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////  now integrate over r with Simpsons method    /////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 
 void generate_data_set(double *par, double *csarray){
 	//csarray is counterpart of CS_DATA ...
@@ -56,11 +67,16 @@ void generate_data_set(double *par, double *csarray){
 		for(unsigned fl=0;fl<(NF-1);fl++){
 			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){	
 				r=R_STEP*j+ep;
-				//r=r/(1-r);
+#if R_CHANGE_VAR==1
+				r=r/(1-r);
+#endif
 				Q2=*(Q2_DATA+i);
 				xm=mod_x(*(X_DATA+i), Q2,fl );
 				
 				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, par) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
+#if R_CHANGE_VAR==1
+				term*=pow(1+r,2);
+#endif
 				//printf("%f\n",term);
 				if((j==0)||(j==2*N_SIMPS_R)){
 					
@@ -83,7 +99,7 @@ void generate_data_set(double *par, double *csarray){
 }
 
 
-extern double sigma_DIS( double ,double, double ,double* );
+//extern double sigma_DIS( double ,double, double ,double* );
 /*******************************************************************************
 * The function which returns maximal of two arguments
 *******************************************************************************/
@@ -105,18 +121,15 @@ void dum_func(void){
 }
 
 double compute_chisq(double *par){
-	/////////////////////////////////////////
-	//for detail see MINUIT documentatin.
+	
 	//////////////////////////////////////////
 	////////////   GLOBALS   /////////////////
 	//////////////////////////////////////////
-	//double * DATA	experimental data array
-	//double * X		bjorken x
-	//double * Q2		Q^2
-	//double * Y		rapidity
+	//double * CS_DATA	experimental data array
+	//double * ERR_DATA	experimental error
 	//unsigned N_DATA	number of data 
 	/////////////////////////////////////////
-	//printf("fcn \n");
+	char outline[200];
 	double chisq=0.0;
 	double val;
 	clock_t time;
@@ -130,33 +143,26 @@ double compute_chisq(double *par){
 	time-=clock();
 	
 	for(unsigned i=0;i<N_PAR;i++){
-		fprintf(stdout, "%.3e, ",*(par+i));
+		sprintf(outline, "%.3e, ",*(par+i));
+		log_printf(log_file,outline);
 		*(FIT_RES+i)=*(par+i);
 	}
 	*(FIT_RES+N_PAR)=chisq;
 	
 	
-	fprintf(stdout,"%.2e / %d = %.3e, in %.2e sec\n",chisq, N_DATA, chisq/N_DATA, -((double)time)/CLOCKS_PER_SEC);
+	sprintf(outline,"%.2e / %d = %.3e, in %.2e sec\n",chisq, N_DATA, chisq/N_DATA, -((double)time)/CLOCKS_PER_SEC);
+	log_printf(log_file,outline);
 	
 	
 	return(chisq);
 }
 
 void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void (*dum)(void) ){
-
+	/////////////////////////////////////////
+	//for detail see MINUIT documentatin.
 	*fcnval=compute_chisq(par);
 }
 
-/*
-void save_result( FILE* file_ptr){
-	
-	for(unsigned i=0;i<N_PAR;i++){
-		fprintf(file_ptr, "%.f\t, ",*(FIT_RES+i));
-	}
-	*(FIT_RES+N_PAR)
-	fprintf(file_ptr, "%f\t%d\n", *(FIT_RES+N_PAR),N_+DATA);
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////        READ           //////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

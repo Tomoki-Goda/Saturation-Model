@@ -73,12 +73,13 @@ double psisq_z_int(double r,double q2,unsigned f){
 	Q2=q2;
 	double res=0;
 	double zmin=1.0e-5;
-	double zmax =1.0 - 1.0e-5;
+	//double zmax =1.0 - 1.0e-5;
+	double zmax = 0.5;//because psi is symmetric in z<->1-z!!
 	int N=96;//64;
 	
 	res=dgquad_(&psisq_f,&zmin,&zmax,&N);
 	//printf("%f\n",res);
-	return(res);
+	return(2.0* res);
 
 }
 

@@ -29,34 +29,3 @@ double   par_max[7] 	= {	80.0,	1.00,	1.0,		20.0,	2.0,	2.0,	2.0};
 #define MASS_B2 21.16
 
 
-//////////////////////////////////////////////////////////////////
-/////////////////////  system control ////////////////////////////
-//////////////////////////////////////////////////////////////////
-#define Z_INTEGRATE 1 
-#define TEST 0
-#define SIMPS_GBS 1
-
-#define N_SIMPS_R 200
-
-//////////////////////////////////////////////////////////////////
-/////////// not to be chaged without a good reason ...///////////////////
-//////////////////////////////////////////////////////////////////
-
-#if MODEL ==0 
-#define N_PAR 3
-#elif MODEL==1
-#define N_PAR 5
-#elif MODEL==2
-#define N_PAR 7
-#endif
-
-
-#if MODEL==0
-#define SIGMA sigma_gbw
-#elif MODEL==1
-#define SIGMA sigma_bgk
-#elif MODEL==2
-#define SIGMA sigma_gbs
-#endif
-
-#define STRATEGY 0.0

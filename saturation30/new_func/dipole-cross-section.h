@@ -2,6 +2,7 @@
 
 extern  double xgpdf(double, double);
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
+extern double dgauss_(double (*)(double*), double*,double*,double *  );
 ////////////////////////////////////////////////////////////
 ////////////////// common functions ////////////////////////
 ////////////////////////////////////////////////////////////
@@ -94,7 +95,11 @@ double sudakov(double r, double mu2,double* par) {
 	}
 	
 	double b0 = (11*CA-2*NF)/12;
-	double val = CA/(2*b0*PI)*(log(mu2/LQCD2)*log(log(mu2/LQCD2)/log(mub2/LQCD2))-log(mu2/mub2));
+	double L_mu_l=log(mu2/LQCD2);
+	double L_mub_l=log(mub2/LQCD2);
+	
+	double val = CA/(2*b0*PI)*(L_mu_l*log(L_mu_l /L_mub_l)-(L_mu_l-L_mub_l ));
+	//double val = CA/(2*b0*PI)*(log(mu2/LQCD2)*log(log(mu2/LQCD2)/log(mub2/LQCD2))-log(mu2/mub2));
 #if SUDAKOV>=2	
 	val+=(g1/2) * pow(r,2) + (g2/4) * log(1+pow(r/r_max,2) )*log( mu2 /pow(Q0 ,2) );
 #endif
@@ -128,20 +133,20 @@ double integrand_gbs(double r, double *par[2] ){
 	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);
 }
 
-
 double sigma_gbs(double r, double x, double Q2, double * par){
 	double param[3]={r,x,Q2};
 
 	double *param_ptr[2]={param, par};
 	double result=0;
 	double error=0;
-	simpson1dA(&integrand_gbs, param_ptr,0.0,r,200,&result,&error);
+	simpson1dA(&integrand_gbs, param_ptr,0.0,r,120,&result,&error);
 	//printf("\n\n");
 	return(result);
 }
+
 #elif SIMPS_GBS==0
 static double VAR[3];
-static double PAR[5];
+static double *PAR;
 
 double integrand_gbs(double *r_ptr){
 	//for the integral integrand has to be in the form 
@@ -162,6 +167,7 @@ double integrand_gbs(double *r_ptr){
 
 	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
+	double val=laplacian_sigma;
 #if SUDAKOV>=1
         val*=exp(-sudakov(r,Q2,sudpar)) ;
 #endif
@@ -174,16 +180,16 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	*(VAR+1)=x;
 	*(VAR+2)=Q2;
 	
-	for(unsigned i=0;i<5;i++){
-		*(PAR+i)=*(par+i);
-	}//not sure of efficiency..
+	PAR=par;
 		
 	double result=0;
 	double rmin=0.0;
-	int N=96;
+	double N=DGAUSS_PREC;
 	
-	result=dgquad_(&integrand_gbs,&rmin,VAR,&N);
-	//printf("\n\n");
+	//int N=96;
+	
+	//result=dgquad_(&integrand_gbs,&rmin,VAR,&N);
+	result=dgauss_(&integrand_gbs,&rmin,VAR,&N);
 	return(result);
 }
 #endif

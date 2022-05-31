@@ -9,3 +9,8 @@ this program can be run in the following steps.
 
 
 ./Automatic_Run will take multiple directories for parallel computation.
+
+4. For multiple runs inparallel prepare individual directory for each setting and one directory <DIR> to put those directories.
+
+and run 
+	./Automatic_Run ./DIR/*

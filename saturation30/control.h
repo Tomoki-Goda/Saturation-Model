@@ -10,7 +10,7 @@ int  flavour      = 1 ;       int  action       = 0;      int  model        = 2;
  *  1 - F_2                *  * 1 - with Cheb. approx. *  * 1 - CERN Simpson  *
  *  2 - F_L                *  *                        *  *                   */
 /***************************//**************************//*********************/
-int  dataform     = 1;       int  cheb_approx  = 1;      int  gluon_int    = 0;
+int  dataform     = 1;       int  cheb_approx  =1 ;      int  gluon_int    = 0;
 /******* UIF_INT ***********//****** xB MODIFICATION ***//*****   BEUTY   *****/
 /*  0 - dadmul             *  * 0 - without mod        *  *  0 - without b    *
  *  1 - simps2d            *  * 1 - wth mod            *  *  1 - with b       *
@@ -22,7 +22,7 @@ int  uif_int      = 1;       int  xbj_mod      = 1;      int  fl_beauty    = 1;
  *  1 - new                *  *  1 - gbw with sudakov   * 
  *                         *  *                         */
 /***************************//***************************/
-int  datatype     = 1;       int  sudflag =0;     
+int  datatype     = 1;       int  sudflag = 2;     
 
 
 int  light_charm;

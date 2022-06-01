@@ -10,8 +10,8 @@
 //double rmax =  2.0e+01;  /* r upper limit */
 double rmin =  1.0e-06;  /* r lower limit */
 double rmax =  3.0e+01;  /* r upper limit */
-double coef3[NX][NQ][NR];     /* The coefficients vector */
-
+//double coef3[NX][NQ][NR];     /* The coefficients vector */
+double coef3[NX * NQ * NR];  
 //double  pi = 3.141592653589793;
 
 /*******************************************************************************

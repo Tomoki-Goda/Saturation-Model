@@ -8,6 +8,7 @@
 #include "float.h"
 #include "chebyshev.h"
 #include "chebyshev3.h"
+//#include"photon-wave-function.h"
 //#include "cuba.h"
 //#include <gsl/gsl_errno.h>
 //#include <gsl/gsl_spline.h>
@@ -26,14 +27,14 @@ extern double dzerox_();
 
 /*******************************************************************************
 *******************************************************************************/
-double determine_rmax(double (*func)(double)) {
+/*double determine_rmax(double (*func)(double)) {
   int imax = 20;
   for (int i = 0; i<imax; i++) {
     double rcut = rmin + (rmax-rmin)*i/imax;
     printf("RMAX: %e %e\n",rcut, func(rcut));
   }
 }
-
+*/
 /*******************************************************************************
 * The 'light' only photon wave function - reduction cross section and F_2 form
 *******************************************************************************/
@@ -205,7 +206,9 @@ double sudakov(double r, double mu2) {
     //double bmax2 = pow(bmax,2.0);
 
     //double mub2 = 1.26095/(r*r/(1+r*r/bmax2));
-    double mub2=C/(pow(r,2)) + mu02;
+    //double mub2=C/(pow(r,2)) + mu02;
+    double mub2=C*(1/pow(r,2)+1/pow(r_max,2));
+    //double mub2=C*(1/(pow(r,2)) + 1/pow(bmax,2));
     //printf("sud %e %e %e\n", r, mub2, mu2);
     //double mub2 = 1.26095/(r*r);
     if (mu2 < Lambda2 || mub2 < Lambda2|| mu2 < mub2) {/*printf("1"); */return(0.0);}; 
@@ -234,7 +237,13 @@ double sudakov(double r, double mu2) {
  *non perturbative sudakov...
  * ***************************************************************************/
 double sudakov_np(double  r,double mu2){
-	double val=g1 * pow(r,2.0)/(2.0);//+ g2 * ( log(mu2/pow(Q0,2.0)) * log((pow(bmax,2.0)+pow(r,2.0))/pow(bmax,2.0))/4.0 );
+
+	double val=g1 * pow(r,2.0)/(2.0)+ g2 * ( log(mu2/pow(Q0,2.0)) * log(1+pow(r/r_max,2)/*mu02*pow(r,2 )/C*/)/4.0 );
+	//double val=g1 * pow(r,2.0)/(2.0) + g2 * ( log(mu2/pow(Q0,2.0)) * log( 1+(mu02* pow(r,2)/C ))/4.0 );
+	//double val=g1 * pow(r,2.0)/(2.0) + g2 * ( log(mu2/pow(Q0,2.0)) * log( 1+(pow(r,2)/pow(bmax,2) ) )/4.0 );
+
+	//double val=g1 * pow(r,2.0)/(2.0) + g2 * ( log(mu2/pow(Q0,2.0)) * log((pow(bmax,2.0)+pow(r,2.0))/pow(bmax,2.0))/4.0 );
+
 	return(val);
 }
 
@@ -719,6 +728,7 @@ extern double uif_bgk (int *dim, double *x) {
         value1 = x[0]*psisql(x[0],x[1])*sigma_bgk_cheb(x[0]);
         light_charm  = 1;
         value2 = x[0]*psisqc(x[0],x[1])*sigma_bgk_cheb(x[0]);
+	value=value1+value2;
         break;
     case 2: /* Charm only */
         value = x[0]*psisqc(x[0],x[1])*sigma_bgk_cheb(x[0]);
@@ -728,8 +738,8 @@ extern double uif_bgk (int *dim, double *x) {
         break;
     }
 
-   return value1 + value2;
-   //return value;
+  // return value1 + value2;
+   return value;
 }
 
 /*******************************************************************************
@@ -943,9 +953,12 @@ double sigma_x (double X, double Q, double Y, double *par) {
         lambda  = par[1];
         x_0     = par[2];
         C       = par[3];
-	mu02    = par[4];
-	g1      = par[5];
+	//mu02    = par[4];
 
+	r_max	=par[4];
+	//bmax	=par[4];
+	g1      = par[5];
+	g2      = par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1064,8 +1077,14 @@ double sigma_l3 (double X, double Q, double Y, double *par) {
         lambda  = par[1];
         x_0     = par[2];
         C       = par[3]; 
-        mu02    = par[4];
+        //mu02    = par[4];
+<<<<<<< HEAD
+	r_max	= par[4];
+=======
+	bmax    = par[4];
+>>>>>>> 5c56e8f61c56da62d800909f013271b2746be3fc
 	g1      = par[5];
+	g2      = par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1189,8 +1208,12 @@ double sigma_l (double X, double Q, double Y, double *par) {
         lambda  = par[1];
         x_0     = par[2];
         C       = par[3]; 
-        mu02    = par[4];
-	g1      = par[5]; 
+        //mu02    = par[4];
+	r_max	= par[4];
+	//bmax    = par[4];
+
+	g1      = par[5];
+       	g2      = par[6];	
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1312,10 +1335,12 @@ double sigma_s (double X, double Q, double Y, double *par) {
         lambda  = par[1];
         x_0     = par[2];
         C       = par[3]; 
-        mu02    = par[4];
+        //mu02    = par[4];
+        //mu02	= par[4];
+	r_max    = par[4];
         g1      = par[5]; 
-
-        /* Perform integration */
+	g2	= par[6];
+ 	/* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
         //    &result, &relerr, &nfnevl, &ifail);
 
@@ -1441,8 +1466,11 @@ double sigma_c (double X, double Q, double Y, double *par) {
         lambda  = par[1];
         x_0     = par[2];
         C       = par[3]; 
-        mu02    = par[4];
+        //mu02    = par[4];
+	r_max	= par[4];
+	//bmax	= par[4];
 	g1      = par[5];
+	g2      = par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -1567,8 +1595,11 @@ double sigma_b (double X, double Q, double Y, double *par) {
         lambda  = par[1];
         x_0     = par[2];
         C       = par[3]; 
-        mu02    = par[4];
+        //mu02    = par[4];
+	r_max 	=par[4];
+	//bmax    = par[4];
 	g1      = par[5]; 
+	g2	= par[6];
 
         /* Perform integration */
         //dadmul_(&uif_gbw, &dim, &A, &B, &minpts, &maxpts, &eps, &wk, &iwk,
@@ -2034,7 +2065,7 @@ void graphdata (void) {
     FILE *fout; 
      int i,k;
 
-    char foutname[3];
+    char foutname[5];
 
    // double pmts[5] = {sigma_0,A_g,lambda_g,C,mu02};
 
@@ -2910,9 +2941,11 @@ void fcn (int npar, double grad[], double *fcnval,
 	lambda   = par[1];
 	x_0      = par[2];
         C        = par[3]; 
-        mu02     = par[4];
+        //mu02     = par[4];
+	r_max 	=par[4];
+//	bmax	= par[4];
 	g1	 = par[5];
-	//g2 	 = par[6];
+	g2 	 = par[6];
   
         //chebft3(xmin,xmax,Qmin,Qmax,rmin,rmax,NX,NQ,NR,coef3,&logS_gbs);
         //printf("chebft3 done...\n", nbins);
@@ -2940,8 +2973,10 @@ void fcn (int npar, double grad[], double *fcnval,
     }
     /* Print current parameters values and chi^2 */
 
-   printf("%e %e %e ",par[0],par[1],par[2]);
-   if(model>=1)printf("%e %e %e ",par[3], par[4],par[5]);
+   printf("%.3e %.3e %.3e ",par[0],par[1],par[2]);
+   if(model>=1)printf("%.3e %.3e ",par[3], par[4]);
+   if(sudflag>=2)printf("%.3e %.3e ",par[5],par[6]);
+   //if(sudflag>=1)printf("%.3e ",par[6]);
    printf("%.4f /%.4f = ",(*fcnval) ,(float) nf2data);
    printf("%.4f",((*fcnval)/((float)nf2data)) );
    printf("\n");

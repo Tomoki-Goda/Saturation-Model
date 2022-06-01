@@ -1,0 +1,16 @@
+this program can be run in the following steps.
+
+1. make directory ./dir 
+2. in that directory copy control.h from ./new_funcs/
+3. compile 
+	gcc Automatic_Run -o Automatic_Run
+4. run 
+	./Automatic_Run "./dir"
+
+
+./Automatic_Run will take multiple directories for parallel computation.
+
+4. For multiple runs inparallel prepare individual directory for each setting and one directory <DIR> to put those directories.
+
+and run 
+	./Automatic_Run ./DIR/*

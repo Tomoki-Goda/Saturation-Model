@@ -31,7 +31,7 @@
 #endif
 
 #ifndef DGAUSS_PREC
-	#define DGAUSS_PREC 0.001
+	#define DGAUSS_PREC 0.0001
 #endif
 
 #ifndef SIMPS_Z_INT

@@ -19,7 +19,8 @@ static unsigned N_DATA;
 static double FIT_RES[N_PAR];
 
 //////////////////GLOBAL ARRAY for DATA/////////////////////
-static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
+//static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
+static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 /////////////////////////////////////////////
 static const double ep=1.0e-6;//for r==0 is divergent or unstable
 #if R_CHANGE_VAR==1
@@ -37,6 +38,12 @@ static const double R_STEP=r_int_max/(2*N_SIMPS_R);
 /////////////////it writes to global PSI...
 void generate_psi_set(){
 	double r;
+	char outline[200];
+	sprintf(outline,"r integrated from 0 to %f, with step %.3e. \n\n", r_int_max, R_STEP);
+	log_printf(log_file,outline);
+	sprintf(outline,"nf=%d\tN_SIMPS=%d\tN_DATA=%d.\n\n", (int)NF, N_SIMPS_R,N_DATA);
+	log_printf(log_file,outline);
+	
 	for(unsigned fl=0;fl<(NF-1);fl++){
 		for(unsigned i=0; i<N_DATA;i++){
 			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){

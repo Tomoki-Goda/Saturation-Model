@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<math.h>
 #include<time.h>
+#include<string.h>
 #include"./control_tmp.h"
 #include"./control-default.h"
 #include"./constants.h"
@@ -17,11 +18,16 @@ void generate_data_set(double *par, double Q2,double x ,char* datafile){
 	FILE* file=fopen(datafile,"w");
 	printf("generate_data_set\n");
 	unsigned point_n=10000;
+	if(file==NULL){
+		printf("generate_data_set::file error\n");
+		
+	}
 	
 	for(unsigned i=0; i<point_n;i++){
 		point=0;
 		r =pow(10,-2+3*((double)i)/point_n);
 		//printf("%f\n",r);
+		//printf("x: %f\nQ2: %f\n", x,Q2);
 		for(unsigned fl=0;fl<(NF-1);fl++){
 				xm=mod_x(x, Q2,fl );
 				point+=  ( SIGMA(r,xm,Q2, par) );
@@ -35,34 +41,50 @@ void generate_data_set(double *par, double Q2,double x ,char* datafile){
 
 
 int main(int argc, char ** argv){
-	char parfilename[100];
-	char resultfilename[100];
-	char name[20];
+	char parfilename[100]="";
+	char resultfilename[100]="";
+	char name[20]="";
 	float par;
 	double param[10];//just any number large enough
 	float dum;
 	//char dumc[100];
+	double Q2=100;
+	double x=0.001;
+	char* end;
 	
-	if(argc>1){
-		//FILE * out_file= fopen("./results.txt","w");
-		sprintf(parfilename,"%s/result.txt",argv[1]);
-		sprintf(resultfilename,"%s/plot.txt",argv[1]);
-	}else{
-		sprintf(parfilename,"./result.txt");
-		sprintf(resultfilename,"./plot.txt");		
+	for(unsigned i=1;i<=argc/2;i++){
+		if( strcmp(argv[2*i-1],"-Q2")==0 ){
+			Q2=strtod(argv[2*i],&end);
+		}else if( strcmp(argv[2*i-1],"-x")==0 ){
+			x=strtod(argv[2*i],&end);
+		}else if( strcmp(argv[2*i-1],"-out")==0 ){
+			sprintf(resultfilename,"%s",argv[2*i]);
+		}else if( strcmp(argv[2*i-1],"-in" ) ==0){
+			sprintf(parfilename,"%s" ,argv[2*i]);
+		}else{
+			printf("Please Use flag, -Q2, -x, -out , -in\n\n");
+		}
+			
 	}
+	printf("Q2= %f, x=%f\n",Q2,x);
+	
+	
+	printf("%s\n%s\n",parfilename,resultfilename);
 	FILE* parfile=fopen(parfilename,"r");
 	
-	fscanf(parfile,"%s\t%f\n",name,&par);//first line is Qup
-	printf("%s\t%.0f\n",name,par);
-
+	if(parfile==NULL){
+		printf("Plot-DP.c file error\n");
+		return 1;
+	}
+	
+	fscanf(parfile,"%s\t%f",name,&dum);//line for Qup
+	
 	for(unsigned i=0;i<N_PAR;i++){
-		//printf("%d\n",i);
 		fscanf(parfile,"%s\t%lf\t%f\n",name,param+i,&dum);
 		fprintf(stdout,"%s \t\t %.3e  \n",name ,*(param+i));
 	}
 	fclose(parfile);
-	generate_data_set(param, 100.0,0.001 ,resultfilename);
+	generate_data_set(param, Q2,x ,resultfilename);
 	
 	return 0;
 

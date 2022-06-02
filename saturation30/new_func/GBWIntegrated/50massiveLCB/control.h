@@ -28,6 +28,4 @@ double   par_max[7] 	= {	80.0,	1.00,	1.0,		20.0,	2.0,	2.0,	2.0};
 #define MASS_C2 1.96
 #define MASS_B2 21.16
 
-////////////////////////////////////////
-#define DGAUSS_PREC 0.001
-#define N_SIMPS_R 250
+

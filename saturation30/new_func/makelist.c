@@ -23,8 +23,11 @@ int main(int argc, char** argv){
 	for(unsigned i =2 ;i<argc-1;i++){	
 		resfile=fopen(argv[i],"r");
 		//fprintf(outfile,"%s",argv[i]);
-		
-		fscanf(resfile,"%s\t%f",name, &value);
+		if(resfile==NULL){ 
+			printf("makelist error no file");
+			return 1;
+		}
+		fscanf(resfile,"%s\t%f",name, &value);//Qup
 		fprintf(outfile,"%.0f",value);
 		for(unsigned line =0; (line<(line_n)) ; line++){
 			fscanf(resfile,"%s\t%f\t%f\n",name,&value, &error );
@@ -42,4 +45,5 @@ int main(int argc, char** argv){
 		fclose(resfile);	
 	}
 	fclose(outfile);
+	return 0;
 }

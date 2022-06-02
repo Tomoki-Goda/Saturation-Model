@@ -49,13 +49,16 @@ int main(int argc, char* argv[]){
 	//FILE * out_file;
 	char resultfile[100];
 	char logfile[100];
+	//char datafile[100];
 	if(argc>1){
 		//FILE * out_file= fopen("./results.txt","w");
 		sprintf(resultfile,"%s/result.txt",argv[1]);
 		sprintf(logfile,"%s/log.txt",argv[1]);
+		//sprintf(resultfile,"%s/plot.txt",argv[1]);
 	}else{
 		strcpy(resultfile,"./result.txt");
 		strcpy(logfile,"./log.txt");
+		//strcpy(resultfile,"./plot.txt");	
 	}
 	log_file=fopen(logfile,"w");
 	out_file=fopen(resultfile,"w");
@@ -98,12 +101,16 @@ int main(int argc, char* argv[]){
 	
 	time_measure-=clock();
 	////////////////////SAVE RESULTS////////////////////////////////
+	
 	char outline[500];
+	sprintf(outline,"Q_up\t%.0f\n",Q2_MAX);
+	log_printf(out_file,outline);
+	double res_par[N_PAR];
 	for(unsigned i=0;i<N_PAR;i++){
 		MNPOUT(i+1,name,res,error,dum3,dum3,dum4);
 		sprintf(outline,"%s\t%.4e\t%.4e\n",name,res,error);
 		log_printf(out_file,outline);
-		//*(res_par+i)=res;
+		*(res_par+i)=res;
 	}
 	
 	MNSTAT(res,error,dum3,dum4,dum4,dum4);

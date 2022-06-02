@@ -14,3 +14,15 @@ this program can be run in the following steps.
 
 and run 
 	./Automatic_Run ./DIR/*
+	
+5. then something like 
+	./makelist 3 ./GBW/*massless*/result.txt ./GBW/massless.txt
+to produce latex list. (see makelist.c for syntax)
+
+
+6. For plotting, 
+compile Auto-Plot-DP.c 
+then 
+	./Auto-Plot-DP <Q2>  <-log(10,x)>  <directories...>
+e.g.
+	./Auto-Plot-DP 100 5 ./GBW/*

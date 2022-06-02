@@ -44,7 +44,7 @@ int main(int argc, char** argv){
 ///////////////////////   prepare command   /////////////////////
 	if(argc>2){
 		//strcpy(command,"parallel -keep-order --link -j 2 --line-buffer :::");
-		strcpy(command,"parallel --link -j 2 --line-buffer :::");
+		strcpy(command,"parallel --link -j 4 --line-buffer :::");
 	}else{
 		strcpy(command,"");
 	}

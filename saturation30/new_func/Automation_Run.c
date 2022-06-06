@@ -12,9 +12,9 @@ int main(int argc, char** argv){
 		printf("specify directory");
 		return 1;
 	}
-	char command[1000];
-	char dir[50]="";
-	char runfile[100]="";
+	char command[5000];
+	char dir[100]="";
+	char runfile[500]="";
 /////////////////   compile   //////////////////////////////////////
 	for(unsigned i=1;i<argc;i++){
 		strcpy(dir,argv[i]);
@@ -40,6 +40,10 @@ int main(int argc, char** argv){
 		
 		
 	}
+	
+printf("*************************************************************\n");
+printf("***********************     compiled     ********************\n");
+printf("*************************************************************\n");
 	
 ///////////////////////   prepare command   /////////////////////
 	if(argc>2){
@@ -76,6 +80,11 @@ int main(int argc, char** argv){
 		strcat(command, runfile);
 	}
 	*/
+printf("*************************************************************\n");
+printf("*********************    Ready to run    ********************\n");
+printf("*************************************************************\n");
+	
+	
 ////////////////   RUN!   //////////////////////////
 	system_printf(command);
 	

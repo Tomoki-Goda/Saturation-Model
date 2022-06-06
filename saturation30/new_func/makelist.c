@@ -1,5 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
+
 ///syntax///
 // ./main <no. of parameters > <input files...> <output file>
 //#define line_n 3
@@ -13,14 +15,19 @@ int main(int argc, char** argv){
 	char name[20];
 	float value;
 	float error;
-	float chisq;
+	//float chisq;
 	int ndata;
+	unsigned count=0;
 	
 	//int line_n= *(argv[1])-'0';//char to int
-	int line_n= atoi(argv[1]);
-	printf("%d parameters \n",line_n);
+	//int line_n= atoi(argv[1]);
+	
+	//printf("%d parameters \n",line_n);
+	
+	
+	for(unsigned i =1 ;i<argc-1;i++){	
+		count=0;
 		
-	for(unsigned i =2 ;i<argc-1;i++){	
 		resfile=fopen(argv[i],"r");
 		//fprintf(outfile,"%s",argv[i]);
 		if(resfile==NULL){ 
@@ -29,17 +36,26 @@ int main(int argc, char** argv){
 		}
 		fscanf(resfile,"%s\t%f",name, &value);//Qup
 		fprintf(outfile,"%.0f",value);
-		for(unsigned line =0; (line<(line_n)) ; line++){
+		
+		
+		//for(unsigned line =0; (line<(line_n)) ; line++){
+		for(unsigned line =0; line<10 /* > max possible no. of parameter*/; line++){
 			fscanf(resfile,"%s\t%f\t%f\n",name,&value, &error );
+			if(strcmp(name,"chisq")==0){
+				printf("%d parameters \n",count);
+				break;	
+			}
 			fprintf(outfile,"& %.2e {\\tiny $\\pm$ %.2e }",value, error);
+			count++;
 			//fprintf(stdout,"& %f $\\pm$ %f \n",value, error);
 		}
-		fscanf(resfile,"%s\t%f\t%f\n",name,&chisq, &error );
-		fprintf(outfile,"& %.2e  ",chisq);
+		//fscanf(resfile,"%s\t%f\t%f\n",name,&chisq, &error );
+		//fprintf(outfile,"& %.2e  ",chisq);
+		fprintf(outfile,"& %.2e  ",value);
 		fscanf(resfile,"%s\t%d\n",name,&ndata);
 		fprintf(outfile,"/ %d  ",ndata);
 		
-		fprintf(outfile,"= %.2f  ",chisq/ndata);
+		fprintf(outfile,"= %.2f  ",value/(ndata-count));
 		fprintf(outfile,"\\\\ \\hline \n");
 			
 		fclose(resfile);	

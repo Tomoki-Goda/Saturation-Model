@@ -136,7 +136,7 @@ double compute_chisq(double *par){
 	//double * ERR_DATA	experimental error
 	//unsigned N_DATA	number of data 
 	/////////////////////////////////////////
-	char outline[200];
+	char outline[200];//entry in the log file 
 	double chisq=0.0;
 	double val;
 	clock_t time;

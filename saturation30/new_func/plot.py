@@ -19,18 +19,21 @@ def import_array(name ):
 	dataarray=np.transpose(dataarray)
 	return(dataarray)
 	
+	
+name="ThetaOff"
+path= "./"+name+"/"
 ################################## x dependence ###################################
-dataarray=import_array("./Archive0106/GBSrfix/gbs500masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rfix log10x=-3")
+dataarray=import_array(path+"GBSrfix/500masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rfix log10x=-3",ls="-")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs500masslessLCB/pointsQ2500x5.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rfix log10x=-5")
+dataarray=import_array(path+"GBSrfix/500masslessLCB/pointsQ2500x5.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rfix log10x=-5",ls="-.")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs10masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless rfix log10x=-3")
+dataarray=import_array(path+"GBSrfix/10masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless rfix log10x=-3",ls=":")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs10masslessLCB/pointsQ2500x5.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless rfix log10x=-5")
+dataarray=import_array(path+"GBSrfix/10masslessLCB/pointsQ2500x5.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless rfix log10x=-5",ls="--")
 
 
 plt.xscale('log')
@@ -43,21 +46,21 @@ plt.title("GBS (r=0.5,m_l=0) Dipole Cross-Section Q^2=100GeV")
 
 
 plt.legend()
-plt.savefig('/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots/GBSrfix x dependence.png')
+plt.savefig("/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots"+name+"/GBSrfix x dependence.png")
 #plt.show()
 plt.clf()
 ############################## Q dependence ####################################
-dataarray=import_array("./Archive0106/GBSrfix/gbs500masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rfix Q2=500")
+dataarray=import_array(path+"GBSrfix/500masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rfix Q2=500",ls="-")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs500masslessLCB/pointsQ2100x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rfix Q2=100")
+dataarray=import_array(path+"GBSrfix/500masslessLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rfix Q2=50",ls="-.")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs10masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless rfix Q2=500")
+dataarray=import_array(path+"GBSrfix/50masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 50 massless rfix Q2=500",ls=":")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs10masslessLCB/pointsQ2100x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless rfix Q2=100")
+dataarray=import_array(path+"GBSrfix/50masslessLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 50 massless rfix Q2=50",ls="--")
 
 
 plt.xscale('log')
@@ -70,26 +73,26 @@ plt.title("GBS (r=0.5,m_l=0) Dipole Cross-Section x=0.001")
 
 
 plt.legend()
-plt.savefig('/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots/GBSrfix Q2 dependence.png')
+plt.savefig("/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots"+name+"/GBSrfix Q2 dependence.png")
 #plt.show()
 plt.clf()	
 
 ############################## Model dependence ####################################
-dataarray=import_array("./Archive0106/GBS/gbs500masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless")
+dataarray=import_array(path+"GBS/500masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless",ls="-")
 
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs500masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rmax=0.5")
+dataarray=import_array(path+"GBSrfix/500masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless rmax=0.5",ls="--")
 
-dataarray=import_array("./Archive0106/GBSPert/gbs500masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massless")
+dataarray=import_array(path+"GBSPert/500masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massless",ls="--")
 
-dataarray=import_array("./Archive0106/GBSPertrfix/gbs500masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massless rmax=0.5")
+dataarray=import_array(path+"GBSPertrfix/500masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massless rmax=0.5",ls="-.")
 
-dataarray=import_array("./GBWIntegratedHighAccu/500masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbw 500 massless")
+dataarray=import_array(path+"GBWIntegrated/500masslessLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbw 500 massless",ls=":")
 
 plt.xscale('log')
 plt.yscale('log')
@@ -101,25 +104,25 @@ plt.title("Dipole Cross-Section Q2=500,  x=0.001")
 
 
 plt.legend()
-plt.savefig('/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots/Model dependence 500 massless.png')
+plt.savefig("/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots"+name+"/Model dependence 500 massless.png")
 #plt.show()
 plt.clf()
 
 #########################################massive 500 #######################################################
-dataarray=import_array("./Archive0106/GBS/gbs500massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 500 massive")
+dataarray=import_array(path+"GBS/500massiveLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 500 massive",ls="-")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs500massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 500 massive rmax=0.5")
+dataarray=import_array(path+"GBSrfix/500massiveLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 500 massive rmax=0.5",ls="--")
 
-dataarray=import_array("./Archive0106/GBSPert/gbs500massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massive")
+dataarray=import_array(path+"GBSPert/500massiveLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massive",ls="--")
 
-dataarray=import_array("./Archive0106/GBSPertrfix/gbs500massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massive rmax=0.5")
+dataarray=import_array(path+"GBSPertrfix/500massiveLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massive rmax=0.5",ls="-.")
 
-dataarray=import_array("./GBWIntegratedHighAccu/500massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbw 500 massive")
+dataarray=import_array(path+"GBWIntegrated/500massiveLCB/pointsQ2500x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbw 500 massive",ls=":")
 
 
 plt.xscale('log')
@@ -132,25 +135,25 @@ plt.title("Dipole Cross-Section Q2=500,  x=0.001")
 
 
 plt.legend()
-plt.savefig('/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots/Model dependence 500 massive.png')
+plt.savefig("/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots"+name+"/Model dependence 500 massive.png")
 #plt.show()
 plt.clf()
 
-############################################ massless 100 #################################################################	
-dataarray=import_array("./Archive0106/GBS/gbs100masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 100 massless")
+############################################ massless 50 #################################################################	
+dataarray=import_array(path+"GBS/50masslessLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 50 massless",ls="-")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs100masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 100 massless rmax=0.5")
+dataarray=import_array(path+"GBSrfix/50masslessLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 50 massless rmax=0.5",ls="--")
 
-dataarray=import_array("./Archive0106/GBSPert/gbs100masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs pert 100 massless")
+dataarray=import_array(path+"GBSPert/50masslessLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs pert 50 massless",ls="--")
 
-dataarray=import_array("./Archive0106/GBSPertrfix/gbs100masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs pert 100 massless rmax=0.5")
+dataarray=import_array(path+"GBSPertrfix/50masslessLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs pert 50 massless rmax=0.5",ls="-.")
 
-dataarray=import_array("./GBWIntegratedHighAccu/100masslessLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbw 100 massless")
+dataarray=import_array(path+"GBWIntegrated/50masslessLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbw 50 massless",ls=":")
 
 plt.xscale('log')
 plt.yscale('log')
@@ -158,29 +161,29 @@ plt.grid(True)
 
 plt.xlabel("r /GeV")
 plt.ylabel("sigma/sigma_0")
-plt.title("Dipole Cross-Section Q2=500,  x=0.001")
+plt.title("Dipole Cross-Section Q2=50,  x=0.001")
 
 
 plt.legend()
-plt.savefig('/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots/Model dependence 100 massless.png')
+plt.savefig("/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots"+name+"/Model dependence 50 massless.png")
 #plt.show()
 plt.clf()
 
-############################################ massive 100 ####################################################################
-dataarray=import_array("./Archive0106/GBS/gbs100massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 100 massive")
+############################################ massive 50 ####################################################################
+dataarray=import_array(path+"GBS/50massiveLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 50 massive",ls="-")
 
-dataarray=import_array("./Archive0106/GBSrfix/gbs100massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs 100 massive rmax=0.5")
+dataarray=import_array(path+"GBSrfix/50massiveLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs 50 massive rmax=0.5",ls="--")
 
-dataarray=import_array("./Archive0106/GBSPert/gbs100massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs pert 100 massive")
+dataarray=import_array(path+"GBSPert/50massiveLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs pert 50 massive",ls="--")
 
-dataarray=import_array("./Archive0106/GBSPertrfix/gbs100massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbs pert 100 massive rmax=0.5")
+dataarray=import_array(path+"GBSPertrfix/50massiveLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbs pert 50 massive rmax=0.5",ls="-.")
 
-dataarray=import_array("./GBWIntegratedHighAccu/100massiveLCB/pointsQ2500x3.txt")
-plt.plot(dataarray[0],dataarray[1],label="gbw 100 massive")
+dataarray=import_array(path+"GBWIntegrated/50massiveLCB/pointsQ250x3.txt")
+plt.plot(dataarray[0],dataarray[1],label="gbw 50 massive",ls=":")
 
 
 plt.xscale('log')
@@ -189,11 +192,11 @@ plt.grid(True)
 
 plt.xlabel("r /GeV")
 plt.ylabel("sigma/sigma_0")
-plt.title("Dipole Cross-Section Q2=500,  x=0.001")
+plt.title("Dipole Cross-Section Q2=50,  x=0.001")
 
 
 plt.legend()
-plt.savefig('/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots/Model dependence 100 massive.png')
+plt.savefig("/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots"+name+"/Model dependence 50 massive.png")
 #plt.show()
 plt.clf()
 				

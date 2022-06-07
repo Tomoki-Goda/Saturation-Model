@@ -90,9 +90,16 @@ double sudakov(double r, double mu2,double* par) {
 
 	double mub2=C*( 1.0/(pow(r,2)) + 1.0/pow(r_max,2) ) ;
 	
-	if (mu2 < LQCD2 || mub2 < LQCD2|| mu2 < mub2) {
+	if (mu2 < LQCD2 || mub2 < LQCD2) {
 		return(0.0);
 	}
+#if THETA_OFF==1
+	if (mu2 < mub2) {
+		return(0.0);
+	}
+#endif
+	
+	
 	
 	double b0 = (11*CA-2*NF)/12;
 	double L_mu_l=log(mu2/LQCD2);

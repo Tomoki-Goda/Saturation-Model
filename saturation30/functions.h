@@ -1078,11 +1078,9 @@ double sigma_l3 (double X, double Q, double Y, double *par) {
         x_0     = par[2];
         C       = par[3]; 
         //mu02    = par[4];
-<<<<<<< HEAD
 	r_max	= par[4];
-=======
-	bmax    = par[4];
->>>>>>> 5c56e8f61c56da62d800909f013271b2746be3fc
+//	bmax    = par[4];
+
 	g1      = par[5];
 	g2      = par[6];
 

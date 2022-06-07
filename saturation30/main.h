@@ -27,7 +27,7 @@ double xmoddata[NDATA];
 
 /* Limits for Q^2 and Bjorken x used to fit */
 double q_down = 0.0;
-double q_up   = 100.0;
+double q_up   =100.0;
 double x_up   = 0.01;
 
 int nf2data;
@@ -59,6 +59,8 @@ double  A_g;
 double  lambda_g;
 double  C;
 double  mu02;
+double bmax;
+double r_max;
 
 /*GBS-G*/
 double g1, g2;
@@ -69,7 +71,7 @@ double g1, g2;
 double       beta = 6.6;
 
 /* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2,g1 */
-double par_start[7]	= {	23.0,	0.29,	3.0e-4,		1.26,	5.0,	0.2,	0.8};
+double par_start[7]	= {	23.0,	0.29,	3.0e-4,		1.26,	4.0,	0.2,	0.8};
 double par_error[7]	= {	1.0,	0.05,	0.1e-04,	0.01,	0.01,	0.01,	0.01 };
 
 double   par_min[7]	= {	0.0,	0.00,	0.0,		0.01,	1.0 ,	0.0,	0.0};
@@ -113,7 +115,7 @@ int           n_f = 5;         /* Number of avtive flavours */
 double        n_0 = 0.5;       /* Maximal singluraity of integrand */
 double         Q0 = 1.0;    
 double    Lambda2 = 0.09;    /* QCD Lambda^2 = (300)^2 GeV^2 */
-double	bmax=0.5;
+//double	bmax=0.5;
 
 
 /* CERNLIB functions */

@@ -4,7 +4,7 @@
  *  2 - charm only         *  *  2 - test              *  *                   * 
  *  3 - beuaty only        *  *                        *  *                   */
 /***************************//**************************//*********************/
-int  flavour      = 1 ;       int  action       = 0;      int  model        = 2;
+int  flavour      = 1 ;       int  action       = 0;      int  model        = 0;
 /******* DATAFORM **********//****** CHEB_APPROX *******//***** GLUON_INT *****/
 /*  0 - reduced cs         *  * 0 - exact form         *  * 0 - Golec Simpson * 
  *  1 - F_2                *  * 1 - with Cheb. approx. *  * 1 - CERN Simpson  *

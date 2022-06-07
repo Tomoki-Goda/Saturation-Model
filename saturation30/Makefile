@@ -2,9 +2,9 @@
 #                               Makefile: GBW Model                            #
 #------------------------------------------------------------------------------#
 
-CC = gcc $(INCLUDE)
-FC = gfortran
-LD = gfortran
+CC = gcc -std=c17 $(INCLUDE)
+FC = gfortran -std=gnu
+LD = gfortran 
 
 //CUBADIR=$(HOME)/heptools/Cuba-4.2
 CUBADIR=$(HOME)/Tools/Cuba-4.2

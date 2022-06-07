@@ -19,6 +19,9 @@ and run
 	./makelist 3 ./GBW/*massless*/result.txt ./GBW/massless.txt
 to produce latex list. (see makelist.c for syntax)
 
+alternatively, use makelist-all.sh 
+change "alldir" and 'dir' appropriately.
+
 
 6. For plotting, 
 compile Auto-Plot-DP.c 

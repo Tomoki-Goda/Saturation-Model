@@ -1,6 +1,7 @@
 
 
-alldir="ThetaOff"
+#alldir="ThetaOff"
+alldir="FirstRun"
 
 for dir in "GBS" "GBWIntegrated" "GBSPert" "GBSrfix" "GBSPertrfix" 
 do

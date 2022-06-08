@@ -1,4 +1,40 @@
+//////////////////////////////////////////////////////////////////
+/////////////////////// regular control //////////////////////////
+//////////////////////////////////////////////////////////////////
+#ifndef X_MAX 
+	#define X_MAX 1.0e-2
+#endif
+#ifndef Q2_MAX 
+	#define Q2_MAX 1.0e+1
+#endif
 
+#ifndef MODEL 
+	#define MODEL 2
+#endif
+#ifndef FLAVOUR 
+	#define FLAVOUR 2
+#endif
+#ifndef SUDAKOV 
+	#define SUDAKOV 2
+#endif
+
+/* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2,g1 */
+#ifndef MASS_L2
+	#define MASS_L2 0.0196
+#endif
+#ifndef MASS_S2 
+	#define MASS_S2 0.0196
+#endif
+#ifndef MASS_C2 
+	#define MASS_C2 1.96
+#endif
+#ifndef MASS_B2
+	#define MASS_B2 21.16
+#endif
+
+#ifndef R_FIX
+	#define R_FIX 0
+#endif
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -15,7 +51,7 @@
 #endif
 
 #ifndef N_SIMPS_R
-	#define N_SIMPS_R 250
+	#define N_SIMPS_R 150
 #endif
 
 #ifndef R_CHANGE_VAR
@@ -31,7 +67,7 @@
 #endif
 
 #ifndef DGAUSS_PREC
-	#define DGAUSS_PREC 0.0001
+	#define DGAUSS_PREC 0.001
 #endif
 
 #ifndef SIMPS_Z_INT

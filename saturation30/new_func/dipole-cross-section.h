@@ -68,6 +68,8 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	
 	//double xm=mod_x(x);	
 	double mu2=C/(r*r)+mu02;
+	//gpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2);
+
 	double expo = (pow(r * PI,2) * alpha_s(mu2)* xgpdf(x,mu2))/ (3* sigma_0);
 	
 	return( sigma_0*(1-exp(-expo))) ;	
@@ -90,26 +92,40 @@ double sudakov(double r, double mu2,double* par) {
 
 	double mub2=C*( 1.0/(pow(r,2)) + 1.0/pow(r_max,2) ) ;
 	
-	if (mu2 < LQCD2 || mub2 < LQCD2) {
-		return(0.0);
-	}
-#if THETA_OFF==1
-	if (mu2 < mub2) {
-		return(0.0);
-	}
+	double val=0.0;
+
+#if SUDAKOV>=2	
+	val+=(g1/2) * pow(r,2) + (g2/4) * log(1+pow(r/r_max,2) )*log( mu2 /pow(Q0 ,2) );	
 #endif
 	
+#if THETA_OFF==0
+	if (mu2 < mub2) {//ensures that lower limit of integral is smaller than upper limit...
+		return(val);
+	}
+#endif
+		
+//#if SUDAKOV>=2	
+//	val+=(g1/2) * pow(r,2) + (g2/4) * log(1+pow(r/r_max,2) )*log( mu2 /pow(Q0 ,2) );	
+//#endif
 	
+	if (mub2 < LQCD2){
+		printf("\nsudakov:: mu_b is too low!!!\n%f\t%f\n\n",C,r_max);
+	}
+	if (mu2 < LQCD2 ) {
+		//treatment here is unsure, this is dependent on how we treat the case Q2<mu2b
+		//return(val);
+		//printf("\nsudakow:: warning non perturbative region: Q2=%f\n\n",mu2);
+		return(0.0);
+	}
 	
 	double b0 = (11*CA-2*NF)/12;
 	double L_mu_l=log(mu2/LQCD2);
 	double L_mub_l=log(mub2/LQCD2);
 	
-	double val = CA/(2*b0*PI)*(L_mu_l*log(L_mu_l /L_mub_l)-(L_mu_l-L_mub_l ));
+	val += CA/(2*b0*PI)*(L_mu_l*log(L_mu_l /L_mub_l)-(L_mu_l-L_mub_l ));
 	//double val = CA/(2*b0*PI)*(log(mu2/LQCD2)*log(log(mu2/LQCD2)/log(mub2/LQCD2))-log(mu2/mub2));
-#if SUDAKOV>=2	
-	val+=(g1/2) * pow(r,2) + (g2/4) * log(1+pow(r/r_max,2) )*log( mu2 /pow(Q0 ,2) );
-#endif
+	
+
     return val;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

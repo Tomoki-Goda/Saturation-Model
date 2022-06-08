@@ -35,8 +35,8 @@ def import_array_slope(name,xpow ):
 	return(dataarray)
 	
 	
-#name="FirstRun"
-name="ThetaOff"
+name="FirstRun"
+#name="ThetaOff"
 path= "./"+name+"/"
 ################################## x dependence ###################################
 dataarray=import_array(path+"GBS/100masslessLCB/pointsF2-x3.txt")

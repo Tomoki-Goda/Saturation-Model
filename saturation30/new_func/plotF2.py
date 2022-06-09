@@ -34,27 +34,28 @@ def import_array_slope(name,xpow ):
 	dataarray=np.transpose(dataarray)
 	return(dataarray)
 	
-	
-name="FirstRun"
+
+name="NewRun"	
+#name="FirstRun"
 #name="ThetaOff"
 path= "./"+name+"/"
 ################################## x dependence ###################################
-dataarray=import_array(path+"GBS/100masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBS/Mass0.0-Qup100-Model2-Sud2-rfix0/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs 100 massless log10x=-3",ls="-")
 
-dataarray=import_array(path+"GBSPert/100masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBSPert/Mass0.0-Qup100-Model2-Sud1-rfix0/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 100 massless log10x=-3",ls="-.")
 
-dataarray=import_array(path+"GBWIntegrated/100masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBWIntegrated/Mass0.0-Qup100-Model2-Sud0-rfixDefault/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbw 100 massless rfix log10x=-3",ls=":")
 
-dataarray=import_array(path+"GBS/100masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBS/Mass0.0-Qup100-Model2-Sud2-rfix0/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs 100 massless log10x=-5",ls="-")
 
-dataarray=import_array(path+"GBSPert/100masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBSPert/Mass0.0-Qup100-Model2-Sud1-rfix0/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 100 massless log10x=-5",ls="-.")
 
-dataarray=import_array(path+"GBWIntegrated/100masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBWIntegrated/Mass0.0-Qup100-Model2-Sud0-rfixDefault/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbw 100 massless rfix log10x=-5",ls=":")
 
 
@@ -74,23 +75,23 @@ plt.clf()
 		
 
 ################################## slope ###################################
-dataarray=import_array_slope(path+"GBS/100masslessLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBS/Mass0.0-Qup100-Model2-Sud2-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs 100 massless log10x=-5",ls="-")
 
-dataarray=import_array_slope(path+"GBSPert/100masslessLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBSPert/Mass0.0-Qup100-Model2-Sud1-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 100 massless log10x=-5",ls="-.")
 
-dataarray=import_array_slope(path+"GBWIntegrated/100masslessLCB/pointsF2-x5.txt",-5)
+dataarray=import_array_slope(path+"GBWIntegrated/Mass0.0-Qup100-Model2-Sud0-rfixDefault/pointsF2-x5.txt",-5)
 plt.plot(dataarray[0],dataarray[1],label="gbw 100 massless rfix log10x=-5",ls=":")
 
 
-dataarray=import_array_slope(path+"GBS/100massiveLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBS/Mass0.0196-Qup100-Model2-Sud2-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs 100 massive log10x=-5",ls="-")
 
-dataarray=import_array_slope(path+"GBSPert/100massiveLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBSPert/Mass0.0196-Qup100-Model2-Sud1-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 100 massive log10x=-5",ls="-.")
 
-dataarray=import_array_slope(path+"GBWIntegrated/100massiveLCB/pointsF2-x5.txt",-5)
+dataarray=import_array_slope(path+"GBWIntegrated/Mass0.0196-Qup100-Model2-Sud0-rfixDefault/pointsF2-x5.txt",-5)
 plt.plot(dataarray[0],dataarray[1],label="gbw 100 massive rfix log10x=-5",ls=":")
 
 
@@ -108,22 +109,22 @@ plt.savefig("/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots
 #plt.show()
 plt.clf()	
 ################################## x dependence ###################################
-dataarray=import_array(path+"GBS/500masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBS/Mass0.0-Qup500-Model2-Sud2-rfix0/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless log10x=-3",ls="-")
 
-dataarray=import_array(path+"GBSPert/500masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBSPert/Mass0.0-Qup500-Model2-Sud1-rfix0/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massless log10x=-3",ls="-.")
 
-dataarray=import_array(path+"GBWIntegrated/500masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBWIntegrated/Mass0.0-Qup500-Model2-Sud0-rfixDefault/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbw 500 massless rfix log10x=-3",ls=":")
 
-dataarray=import_array(path+"GBS/500masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBS/Mass0.0-Qup500-Model2-Sud2-rfix0/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless log10x=-5",ls="-")
 
-dataarray=import_array(path+"GBSPert/500masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBSPert/Mass0.0-Qup500-Model2-Sud1-rfix0/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massless log10x=-5",ls="-.")
 
-dataarray=import_array(path+"GBWIntegrated/500masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBWIntegrated/Mass0.0-Qup500-Model2-Sud0-rfixDefault/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbw 500 massless rfix log10x=-5",ls=":")
 
 
@@ -143,22 +144,22 @@ plt.clf()
 
 
 ################################## slope ###################################
-dataarray=import_array_slope(path+"GBS/500masslessLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBS/Mass0.0-Qup500-Model2-Sud2-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs 500 massless log10x=-5",ls="-")
 
-dataarray=import_array_slope(path+"GBSPert/500masslessLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBSPert/Mass0.0-Qup500-Model2-Sud1-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massless log10x=-5",ls="-.")
 
-dataarray=import_array_slope(path+"GBWIntegrated/500masslessLCB/pointsF2-x5.txt",-5)
+dataarray=import_array_slope(path+"GBWIntegrated/Mass0.0-Qup500-Model2-Sud0-rfixDefault/pointsF2-x5.txt",-5)
 plt.plot(dataarray[0],dataarray[1],label="gbw 500 massless rfix log10x=-5",ls=":")
 
-dataarray=import_array_slope(path+"GBS/500massiveLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBS/Mass0.0196-Qup500-Model2-Sud2-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs 500 massive log10x=-5",ls="-")
 
-dataarray=import_array_slope(path+"GBSPert/500massiveLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBSPert/Mass0.0196-Qup500-Model2-Sud1-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 500 massive log10x=-5",ls="-.")
 
-dataarray=import_array_slope(path+"GBWIntegrated/500massiveLCB/pointsF2-x5.txt",-5)
+dataarray=import_array_slope(path+"GBWIntegrated/Mass0.0196-Qup500-Model2-Sud0-rfixDefault/pointsF2-x5.txt",-5)
 plt.plot(dataarray[0],dataarray[1],label="gbw 500 massive rfix log10x=-5",ls=":")
 
 
@@ -178,22 +179,22 @@ plt.savefig("/media/tomoki/TOMOKI-USB/Saturation Model/Saturation Notes/NewPlots
 plt.clf()	
 
 ################################## x dependence ###################################
-dataarray=import_array(path+"GBS/10masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBS/Mass0.0-Qup10-Model2-Sud2-rfix0/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless log10x=-3",ls="-")
 
-dataarray=import_array(path+"GBSPert/10masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBSPert/Mass0.0-Qup10-Model2-Sud1-rfix0/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 10 massless log10x=-3",ls="-.")
 
-dataarray=import_array(path+"GBWIntegrated/10masslessLCB/pointsF2-x3.txt")
+dataarray=import_array(path+"GBWIntegrated/Mass0.0-Qup10-Model2-Sud0-rfixDefault/pointsF2-x3.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbw 10 massless rfix log10x=-3",ls=":")
 
-dataarray=import_array(path+"GBS/10masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBS/Mass0.0-Qup10-Model2-Sud2-rfix0/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless log10x=-5",ls="-")
 
-dataarray=import_array(path+"GBSPert/10masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBSPert/Mass0.0-Qup10-Model2-Sud1-rfix0/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 10 massless log10x=-5",ls="-.")
 
-dataarray=import_array(path+"GBWIntegrated/10masslessLCB/pointsF2-x5.txt")
+dataarray=import_array(path+"GBWIntegrated/Mass0.0-Qup10-Model2-Sud0-rfixDefault/pointsF2-x5.txt")
 plt.plot(dataarray[0],dataarray[1],label="gbw 10 massless rfix log10x=-5",ls=":")
 
 
@@ -213,22 +214,22 @@ plt.clf()
 
 
 ################################## slope ###################################
-dataarray=import_array_slope(path+"GBS/10masslessLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBS/Mass0.0-Qup10-Model2-Sud2-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs 10 massless log10x=-5",ls="-")
 
-dataarray=import_array_slope(path+"GBSPert/10masslessLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBSPert/Mass0.0-Qup10-Model2-Sud1-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 10 massless log10x=-5",ls="-.")
 
-dataarray=import_array_slope(path+"GBWIntegrated/10masslessLCB/pointsF2-x5.txt",-5)
+dataarray=import_array_slope(path+"GBWIntegrated/Mass0.0-Qup10-Model2-Sud0-rfixDefault/pointsF2-x5.txt",-5)
 plt.plot(dataarray[0],dataarray[1],label="gbw 10 massless rfix log10x=-5",ls=":")
 
-dataarray=import_array_slope(path+"GBS/10massiveLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBS/Mass0.0196-Qup10-Model2-Sud2-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs 10 massive log10x=-5",ls="-")
 
-dataarray=import_array_slope(path+"GBSPert/10massiveLCB/pointsF2-x5.txt",-5 )
+dataarray=import_array_slope(path+"GBSPert/Mass0.0196-Qup10-Model2-Sud1-rfix0/pointsF2-x5.txt",-5 )
 plt.plot(dataarray[0],dataarray[1],label="gbs pert 10 massive log10x=-5",ls="-.")
 
-dataarray=import_array_slope(path+"GBWIntegrated/10massiveLCB/pointsF2-x5.txt",-5)
+dataarray=import_array_slope(path+"GBWIntegrated/Mass0.0196-Qup10-Model2-Sud0-rfixDefault/pointsF2-x5.txt",-5)
 plt.plot(dataarray[0],dataarray[1],label="gbw 10 massive rfix log10x=-5",ls=":")
 
 

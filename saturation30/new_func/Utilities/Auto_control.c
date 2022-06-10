@@ -29,16 +29,19 @@ int main(int argc, char** argv){
 	char *dir;
 	
 	//this function is used to generate control.h for different settings.
-	for(unsigned i=1;i<argc-1; i++){
-		if(strcmp(argv[i],"-h" )==0||strcmp(argv[i],"--help" )==0){
+	//printf("%d\n",argc);
+	//if(argc==2){argc++;}
+	for(unsigned i=1;i<argc; i++){
+		if( (strcmp(argv[i],"-h" )==0)||(strcmp(argv[i],"--help" )==0)){
 			printf("********************************************************************************\n");
 			printf("Hello there! Asked for help? Here are some tips.\n");
-			printf("Possible options are:\n -lmass, -qup, -model, -sudakov\nList the values or whatever they have to be.\n");
+			printf("Possible options are:\n -lmass, -qup, -model, -sudakov, -dir\nList the values or whatever they have to be.\n");
 			printf("Control file of every combination will be generated\n" ) ;
 			printf("Good luck! and cheerio!\n");	
 			printf("********************************************************************************\n");
 			return 0;		
 		}
+		
 		if(strcmp(argv[i],"-lmass" )==0){
 			for (lmasslen=0;(i< (argc-1))&&(argv[i+1][0]!='-') ;lmasslen++ ){
 				*(lmass+lmasslen)= argv[++i];

@@ -6,9 +6,12 @@
 #include"./control-default.h"
 #include"./constants.h"
 
+#include"gluon-chebyshev.h"
 #include"simpson-integral.h"
 #include"dipole-cross-section.h"
 #include"photon-wave-function-2.h"
+
+
 
 #include"cfortran.h"
 #include"../minuit.h"
@@ -21,11 +24,11 @@
 #include"./Parametersrfix.h"
 #endif
 
-#if MODEL==1
-#include"../gluon.h"
-#include"../chebyshev.h"
-#include"../chebyshev3.h"
-#endif
+//#if MODEL==1
+//#include"../gluons.h"
+//#include"../chebyshev.h"
+//#/include"../chebyshev3.h"
+//#endif
 
 //#define TEST 2
 #define MAXN 600

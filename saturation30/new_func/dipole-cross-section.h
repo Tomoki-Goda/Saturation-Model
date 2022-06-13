@@ -55,30 +55,31 @@ double sigma_gbw(double r,double x,double Q2, double * par){
 /////////////////////////////////////////////////////////////
 //////////////////////////// BGK ////////////////////////////
 /////////////////////////////////////////////////////////////
-#if BGK
+//#if BGK
 
 //extern "C" double xgpdf(double, double);
 
 double sigma_bgk(double r, double x, double Q2, double * par){
 	double sigma_0		=par[0];
 	double A_g		=par[1];
-	double lambda_g		=par[2];
+	double lambda_g	=par[2];
 	double C		=par[3];
 	double mu02		=par[4];
 	
 	//double xm=mod_x(x);	
 	double mu2=C/(r*r)+mu02;
 	//gpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2);
-
-	double expo = (pow(r * PI,2) * alpha_s(mu2)* xgpdf(x,mu2))/ (3* sigma_0);
+	
+	//printf("x=%f,Q2=%f\n",x,mu2);
+	double expo = (pow(r * PI,2) * alpha_s(mu2)* xg_chebyshev(x,mu2))/ (3* sigma_0);
 	
 	return( sigma_0*(1-exp(-expo))) ;	
 }
-#else
-double sigma_bgk(double r, double x, double Q2, double * par){
-	return(0.0);
-};
-#endif
+//#else
+//double sigma_bgk(double r, double x, double Q2, double * par){
+//	return(0.0);
+//};
+//#endif
 
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBS ////////////////////////////

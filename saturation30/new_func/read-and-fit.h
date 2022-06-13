@@ -22,7 +22,7 @@ static double FIT_RES[N_PAR];
 //static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
 static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 /////////////////////////////////////////////
-static const double ep=1.0e-6;//for r==0 is divergent or unstable
+static const double ep=1.0e-5;//for r==0 is divergent or unstable
 #if R_CHANGE_VAR==1
 static const double r_int_max=0.99;
 #else
@@ -167,6 +167,9 @@ double compute_chisq(double *par){
 void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void (*dum)(void) ){
 	/////////////////////////////////////////
 	//for detail see MINUIT documentatin.
+#if MODEL==1	
+	approx_xg(par+1);//generate chebyshev coefficients
+#endif
 	*fcnval=compute_chisq(par);
 }
 

@@ -6,9 +6,37 @@
  * Modified by T. Goda
  */
 
-#include "main.h"
-#include "complex.h"
+//#include "main.h"
+#include "../complex.h"
 
+
+////////////// use values from the control & constant ///////////////////
+static double n_f=NF;
+static double Lambda2=LQCD2;
+static double pi=PI;
+static double eulergamma = GAMMA_E;
+////from main.h////////
+static double simpsN=500;
+/* Initial condition */
+//double       beta = 9.6;
+double       beta = 6.6;
+double        n_0 = 0.5;       /* Maximal singluraity of integrand */
+
+////from control.h/////////////
+int  gluon_int    = 1;
+//////////////////       fit parametr          /////////////////////////
+static double A_g, lambda_g;
+////////////////////////////////////////////////////////////////////////
+
+///////////////////function to control fitparameter from outside the file////////////////
+void set_xg_parameter(double ag,double lg){
+	A_g=ag;
+	lambda_g=lg;
+}
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////// Old Part, no major change below/////////////////////////////////////////
 
 /* CERNLIB functions*/
 extern doublecomplex wgamma_();
@@ -167,6 +195,7 @@ double xgpdf(double x, double QQ) {
 			  variable declared in main.h. N is the number
 			  of points in which the integrand function
 			  is calculated.                              */
+			
     int    i;
     double fr[N+1];
 
@@ -175,7 +204,7 @@ double xgpdf(double x, double QQ) {
     tg = (1/bprim)*log(log(QQ/Lambda2)/log(Q0/Lambda2));
 
     normalization = A_g*exp(n_0*Yg)*dgammf_(&beta)/pi;
-
+    
     switch (gluon_int) {
         /* Golec Simpson method of 1d integration */
         case 0:
@@ -191,7 +220,7 @@ double xgpdf(double x, double QQ) {
 	         fr[i]=xgpdf_integrand2(i*(b-a)/N,Yg,tg).r;
 
         }
-
+	//printf("simpsN %d\n",N);
         value = dsimps_(fr,&a,&b,&N);
         break;
     }

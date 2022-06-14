@@ -49,7 +49,7 @@ int comp( double a, double b ,double tolarence){
 void approx_xg(double * par){
 	static double param[2];
 	clock_t time_xg=clock();
-	printf("*************************************** xg(x,Q2) **************************\n");
+	printf("*************************       xg(x,Q2)          **************************\n");
 	if((comp(*(par+1),param[1] , 1.0e-10)==0)){
 		if((comp(*(par),param[0] , 1.0e-10)==0)){
 			printf("skip\n");				//both A_g and lambda_g are not changed.
@@ -75,7 +75,7 @@ void approx_xg(double * par){
 double xg_chebyshev(double  x,double q2){
 	double args[2];
 	(*args)=change_var_compactify(1.0e-7,1.0,x);
-	(*(args+1))=change_var_compactify(0.005,1.0e+10,q2);
+	(*(args+1))=change_var_compactify(0.05,1.0e+10,q2);
 	//(*args)=(2*x-1);
 	//(*(args+1))=(q2-1)/(q2+1);	
 	

@@ -24,7 +24,7 @@ static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 /////////////////////////////////////////////
 static const double ep=1.0e-5;//for r==0 is divergent or unstable
 #if R_CHANGE_VAR==1
-static const double r_int_max=0.99;
+static const double r_int_max=0.95;
 #else
 static const double r_int_max=30.0;
 #endif

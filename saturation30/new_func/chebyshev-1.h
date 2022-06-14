@@ -42,8 +42,22 @@ double change_var_compactify(double min,double max, double val){
 		printf("continue");
 		return 0.0;
 	}
+	
 	return (2*((val-min)/(max-min)) -1);
 	
+}
+////////////////////////////////log version ////////////////////////////
+double change_var_revert_log(double min,double max, double val){
+	//for val =[-1,1]  return value between min and max
+	double ret=min*pow((max/min),(1.0-val)/2)  ;
+	
+	return (ret);
+}
+//double change_var_revert(double min,double max, double val){
+double change_var_compactify_log(double min,double max, double val){
+	double ret=1-2*(log(val/min) /log(max/min)) ;
+	
+	return (ret);	
 }
 //////////////////////////////////////////////////////////////////////////////////
 void ind_vec_increment(unsigned * vec, const unsigned * max, unsigned dim){

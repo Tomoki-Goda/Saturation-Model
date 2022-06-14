@@ -71,9 +71,12 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	//gpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2);
 	
 	//printf("x=%f,Q2=%f\n",x,mu2);
-	double expo = (pow(r * PI,2) * alpha_s(mu2)* xg_chebyshev(x,mu2))/ (3* sigma_0);
-	
-	return( sigma_0*(1-exp(-expo))) ;	
+	//double expo = (pow(r * PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0);
+	double expo = (pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0);
+	//printf("%f\n",expo);
+	double val=sigma_0*(1-exp(-expo));
+	//printf("%f\t%f^2\n",val,r);
+	return(val) ;	
 }
 //#else
 //double sigma_bgk(double r, double x, double Q2, double * par){

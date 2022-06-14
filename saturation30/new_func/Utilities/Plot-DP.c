@@ -7,7 +7,9 @@
 #include"../control-default.h"
 #include"../constants.h"
 
+#include"../gluon-chebyshev.h"
 #include"../dipole-cross-section.h"
+
 
 //Syntax is ./main -in <input dir > -out <output dir > -Q2 <Q2 > -x <x >
 
@@ -24,6 +26,7 @@ void generate_data_set(double *par, double Q2,double x ,char* datafile){
 		printf("generate_data_set::file error\n");
 		
 	}
+	
 	
 	for(unsigned i=0; i<point_n;i++){
 		point=0;
@@ -86,6 +89,10 @@ int main(int argc, char ** argv){
 		fprintf(stdout,"%s \t\t %.3e  \n",name ,*(param+i));
 	}
 	fclose(parfile);
+	
+#if MODEL==1	
+	approx_xg(param+1);//generate chebyshev coefficients
+#endif
 	generate_data_set(param, Q2,x ,resultfilename);
 	
 	return 0;

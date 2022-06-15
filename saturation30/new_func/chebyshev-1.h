@@ -60,6 +60,19 @@ double change_var_compactify_log(double min,double max, double val){
 	return (ret);	
 }
 //////////////////////////////////////////////////////////////////////////////////
+unsigned convert_index(unsigned * index, unsigned * max, unsigned dim){
+	unsigned unit;
+	unsigned total=0;
+	for(unsigned i=0;i<dim;i++){
+		unit=1;
+		for(unsigned j=0;j<(dim-i-1);j++){
+			unit*= max[dim-j-1];	
+		}
+		total+=unit*index[i];	
+	}
+	return(total);
+}
+/////////////
 void ind_vec_increment(unsigned * vec, const unsigned * max, unsigned dim){
 //increment the vec
 // like in the way increasing (hr,min,sec) second by second. 	
@@ -74,6 +87,7 @@ void ind_vec_increment(unsigned * vec, const unsigned * max, unsigned dim){
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////
 
 void chebyshevT(double x,unsigned degree, double * T ){
 //iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
@@ -88,28 +102,72 @@ int kronecker(int i,int j){
 	return((i==j)?1:0);
 } 
 
+void sample(double func(double *,double* ), double * par,  unsigned * degree, unsigned dim,  double* sample_arr){
+	unsigned index[dim];
+	double argvec[dim];
+	unsigned max=1;
+	double cosarg;
+	for(unsigned i=0;i<dim;i++){
+		index[i]=0;
+		max*=degree[i];
+	}
+	
+	for(unsigned i=0;i<max;i++){
+		for(unsigned j=0;j<dim;j++){
+			cosarg=PI*(index[j]+0.5)/( degree[j] );
+			argvec[j]=cos( cosarg ) ;
+		}
+		
+		
+		(*(sample_arr+i)) =(*func)(argvec,par);
+		if(convert_index(index,degree,dim)!=i){
+			printf("%d?=%d\n", convert_index(index,degree,dim),i);
+		}
+		ind_vec_increment(index,degree,dim);
+	}
+}
 
-double cheb_c_summand(double func(double * vec,double* par) , double * par, unsigned* ind1, unsigned* ind2, unsigned *degree, unsigned dim ){
+
+//double cheb_c_summand(double func(double * vec,double* par) , double * par, unsigned* ind1, unsigned* ind2, unsigned *degree, unsigned dim ){
+	//vec, ind1, ind2, degree are vector of length dim.
+	// sum over ind2 is the coefficients in the chebyshev
+//	double argvec[dim];
+//	double factor=1;
+//	double cosarg; 
+//	double val;
+	
+//	for(unsigned i=0;i<dim;i++){
+//		cosarg=PI*(ind2[i]+0.5)/( degree[i] );
+//		argvec[i]=cos( cosarg ) ;
+//		factor*=cos(ind1[i] * cosarg );
+//	}
+//	
+//	 val=(*func)(argvec,par)*factor;
+	 //printf("sijIJ %f\t %f\n",val,factor);
+//	 return val;
+//}
+
+double cheb_c_summand(double * sample_arr, unsigned* ind1, unsigned* ind2, unsigned *degree, unsigned dim ){
 //vec, ind1, ind2, degree are vector of length dim.
 // sum over ind2 is the coefficients in the chebyshev
-	double argvec[dim];
+	
 	double factor=1;
 	double cosarg; 
 	double val;
 	
 	for(unsigned i=0;i<dim;i++){
 		cosarg=PI*(ind2[i]+0.5)/( degree[i] );
-		argvec[i]=cos( cosarg ) ;
+		//argvec[i]=cos( cosarg ) ;
 		factor*=cos(ind1[i] * cosarg );
 	}
 	
-	 val=(*func)(argvec,par)*factor;
+	 val=(sample_arr[ convert_index(ind2,degree,dim) ]) *factor;
 	 //printf("sijIJ %f\t %f\n",val,factor);
 	 return val;
 }
 
 
-double cheb_c(double func(double * vec,double* par) , double * par, unsigned* ind1,unsigned *degree, unsigned dim ){
+double cheb_c(/*double func(double * vec,double* par) */double * sample_arr,/*double * par,*/ unsigned* ind1,unsigned *degree, unsigned dim ){
 // do the sum, produce coefficient c of chebyshev \sum c*T
 //vec, ind1,  degree are vector of length dim.
 	unsigned ind2[dim];//={0};
@@ -127,7 +185,7 @@ double cheb_c(double func(double * vec,double* par) , double * par, unsigned* in
 //			printf("%d", ind2[i]);
 //			(i==(dim-1))?(printf("\n")):(printf(", ")) ;
 //		}
-		dif=cheb_c_summand( func, par,ind1 ,ind2,degree,dim);
+		dif=cheb_c_summand( /*func, par,*/ sample_arr, ind1 ,ind2,degree,dim);
 		val+=dif;
 #if CHEBYSHEV_TEST ==1
 		printf("%f\t",dif);
@@ -151,17 +209,22 @@ void cheb_coeff(double func(double * vec,double* par) , double * par,unsigned *d
 	unsigned ind1[dim];//={0};
 	unsigned len=1;
 	
+	
 	for(unsigned i=0;i<dim;i++){
 		len*=degree[i];
 		*(ind1+i)=0;//initialize indices
 	}
+	double sample_arr[len];
+	sample(func,  par, degree, dim,   sample_arr);
+	
 	for(unsigned j=0;j<len; j++ ){	
 //		for(unsigned i=0;i<dim;i++){
 //			printf("%d", ind1[i]);
 //			(i==(dim-1))?(printf("\n")):(printf(", ")) ;
 //		}
 		
-		(*(coeff+j))=cheb_c( func, par,ind1 ,degree,dim);
+		//(*(coeff+j))=cheb_c( func, par,ind1 ,degree,dim);
+		(*(coeff+j))=cheb_c(sample_arr,ind1 ,degree,dim);
 		//printf("coeff\t %f\n", (*(coeff+j)) );
 		ind_vec_increment(ind1,degree,dim);//increment the ind1; like in the way increasing (hr,min,sec) second by second. 
 		//order in wich coeff is stored is {(0,0,0),(0,0,1),(0,0,2)...,(0,1,0),(0,1,1)...}

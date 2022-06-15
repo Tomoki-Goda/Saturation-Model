@@ -215,13 +215,13 @@ double chebyshev(unsigned *degree,unsigned dim, double* coeff ,double* args ){
 	double Tlist[lenT];
 	unsigned posit[10]={0};//max dim=10. This is a list containing where the index move to the next dimension.
 	
-	for(int i=0;i<dim;i++){
+	for(unsigned i=0;i<dim;i++){
 		if(args[i]>1) {
-			printf("arg too large %f at position %d\n",args[i], i);
+			printf("chebyshev:: arg too large %f at position %d\n",args[i], i);
 			(args[i])-=2;			
 		}
 		if(args[i]<-1) {
-			printf("arg too small %f at position %d\n",args[i], i);
+			printf("chebyshev:: arg too small %f at position %d\n",args[i], i);
 			(args[i])+=2;			
 		}
 		chebyshevT(args[i], degree[i], Tlist+*(posit+i)); 

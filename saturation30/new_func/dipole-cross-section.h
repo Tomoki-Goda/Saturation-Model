@@ -67,12 +67,13 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	double mu02		=par[4];
 	
 	//double xm=mod_x(x);	
-	double mu2=C/(r*r)+mu02;
+	//double mu2=C/(r*r)+mu02;
+	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
 	//gpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2);
 	
 	//printf("x=%f,Q2=%f\n",x,mu2);
 	//double expo = (pow(r * PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0);
-	double expo = (pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0);
+	double expo = 0.389379*(pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	//printf("%f\n",expo);
 	double val=sigma_0*(1-exp(-expo));
 	//printf("%f\t%f^2\n",val,r);

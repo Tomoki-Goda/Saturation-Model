@@ -147,15 +147,15 @@ double integrand_gbs(double r, double *par[2] ){
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
 #elif MODEL==3
 	double sigma_0=(*(*(par+1) ));
-	double A_g=( *(*(par+1)+1) );
-	double lambda_g   =( *(*(par+1) +2) );
+	//double A_g=( *(*(par+1)+1) );
+	//double lambda_g   =( *(*(par+1) +2) );
 	double C=*( *(par+1)+3 );
 	double rmax=*( *(par+1)+4 );
 	double mu02=C/pow(rmax ,2);
 	double *sudpar=( *(par+1)+3 );//whatever parameter sudakov takes...
 	
 	double axg = xg_chebyshev(x,C/(r*r) +mu02);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
-	double Qs2 =4*PI*PI*axg/(3*sigma_0);
+	double Qs2 = 0.389379*4*PI*PI*axg/(3*sigma_0);
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
 #endif
 
@@ -204,15 +204,15 @@ double integrand_gbs(double *r_ptr){
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
 #elif MODEL==3
 	double sigma_0=(*(PAR ));
-	double A_g=( *(PAR+1) );
-	double lambda_g  =( *(PAR +2) );
+	//double A_g=( *(PAR+1) );
+	//double lambda_g  =( *(PAR +2) );
 	double C =(*( PAR+3 ));
 	double rmax =(*( PAR+4 ));
 	double mu02=C/pow(rmax,2);
 	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
 	
 	double axg = xg_chebyshev(x,C/(r*r) +mu02);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
-	double Qs2 =4*PI*PI*axg/(3*sigma_0);
+	double Qs2 = 0.389379*4*PI*PI*axg/(3*sigma_0);
 	
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
 #endif

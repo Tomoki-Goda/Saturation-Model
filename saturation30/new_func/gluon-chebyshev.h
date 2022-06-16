@@ -6,13 +6,14 @@
 #include"./gluons.h"
 #include"./chebyshev-1.h"
 
-#define X_DEGREE 50
-#define Q2_DEGREE 50
+#define X_DEGREE 20
+#define Q2_DEGREE 20
  
 #ifndef SKIP_SAME
 	#define SKIP_SAME 1
 #endif
 
+static int ERROR_FLAG = 1;
 ///////just to clarify/////////
 //extern void cheb_coeff(double func(double * vec,double* par) , double * par,const unsigned *degree,unsigned dim, double* coeff  );
 //extern double chebyshev(const unsigned *degree,unsigned dim, double* coeff ,double* args );
@@ -29,7 +30,7 @@ static double coeff[X_DEGREE*Q2_DEGREE];
 static  const unsigned dim=2;
 static  unsigned degree[2]={X_DEGREE,Q2_DEGREE};
 
-static double xlim[2]={1.0e-7,1.0} ;//x upper lim is not 0.01 for it is x_mod... 
+static double xlim[2]={1.0e-7,1.0} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
 static double q2lim[2]={0.5,1.0e+10};
 /////////////////////////////////////////
 
@@ -49,6 +50,7 @@ int comp( double a, double b ,double tolarence){
 	return( (int)(fabs(a-b)/(( fabs(a)+fabs(b) )*tolarence)) );
 }
 void approx_xg(double * par){
+	
 	static double param[2];
 	clock_t time_xg=clock();
 	//printf("*************************       xg(x,Q2)          **************************\n");
@@ -74,11 +76,17 @@ void approx_xg(double * par){
 #endif
 	time_xg-=clock();
 	printf(  "*********************   Chebyshev  done, %.3e seconds    **************************\n", -((double)time_xg)/CLOCKS_PER_SEC);
+	ERROR_FLAG=0;//indicate approxmation is done,
 	
 }
 
 ///////////// result /////////////////
 double xg_chebyshev(double  x,double q2){
+	if(ERROR_FLAG!=0 ){
+		printf("approx_xg has to be run first!!!");
+		char ch;
+		scanf("%c",&ch);
+	}
 	double args[2];
 	(*args)=change_var_compactify_log(xlim[0],xlim[1],x);
 	(*(args+1))=change_var_compactify_log(q2lim[0],q2lim[1],q2);

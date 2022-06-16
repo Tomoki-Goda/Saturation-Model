@@ -40,7 +40,6 @@ double mod_x(double x, double Q2, unsigned flavour) {
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBW ////////////////////////////
 /////////////////////////////////////////////////////////////
-
 double sigma_gbw(double r,double x,double Q2, double * par){
 	double sigma_0 =par[0];
 	double lambda	=par[1];
@@ -55,35 +54,25 @@ double sigma_gbw(double r,double x,double Q2, double * par){
 /////////////////////////////////////////////////////////////
 //////////////////////////// BGK ////////////////////////////
 /////////////////////////////////////////////////////////////
-//#if BGK
-
-//extern "C" double xgpdf(double, double);
-
 double sigma_bgk(double r, double x, double Q2, double * par){
 	double sigma_0		=par[0];
 	double A_g		=par[1];
 	double lambda_g	=par[2];
 	double C		=par[3];
-	double mu02		=par[4];
+	//double mu02		=par[4];
+	double rmax		=par[4];
+	double mu02		=C/(rmax*rmax);
 	
-	//double xm=mod_x(x);	
-	//double mu2=C/(r*r)+mu02;
+	//double mu2=C(1.0/(r*r)+1.0/(rmax*rmax)) ;
 	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
-	//gpdf_cheb = chebev(xmin,xmax,Qmin,Qmax,MX,MQ,coef,xmod,mu2);
 	
-	//printf("x=%f,Q2=%f\n",x,mu2);
-	//double expo = (pow(r * PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0);
 	double expo = 0.389379*(pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
-	//printf("%f\n",expo);
+	
 	double val=sigma_0*(1-exp(-expo));
-	//printf("%f\t%f^2\n",val,r);
+	
 	return(val) ;	
 }
-//#else
-//double sigma_bgk(double r, double x, double Q2, double * par){
-//	return(0.0);
-//};
-//#endif
+
 
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBS ////////////////////////////
@@ -149,10 +138,26 @@ double integrand_gbs(double r, double *par[2] ){
 	double x=( *(*par+1) );
 	//double xm=mod_x(x);
 	double Q2=( *(*par+2) ) ;
+#if MODEL==2	
 	double sigma_0=(*(*(par+1) ));
 	double lambda=( *(*(par+1)+1) );
 	double x_0   =( *(*(par+1) +2) );
 	double *sudpar=( *(par+1)+3 );//whatever parameter sudakov takes...
+	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
+	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
+#elif MODEL==3
+	double sigma_0=(*(*(par+1) ));
+	double A_g=( *(*(par+1)+1) );
+	double lambda_g   =( *(*(par+1) +2) );
+	double C=*( *(par+1)+3 );
+	double rmax=*( *(par+1)+4 );
+	double mu02=C/pow(rmax ,2);
+	double *sudpar=( *(par+1)+3 );//whatever parameter sudakov takes...
+	
+	double axg = xg_chebyshev(x,C/(r*r) +mu02);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
+	double Qs2 =4*PI*PI*axg/(3*sigma_0);
+	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
+#endif
 
 	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
@@ -179,7 +184,7 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 ////////////////////////////////// CERN INTEGRATION ROUTINE VERSION ////////////////////////////////////
 /// GLOBAL ///
 static double VAR[3];
-static double *PAR;
+static double *PAR;//its array but need only one because it needs only to point at par;
 
 double integrand_gbs(double *r_ptr){
 	double r=*r_ptr;
@@ -190,13 +195,28 @@ double integrand_gbs(double *r_ptr){
 	double x=( *(VAR+1) );
 	//double xm=mod_x(x);
 	double Q2=( *(VAR+2) ) ;
+#if MODEL==2
 	double sigma_0=(*(PAR ));
 	double lambda=( *(PAR+1) );
 	double x_0   =( *(PAR +2) );
 	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
-
 	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
 	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
+#elif MODEL==3
+	double sigma_0=(*(PAR ));
+	double A_g=( *(PAR+1) );
+	double lambda_g  =( *(PAR +2) );
+	double C =(*( PAR+3 ));
+	double rmax =(*( PAR+4 ));
+	double mu02=C/pow(rmax,2);
+	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
+	
+	double axg = xg_chebyshev(x,C/(r*r) +mu02);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
+	double Qs2 =4*PI*PI*axg/(3*sigma_0);
+	
+	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
+#endif
+
 	double val=laplacian_sigma;
 #if SUDAKOV>=1
         val*=exp(-sudakov(r,Q2,sudpar)) ;
@@ -213,7 +233,7 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	PAR=par;
 		
 	double result=0;
-	double rmin=0.0;
+	double rmin=1.0e-5;
 	double N=DGAUSS_PREC;
 	//int N=96;
 	//result=dgquad_(&integrand_gbs,&rmin,VAR,&N);

@@ -239,8 +239,7 @@ double chebyshev(unsigned *degree,unsigned dim, double* coeff ,double* args ){
 		val*=(*(coeff+j));
 		
 		res+=val;	
-		ind_vec_increment(ind1,degree,dim);//increment the ind1; like in the way increasing (hr,min,sec) second by second. 
-		//order in wich coeff is stored is {(0,0,0),(0,0,1),(0,0,2)...,(0,1,0),(0,1,1)...}
+		ind_vec_increment(ind1,degree,dim);
 	}
 
 	for(unsigned i=0;i<dim;i++){

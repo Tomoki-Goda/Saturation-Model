@@ -6,7 +6,7 @@
 #include"../control_tmp.h"
 #include"../control-default.h"
 #include"../constants.h"
-
+#include"../gluon-chebyshev.h"
 #include"../dipole-cross-section.h"
 #include"../photon-wave-function-2.h"
 #include"../simpson-integral.h"
@@ -51,6 +51,10 @@ void generate_data_set(double *par,double xpow ,char* datafile){
 	}
 	double res[2], err[2];
 	//printf("s_0: %f\t l: %f\t x_0: %f \n", *(*(param+1)),(*(*(param+1)+1) ),(*(*(param+1)+2) ), res);
+#if MODEL==1	
+	approx_xg(par+1);//generate chebyshev coefficients
+	//printf("cheb\n");
+#endif
 	
 	for(unsigned i=0; i<point_n;i++){
 		
@@ -58,12 +62,12 @@ void generate_data_set(double *par,double xpow ,char* datafile){
 		*(var+1) =Q2;//Q2
 		for(unsigned j=0;j<2;j++){
 			*(res+j)=0;
-			(*(var))= pow( 10,xpow+0.1*j );
+			(*(var))= pow( 10,xpow+0.01*j );
 			
-			simpson1dA(&f2_integrand,param,1.0e-6,30,100,res+j,err+j);
+			simpson1dA(&f2_integrand,param,1.0e-5,30,100,res+j,err+j);
 			//printf("NF:%f\n",NF);	
 		}
-		grad=(log((*res)) - log( (*(res+1))) )/ (0.1 *log(10) );
+		grad=(log((*res)) - log( (*(res+1))) )/ (0.01 *log(10) );
 		
 		fprintf(file,"%lf\t%lf\t%lf\n",Q2,*res, grad);	
 	}
@@ -114,6 +118,8 @@ int main(int argc, char ** argv){
 		fprintf(stdout,"%s \t\t %.3e  \n",name ,*(param+i));
 	}
 	fclose(parfile);
+	
+	
 	generate_data_set(param, x ,resultfilename);
 	
 	return 0;

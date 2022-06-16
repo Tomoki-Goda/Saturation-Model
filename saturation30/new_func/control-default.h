@@ -93,6 +93,14 @@
 	#elif SUDAKOV==2
 		#define N_PAR 7
 	#endif
+#elif MODEL==3
+	#if SUDAKOV==0
+		#define N_PAR 5
+	#elif SUDAKOV==1
+		#define N_PAR 5
+	#elif SUDAKOV==2
+		#define N_PAR 7
+	#endif
 #endif
 
 
@@ -101,7 +109,7 @@
 #define SIGMA sigma_gbw
 #elif MODEL==1
 #define SIGMA sigma_bgk
-#elif MODEL==2
+#elif MODEL>=2
 #define SIGMA sigma_gbs
 #endif
 

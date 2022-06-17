@@ -9,6 +9,9 @@
 #include"gluon-chebyshev.h"
 #include"simpson-integral.h"
 #include"dipole-cross-section.h"
+
+#include"otherintegration.h"
+
 #include"photon-wave-function-2.h"
 
 

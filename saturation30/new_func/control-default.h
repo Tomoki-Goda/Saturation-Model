@@ -109,8 +109,10 @@
 #define SIGMA sigma_gbw
 #elif MODEL==1
 #define SIGMA sigma_bgk
-#elif MODEL>=2
+#elif MODEL==2
 #define SIGMA sigma_gbs
+#elif MODEL==3
+#define SIGMA sigma_bgks
 #endif
 
 #define STRATEGY 0.0

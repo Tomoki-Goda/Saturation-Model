@@ -9,8 +9,12 @@ int main(int argc, char** argv){
 			printf("e.g. \n\t \"#define PRINT_PROGRESS 1\" ./BGK/M* \n");
 			return 0;
 		}
+		
 	}
-
+	
+	//if(strcmp(argv[1],"--remove")==0){	
+	//}
+	
 	char addline[100];
 	sprintf(addline ,"%s" ,argv[1]);
 	printf("%s\n" ,addline);

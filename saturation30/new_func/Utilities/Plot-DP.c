@@ -9,6 +9,7 @@
 
 #include"../gluon-chebyshev.h"
 #include"../dipole-cross-section.h"
+#include"../otherintegration.h"
 
 
 //Syntax is ./main -in <input dir > -out <output dir > -Q2 <Q2 > -x <x >
@@ -21,7 +22,7 @@ void generate_data_set(double *par, double Q2,double x ,char* datafile){
 	double r,xm;
 	FILE* file=fopen(datafile,"w");
 	printf("generate_data_set\n");
-	unsigned point_n=10000;
+	unsigned point_n=100;
 	if(file==NULL){
 		printf("generate_data_set::file error\n");
 		

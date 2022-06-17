@@ -63,9 +63,9 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	double rmax		=par[4];
 	double mu02		=C/(rmax*rmax);
 	
-	//double mu2=C(1.0/(r*r)+1.0/(rmax*rmax)) ;
+	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
 	//double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
-	double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
+	//double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
 	
 	double expo = 0.389379*(pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	
@@ -103,6 +103,7 @@ double sudakov(double r, double mu2,double* par) {
 //	val+=(g1/2) * pow(r,2) + (g2/4) * log(1+pow(r/r_max,2) )*log( mu2 /pow(Q0 ,2) );	
 //#endif
 	
+#if SUDAKOV>=1
 	if (mub2 < LQCD2){
 		printf("\nsudakov:: mu_b is too low!!!\n%f\t%f\n\n",C,r_max);
 	}
@@ -119,7 +120,7 @@ double sudakov(double r, double mu2,double* par) {
 	
 	val += CA/(2*b0*PI)*(L_mu_l*log(L_mu_l /L_mub_l)-(L_mu_l-L_mub_l ));
 	//double val = CA/(2*b0*PI)*(log(mu2/LQCD2)*log(log(mu2/LQCD2)/log(mub2/LQCD2))-log(mu2/mub2));
-	
+#endif	
 
     return val;
 }
@@ -128,7 +129,7 @@ double sudakov(double r, double mu2,double* par) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 #if SIMPS_GBS==1
 //////////////////////////////// ORIGINAL SIMPSON INTEGRAL VERSION //////////////////////////////////////////
-double integrand_gbs(double r, double *par[2] ){
+double integrand_gbs(double r, double *par[2] ){/*
 	//for the integral integrand has to be in the form 
 	//func(double , double**) where integration is over the first argument. second are constants to be passed.
 	//hence the following constant  parameters.
@@ -167,10 +168,10 @@ double integrand_gbs(double r, double *par[2] ){
         val*=exp(-sudakov(r,Q2,sudpar)) ;
 #endif
 	//printf("integrand return for r=%f, %f. \n",r,val);       
-	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);
+	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);*/return 0.0;
 }
 
-double sigma_gbs(double r, double x, double Q2, double * par){
+double sigma_gbs(double r, double x, double Q2, double * par){/*
 	double param[3]={r,x,Q2};
 
 	double *param_ptr[2]={param, par};
@@ -178,7 +179,7 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	double error=0;
 	simpson1dA(&integrand_gbs, param_ptr,0.0,r,120,&result,&error);
 	//printf("\n\n");
-	return(result);
+	return(result);*/return 0.0;
 }
 
 #elif SIMPS_GBS==0
@@ -212,7 +213,10 @@ double integrand_gbs(double *r_ptr){
 	double rmax =(*( PAR+4 ));
 	double mu02=C/pow(rmax,2);
 	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
-	double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
+	//double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
+	double mu2=C*(pow(r,-2)+pow(rmax,-2));
+	//printf("s0 %.2e, A_g %.2e, l_g %.2e, C %.2e, rm %.2e ", *(PAR),*(PAR+1) ,*(PAR+2),*(PAR+3),*(PAR+4) );
+	//printf("%.2e %.2e %.2e \n", R,x,Q2);
 	
 	double axg = xg_chebyshev(x,mu2);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
 	 Qs2 = 0.389379*4*PI*PI*axg/(3*sigma_0);

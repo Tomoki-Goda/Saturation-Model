@@ -18,7 +18,7 @@
 #include"./read-and-fit.h"
 
 
-#if R_FIX==1
+#if R_FIX==0
 #include"./Parameters.h"
 #else 
 #include"./Parametersrfix.h"
@@ -96,6 +96,7 @@ int main(int argc, char* argv[]){
 	
 	printf("*************************  Starting  **************************\n");
 	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
+	printf("R_FIX: %d \t                                               \n",R_FIX );
 	
 	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
 	printf("****************************************************************\n");

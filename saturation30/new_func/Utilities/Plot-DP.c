@@ -90,7 +90,7 @@ int main(int argc, char ** argv){
 	}
 	fclose(parfile);
 	
-#if MODEL==1	
+#if (MODEL==1||MODEL==3)	
 	approx_xg(param+1);//generate chebyshev coefficients
 #endif
 	generate_data_set(param, Q2,x ,resultfilename);

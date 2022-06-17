@@ -64,7 +64,8 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	double mu02		=C/(rmax*rmax);
 	
 	//double mu2=C(1.0/(r*r)+1.0/(rmax*rmax)) ;
-	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
+	//double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
+	double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
 	
 	double expo = 0.389379*(pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	
@@ -193,29 +194,31 @@ double integrand_gbs(double *r_ptr){
 	}
 	double R=( *(VAR)) ;
 	double x=( *(VAR+1) );
-	//double xm=mod_x(x);
 	double Q2=( *(VAR+2) ) ;
-#if MODEL==2
+	double laplacian_sigma=0;
+	
 	double sigma_0=(*(PAR ));
+	double Qs2 =1;
+#if MODEL==2
 	double lambda=( *(PAR+1) );
 	double x_0   =( *(PAR +2) );
 	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
-	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
-	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
+	 Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
+	
 #elif MODEL==3
-	double sigma_0=(*(PAR ));
 	//double A_g=( *(PAR+1) );
 	//double lambda_g  =( *(PAR +2) );
 	double C =(*( PAR+3 ));
 	double rmax =(*( PAR+4 ));
 	double mu02=C/pow(rmax,2);
 	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
+	double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
 	
-	double axg = xg_chebyshev(x,C/(r*r) +mu02);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
-	double Qs2 = 0.389379*4*PI*PI*axg/(3*sigma_0);
-	
-	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
-#endif
+	double axg = xg_chebyshev(x,mu2);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
+	 Qs2 = 0.389379*4*PI*PI*axg/(3*sigma_0);
+#endif	
+	laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
+
 
 	double val=laplacian_sigma;
 #if SUDAKOV>=1

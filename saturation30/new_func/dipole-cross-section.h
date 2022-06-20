@@ -127,6 +127,7 @@ double sudakov(double r, double mu2,double* par) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+#if MODEL==2
 #if SIMPS_GBS==1
 //////////////////////////////// ORIGINAL SIMPSON INTEGRAL VERSION //////////////////////////////////////////
 double integrand_gbs(double r, double *par[2] ){/*
@@ -200,7 +201,7 @@ double integrand_gbs(double *r_ptr){
 	
 	double sigma_0=(*(PAR ));
 	double Qs2 =1;
-#if MODEL==2
+#if (MODEL==2||MODEL==22)
 	double lambda=( *(PAR+1) );
 	double x_0   =( *(PAR +2) );
 	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
@@ -248,4 +249,4 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	return(result);
 }
 #endif
-
+#endif

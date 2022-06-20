@@ -9,7 +9,10 @@
 
 #include"../gluon-chebyshev.h"
 #include"../dipole-cross-section.h"
-#include"../otherintegration.h"
+
+#if (MODEL==3||MODEL==22)
+#include"../sudakov.h"
+#endif
 
 
 //Syntax is ./main -in <input dir > -out <output dir > -Q2 <Q2 > -x <x >

@@ -85,7 +85,7 @@
 	#define N_PAR 3
 #elif MODEL==1
 	#define N_PAR 5
-#elif MODEL==2
+#elif (MODEL==2||MODEL==22)
 	#if SUDAKOV==0
 		#define N_PAR 3
 	#elif SUDAKOV==1
@@ -111,8 +111,17 @@
 #define SIGMA sigma_bgk
 #elif MODEL==2
 #define SIGMA sigma_gbs
+#elif MODEL==22
+#define SIGMA sigma_s
 #elif MODEL==3
-#define SIGMA sigma_bgks
+#define SIGMA sigma_s
+#endif
+
+
+#if MODEL==3
+	#define BASE_SIGMA sigma_bgk
+#elif MODEL==22
+	#define BASE_SIGMA sigma_gbw
 #endif
 
 #define STRATEGY 0.0

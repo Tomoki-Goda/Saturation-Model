@@ -10,7 +10,10 @@
 #include"simpson-integral.h"
 #include"dipole-cross-section.h"
 
-#include"otherintegration.h"
+#if (MODEL==3||MODEL==22)
+#include"sudakov.h"
+#endif
+
 
 #include"photon-wave-function-2.h"
 

@@ -1,4 +1,4 @@
-#define BGK 0
+//#define BGK 0
 
 extern  double xgpdf(double, double);
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
@@ -55,6 +55,7 @@ double sigma_gbw(double r,double x,double Q2, double * par){
 //////////////////////////// BGK ////////////////////////////
 /////////////////////////////////////////////////////////////
 double sigma_bgk(double r, double x, double Q2, double * par){
+	//clock_t tim=clock();
 	double sigma_0		=par[0];
 	double A_g		=par[1];
 	double lambda_g	=par[2];
@@ -70,7 +71,8 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	double expo = 0.389379*(pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	
 	double val=sigma_0*(1-exp(-expo));
-	
+	//tim-=clock();
+	//printf("%.2e seconds\n",-((double)tim)/CLOCKS_PER_SEC);
 	return(val) ;	
 }
 
@@ -124,66 +126,12 @@ double sudakov(double r, double mu2,double* par) {
 
     return val;
 }
+
+//////////////////////////////////////Will be removed in the future/////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 #if MODEL==2
-#if SIMPS_GBS==1
-//////////////////////////////// ORIGINAL SIMPSON INTEGRAL VERSION //////////////////////////////////////////
-double integrand_gbs(double r, double *par[2] ){/*
-	//for the integral integrand has to be in the form 
-	//func(double , double**) where integration is over the first argument. second are constants to be passed.
-	//hence the following constant  parameters.
-	if(fabs(r)<1.0e-15){
-		return(0.0);
-	}
-	double R=( *(*par) ) ;
-	double x=( *(*par+1) );
-	//double xm=mod_x(x);
-	double Q2=( *(*par+2) ) ;
-#if MODEL==2	
-	double sigma_0=(*(*(par+1) ));
-	double lambda=( *(*(par+1)+1) );
-	double x_0   =( *(*(par+1) +2) );
-	double *sudpar=( *(par+1)+3 );//whatever parameter sudakov takes...
-	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
-	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
-#elif MODEL==3
-	double sigma_0=(*(*(par+1) ));
-	//double A_g=( *(*(par+1)+1) );
-	//double lambda_g   =( *(*(par+1) +2) );
-	double C=*( *(par+1)+3 );
-	double rmax=*( *(par+1)+4 );
-	double mu02=C/pow(rmax ,2);
-	double *sudpar=( *(par+1)+3 );//whatever parameter sudakov takes...
-	
-	double axg = xg_chebyshev(x,C/(r*r) +mu02);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
-	double Qs2 = 0.389379*4*PI*PI*axg/(3*sigma_0);
-	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
-#endif
-
-	double Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
-	double laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
-	double val=laplacian_sigma;
-#if SUDAKOV>=1
-        val*=exp(-sudakov(r,Q2,sudpar)) ;
-#endif
-	//printf("integrand return for r=%f, %f. \n",r,val);       
-	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);*/return 0.0;
-}
-
-double sigma_gbs(double r, double x, double Q2, double * par){/*
-	double param[3]={r,x,Q2};
-
-	double *param_ptr[2]={param, par};
-	double result=0;
-	double error=0;
-	simpson1dA(&integrand_gbs, param_ptr,0.0,r,120,&result,&error);
-	//printf("\n\n");
-	return(result);*/return 0.0;
-}
-
-#elif SIMPS_GBS==0
 ////////////////////////////////// CERN INTEGRATION ROUTINE VERSION ////////////////////////////////////
 /// GLOBAL ///
 static double VAR[3];
@@ -201,12 +149,13 @@ double integrand_gbs(double *r_ptr){
 	
 	double sigma_0=(*(PAR ));
 	double Qs2 =1;
-#if (MODEL==2||MODEL==22)
+#if (MODEL==2)
 	double lambda=( *(PAR+1) );
 	double x_0   =( *(PAR +2) );
 	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
 	 Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
-	
+#endif
+/*	
 #elif MODEL==3
 	//double A_g=( *(PAR+1) );
 	//double lambda_g  =( *(PAR +2) );
@@ -221,7 +170,7 @@ double integrand_gbs(double *r_ptr){
 	
 	double axg = xg_chebyshev(x,mu2);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
 	 Qs2 = 0.389379*4*PI*PI*axg/(3*sigma_0);
-#endif	
+#endif	*/
 	laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
 
 
@@ -252,5 +201,5 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	result=dgauss_(&integrand_gbs,&rmin,VAR,&N);
 	return(result);
 }
-#endif
+
 #endif

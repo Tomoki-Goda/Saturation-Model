@@ -217,6 +217,8 @@ int load_data(){
 	//import_points(X_DATA,Q2_DATA);
 	return(0);
 #endif	
+	printf("load_data:: code not finished...\n");
+	return(1);
 	//////////////////////////////ZEUS 05//////////////////////////////////
 	file =fopen("../data/h1zeus_05.dat","r");
 	while((!feof(file) )&&(j<331)){

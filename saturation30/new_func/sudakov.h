@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 extern double dgauss_(double(* )(double*),double*,double*,double*); 
-
+extern double dgquad_(double(* )(double*),double*,double*,int*);
 /////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////Jacobian/////////////////////////////////////////
 double dsdr(double r,double Q2,double C,double rmax){
@@ -8,7 +8,7 @@ double dsdr(double r,double Q2,double C,double rmax){
 	return 0.0;
 #endif
 	double mu2=C*(pow(r,-2.0)+pow(rmax,-2.0));
-	if(mu2>Q2){
+	if(mu2>Q2){ 
 		return(0.0);
 	}
 	if(mu2<LQCD2){
@@ -91,6 +91,8 @@ double integrand( double * r_ptr){
 
 
 double integral_term(double r, double x, double Q2,double* par){
+	//clock_t time=clock();
+	
 	VAR[0]=r;
 	VAR[1]=x;
 	VAR[2]=Q2;
@@ -100,11 +102,21 @@ double integral_term(double r, double x, double Q2,double* par){
 	double rmin=1.0e-5;
 	
 	double mu2=(*(par+3))*( pow(r,-2) +pow(*(par+4),-2) );
-	rmin=1.0/pow(Q2/(*(par+3)) -pow(*(par+4),-2),0.5);
+	double invrmin2=Q2/(*(par+3)) - pow(*(par+4),-2);
+	
+	//printf("1/rmin^2 =%.1e 1/r^2=%.1e \n" ,invrmin2,1.0/(r*r));
+	if( 1.0/(r*r)>invrmin2){ 
+		return(0.0);
+	}
 	double N=DGAUSS_PREC;
 	//int N=96;
-	//result=dgquad_(&integrand_gbs,&rmin,VAR,&N);
+	rmin=1.0/pow(invrmin2,0.5);
+	//printf("rmin= %.1e\n",rmin);
+	//result=dgquad_(&integrand,&rmin,VAR,&N);
 	result=dgauss_(&integrand,&rmin,VAR,&N);	
+	
+	//time-=clock();
+	//printf("%.2e seconds\n", -((double)time)/CLOCKS_PER_SEC);
 	
 	return result;
 	
@@ -114,11 +126,16 @@ double sigma_s(double r, double x, double Q2, double * par){
 	double sud=exp(-sudakov(r,Q2, par+3 ) );
 	
 	double val=sud*BASE_SIGMA(r,x,Q2, par );
-	
-	double intterm=integral_term(r,x,Q2,par);
-	//printf("first= %.3e sud=%.3e\tintterm=%.3e\n",val, sud,intterm );
-	val+=intterm;
-	printf("=%.3e\n",val);
+	//printf("first= %.3e sud=%.3e\t",val, sud);
+	//double intterm=integral_term(r,x,Q2,par);
+	//printf("intterm=%.3e ",intterm );
+	//val+=intterm;
+	val+=integral_term(r,x,Q2,par);
+	//printf("\ttotal =%.3e\n",val);
+	//for(unsigned i=0;i<N_PAR;i++){
+	//	printf("%.2e ",par[i]);	
+	//}
+	//printf( "r=%.2e , x=%.2e Q2= %.2e \n",r,x,Q2);
 	return val;
 }
 

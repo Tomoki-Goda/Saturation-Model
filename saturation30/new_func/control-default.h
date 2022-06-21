@@ -70,6 +70,10 @@
 	#define DGAUSS_PREC 0.001
 #endif
 
+#ifndef STAR
+	#define STAR 0
+#endif
+
 #ifndef SIMPS_Z_INT
 	#define SIMPS_Z_INT 0
 #endif
@@ -120,7 +124,7 @@
 
 #if MODEL==3
 	#define BASE_SIGMA sigma_bgk
-#elif MODEL==22
+#elif (MODEL==22||MODEL==2)
 	#define BASE_SIGMA sigma_gbw
 #endif
 

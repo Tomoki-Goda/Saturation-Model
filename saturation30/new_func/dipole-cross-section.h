@@ -62,10 +62,15 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	double C		=par[3];
 	//double mu02		=par[4];
 	double rmax		=par[4];
-	double mu02		=C/(rmax*rmax);
 	
+	
+#if STAR==0
 	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
-	//double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
+#elif STAR==1
+	double mu02=C/(rmax*rmax);
+	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
+#endif
+	
 	//double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
 	
 	double expo = 0.389379*(pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
@@ -80,14 +85,25 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBS ////////////////////////////
 /////////////////////////////////////////////////////////////
+#if ((MODEL==2)||(MODEL==3)||(MODEL==22))
+extern double rmu2( double ,double ,double );
+
 double sudakov(double r, double mu2,double* par) {
 	//pertubative+non-perturbative sudakov
 	double C= (*(par));
 	double r_max=( *(par+1));
 	double g1=(*(par+2));
 	double g2=(*(par+3));
-
-	double mub2=C*( 1.0/(pow(r,2)) + 1.0/pow(r_max,2) ) ;
+	
+	double mub2=rmu2(r ,C,r_max);
+/*
+#if STAR==0
+	double mub2=C*(1.0/(r*r)+1.0/(r_max*r_max)) ;
+#elif STAR==1
+	double mu02=C/(r_max*r_max);
+	double mub2=mu02/(1-exp(-pow(r/r_max,2) ) );
+#endif
+*/
 	
 	double val=0.0;
 
@@ -126,7 +142,7 @@ double sudakov(double r, double mu2,double* par) {
 
     return val;
 }
-
+#endif
 //////////////////////////////////////Will be removed in the future/////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////

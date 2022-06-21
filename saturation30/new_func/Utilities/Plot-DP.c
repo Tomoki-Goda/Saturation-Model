@@ -10,7 +10,7 @@
 #include"../gluon-chebyshev.h"
 #include"../dipole-cross-section.h"
 
-#if (MODEL==3||MODEL==22)
+#if (MODEL==3||MODEL==22||MODEL==2)
 #include"../sudakov.h"
 #endif
 

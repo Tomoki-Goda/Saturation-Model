@@ -237,7 +237,11 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	*(VAR)=r;
 	*(VAR+1)=x;
 	*(VAR+2)=Q2;
-	
+	 /*for(unsigned i=0;i<N_PAR;i++){
+                printf("%.3e ",*(par+i));
+        }
+        printf("\n");*/
+
 	PAR=par;
 		
 	double result=0;

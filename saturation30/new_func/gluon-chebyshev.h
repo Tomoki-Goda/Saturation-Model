@@ -6,8 +6,8 @@
 #include"./gluons.h"
 #include"./chebyshev-1.h"
 
-#define X_DEGREE 25
-#define Q2_DEGREE 30
+#define X_DEGREE 20
+#define Q2_DEGREE 20
  
 #ifndef SKIP_SAME
 	#define SKIP_SAME 1

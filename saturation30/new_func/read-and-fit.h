@@ -78,7 +78,7 @@ void generate_data_set(double *par, double *csarray){
 #elif MODEL==3
 	double sudpar[10];
 	sudpar[0]=par[3]*par[5] ;//C*C2
-	sudpar[1]=par[4]/par[5];//rmax mu02=C/rmax^2
+	sudpar[1]=par[4]/sqrt(par[5]);//rmax mu02=C/rmax^2
 #if SUDAKOV==2
 	sudpar[3]=par[6];
 	sudpar[4]=par[7];

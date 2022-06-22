@@ -165,8 +165,8 @@ int main(int argc, char* argv[]){
 	printf("*************************  Koniec   **************************\n");
 	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
 	printf("R_FIX: %d \t                                               \n",R_FIX );
-	printf("L %.2e S %.2e C %.2e B %.2e",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
-	printf(" STAR %d", STAR );
+	printf("L %.2e S %.2e C %.2e B %.2e\n",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
+	printf(" STAR %d\n", STAR );
 	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
 	printf("chisq/dof\t%.3e\n",res/(N_DATA-N_PAR));
 	printf("****************************************************************\n");

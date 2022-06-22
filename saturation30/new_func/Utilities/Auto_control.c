@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv){
 	//unsigned i;
-	char filenames[2*5*3*3*2][200];
+	char filenames[2*5*3*5*2][200];
 	
 	char def[10]="Default";
 	
@@ -20,7 +20,7 @@ int main(int argc, char** argv){
 	char* sudakov[3];
 	unsigned sudakovlen=1;
 	*sudakov=def;
-	char* model[3];
+	char* model[5];
 	unsigned modellen=1;
 	*model=def;
 	char* rfix[2];

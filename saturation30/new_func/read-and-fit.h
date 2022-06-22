@@ -69,6 +69,22 @@ void generate_data_set(double *par, double *csarray){
 	//double integral[N_DATA];
 	double term ,val;
 	double r,Q2,xm;
+	
+///////////////////////////unfortunately positions of parameters are now incompatible between models ....///////////////////
+	double* sigpar= par;
+#if MODEL==22||MODEL==2
+	double *sudpar;
+	sudpar=(par+3);
+#elif MODEL==3
+	double sudpar[10];
+	sudpar[0]=par[3]*par[5] ;//C*C2
+	sudpar[1]=par[4]/par[5];//rmax mu02=C/rmax^2
+#if SUDAKOV==2
+	sudpar[3]=par[6];
+	sudpar[4]=par[7];
+#endif
+#endif
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	for(unsigned i=0; i<N_DATA;i++){
 		val=0;
 		for(unsigned fl=0;fl<(NF-1);fl++){
@@ -79,8 +95,8 @@ void generate_data_set(double *par, double *csarray){
 #endif
 				Q2=*(Q2_DATA+i);
 				xm=mod_x(*(X_DATA+i), Q2,fl );
-				
-				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, par) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
+
+				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
 #if R_CHANGE_VAR==1
 				term*=pow(1+r,2);
 #endif

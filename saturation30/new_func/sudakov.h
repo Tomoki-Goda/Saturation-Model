@@ -137,6 +137,8 @@ double integrand( double * r_ptr){
 	
 	val=(2.0-logrr)*dels+r*logrr*(dels*dels-deldels) ;
 	val*=exp(-sud)*BASE_SIGMA(r,x,Q2,PAR);
+	
+	return val;
 }
 
 

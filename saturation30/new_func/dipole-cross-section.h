@@ -91,7 +91,7 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 //////////////////////////// GBS ////////////////////////////
 /////////////////////////////////////////////////////////////
 #if ((MODEL==2)||(MODEL==3)||(MODEL==22))
-extern double rmu2( double ,double ,double );
+extern double rmu2( double ,double*  );
 
 double sudakov(double r, double mu2,double* par) {
 	//pertubative+non-perturbative sudakov
@@ -100,7 +100,7 @@ double sudakov(double r, double mu2,double* par) {
 	double g1=(*(par+2));
 	double g2=(*(par+3));
 	
-	double mub2=rmu2(r ,C,r_max);
+	double mub2=rmu2(r ,par );
 /*
 #if STAR==0
 	double mub2=C*(1.0/(r*r)+1.0/(r_max*r_max)) ;

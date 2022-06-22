@@ -6,13 +6,35 @@
 #include"./control-default.h"
 #include"./constants.h"
 
+#include"gluon-chebyshev.h"
 #include"simpson-integral.h"
 #include"dipole-cross-section.h"
+
+#if (MODEL==3||MODEL==22||MODEL==2)
+#include"sudakov.h"
+#endif
+
+
 #include"photon-wave-function-2.h"
+
+
 
 #include"cfortran.h"
 #include"../minuit.h"
 #include"./read-and-fit.h"
+
+
+#if R_FIX==0
+#include"./Parameters.h"
+#else 
+#include"./Parametersrfix.h"
+#endif
+
+//#if MODEL==1
+//#include"../gluons.h"
+//#include"../chebyshev.h"
+//#/include"../chebyshev3.h"
+//#endif
 
 //#define TEST 2
 #define MAXN 600
@@ -64,7 +86,7 @@ int main(int argc, char* argv[]){
 	out_file=fopen(resultfile,"w");
 	
 	
-	/////////////////results//////////////////////
+	/////////////////   for results   //////////////////////
 	char name[11];//apparently thats the max length minuit accepts
 	double res;
 	//double res_par[N_PAR];
@@ -73,9 +95,19 @@ int main(int argc, char* argv[]){
 	int dum4;
 
 	int error_flag = 0;
+	///////////////////// Initial /////////////////////////
 	
 	load_data( Q2_data, x_data, y_data, w_data, cs_data, err_data,  N_DATA);
 	generate_psi_set();
+	
+	printf("*************************  Starting  **************************\n");
+	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
+	printf("R_FIX: %d \t                                               \n",R_FIX );
+	printf("L %.2e S %.2e C %.2e B %.2e",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
+	printf(" STAR %d", STAR );
+	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
+	printf("****************************************************************\n");
+	
 	
 	
 #if TEST==1
@@ -129,6 +161,15 @@ int main(int argc, char* argv[]){
 	log_printf(out_file,outline);
 	fclose(out_file);
 	fclose(log_file);
+	
+	printf("*************************  Koniec   **************************\n");
+	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
+	printf("R_FIX: %d \t                                               \n",R_FIX );
+	printf("L %.2e S %.2e C %.2e B %.2e",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
+	printf(" STAR %d", STAR );
+	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
+	printf("chisq/dof\t%.3e\n",res/(N_DATA-N_PAR));
+	printf("****************************************************************\n");
 	return(0);
  
 }

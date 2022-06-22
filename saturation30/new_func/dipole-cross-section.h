@@ -3,6 +3,8 @@
 extern  double xgpdf(double, double);
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
 extern double dgauss_(double (*)(double*), double*,double*,double *  );
+
+
 ////////////////////////////////////////////////////////////
 ////////////////// common functions ////////////////////////
 ////////////////////////////////////////////////////////////
@@ -70,6 +72,9 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	double mu02=C/(rmax*rmax);
 	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
 #endif
+
+	
+	//double mu2=rmu2(r ,C,rmax);
 	
 	//double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
 	

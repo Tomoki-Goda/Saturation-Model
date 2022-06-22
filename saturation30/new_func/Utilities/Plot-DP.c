@@ -32,18 +32,20 @@ void generate_data_set(double *par, double Q2,double x ,char* datafile){
 	}
 	
 	
-	for(unsigned i=0; i<point_n;i++){
+	for(int i=0; i<point_n;i++){
 		point=0;
 		r =pow(10,-2+3*((double)i)/point_n);
 		//printf("%f\n",r);
 		//printf("x: %f\nQ2: %f\n", x,Q2);
 		for(unsigned fl=0;fl<(NF-1);fl++){
+		//for(int fl=0;fl<1;fl++){
 				xm=mod_x(x, Q2,fl );
+				//xm=x;
 				point+=  ( SIGMA(r,xm,Q2, par) );
 							
 		
 		}
-		fprintf(file,"%f\t%f\n",gevtofm*r,point/((NF-1)*(*par)));		
+		fprintf(file,"%f\t%f\n",gevtofm*r,point/( (NF-1) * (*par)));		
 	}
 	fclose(file);
 }

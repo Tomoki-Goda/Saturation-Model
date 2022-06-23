@@ -35,6 +35,10 @@
 #ifndef R_FIX
 	#define R_FIX 0
 #endif
+
+#ifndef INDEPENDENT_C
+	#define INDEPENDENT_C 1
+#endif
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -101,30 +105,30 @@
 	#if SUDAKOV==0
 		#define N_PAR 5
 	#elif SUDAKOV==1
-		#define N_PAR 5
+		#define N_PAR 6//5
 	#elif SUDAKOV==2
-		#define N_PAR 7
+		#define N_PAR 8//7
 	#endif
 #endif
 
 
 
 #if MODEL==0
-#define SIGMA sigma_gbw
+#define SIGMA(r,x,Q2,par, sudpar)  sigma_gbw(r,x,Q2,par)
 #elif MODEL==1
-#define SIGMA sigma_bgk
+#define SIGMA(r,x,Q2,par, sudpar)  sigma_bgk(r,x,Q2,par)
 #elif MODEL==2
-#define SIGMA sigma_gbs
+#define SIGMA(r,x,Q2,par, sudpar)  sigma_gbs(r,x,Q2,par)  
 #elif MODEL==22
-#define SIGMA sigma_s
+#define SIGMA sigma_s 
 #elif MODEL==3
 #define SIGMA sigma_s
 #endif
 
 
-#if MODEL==3
+#if (MODEL==3||MODEL==1)
 	#define BASE_SIGMA sigma_bgk
-#elif (MODEL==22||MODEL==2)
+#elif (MODEL==22||MODEL==2||MODEL==0)
 	#define BASE_SIGMA sigma_gbw
 #endif
 

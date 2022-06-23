@@ -1,8 +1,12 @@
-//#include<math.h>
-//#include<stdlib.h>
-//#include<stdio.h>
-//#include"./constants.h"
-//#include"./control-default.h"
+#include<math.h>
+#include<stdlib.h>
+#include<stdio.h>
+
+
+#include"./control_tmp.h"
+#include"./control-default.h"
+#include"./constants.h"
+
 #include"./gluons.h"
 #include"./chebyshev-1.h"
 
@@ -52,17 +56,17 @@ int comp( double a, double b ,double tolarence){
 void approx_xg(double * par){
 	
 	static double param[2];
-	clock_t time_xg=clock();
+	//clock_t time_xg=clock();
 	//printf("*************************       xg(x,Q2)          **************************\n");
 #if SKIP_SAME==1
 	if((comp(*(par+1),param[1] , 1.0e-10)==0)){
 		if((comp(*(par),param[0] , 1.0e-10)==0)){
-			printf("skip\n");				//both A_g and lambda_g are not changed.
+			//printf("skip\n");				//both A_g and lambda_g are not changed.
 		}else{	
 			for(unsigned i=0;i<(X_DEGREE*Q2_DEGREE); i++){
 				*(coeff+i)=((*(par))/param[0])*(*(coeff+i));
 			}
-			printf("skip - normalize\n");			//only A_g is different
+			//printf("skip - normalize\n");			//only A_g is different
 			*(param)   = *(par);
 		}
 		
@@ -74,8 +78,8 @@ void approx_xg(double * par){
 #if SKIP_SAME==1
 	}
 #endif
-	time_xg-=clock();
-	printf(  "*********************   Chebyshev  done, %.3e seconds    **************************\n", -((double)time_xg)/CLOCKS_PER_SEC);
+	//time_xg-=clock();
+	//printf(  "*********************   Chebyshev  done, %.3e seconds    **************************\n", -((double)time_xg)/CLOCKS_PER_SEC);
 	ERROR_FLAG=0;//indicate approxmation is done,
 	
 }
@@ -84,8 +88,9 @@ void approx_xg(double * par){
 double xg_chebyshev(double  x,double q2){
 	if(ERROR_FLAG!=0 ){
 		printf("approx_xg has to be run first!!!");
-		char ch;
-		scanf("%c",&ch);
+		getchar();
+		//char ch;
+		//scanf("%c",&ch);
 	}
 	double args[2];
 	(*args)=change_var_compactify_log(xlim[0],xlim[1],x);
@@ -94,7 +99,7 @@ double xg_chebyshev(double  x,double q2){
 	double val = chebyshev(degree, dim, coeff, args );
 	
 	
-	char ch;
+	//char ch;
 	//printf("%f x = %f  q2 = %f\n",val,x,q2);
 	if(val<0){
 		//printf(" alpha x g(%.2e,%.2e)=%.3e\n",x,q2,val);

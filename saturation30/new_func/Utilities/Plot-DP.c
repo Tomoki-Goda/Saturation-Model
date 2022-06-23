@@ -11,7 +11,7 @@
 #include"../dipole-cross-section.h"
 
 #if (MODEL==3||MODEL==22||MODEL==2)
-#include"../sudakov.h"
+#include"../sudakov2.h"
 #endif
 
 
@@ -31,19 +31,34 @@ void generate_data_set(double *par, double Q2,double x ,char* datafile){
 		
 	}
 	
+	double* sigpar=par;
 	
-	for(unsigned i=0; i<point_n;i++){
+#if MODEL==22||MODEL==2
+	double *sudpar;
+	sudpar=(par+3);
+#elif MODEL==3
+	double sudpar[10];
+	sudpar[0]=par[3]*par[5] ;//C*C2
+	sudpar[1]=par[4]/sqrt(par[5]);//rmax/sqrt(C2) so that mu02=C/rmax^2
+#if SUDAKOV==2
+	sudpar[3]=par[6];
+	sudpar[4]=par[7];
+#endif
+#endif
+	for(int i=0; i<point_n;i++){
 		point=0;
 		r =pow(10,-2+3*((double)i)/point_n);
 		//printf("%f\n",r);
 		//printf("x: %f\nQ2: %f\n", x,Q2);
 		for(unsigned fl=0;fl<(NF-1);fl++){
+		//for(int fl=0;fl<1;fl++){
 				xm=mod_x(x, Q2,fl );
-				point+=  ( SIGMA(r,xm,Q2, par) );
+				//xm=x;
+				point+=  ( SIGMA(r,xm,Q2, sigpar,sudpar) );
 							
 		
 		}
-		fprintf(file,"%f\t%f\n",gevtofm*r,point/((NF-1)*(*par)));		
+		fprintf(file,"%f\t%f\n",gevtofm*r,point/( (NF-1) * (*par)));		
 	}
 	fclose(file);
 }

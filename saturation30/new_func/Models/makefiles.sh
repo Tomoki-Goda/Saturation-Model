@@ -3,7 +3,8 @@
 
 DIR="/home/tomoki/Saturation-Model/saturation30/new_func/Models"
 
-
+tar -czvf "${DIR}-previous.tar.gz" ${DIR}
+rm -r ${DIR}/*G*
 ################# GBW  #################################
 
 NDIR="${DIR}/GBW"
@@ -112,7 +113,7 @@ ${DIR}/../Append "#define STAR 1" ${DIR}/*GWIA*/M*/M*
 
 ${DIR}/../Append "#define INDEPENDENT_C 0" ${DIR}/*fixC*/M*/M*
 
-${DIR}/../Append "#define PRINT_PROGRESS 1" ${DIR}/*G*/Massless/*500*
+#${DIR}/../Append "#define PRINT_PROGRESS 1" ${DIR}/*G*/Massless/*500*
 
 
 #for i in ./Models/*G*; do ./Auto_Run ${i}/M*/M*; done

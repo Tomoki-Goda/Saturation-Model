@@ -35,6 +35,10 @@
 #ifndef R_FIX
 	#define R_FIX 0
 #endif
+
+#ifndef INDEPENDENT_C
+	#define INDEPENDENT_C 1
+#endif
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -122,9 +126,9 @@
 #endif
 
 
-#if MODEL==3
+#if (MODEL==3||MODEL==1)
 	#define BASE_SIGMA sigma_bgk
-#elif (MODEL==22||MODEL==2)
+#elif (MODEL==22||MODEL==2||MODEL==0)
 	#define BASE_SIGMA sigma_gbw
 #endif
 

@@ -1,6 +1,19 @@
+#include<stdio.h>
+#include<math.h>
+
+
+#include"./control_tmp.h"
+#include"./control-default.h"
+#include"constants.h"
+
+//#include"dipole-cross-section.h"
+
 #include"./mu2.h"
 
 
+extern double sudakov(double ,double, double* );// in dipole-cross-section
+extern double sigma_gbw(double, double, double, double*);
+extern double sigma_bgk(double, double, double, double*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 extern double dgauss_(double(* )(double*),double*,double*,double*); 
@@ -132,27 +145,38 @@ double integral_term(double r, double x, double Q2, double * sigmapar, double* s
 	//printf("rmin= %.1e\n",rmin);
 	//result=dgquad_(&integrand,&rmin,VAR,&N);
 	result=dgauss_(&integrand,&rmin,VAR,&N);	
-	
+	//printf("%f\n",result);
 	//time-=clock();
 	//printf("%.2e seconds\n", -((double)time)/CLOCKS_PER_SEC);
+	//for (unsigned i=0;i<5;i++){
+	//	printf("%.2e\t",sigmapar[i]);
+	//}
+	//
+	//for (unsigned i=0;i<2;i++){
+	//	printf("%.2e\t",sudpar[i]);
+	//}
+	//printf("result %f\n",result);
 	
 	return result;
 	
 }
 
 double sigma_s(double r, double x, double Q2, double * sigmapar, double* sudpar){
-	//for (unsigned i=0;i<N_PAR;i++){
-	//	printf("%.2e\t",par[i]);
+	//for (unsigned i=0;i<5;i++){
+	//	printf("%.2e\t",sigmapar[i]);
 	//}
 	//printf("\n");
-	
+	//for (unsigned i=0;i<2;i++){
+	//	printf("%.2e\t",sudpar[i]);
+	//}
+	//printf("\n");
 	
 	double sud=exp(-sudakov(r,Q2, sudpar ) );
 	
 	double val=sud*BASE_SIGMA(r,x,Q2, sigmapar );
-	
+	//printf("val sud val %.2e \t %.2e \t",val,sud);
 	val+=integral_term(r,x,Q2,sigmapar,sudpar);
-	
+	//printf("%.2e \n",val);
 	return val;
 }
 

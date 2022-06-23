@@ -1,7 +1,12 @@
-//#include<stdio.h>
-//#include<math.h>
-//#include"constants.h"
-//
+#include<stdio.h>
+#include<math.h>
+
+
+#include"./control_tmp.h"
+#include"./control-default.h"
+#include"constants.h"
+
+//#include"simpson-integral.h"
 
 
 extern double dbesk0_(double*);
@@ -9,6 +14,7 @@ extern double dbesk1_(double*);
 
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
 
+extern void simpson1dA(double(*)(double ,double**),double**,double,double,int,double*,double*);
 
 
 #if SIMPS_Z_INT==0
@@ -47,6 +53,7 @@ double psisq_f (double R, double z, double Q2, unsigned flavourtype/*, unsigned 
 			break;
 		default:
 			printf("psisq_f::wrong input %d\n",flavourtype);
+			getchar();
 			charge_sum=5.0/6.0;
 			mass2=MASS_L2;
 	}
@@ -75,6 +82,7 @@ double psisq_f (double R, double z, double Q2, unsigned flavourtype/*, unsigned 
 
 #if SIMPS_Z_INT==0
 double psisq_z_int(double r,double q2,unsigned f){
+	//printf("%d\n",f);
 	flavourtype=f;
 	R=r;
 	Q2=q2;

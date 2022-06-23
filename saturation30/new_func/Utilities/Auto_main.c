@@ -12,7 +12,7 @@ int main(int argc, char** argv){
 		printf("specify directory");
 		return 1;
 	}
-	char command[5000];
+	char command[7500];
 	char dir[100]="";
 	char runfile[500]="";
 /////////////////   compile   //////////////////////////////////////
@@ -30,8 +30,29 @@ int main(int argc, char** argv){
 		
 		//system("make");
 		//sprintf(command,"./main \"%s/result.txt\"",dir);
+		//printf(command,"gcc sudakov.c -c -Ofast");
+		//system(command);
 		
-		sprintf(command,"gcc main.c -o %s/main -lm -lmathlib -lkernlib -lpacklib",dir);
+		sprintf(command,"gcc dipole-cross-section.c -c -Ofast");
+		system(command);
+		
+		sprintf(command,"gcc gluon-chebyshev.c -c -Ofast");
+		system(command);
+		
+		sprintf(command,"gcc photon-wave-function.c -c -Ofast");
+		system(command);
+		
+		sprintf(command,"gcc -c sudakov.c  -Ofast");
+		system(command);
+		
+		sprintf(command,"gcc read-and-fit.c -c -Ofast");
+		system(command);
+		
+		sprintf(command,"gcc simpson-integral.c -c -Ofast");
+		system(command);
+		
+		
+		sprintf(command,"gcc main.c  -o %s/main  gluon-chebyshev.o photon-wave-function.o sudakov.o dipole-cross-section.o simpson-integral.o read-and-fit.o -lm -lmathlib -lkernlib -lpacklib",dir);
 		system(command);
 		
 		

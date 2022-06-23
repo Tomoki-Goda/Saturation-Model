@@ -1,7 +1,40 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+#include<time.h>
+
+
+
+#include"./control_tmp.h"
+#include"./control-default.h"
+#include"constants.h"
+
+//#include"./simpson-integral.h"
+
+//#include"./gluon-chebyshev.h"
+//extern double xg_chebyshev(double  x,double q2);
+//extern void approx_xg(double * par);
+
+//#include"./dipole-cross-section.h"
+//#include"./sudakov.h"
+
+//#include"./photon-wave-function.h"
+
+
+
+
 #define MAXN 600
 #define RESCALE 1.05
 
 
+extern double psisq_z_int(double, double ,int);
+extern double sigma_gbw(double, double, double, double*);
+extern double sigma_bgk(double, double, double, double*);
+extern double sigma_gbs(double, double, double, double*);
+extern double sigma_s(double, double, double, double*,double*);
+extern double mod_x(double,double, int);
+
+extern void approx_xg(double *);
 
 ///////////Set in main.c//////////////////
 extern void log_printf(FILE*,char*);
@@ -16,7 +49,7 @@ static double CS_DATA[MAXN]={0};
 static double ERR_DATA[MAXN]={0};
 static unsigned N_DATA;
 
-static double FIT_RES[N_PAR];
+//static double FIT_RES[N_PAR+1]={0};
 
 //////////////////GLOBAL ARRAY for DATA/////////////////////
 //static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
@@ -45,12 +78,14 @@ void generate_psi_set(){
 	log_printf(log_file,outline);
 	
 	for(unsigned fl=0;fl<(NF-1);fl++){
+	
 		for(unsigned i=0; i<N_DATA;i++){
 			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){
 				r=R_STEP*j+ep;
 #if R_CHANGE_VAR==1
 				r=r/(1-r);
 #endif
+				//printf("%d\n",fl);
 				*(*(*(PSI+fl )+j )+i )=psisq_z_int(r, *(Q2_DATA+i), fl);
 			}
 		}
@@ -78,10 +113,10 @@ void generate_data_set(double *par, double *csarray){
 #elif MODEL==3
 	double sudpar[10];
 	sudpar[0]=par[3]*par[5] ;//C*C2
-	sudpar[1]=par[4]/sqrt(par[5]);//rmax mu02=C/rmax^2
+	sudpar[1]=par[4]*sqrt(par[5]);//rmax mu02=C/rmax^2
 #if SUDAKOV==2
-	sudpar[3]=par[6];
-	sudpar[4]=par[7];
+	sudpar[2]=par[6];
+	sudpar[3]=par[7];
 #endif
 #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -93,10 +128,11 @@ void generate_data_set(double *par, double *csarray){
 #if R_CHANGE_VAR==1
 				r=r/(1-r);
 #endif
-				Q2=*(Q2_DATA+i);
-				xm=mod_x(*(X_DATA+i), Q2,fl );
+				Q2=Q2_DATA[i];
+				xm=mod_x(X_DATA[i], Q2,fl );
 
 				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
+				//term= PSI[fl][j][i] * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
 #if R_CHANGE_VAR==1
 				term*=pow(1+r,2);
 #endif
@@ -161,17 +197,19 @@ double compute_chisq(double *par){
 	generate_data_set(par,cs);
 	
 	for(unsigned i=0;i<N_DATA;i++){
-		chisq+=pow( ((*(cs+i))-(*(CS_DATA+i)))/(*(ERR_DATA+i)),2);
+		//chisq+=pow( ( cs[i]-CS_DATA[i] )/(ERR_DATA[i]),2);
+		chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
 	}
 	time-=clock();
 	
 	for(unsigned i=0;i<N_PAR;i++){
 		sprintf(outline, "%.3e, ",*(par+i));
 		log_printf(log_file,outline);
-		*(FIT_RES+i)=*(par+i);
+		//*(FIT_RES+i)=*(par+i);
+		//FIT_RES[i]=*(par+i);
 	}
-	*(FIT_RES+N_PAR)=chisq;
-	
+	//FIT_RES[N_PAR]=chisq;
+	//*(FIT_RES+N_PAR)=chisq;
 	
 	sprintf(outline,"%.2e / %d = %.3e, in %.2e sec\n",chisq, N_DATA, chisq/N_DATA, -((double)time)/CLOCKS_PER_SEC);
 	log_printf(log_file,outline);
@@ -230,9 +268,11 @@ int load_data(){
 	
 #if NEW_DATA==1 
 	N_DATA=i;
+	
 	//import_points(X_DATA,Q2_DATA);
-	return(0);
-#endif	
+	return(i);
+#else
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	printf("load_data:: code not finished...\n");
 	return(1);
 	//////////////////////////////ZEUS 05//////////////////////////////////
@@ -335,4 +375,5 @@ int load_data(){
 	
 
 	return(0);
+#endif
 }

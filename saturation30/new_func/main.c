@@ -6,22 +6,24 @@
 #include"./control-default.h"
 #include"./constants.h"
 
-#include"gluon-chebyshev.h"
-#include"simpson-integral.h"
-#include"dipole-cross-section.h"
-
-#if (MODEL==3||MODEL==22||MODEL==2)
-#include"sudakov2.h"
-#endif
 
 
-#include"photon-wave-function-2.h"
+//#include"gluon-chebyshev.h"
+//#include"simpson-integral.h"
+//#include"dipole-cross-section.h"
+
+//#if (MODEL==3||MODEL==22||MODEL==2)
+//#include"sudakov.c"
+//#endif
+
+
+//#include"photon-wave-function-2.h"
 
 
 
 #include"cfortran.h"
 #include"../minuit.h"
-#include"./read-and-fit.h"
+//#include"./read-and-fit.c"
 
 
 #if R_FIX==0
@@ -38,14 +40,18 @@
 
 //#define TEST 2
 #define MAXN 600
+extern int load_data(void);
+extern void generate_psi_set(void);
+//extern void fcn(int , double , double, double ,unsigned ,void (*)(void) );
+extern void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void (*dum)(void) );
 
-static double x_data[MAXN]={0};
-static double y_data[MAXN]={0};
-static double w_data[MAXN]={0};
-static double Q2_data[MAXN]={0};
-static double cs_data[MAXN]={0};
-static double err_data[MAXN]={0};
-static unsigned N_DATA;
+//static double x_data[MAXN]={0};
+//static double y_data[MAXN]={0};
+//static double w_data[MAXN]={0};
+//static double Q2_data[MAXN]={0};
+//static double cs_data[MAXN]={0};
+//static double err_data[MAXN]={0};
+//extern unsigned N_DATA;
 
 double arglist[10];
 
@@ -66,6 +72,7 @@ FILE * out_file;
 //////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[]){
+	int n_data;
 	clock_t time_measure=clock();
 	//FILE* logfile;
 	//FILE * out_file;
@@ -97,14 +104,17 @@ int main(int argc, char* argv[]){
 	int error_flag = 0;
 	///////////////////// Initial /////////////////////////
 	
-	load_data( Q2_data, x_data, y_data, w_data, cs_data, err_data,  N_DATA);
+	//load_data( Q2_data, x_data, y_data, w_data, cs_data, err_data,  N_DATA);
+	n_data=load_data();
+	//printf("%d\n",N_DATA);
+	printf("%d\n",n_data);
 	generate_psi_set();
 	
 	printf("*************************  Starting  **************************\n");
 	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
-	printf("R_FIX: %d \t                                               \n",R_FIX );
-	printf("L %.2e S %.2e C %.2e B %.2e",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
-	printf(" STAR %d", STAR );
+	printf("R_FIX: %d \t N_PAR %d                                     \n",R_FIX,N_PAR );
+	printf("L %.2e S %.2e C %.2e B %.2e\n",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
+	printf(" STAR %d\n", STAR );
 	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
 	printf("****************************************************************\n");
 	
@@ -149,9 +159,9 @@ int main(int argc, char* argv[]){
 	
 	sprintf(outline,"chisq\t%.4e\t%.4e\n",res,error);
 	log_printf(out_file,outline);
-	sprintf(outline,"N_DATA\t%d\n",N_DATA);
+	sprintf(outline,"n_data\t%d\n",n_data);
 	log_printf(out_file,outline);
-	sprintf(outline,"chisq/dof\t%.3e\n",res/(N_DATA-N_PAR));
+	sprintf(outline,"chisq/dof\t%.3e\n",res/(n_data-N_PAR));
 	log_printf(out_file,outline);
 	
 	
@@ -168,7 +178,7 @@ int main(int argc, char* argv[]){
 	printf("L %.2e S %.2e C %.2e B %.2e\n",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
 	printf(" STAR %d\n", STAR );
 	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
-	printf("chisq/dof\t%.3e\n",res/(N_DATA-N_PAR));
+	printf("chisq/dof\t%.3e\n",res/(n_data-N_PAR));
 	printf("****************************************************************\n");
 	return(0);
  

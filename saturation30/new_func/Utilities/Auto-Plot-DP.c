@@ -38,7 +38,7 @@ int main(int argc, char** argv){
 		sprintf(command, "cp \"%s/control.h\" ./control_tmp.h",dir);
 		system(command);
 		
-		sprintf(command,"gcc ./Utilities/Plot-DP.c -o %s/Plot -lm -lmathlib -lkernlib -lpacklib",dir);
+		sprintf(command,"gcc ./Utilities/Plot-DP.c -o %s/Plot -Ofast -lm -lmathlib -lkernlib -lpacklib",dir);
 		system(command);
 		
 		sprintf(command,"rm \"./control_tmp.h\"");

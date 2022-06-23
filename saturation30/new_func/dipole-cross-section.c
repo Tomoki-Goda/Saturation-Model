@@ -1,6 +1,21 @@
+#include<stdio.h>
+#include<math.h>
+
+
+#include"./control_tmp.h"
+#include"./control-default.h"
+#include"constants.h"
+
+//#include"./gluon-chebyshev.h"
+
+
 //#define BGK 0
 
 extern  double xgpdf(double, double);
+extern  double xg_chebyshev(double,double);
+
+extern double rmu2( double ,double*  );
+
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
 extern double dgauss_(double (*)(double*), double*,double*,double *  );
 
@@ -72,17 +87,13 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	double mu02=C/(rmax*rmax);
 	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
 #endif
-
 	
-	//double mu2=rmu2(r ,C,rmax);
-	
-	//double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
-	
-	double expo = 0.389379*(pow( r* PI,2) * /*alpha_s(mu2)*/ xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
+	double expo = 0.389379*(pow( r* PI,2) * xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	
 	double val=sigma_0*(1-exp(-expo));
 	//tim-=clock();
 	//printf("%.2e seconds\n",-((double)tim)/CLOCKS_PER_SEC);
+	//printf("sig %f\n",val);
 	return(val) ;	
 }
 
@@ -91,7 +102,7 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 //////////////////////////// GBS ////////////////////////////
 /////////////////////////////////////////////////////////////
 #if ((MODEL==2)||(MODEL==3)||(MODEL==22))
-extern double rmu2( double ,double*  );
+
 
 double sudakov(double r, double mu2,double* par) {
 	//pertubative+non-perturbative sudakov
@@ -101,15 +112,7 @@ double sudakov(double r, double mu2,double* par) {
 	double g2=(*(par+3));
 	
 	double mub2=rmu2(r ,par );
-/*
-#if STAR==0
-	double mub2=C*(1.0/(r*r)+1.0/(r_max*r_max)) ;
-#elif STAR==1
-	double mu02=C/(r_max*r_max);
-	double mub2=mu02/(1-exp(-pow(r/r_max,2) ) );
-#endif
-*/
-	
+
 	double val=0.0;
 
 #if SUDAKOV>=2	
@@ -121,11 +124,7 @@ double sudakov(double r, double mu2,double* par) {
 		return(val);
 	}
 #endif
-		
-//#if SUDAKOV>=2	
-//	val+=(g1/2) * pow(r,2) + (g2/4) * log(1+pow(r/r_max,2) )*log( mu2 /pow(Q0 ,2) );	
-//#endif
-	
+
 #if SUDAKOV>=1
 	if (mub2 < LQCD2){
 		printf("\nsudakov:: mu_b is too low!!!\n%f\t%f\n\n",C,r_max);
@@ -176,22 +175,7 @@ double integrand_gbs(double *r_ptr){
 	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
 	 Qs2 =pow(Q0,2)*pow(x_0/x, lambda);
 #endif
-/*	
-#elif MODEL==3
-	//double A_g=( *(PAR+1) );
-	//double lambda_g  =( *(PAR +2) );
-	double C =(*( PAR+3 ));
-	double rmax =(*( PAR+4 ));
-	double mu02=C/pow(rmax,2);
-	double *sudpar=( PAR+3 );//whatever parameter sudakov takes...
-	//double mu2=mu02/(1-exp(-pow(r/rmax,2)) );
-	double mu2=C*(pow(r,-2)+pow(rmax,-2));
-	//printf("s0 %.2e, A_g %.2e, l_g %.2e, C %.2e, rm %.2e ", *(PAR),*(PAR+1) ,*(PAR+2),*(PAR+3),*(PAR+4) );
-	//printf("%.2e %.2e %.2e \n", R,x,Q2);
-	
-	double axg = xg_chebyshev(x,mu2);//\alpha_s(mu)x g(x,mu)...in chebyshev approx
-	 Qs2 = 0.389379*4*PI*PI*axg/(3*sigma_0);
-#endif	*/
+
 	laplacian_sigma=sigma_0*r *log(R/r)*exp(-Qs2*pow(r,2) /4)*Qs2*(1-(Qs2*pow(r,2))/4);
 
 
@@ -207,11 +191,7 @@ double sigma_gbs(double r, double x, double Q2, double * par){
 	*(VAR)=r;
 	*(VAR+1)=x;
 	*(VAR+2)=Q2;
-	 /*for(unsigned i=0;i<N_PAR;i++){
-                printf("%.3e ",*(par+i));
-        }
-        printf("\n");*/
-
+	 
 	PAR=par;
 		
 	double result=0;

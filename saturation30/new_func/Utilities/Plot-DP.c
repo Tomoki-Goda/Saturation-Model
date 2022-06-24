@@ -7,15 +7,20 @@
 #include"../control-default.h"
 #include"../constants.h"
 
-#include"../gluon-chebyshev.h"
-#include"../dipole-cross-section.h"
+//#include"../gluon-chebyshev.h"
+//#include"../dipole-cross-section.h"
 
-#if (MODEL==3||MODEL==22||MODEL==2)
-#include"../sudakov2.h"
-#endif
+//#if (MODEL==3||MODEL==22||MODEL==2)
+//#include"../sudakov2.h"
+//#endif
 
 
 //Syntax is ./main -in <input dir > -out <output dir > -Q2 <Q2 > -x <x >
+
+
+extern void approx_xg(double*);
+extern double SIGMA(double ,double,double ,double *,double*);
+extern double  mod_x(double,double,int);
 
 void generate_data_set(double *par, double Q2,double x ,char* datafile){
 	//csarray is counterpart of CS_DATA ...
@@ -39,7 +44,7 @@ void generate_data_set(double *par, double Q2,double x ,char* datafile){
 #elif MODEL==3
 	double sudpar[10];
 	sudpar[0]=par[3]*par[5] ;//C*C2
-	sudpar[1]=par[4]/sqrt(par[5]);//rmax/sqrt(C2) so that mu02=C/rmax^2
+	sudpar[1]=par[4]*sqrt(par[5]);//rmax/sqrt(C2) so that mu02=C/rmax^2
 #if SUDAKOV==2
 	sudpar[3]=par[6];
 	sudpar[4]=par[7];

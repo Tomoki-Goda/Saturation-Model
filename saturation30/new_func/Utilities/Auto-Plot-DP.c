@@ -37,8 +37,19 @@ int main(int argc, char** argv){
 		printf("going to %s/\n",dir);
 		sprintf(command, "cp \"%s/control.h\" ./control_tmp.h",dir);
 		system(command);
+
 		
-		sprintf(command,"gcc ./Utilities/Plot-DP.c -o %s/Plot -Ofast -lm -lmathlib -lkernlib -lpacklib",dir);
+		sprintf(command,"gcc -c sudakov.c -Ofast -lm -lmathlib -lkernlib -lpacklib");
+		system(command);
+		
+		sprintf(command,"gcc -c dipole-cross-section.c -Ofast -lm -lmathlib -lkernlib -lpacklib");
+		system(command);
+		
+		sprintf(command,"gcc -c gluon-chebyshev.c -Ofast -lm -lmathlib -lkernlib -lpacklib");
+		system(command);
+		
+		
+		sprintf(command,"gcc ./Utilities/Plot-DP.c sudakov.o dipole-cross-section.o gluon-chebyshev.o  -o %s/Plot -Ofast -lm -lmathlib -lkernlib -lpacklib",dir);
 		system(command);
 		
 		sprintf(command,"rm \"./control_tmp.h\"");

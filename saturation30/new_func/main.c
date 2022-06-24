@@ -2,7 +2,8 @@
 #include<math.h>
 #include<time.h>
 
-#include"./control_tmp.h"
+//#include"./control_tmp.h"
+#include"control.h"
 #include"./control-default.h"
 #include"./constants.h"
 

@@ -1,16 +1,25 @@
+#########################################################
+# before use do export DIR=<directory >			#
+# like 							#
+# for i in ./GBW/* ;  DIR=${i}; make ;done	#
+#							#
+#########################################################
 
-DEPS= ${DIR}/control.h  ./control-default.h ./constants.h setdir 
+
+
+DEPS= ${DIR}/control.h  ./control-default.h ./constants.h 
+
+full: main clean
 
 all: setdir main
 	echo ${DIR}
-setdir:
-	echo "${DIR}"
+
 
 LIBS=-lm -lmathlib -lkernlib -lpacklib	 
 
 
 main: ${DEPS} main.c read-and-fit.o sudakov.o gluon-chebyshev.o dipole-cross-section.o photon-wave-function.o simpson-integral.o 
-	gcc main.c read-and-fit.o sudakov.o gluon-chebyshev.o dipole-cross-section.o simpson-integral.o photon-wave-function.o ${LIBS} -o ${DIR}/main -Ofast -I ${DIR}
+	gcc main.c ${DIR}/read-and-fit.o ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/main -Ofast -I ${DIR}
 
 read-and-fit.o: ${DEPS} read-and-fit.c 
 	gcc -c read-and-fit.c -Ofast  ${LIBS} -I ${DIR}  -o ${DIR}/read-and-fit.o
@@ -30,5 +39,9 @@ photon-wave-function.o: ${DEPS}  photon-wave-function.c
 simpson-integral.o: simpson-integral.c
 	gcc -c simpson-integral.c  ${LIBS} -Ofast   -o ${DIR}/simpson-integral.o 
        	
+clean: 
+	rm ${DIR}/*.o
+	rm ${DIR}/main
+
 
 	 		

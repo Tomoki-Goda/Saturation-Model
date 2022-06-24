@@ -9,9 +9,9 @@
 
 DEPS= ${DIR}/control.h  ./control-default.h ./constants.h 
 
-full: main clean
+full: main
 
-all: setdir main
+all: main
 	echo ${DIR}
 
 

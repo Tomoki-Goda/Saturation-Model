@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 
-DIR="/home/tomoki/Saturation-Model/saturation30/new_func/Models"
+#DIR="/home/tomoki/Saturation-Model/saturation30/new_func/Models"
+
+DIR="./Models"
 
 tar -czvf "${DIR}-previous.tar.gz" ${DIR}
 rm -r ${DIR}/*G*

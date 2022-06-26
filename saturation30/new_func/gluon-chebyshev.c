@@ -101,7 +101,7 @@ double xg_chebyshev(double  x,double q2){
 	
 	
 	//char ch;
-	//printf("%f x = %f  q2 = %f\n",val,x,q2);
+	//printf("value = %f x = %f  q2 = %f\n",val,x,q2);
 	if(val<0){
 		//printf(" alpha x g(%.2e,%.2e)=%.3e\n",x,q2,val);
 		val=0;

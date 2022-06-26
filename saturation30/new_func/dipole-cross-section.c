@@ -24,6 +24,28 @@ extern double dgauss_(double (*)(double*), double*,double*,double *  );
 ////////////////////////////////////////////////////////////
 ////////////////// common functions ////////////////////////
 ////////////////////////////////////////////////////////////
+int parameter(double *par,double* sigpar,double* sudpar){
+	for(int i=0;i<(N_PAR);i++){
+		*(sigpar+i)=*(par+i);
+	}
+	//double* sigpar= par;
+#if MODEL==22||MODEL==2
+	//double *sudpar;
+	for(int i=0;i<(N_PAR-3);i++){
+		*(sudpar+i)=*(par+3+i);
+	}
+#elif MODEL==3
+	//double sudpar[10];
+	sudpar[0]=par[3]*par[5] ;//C*C2
+	sudpar[1]=par[4]*sqrt(par[5]);//rmax mu02=C/rmax^2
+#if SUDAKOV==2
+	sudpar[2]=par[6];
+	sudpar[3]=par[7];
+#endif
+#endif
+	return 0;
+}
+
 
 double alpha_s(double mu2 ){
 	double b0= ((double)(33 -2*NF))/(12*PI);

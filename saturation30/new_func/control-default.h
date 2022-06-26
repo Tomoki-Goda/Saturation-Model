@@ -55,7 +55,7 @@
 #endif
 
 #ifndef N_SIMPS_R
-	#define N_SIMPS_R 150
+	#define N_SIMPS_R 100
 #endif
 
 #ifndef R_CHANGE_VAR

@@ -28,15 +28,17 @@
 #define RESCALE 1.05
 
 
+//extern double sigma_gbw(double, double, double, double*);
+//extern double sigma_bgk(double, double, double, double*);
+//extern double sigma_gbs(double, double, double, double*);
+//extern double sigma_s(double, double, double, double*,double*);
+extern double SIGMA(double , double ,double ,double *,double*);
 extern double psisq_z_int(double, double ,int);
-extern double sigma_gbw(double, double, double, double*);
-extern double sigma_bgk(double, double, double, double*);
-extern double sigma_gbs(double, double, double, double*);
-extern double sigma_s(double, double, double, double*,double*);
 extern double mod_x(double,double, int);
 
 extern void approx_xg(double *);
 
+extern int parameter(double*,double*,double*);
 ///////////Set in main.c//////////////////
 extern void log_printf(FILE*,char*);
 extern FILE* log_file;
@@ -107,6 +109,11 @@ void generate_data_set(double *par, double *csarray){
 	double r,Q2,xm;
 	
 ///////////////////////////unfortunately positions of parameters are now incompatible between models ....///////////////////
+
+	double sudpar[10];
+	double sigpar[10];
+	parameter(par,sigpar,sudpar);
+	/*
 	double* sigpar= par;
 #if MODEL==22||MODEL==2
 	double *sudpar;
@@ -120,6 +127,7 @@ void generate_data_set(double *par, double *csarray){
 	sudpar[3]=par[7];
 #endif
 #endif
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	for(unsigned i=0; i<N_DATA;i++){
 		val=0;

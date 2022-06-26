@@ -3,10 +3,10 @@
 #include<math.h>
 #include<time.h>
 #include<string.h>
-#include"../control_tmp.h"
+#include"control.h"
 #include"../control-default.h"
 #include"../constants.h"
-
+#include"./plot.c"
 //#include"../gluon-chebyshev.h"
 //#include"../dipole-cross-section.h"
 
@@ -21,106 +21,47 @@
 extern void approx_xg(double*);
 extern double SIGMA(double ,double,double ,double *,double*);
 extern double  mod_x(double,double,int);
+extern int parameter(double*,double*,double*);
 
-void generate_data_set(double *par, double Q2,double x ,char* datafile){
-	//csarray is counterpart of CS_DATA ...
-	//double integral[N_DATA];
-	double gevtofm = 0.1973;
-	double point;
-	double r,xm;
-	FILE* file=fopen(datafile,"w");
-	printf("generate_data_set\n");
-	unsigned point_n=100;
+
+
+double generate_points(double r, double** par){
+	//printf("%.2e %.2e %.2e\n" ,r, *(*(par)), *(*(par)+1) );
+	return(SIGMA(r,*(*(par)),*(*(par)+1),*(par+1),*(par+2)) / ( *(*(par+1)) ) );
+}
+
+
+int main(int argc , char ** argv){
+	char file_name[500];
+	int rlen=100;
+	double rarr[rlen+1];
+	double x, Q2;
+	double param[10];
+	double sigpar[10];
+	double sudpar[10];	
+	
+	read_options(argc,argv,param,&x,&Q2, file_name);
+	parameter(param,sigpar,sudpar);
+	double *par[3];
+	double var[2];
+	*var=x;
+	*(var+1)=Q2;
+	*(par)=var;
+	*(par+1)=sigpar;
+	*(par+2)=sudpar;
+
+	for(int i=0 ;i<=rlen;i++){
+		*(rarr+i)=pow(10,-3+4*((double)i)/rlen);
+	}
+#if (MODEL==1||MODEL==3)
+	approx_xg(sigpar+1);
+#endif
+
+	FILE *file=fopen(file_name,"w");
 	if(file==NULL){
-		printf("generate_data_set::file error\n");
-		
-	}
-	
-	double* sigpar=par;
-	
-#if MODEL==22||MODEL==2
-	double *sudpar;
-	sudpar=(par+3);
-#elif MODEL==3
-	double sudpar[10];
-	sudpar[0]=par[3]*par[5] ;//C*C2
-	sudpar[1]=par[4]*sqrt(par[5]);//rmax/sqrt(C2) so that mu02=C/rmax^2
-#if SUDAKOV==2
-	sudpar[3]=par[6];
-	sudpar[4]=par[7];
-#endif
-#endif
-	for(int i=0; i<point_n;i++){
-		point=0;
-		r =pow(10,-2+3*((double)i)/point_n);
-		//printf("%f\n",r);
-		//printf("x: %f\nQ2: %f\n", x,Q2);
-		for(unsigned fl=0;fl<(NF-1);fl++){
-		//for(int fl=0;fl<1;fl++){
-				xm=mod_x(x, Q2,fl );
-				//xm=x;
-				point+=  ( SIGMA(r,xm,Q2, sigpar,sudpar) );
-							
-		
-		}
-		fprintf(file,"%f\t%f\n",gevtofm*r,point/( (NF-1) * (*par)));		
-	}
+		printf("DP:: file error. %s.\n", file_name);
+	}	
+	plot(&generate_points,rarr,rlen+1,par,file);
 	fclose(file);
 }
-
-
-int main(int argc, char ** argv){
-	char parfilename[100]="";
-	char resultfilename[100]="";
-	char name[20]="";
-	float par;
-	double param[10];//just any number large enough
-	float dum;
-	//char dumc[100];
-	double Q2=100;
-	double x=0.001;
-	char* end;
-	
-	for(unsigned i=1;i<=argc/2;i++){
-		if( strcmp(argv[2*i-1],"-Q2")==0 ){
-			Q2=strtod(argv[2*i],&end);
-		}else if( strcmp(argv[2*i-1],"-x")==0 ){
-			x=strtod(argv[2*i],&end);
-		}else if( strcmp(argv[2*i-1],"-out")==0 ){
-			sprintf(resultfilename,"%s",argv[2*i]);
-		}else if( strcmp(argv[2*i-1],"-in" ) ==0){
-			sprintf(parfilename,"%s" ,argv[2*i]);
-		}else{
-			printf("Please Use flag, -Q2, -x, -out , -in\n\n");
-		}
-			
-	}
-	printf("Q2= %f, x=%f\n",Q2,x);
-	
-	
-	printf("%s\n%s\n",parfilename,resultfilename);
-	FILE* parfile=fopen(parfilename,"r");
-	
-	if(parfile==NULL){
-		printf("Plot-DP.c file error\n");
-		return 1;
-	}
-	
-	fscanf(parfile,"%s\t%f",name,&dum);//line for Qup
-	
-	for(unsigned i=0;i<N_PAR;i++){
-		fscanf(parfile,"%s\t%lf\t%f\n",name,param+i,&dum);
-		fprintf(stdout,"%s \t\t %.3e  \n",name ,*(param+i));
-	}
-	fclose(parfile);
-	
-#if (MODEL==1||MODEL==3)	
-	approx_xg(param+1);//generate chebyshev coefficients
-#endif
-	generate_data_set(param, Q2,x ,resultfilename);
-	
-	return 0;
-
-}
-
 

@@ -218,11 +218,13 @@ double chebyshev(unsigned *degree,unsigned dim, double* coeff ,double* args ){
 	for(unsigned i=0;i<dim;i++){
 		if(args[i]>1) {
 			printf("chebyshev:: arg too large %f at position %d\n",args[i], i);
-			(args[i])-=2;			
+			(args[i])-=2;
+			getchar();			
 		}
 		if(args[i]<-1) {
 			printf("chebyshev:: arg too small %f at position %d\n",args[i], i);
 			(args[i])+=2;			
+			getchar();			
 		}
 		chebyshevT(args[i], degree[i], Tlist+*(posit+i)); 
 		*(posit+i+1)=(*(posit+i)+(*(degree+i)) );

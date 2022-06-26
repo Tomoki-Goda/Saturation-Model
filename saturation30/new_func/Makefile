@@ -9,17 +9,36 @@
 
 DEPS= ${DIR}/control.h  ./control-default.h ./constants.h 
 
-full: main
 
-all: main
+LIBS=-lm -lmathlib -lkernlib -lpacklib	 -Wno-unused-result
+
+UTILDIR=./Utilities
+
+
+all: main critical dipole F2 F2-slope psi
 	echo ${DIR}
 
-
-LIBS=-lm -lmathlib -lkernlib -lpacklib	 
 
 
 main: ${DEPS} main.c read-and-fit.o sudakov.o gluon-chebyshev.o dipole-cross-section.o photon-wave-function.o simpson-integral.o 
 	gcc main.c ${DIR}/read-and-fit.o ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/main -Ofast -I ${DIR}
+
+critical : ${DEPS} ${UTILDIR}/critical-line.c sudakov.o gluon-chebyshev.o dipole-cross-section.o
+	gcc ${UTILDIR}/critical-line.c  ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/critical -Ofast -I ${DIR}
+
+dipole: ${DEPS} ${UTILDIR}/Plot-DP.c sudakov.o gluon-chebyshev.o dipole-cross-section.o
+	gcc ${UTILDIR}/Plot-DP.c ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/dipole -Ofast -I ${DIR}
+
+F2: ${DEPS} ${UTILDIR}/Plot-F2.c sudakov.o gluon-chebyshev.o dipole-cross-section.o photon-wave-function.c simpson-integral.c
+	gcc ${UTILDIR}/Plot-F2.c ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/F2 -Ofast -I ${DIR}
+
+F2-slope: ${DEPS} ${UTILDIR}/F2-slope.c sudakov.o gluon-chebyshev.o dipole-cross-section.o photon-wave-function.c simpson-integral.c
+	gcc ${UTILDIR}/F2-slope.c ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/F2-slope -Ofast -I ${DIR}
+
+psi: ${DEPS} ${UTILDIR}/Plot-Psi.c photon-wave-function.c simpson-integral.c
+	gcc ${UTILDIR}/Plot-Psi.c  ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/psi -Ofast -I ${DIR}
+
+
 
 read-and-fit.o: ${DEPS} read-and-fit.c 
 	gcc -c read-and-fit.c -Ofast  ${LIBS} -I ${DIR}  -o ${DIR}/read-and-fit.o
@@ -42,6 +61,4 @@ simpson-integral.o: simpson-integral.c
 clean: 
 	rm ${DIR}/*.o
 	rm ${DIR}/main
-
-
 	 		

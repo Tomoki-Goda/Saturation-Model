@@ -3,5 +3,7 @@
 DIR="./Utilities"
 
 gcc ${DIR}/Auto_control.c -o Auto-Control 
-gcc ${DIR}/append-control.c -o Append
+gcc ${DIR}/Append-control.c -o Append
 
+
+gcc ${DIR}/Write_TeX.c -o Write_TeX

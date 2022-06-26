@@ -12,7 +12,7 @@ int main(int argc, char** argv){
 	FILE* outfile=fopen(argv[argc-1],"w");
 	
 	
-	char name[20];
+	char name[100];
 	float value;
 	float error;
 	//float chisq;

@@ -31,11 +31,16 @@ def main():
     plottitle=""
 
     argv=sys.argv[1:]
-    
-   
+    plotcolour=["red", "blue", "green", "cyan", "magenta", "brown", "orange", "purple", "yellow"]
+ 	
+ 
+    fig,ax=plt.subplots()
+ 
     try:
-        opts , args =getopt.getopt(argv,"x:y:l:s:a:t:" )
+        opts , args =getopt.getopt(argv,"x:y:l:s:a:t:p:c:" )
         labels=args;
+        plotstyle=["-" for i in range(len(args))]
+        
 
     except:
         print("option eror");
@@ -46,32 +51,32 @@ def main():
         elif opt in ["-y", "--yscale"]:
             ys=arg;
         elif opt in ["-l","--labels"]:
-            labels=arg.split()
+            labels=arg.split(":")
         elif opt in ["-s", "--save"]:
             sflag=True
             sname=arg
         elif opt in ["-a","--axes"]:
-            axes=arg.split();
+            axes=arg.split(":");
         elif opt in ["-t" , "--title"]:
-            plotitle=arg
+            plottitle=arg
+        elif opt in ["-p","--plot-style"]:
+            plotstyle=arg.split();
+        elif opt in ["-c", "--colour"]:
+            plotcolour=arg.split()
 
     data_array=[];
     counter=0;
     for i in args:
         print(i)
         data_array=import_array(i)
-        plt.plot(data_array[0],data_array[1],label=labels[counter] )
+        ax.plot(data_array[0],data_array[1],label=labels[counter],linestyle=plotstyle[counter] ,color=plotcolour[counter] ) 
         counter+=1
     
-    plt.title(plottitle)
-    plt.ylabel(axes[1])
-    plt.xlabel(axes[0])
-    plt.xscale(xs)
-    plt.yscale(ys)
-    plt.grid("true")
-    plt.legend()
+    ax.set(title=plottitle,  ylabel=axes[1],    xlabel=axes[0],  xscale= xs ,   yscale=ys )
+    ax.grid("true")
+    ax.legend()
     if sflag:
-        plt.savefig(sname)
+        fig.savefig(sname)
 
     plt.show()
 

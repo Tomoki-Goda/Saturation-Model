@@ -31,9 +31,9 @@ double generate_points(double r, double** par){
 	double x;
 	for(int i =0; i<( NF-1);i++){
 		x=mod_x(**par, *((*par)+1),i);
-		val+=SIGMA(r,x,*(*(par)+1),*(par+1),*(par+2)) / ( *(*(par+1)) ) ;
+		val+=SIGMA(r/0.1973,x,*(*(par)+1),*(par+1),*(par+2)) / ( *(*(par+1)) ) ; //0.1973 for GeV<-> fm
 	}
-	return val;
+	return val/(NF-1);
 }
 
 
@@ -57,7 +57,7 @@ int main(int argc , char ** argv){
 	*(par+2)=sudpar;
 
 	for(int i=0 ;i<=rlen;i++){
-		*(rarr+i)=pow(10,-3+4*((double)i)/rlen);
+		*(rarr+i)=pow(10,-2+3*((double)i)/rlen)*0.1973;
 	}
 #if (MODEL==1||MODEL==3)
 	approx_xg(sigpar+1);

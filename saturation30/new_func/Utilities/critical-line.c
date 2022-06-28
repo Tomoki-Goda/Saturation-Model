@@ -93,9 +93,9 @@ double generate_points(double x, double **param ){
 	//double *sigpar = *(par+1);
 	//double *sudpar = *(par+2);
 
-	double tolerance =1.0e-6;
-	double min=1.0e-3;
-	double max=9.0;
+	double tolerance =1.0e-10;
+	double min=5.0e-2;
+	double max=30.0;
 	double diffs[2];
 
 	*(*(param))=x;

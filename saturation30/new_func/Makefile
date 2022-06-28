@@ -36,7 +36,7 @@ F2-slope: ${DEPS} ${UTILDIR}/F2-slope.c sudakov.o gluon-chebyshev.o dipole-cross
 	gcc ${UTILDIR}/F2-slope.c ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/F2-slope -Ofast -I ${DIR}
 
 psi: ${DEPS} ${UTILDIR}/Plot-Psi.c photon-wave-function.c simpson-integral.c
-	gcc ${UTILDIR}/Plot-Psi.c  ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/psi -Ofast -I ${DIR}
+	gcc ${UTILDIR}/Plot-Psi.c  ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/psi -I ${DIR}
 
 
 

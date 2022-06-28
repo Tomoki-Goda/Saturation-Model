@@ -14,7 +14,7 @@ double f2(double Q2, double**pars){
 
 int main (int argc, char** argv){
 	char file_name[500];
-	int Q2len=1000;
+	int Q2len=50;
 	double Q2arr[Q2len+1];
 	double param[10];
 	double x=0;

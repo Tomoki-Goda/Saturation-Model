@@ -7,11 +7,11 @@
 
 int main(int argc, char** argv){
 	//unsigned i;
-	char filenames[2*5*3*5*2][200];
+	char filenames[5*5*3*5*2][200];
 	
 	char def[10]="Default";
 	
-	char* lmass[2];
+	char* lmass[5];
 	unsigned lmasslen=1;
 	*lmass=def;
 	char* qup[5];

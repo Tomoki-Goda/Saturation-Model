@@ -9,10 +9,11 @@ double f2_slope(double Q2, double**pars){
 	double xdiff=0.01;
 	double logx=log10(**pars);
 	double f2[2];
-	simpson1dA(&f2_integrand,pars,1.0e-5,30,100,f2,&err);
+	simpson1dA(&f2_integrand,pars,1.0e-5,30,200,f2,&err);
 	(*(*pars)) = pow(10.0, logx+xdiff);
-	simpson1dA(&f2_integrand,pars,1.0e-5,30,100,f2+1,&err);
-	double slope = (log10(f2[0]) - log10( f2[1]) )/xdiff;
+	simpson1dA(&f2_integrand,pars,1.0e-5,30,200,f2+1,&err);
+	//double slope = (log(f2[0]/ f2[1]) )/(log(10)*xdiff);
+	double slope = (log10(f2[0]/ f2[1]) )/(xdiff);
 	//printf("%f\n",res);
 	(*(*pars)) = pow(10.0, logx);
 	return slope;
@@ -22,7 +23,7 @@ double f2_slope(double Q2, double**pars){
 
 int main (int argc, char** argv){
 	char file_name[500];
-	int Q2len=1000;
+	int Q2len=25;
 	double Q2arr[Q2len+1];
 	double param[10];
 	double x=0;
@@ -32,7 +33,7 @@ int main (int argc, char** argv){
 	//printf("x= %.2e\tQ2= %.2e\n",x,Q2);
 	
 	for(int i =0;i<=Q2len;i++){
-		*(Q2arr+i)=pow(10.0, -1+3*((double)(i))/Q2len);
+		*(Q2arr+i)=pow(10.0, -1+4*((double)(i))/Q2len);
 	}
 
 	double *par[3];

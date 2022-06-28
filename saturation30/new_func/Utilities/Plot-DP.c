@@ -27,7 +27,13 @@ extern int parameter(double*,double*,double*);
 
 double generate_points(double r, double** par){
 	//printf("%.2e %.2e %.2e\n" ,r, *(*(par)), *(*(par)+1) );
-	return(SIGMA(r,*(*(par)),*(*(par)+1),*(par+1),*(par+2)) / ( *(*(par+1)) ) );
+	double val = 0;
+	double x;
+	for(int i =0; i<( NF-1);i++){
+		x=mod_x(**par, *((*par)+1),i);
+		val+=SIGMA(r,x,*(*(par)+1),*(par+1),*(par+2)) / ( *(*(par+1)) ) ;
+	}
+	return val;
 }
 
 

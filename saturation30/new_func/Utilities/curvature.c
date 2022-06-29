@@ -11,12 +11,7 @@
 #include"./plot.c"
 #include"./critical-line.h"
 
-
-
-
 int main(int argc, char ** argv){
-	int xlen=100;
-	double xarr[xlen+1];
 	char file_name[500];
 	double param[10];
 	double sigpar[10];
@@ -29,7 +24,7 @@ int main(int argc, char ** argv){
 	parameter(param,sigpar,sudpar);
 	double var[2];
 	var[1]=Q2;
-	//*par={x,Q2};
+	var[0]=x;
 	*(par)=var;
 	*(par+1)=sigpar;
 	*(par+2)=sudpar;	
@@ -39,21 +34,18 @@ int main(int argc, char ** argv){
 #if (MODEL==1||MODEL==3)	
 	approx_xg(sigpar+1);//generate chebyshev coefficients
 #endif
-	//printf("gluon ready\n");
-	double point=0;
-	for (int i=0;i<=xlen;i++){
-		*(xarr+i)=pow(10.0,-6+4*(((double)i)/xlen) );
-		
-	}
 	FILE* file=fopen(file_name,"w");
 	if(file==NULL){
 		printf(" critical line :: file error. %s.\n", file_name);
 	}	
-	plot(&generate_points,xarr,xlen+1,par,file);
+	
+
+	plot_curvature(x,Q2,sigpar,sudpar,file);
 	fclose(file);
 	
 	return 0;
 }
+
 
 
 

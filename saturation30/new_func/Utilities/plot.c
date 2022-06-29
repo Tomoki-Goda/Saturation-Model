@@ -79,7 +79,8 @@ int plot(double (*func)(double ,double**), double* var ,int varlen,  double ** p
 	
 	for(int i=0 ; i<varlen; i++){
 		val=(*func)(*(var+i),par);	
-		fprintf(file,"%f\t%f\n",*(var+i),val);
+		//fprintf(file,"%f\t%f\n",*(var+i),val);
+		fprintf(file,"%.5e\t%.5e\n",*(var+i),val);
 		//printf("%.2e\t%.2e\n", *(var+i),val);
 
 	}

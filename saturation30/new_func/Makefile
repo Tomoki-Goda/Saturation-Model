@@ -23,7 +23,7 @@ all: main critical dipole F2 F2-slope psi
 main: ${DEPS} main.c read-and-fit.o sudakov.o gluon-chebyshev.o dipole-cross-section.o photon-wave-function.o simpson-integral.o 
 	gcc main.c ${DIR}/read-and-fit.o ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/main -Ofast -I ${DIR}
 
-critical : ${DEPS} ${UTILDIR}/critical-line.c sudakov.o gluon-chebyshev.o dipole-cross-section.o
+critical : ${DEPS} ${UTILDIR}/critical-line.c ${UTILDIR}/critical-line.h sudakov.o gluon-chebyshev.o dipole-cross-section.o
 	gcc ${UTILDIR}/critical-line.c  ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/critical -Ofast -I ${DIR}
 
 dipole: ${DEPS} ${UTILDIR}/Plot-DP.c sudakov.o gluon-chebyshev.o dipole-cross-section.o
@@ -37,6 +37,9 @@ F2-slope: ${DEPS} ${UTILDIR}/F2-slope.c sudakov.o gluon-chebyshev.o dipole-cross
 
 psi: ${DEPS} ${UTILDIR}/Plot-Psi.c photon-wave-function.c simpson-integral.c
 	gcc ${UTILDIR}/Plot-Psi.c  ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/psi -I ${DIR}
+
+curvature : ${DEPS} ${UTILDIR}/curvature.c ${UTILDIR}/critical-line.h  sudakov.o gluon-chebyshev.o dipole-cross-section.o
+	gcc ${UTILDIR}/curvature.c  ${DIR}/sudakov.o ${DIR}/gluon-chebyshev.o ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/curvature -Ofast -I ${DIR}
 
 
 

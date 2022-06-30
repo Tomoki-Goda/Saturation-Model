@@ -77,8 +77,8 @@ def main():
     ax.legend()
     if sflag:
         fig.savefig(sname)
-
-    plt.show()
+    else:
+        plt.show()
 
 main()
 

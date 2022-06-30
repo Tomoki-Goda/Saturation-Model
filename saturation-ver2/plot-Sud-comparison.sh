@@ -2,19 +2,19 @@
 
 export DIR
 
-for i in ./BGK-BGKS-Star/M* ./GBW-GBWS-Star/M*;
+for i in ./BGK-BGKS/M* ./GBW-GBWS/M*;
 do
        	DIR=${i};
 	make;
 done
 
 
-for q2 in 50 500;
+for q2 in 10 50 650;
 do
-	for m in 0.0 0.0196;
+	for m in 0.0;
 	do
-		dir=./BGK-BGKS-Star/Mass${m}-Qup${q2}-Model1-Sud0-rfix0;
-		dirS=./BGKSStar/Mass${m}-Qup${q2}-Model3-Sud1-rfix0;
+		dir=./BGK-BGKS/Mass${m}-Qup${q2}-Model1-Sud0-rfix0;
+		dirS=./BGKS/Mass${m}-Qup${q2}-Model3-Sud1-rfix0;
 		for x in 3 5;
 		do
 			for Q2 in 10 50 500;
@@ -35,12 +35,12 @@ done
 
 
 
-for q2 in 50 500;
+for q2 in 10 50 650;
 do
-	for m in 0.0 0.0196;
+	for m in 0.0;
 	do
-		dir=./GBW-GBWS-Star/Mass${m}-Qup${q2}-Model0-Sud0-rfix0;
-		dirS=./GBWSStar/Mass${m}-Qup${q2}-Model22-Sud1-rfix0;
+		dir=./GBW-GBWS/Mass${m}-Qup${q2}-Model0-Sud0-rfix0;
+		dirS=./GBWS/Mass${m}-Qup${q2}-Model22-Sud1-rfix0;
 		for x in 3 5;
 		do
 			for Q2 in 10 50 500;

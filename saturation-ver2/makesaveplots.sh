@@ -2,12 +2,12 @@
 
 #mkdir PlotRelated
 
-BGKBGKSDIR=./BGK-BGKS-Star/Mass0.0-Qup500-Model1-Sud0-rfix0
-BGKSDIR=./BGKSStar/Mass0.0-Qup500-Model3-Sud1-rfix0
-BGKDIR=./BGKStar/Mass0.0-Qup500-Model1-Sud0-rfix0
-GBWGBWSDIR=./GBW-GBWS-Star/Mass0.0-Qup500-Model0-Sud0-rfix0
-GBWDIR=./GBW/Mass0.0-Qup500-Model0-Sud0-rfix0
-GBWSDIR=./GBWSStar/Mass0.0-Qup500-Model22-Sud1-rfix0
+BGKBGKSDIR=../BGK-BGKS/Mass0.0-Qup650-Model1-Sud0-rfix0
+BGKSDIR=../BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0
+BGKDIR=../BGK/Mass0.0-Qup650-Model1-Sud0-rfix0
+GBWGBWSDIR=../GBW-GBWS/Mass0.0-Qup650-Model0-Sud0-rfix0
+GBWDIR=../GBW/Mass0.0-Qup650-Model0-Sud0-rfix0
+GBWSDIR=./GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0
 
 #SAVEDIR=./PlotRelated
 SAVEDIR="/media/tomoki/TOMOKI-USB/Saturation-Model/NewPlots"
@@ -254,24 +254,24 @@ SAVEDIR="/media/tomoki/TOMOKI-USB/Saturation-Model/NewPlots"
   -p "-- -. -- -. " \
   -l "GBW 50 GeV:GBW 500 GeV:GBWS 50 GeV:GBWS 500 GeV" \
   -c "cyan magenta blue red" \
-  -t "Q dependence of dipole cross-section -  Massless Fits Q_max=500" \
+  -t "Q dependence of dipole cross-section -  Massless Fits Q_max=650" \
   -s ${SAVEDIR}/GBWQdependence.png \
   -a " r fm : sigma/sigma_0 "\
-   ./GBW/Mass0.0-Qup500-Model0-Sud0-rfix0/dipole-50-5.txt \
-   ./GBW/Mass0.0-Qup500-Model0-Sud0-rfix0/dipole-500-5.txt \
-   ./GBWSStar/Mass0.0-Qup500-Model22-Sud1-rfix0/dipole-50-5.txt \
-   ./GBWSStar/Mass0.0-Qup500-Model22-Sud1-rfix0/dipole-500-5.txt 
+   ./GBW/Mass0.0-Qup650-Model0-Sud0-rfix0/dipole-50-5.txt \
+   ./GBW/Mass0.0-Qup650-Model0-Sud0-rfix0/dipole-500-5.txt \
+   ./GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0/dipole-50-5.txt \
+   ./GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0/dipole-500-5.txt 
    
     ./plot.py \
   -y linear\
    -p "-- -. -- -." \
   -l "BGK 50 GeV:BGK 500 GeV:BGKS 50 GeV:BGKS 500 GeV" \
   -c "cyan magenta blue red" \
-  -t "Q dependence of dipole cross-section -  Massless Fits Q_max=500" \
+  -t "Q dependence of dipole cross-section -  Massless Fits Q_max=650" \
   -s ${SAVEDIR}/BGKQdependence.png \
   -a " r fm : sigma/sigma_0 "\
-   ./BGKStar/Mass0.0-Qup500-Model1-Sud0-rfix0/dipole-50-5.txt \
-   ./BGKStar/Mass0.0-Qup500-Model1-Sud0-rfix0/dipole-500-5.txt \
-   ./BGKSStar/Mass0.0-Qup500-Model3-Sud1-rfix0/dipole-50-5.txt \
-   ./BGKSStar/Mass0.0-Qup500-Model3-Sud1-rfix0/dipole-500-5.txt 
+   ./BGK/Mass0.0-Qup650-Model1-Sud0-rfix0/dipole-50-5.txt \
+   ./BGK/Mass0.0-Qup650-Model1-Sud0-rfix0/dipole-500-5.txt \
+   ./BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0/dipole-50-5.txt \
+   ./BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0/dipole-500-5.txt 
 

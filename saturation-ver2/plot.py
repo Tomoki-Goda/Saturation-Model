@@ -75,6 +75,10 @@ def main():
     ax.set(title=plottitle,  ylabel=axes[1],    xlabel=axes[0],  xscale= xs ,   yscale=ys )
     ax.grid("true")
     ax.legend()
+    
+    fig.set_figheight(9);
+    fig.set_figwidth(12);
+
     if sflag:
         fig.savefig(sname)
     else:

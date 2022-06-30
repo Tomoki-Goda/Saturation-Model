@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for dir in ./GBW/M* ./BGKStar/M* ./GBWSStar/M* ./BGKSStar/M*
+for dir in ../GBW/M* ../BGK/M* ../GBWS/M* ../BGKS/M*
 do
 	for x in 3 4 5
 	do

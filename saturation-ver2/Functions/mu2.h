@@ -4,32 +4,23 @@
 
 #if STAR ==0
 /////////////////////////////////////Type 0//////////////////////////////////////////////
-double rmu2( double r ,double* sudpar){
+int compute_mu2(double r, const double * sudpar, double * const mu2_arr,int opt){
 	double C=sudpar[0];
 	double rmax=sudpar[1];
-	
-	double mu2=C*(pow(r,-2.0)+pow(rmax,-2.0));
-	return mu2;
-}
-//////////////////////////
-double rmu2_jac_first( double r ,double* sudpar){
-	double C=sudpar[0];
-	double rmax=sudpar[1];
-	
-	double	jac= -2.0*C/pow(r,3.0);
-	return jac;
-}
-//////////////////////////
-double rmu2_jac_second( double r  ,double* sudpar){
-	double C=sudpar[0];
-	double rmax=sudpar[1];
-	
-	double jac=6.0*C/pow(r,4.0);
-	return jac;
+	double r2=r*r;
+	double rm2=rmax*rmax;
+	mu2_arr[0]=C*(1.0/r2+1.0/rm2);
+	if(opt==1){
+		return 0;
+	}
+	mu2_arr[1] = -2.0*C/(r*r2);
+	mu2_arr[2] = 6.0*C/(r2*r2);
+	return 0;	
 }
 
+
 /////////////////////////////////////////////
-double rmin2(double Q2 ,double* sudpar){
+double rmin2(double Q2 ,const double* sudpar){
 	double C=sudpar[0];
 	double rmax=sudpar[1];
 	
@@ -37,37 +28,33 @@ double rmin2(double Q2 ,double* sudpar){
 	return rmin2;
 }
 
+
 #elif STAR ==1
+
 ///////////////////////////////////////type1////////////////////////////////////////////
-double rmu2( double r  ,double* sudpar){
+
+int compute_mu2(double r, const double * sudpar, double * const mu2_arr, int opt){
 	double C=sudpar[0];
 	double rmax=sudpar[1];
+	double r2=r*r;
+	double rm2=rmax*rmax;
 	
-	double exprrmax=exp(-pow(r/rmax,2));
-	double mu2=C/(rmax*rmax*(1.0-exprrmax ));
-	return mu2;
-}
-//////////////////////////
-double rmu2_jac_first( double r  ,double* sudpar){
-	double C=sudpar[0];
-	double rmax=sudpar[1];
+	double exprrmax=exp(-r2/rm2);
 	
-	double exprrmax=exp(-pow(r/rmax,2));
-	double jac=-2.0*C*(r/pow(rmax,4))*( exprrmax/pow(1.0-exprrmax,2));
-	return jac;
-}
-//////////////////////////
-double rmu2_jac_second( double r ,double* sudpar){
-	double C=sudpar[0];
-	double rmax=sudpar[1];
+	mu2_arr[0]=C/(rm2*(1.0-exprrmax ));
+	if(opt==1){
+		return 0;
+	}
+	double jac=-2.0*C/(rm2*rm2)*( exprrmax/pow(1.0-exprrmax,2)); 
 	
-	double exprrmax=exp(-pow(r/rmax,2));
-	double jac =- 2.0*(C/pow(rmax,4))*(exprrmax/pow(1.0-exprrmax,2))*( 1.0- 2* pow(r/rmax,2)*((1.0+exprrmax)/(1.0-exprrmax)) ) ;
-	return jac;
+	mu2_arr[1] = jac*r;
+	mu2_arr[2] = jac*( 1.0- 2* (r2/rm2) *((1.0+exprrmax)/(1.0-exprrmax)) ) ;	
+	return 0;
 }
 
+
 /////////////////////////////////////////////
-double rmin2(double Q2 ,double* sudpar){
+double rmin2(double Q2 ,const double* sudpar){
 	double C=sudpar[0];
 	double rmax=sudpar[1];
 	

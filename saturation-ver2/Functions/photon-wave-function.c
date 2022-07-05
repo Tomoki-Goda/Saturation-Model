@@ -14,9 +14,9 @@ extern double dbesk0_(double*);
 extern double dbesk1_(double*);
 
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
-
+extern double dgauss_(double (*)(double*), double*,double*,double *  );
 extern void simpson1dA(double(*)(double ,double**),double**,double,double,int,double*,double*);
-
+extern double dadapt_(double(* )(double*),double*,double*,int*,double*,double* ,double*,double*);
 
 #if SIMPS_Z_INT==0
 static double Q2;
@@ -88,13 +88,21 @@ double psisq_z_int(double r,double q2,unsigned f){
 	R=r;
 	Q2=q2;
 	double res=0;
-	double zmin=1.0e-5;
+	double zmin=1.0e-10;
 	//double zmax =1.0 - 1.0e-5;
 	double zmax = 0.5;//because psi is symmetric in z<->1-z!!
-	int N=96;//64;
-	
-	res=dgquad_(&psisq_f,&zmin,&zmax,&N);
-	//printf("%f\n",res);
+
+	//double N=DGAUSS_PREC;
+	//int N=96;
+	//res=dgquad_(&psisq_f,&zmin,&zmax,&N);
+	//res=dgauss_(&psisq_f,&zmin,&zmax,&N);
+	////////////////////////////////////
+	int seg=1;
+	double NRel=DGAUSS_PREC;
+	double NAbs=1.0e-10;
+	double error=0;
+	dadapt_(&psisq_f,&zmin,&zmax,&seg ,&NRel, &NAbs, &res, &error)	;
+	/////////////////////////////////////////
 	return(2.0* res);
 
 }
@@ -111,6 +119,8 @@ double psisq_z_integrand(double z,double **par){
 }
 
 double psisq_z_int(double r,double Q2,unsigned f){
+	printf("psisq_z_int no longer supported \n");
+	getchar();
 		
 	double param[3];
 	*(param)=r;

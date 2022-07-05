@@ -36,7 +36,7 @@ static  const unsigned dim=2;
 static  unsigned degree[2]={X_DEGREE,Q2_DEGREE};
 
 static double xlim[2]={1.0e-7,2.0} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
-static double q2lim[2]={LQCD2*2,1.0e+11};
+static double q2lim[2]={LQCD2*2,2.0e+12};
 
 /////////////////////////////////////////
 

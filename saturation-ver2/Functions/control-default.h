@@ -33,7 +33,9 @@
 	#define MASS_B2 21.16
 #endif
 
-
+#ifndef  SATURATION 
+	#define SATURATION  1
+#endif
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -42,11 +44,11 @@
 #endif
 
 #ifndef N_SIMPS_R
-	#define N_SIMPS_R 100
+	#define N_SIMPS_R 125
 #endif
 
 #ifndef DGAUSS_PREC
-	#define DGAUSS_PREC 0.001
+	#define DGAUSS_PREC 1.0e-4
 #endif
 
 #ifndef STAR
@@ -129,11 +131,26 @@
 #define SIGMA sigma_s
 #endif
 
-
-#if (MODEL==3||MODEL==1)
-	#define BASE_SIGMA sigma_bgk
-#elif (MODEL==22||MODEL==2||MODEL==0)
-	#define BASE_SIGMA sigma_gbw
+#if SATURATION ==1
+	#if (MODEL==3||MODEL==1)
+		#define BASE_SIGMA sigma_bgk
+	#elif (MODEL==22||MODEL==2||MODEL==0)
+		#define BASE_SIGMA sigma_gbw
+	#endif
+#elif SATURATION==0
+	#if (MODEL==3||MODEL==1)
+		#define BASE_SIGMA sigma_bgk_ns
+	#elif (MODEL==22||MODEL==2||MODEL==0)
+		#define BASE_SIGMA sigma_gbw_ns
+	#endif
 #endif
 
-#define STRATEGY 0.0
+
+
+#define STRATEGY 1
+
+
+
+
+
+

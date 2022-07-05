@@ -3,42 +3,20 @@
 #include<math.h>
 #include<time.h>
 
-
-
-//#include"./control_tmp.h"
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
 
-//#include"./simpson-integral.h"
-
-//#include"./gluon-chebyshev.h"
-//extern double xg_chebyshev(double  x,double q2);
-//extern void approx_xg(double * par);
-
-//#include"./dipole-cross-section.h"
-//#include"./sudakov.h"
-
-//#include"./photon-wave-function.h"
-
-
-
-
 #define MAXN 600
 #define RESCALE 1.05
 
-
-//extern double sigma_gbw(double, double, double, double*);
-//extern double sigma_bgk(double, double, double, double*);
-//extern double sigma_gbs(double, double, double, double*);
-//extern double sigma_s(double, double, double, double*,double*);
-extern double SIGMA(double , double ,double ,double *,double*);
+extern double SIGMA(double , double ,double , const double *, const double*);
 extern double psisq_z_int(double, double ,int);
 extern double mod_x(double,double, int);
 
 extern void approx_xg(double *);
 
-extern int parameter(double*,double*,double*);
+extern int parameter(const double*,double*,double*);
 ///////////Set in main.c//////////////////
 extern void log_printf(FILE*,char*);
 extern FILE* log_file;
@@ -58,11 +36,11 @@ static unsigned N_DATA;
 //static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
 static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 /////////////////////////////////////////////
-static const double ep=1.0e-5;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
+static const double ep=1.0e-6;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
 #if R_CHANGE_VAR==1
-static const double r_int_max=0.97;
+static const double r_int_max=0.98;
 #else
-static const double r_int_max=30.0;
+static const double r_int_max=50.0;
 #endif
 
 static const double R_STEP=r_int_max/(2*N_SIMPS_R);
@@ -87,6 +65,7 @@ void generate_psi_set(){
 				r=R_STEP*j+ep;
 #if R_CHANGE_VAR==1
 				r=r/(1-r);
+				//r=-log(r);
 #endif
 				//printf("%d\n",fl);
 				*(*(*(PSI+fl )+j )+i )=psisq_z_int(r, *(Q2_DATA+i), fl);
@@ -102,7 +81,7 @@ void generate_psi_set(){
 ///////////////  now integrate over r with Simpsons method    /////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void generate_data_set(double *par, double *csarray){
+void generate_data_set(const double *par, double *csarray){
 	//csarray is counterpart of CS_DATA ...
 	//double integral[N_DATA];
 	double term ,val;
@@ -110,38 +89,29 @@ void generate_data_set(double *par, double *csarray){
 	
 ///////////////////////////unfortunately positions of parameters are now incompatible between models ....///////////////////
 
-	double sudpar[10];
-	double sigpar[10];
-	parameter(par,sigpar,sudpar);
-	/*
-	double* sigpar= par;
-#if MODEL==22||MODEL==2
-	double *sudpar;
-	sudpar=(par+3);
-#elif MODEL==3
-	double sudpar[10];
-	sudpar[0]=par[3]*par[5] ;//C*C2
-	sudpar[1]=par[4]*sqrt(par[5]);//rmax mu02=C/rmax^2
-#if SUDAKOV==2
-	sudpar[2]=par[6];
-	sudpar[3]=par[7];
-#endif
-#endif
-*/
+	double sudpar[10]={0};
+	double sigpar[10]={0};
+	parameter(par,sigpar,sudpar);// problem here if -Ofast is used...?
+	//printf("%.3e %.3e %.3e\n", sigpar[0],sigpar[1],sigpar[2]);
+	//printf("%.3e %.3e %.3e %.3e \n" ,sudpar[0],sudpar[1],sudpar[2],sudpar[3]);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	for(unsigned i=0; i<N_DATA;i++){
 		val=0;
 		for(unsigned fl=0;fl<(NF-1);fl++){
-			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){	
+			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){
+				
 				r=R_STEP*j+ep;
 #if R_CHANGE_VAR==1
 				r=r/(1-r);
+				//r=-log(r);
 #endif
 				Q2=Q2_DATA[i];
 				xm=mod_x(X_DATA[i], Q2,fl );
 
+				//term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) );//there should be a factor *r coming from dr r d(theta) but we give r^2 to psi and so /r and one r forthe jacobian! ;
+
 				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
-				//term= PSI[fl][j][i] * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
+
 #if R_CHANGE_VAR==1
 				term*=pow(1+r,2);
 #endif
@@ -164,6 +134,9 @@ void generate_data_set(double *par, double *csarray){
 		
 	}
 	//printf("crosssection ready\n");
+	//printf("%f\n",val);
+	//printf("*****%.3e %.3e %.3e*******\n", sigpar[0],sigpar[1],sigpar[2]);
+	//printf("*****%.3e %.3e %.3e %.3e ******\n" ,sudpar[0],sudpar[1],sudpar[2],sudpar[3]);
 }
 
 
@@ -188,7 +161,7 @@ void dum_func(void){
 	//do nothing
 }
 
-double compute_chisq(double *par){
+double compute_chisq(const double *par){
 	
 	//////////////////////////////////////////
 	////////////   GLOBALS   /////////////////
@@ -220,7 +193,7 @@ double compute_chisq(double *par){
 	//FIT_RES[N_PAR]=chisq;
 	//*(FIT_RES+N_PAR)=chisq;
 	
-	sprintf(outline,"%.2e / %d = %.3e, in %.2e sec\n",chisq, N_DATA, chisq/N_DATA, -((double)time)/CLOCKS_PER_SEC);
+	sprintf(outline,"\t%.2e / %d = %.3e, in %.2e sec\n",chisq, N_DATA-N_PAR, chisq/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
 	log_printf(log_file,outline);
 	
 	

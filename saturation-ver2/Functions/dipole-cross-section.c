@@ -24,7 +24,7 @@ extern double dgauss_(double (*)(double*), double*,double*,double *  );
 ////////////////////////////////////////////////////////////
 ////////////////// common functions ////////////////////////
 ////////////////////////////////////////////////////////////
-int parameter(double *par,double* sigpar,double* sudpar){
+int parameter(const double *par,double* const sigpar,double* const sudpar){
 	for(int i=0;i<(N_PAR);i++){
 		*(sigpar+i)=*(par+i);
 	}
@@ -34,15 +34,20 @@ int parameter(double *par,double* sigpar,double* sudpar){
 	for(int i=0;i<(N_PAR-3);i++){
 		*(sudpar+i)=*(par+3+i);
 	}
+	//printf("%.3e %.3e\n",sudpar[0], sudpar[1]);
+	
 #elif MODEL==3
 	//double sudpar[10];
 	sudpar[0]=par[3]*par[5] ;//C*C2
 	sudpar[1]=par[4]*sqrt(par[5]);//rmax mu02=C/rmax^2
+	//printf("%.3e %.3e\n",sudpar[0], sudpar[1]);
+	
 #if SUDAKOV==2
 	sudpar[2]=par[6];
 	sudpar[3]=par[7];
 #endif
 #endif
+	//printf("%.3e %.3e\n",sudpar[0], sudpar[1]);
 	return 0;
 }
 
@@ -80,7 +85,7 @@ double mod_x(double x, double Q2, unsigned flavour) {
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBW ////////////////////////////
 /////////////////////////////////////////////////////////////
-double sigma_gbw(double r,double x,double Q2, double * par){
+double sigma_gbw(double r,double x,double Q2, const double * par){
 	double sigma_0 =par[0];
 	double lambda	=par[1];
 	double x_0	=par[2];
@@ -88,12 +93,19 @@ double sigma_gbw(double r,double x,double Q2, double * par){
 	return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
 }
 
+double sigma_gbw_ns(double r,double x,double Q2, const double * par){
+	double sigma_0 =par[0];
+	double lambda	=par[1];
+	double x_0	=par[2];
+	return( pow(r * Q0, 2) * pow(x_0/x, lambda)/4   );	
+}
+
 
 
 /////////////////////////////////////////////////////////////
 //////////////////////////// BGK ////////////////////////////
 /////////////////////////////////////////////////////////////
-double sigma_bgk(double r, double x, double Q2, double * par){
+double sigma_bgk(double r, double x, double Q2, const double * par){
 	//clock_t tim=clock();
 	double sigma_0		=par[0];
 	double A_g		=par[1];
@@ -118,6 +130,26 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 	return(val) ;	
 }
 
+double sigma_bgk_ns(double r, double x, double Q2, const double * par){
+	//clock_t tim=clock();
+	double sigma_0		=par[0];
+	double A_g		=par[1];
+	double lambda_g	=par[2];
+	double C		=par[3];
+	//double mu02		=par[4];
+	double rmax		=par[4];
+	
+	
+#if STAR==0
+	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
+#elif STAR==1
+	double mu02=C/(rmax*rmax);
+	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
+#endif
+	
+	double val = (pow( r* PI,2) * xg_chebyshev(x,mu2))/ ( sigma_0); //prefactor, origin unknown...
+	return(val);
+}
 
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBS ////////////////////////////
@@ -130,10 +162,11 @@ double sigma_bgk(double r, double x, double Q2, double * par){
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 #if MODEL==2
+
 ////////////////////////////////// CERN INTEGRATION ROUTINE VERSION ////////////////////////////////////
 /// GLOBAL ///
 static double VAR[3];
-static double *PAR;//its array but need only one because it needs only to point at par;
+static const double *PAR;//its array but need only one because it needs only to point at par;
 
 double integrand_gbs(double *r_ptr){
 	double r=*r_ptr;
@@ -165,7 +198,9 @@ double integrand_gbs(double *r_ptr){
 	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);
 }
 
-double sigma_gbs(double r, double x, double Q2, double * par){
+double sigma_gbs(double r, double x, double Q2, const double * par){
+	printf("discontinued\n");
+	getchar();
 	*(VAR)=r;
 	*(VAR+1)=x;
 	*(VAR+2)=Q2;

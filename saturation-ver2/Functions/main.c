@@ -26,12 +26,14 @@
 #include"../minuit.h"
 //#include"./read-and-fit.c"
 
-
-#if R_FIX==0
 #include"./Parameters.h"
-#else 
-#include"./Parametersrfix.h"
-#endif
+
+
+
+
+//#else 
+//#include"./Parametersrfix.h"
+//#endif
 
 //#if MODEL==1
 //#include"../gluons.h"
@@ -73,6 +75,9 @@ FILE * out_file;
 //////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[]){
+#if R_FIX==1
+	par_error[4]=0.0; 
+#endif
 	int n_data;
 	clock_t time_measure=clock();
 	//FILE* logfile;
@@ -160,7 +165,7 @@ int main(int argc, char* argv[]){
 	
 	sprintf(outline,"chisq\t%.4e\t%.4e\n",res,error);
 	log_printf(out_file,outline);
-	sprintf(outline,"n_data\t%d\n",n_data);
+	sprintf(outline,"n_data-n_par\t%d\n",n_data-N_PAR);
 	log_printf(out_file,outline);
 	sprintf(outline,"chisq/dof\t%.3e\n",res/(n_data-N_PAR));
 	log_printf(out_file,outline);

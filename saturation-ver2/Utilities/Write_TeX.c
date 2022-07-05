@@ -38,12 +38,22 @@ int main(int argc, char** argv){
 		//fprintf(outfile,"%.0f",value);
 		char dir[500], mass[50], qup[50], model[50], sudakov[50] ,rfix[50],dum[100];
 		char* chptr;
-		chptr=strtok(argv[i],"/");
-		//printf("%s\n",chptr);
+		char* filenameptr[3];
 
-		chptr=strtok(NULL,"/");
-		sprintf(dir,"%s",chptr);
-		chptr=strtok(NULL,"-");
+		chptr=strtok(argv[i],"/");//split dir at /
+		//printf("%s\n",chptr);
+		while(chptr!=NULL){
+			filenameptr[0]=filenameptr[1];
+			filenameptr[1]=filenameptr[2];
+			filenameptr[2]=chptr;
+			chptr=strtok(NULL,"/");
+		}
+		//files are usually model-name/Mass0.0-Qup650-.../result.txt 
+		//printf("%s\n",filenameptr[0]);
+		//printf("%s\n",filenameptr[1]);
+		sprintf(dir,"%s",filenameptr[0]);
+		
+		chptr=strtok(filenameptr[1],"-");
 		sscanf(chptr,"%4s%s",dum,mass);
 		
 		chptr=strtok(NULL,"-");
@@ -101,7 +111,7 @@ int main(int argc, char** argv){
 				printf("%d parameters \n",count);
 				break;	
 			}
-			fprintf(outfile,"& %.2e {\\tiny $\\pm$ %.2e }",value, error);
+			fprintf(outfile," & %.2e {\\tiny $\\pm$ %.2e } ",value, error);
 			count++;
 			//fprintf(stdout,"& %f $\\pm$ %f \n",value, error);
 		}

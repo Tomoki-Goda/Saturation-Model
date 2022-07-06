@@ -78,7 +78,8 @@ double sudakov_np(double r,double mub2, double Q2,const double* par) {
 double dsnpdr(double r, const double * mub2_arr, double Q2,const double* sudpar){
 #if SUDAKOV<=1 
 	return 0.0;
-#endif 	
+#endif 
+	
 	double rmax=sudpar[1];
 	double g1=sudpar[2];
 	double g2=sudpar[3];
@@ -191,16 +192,18 @@ double integrand( double * r_ptr){
 	double dels,deldels;
 	
 	//double mu2=rmu2(r, SUDPAR);
-	double mu2_arr[3];
+	double mu2_arr[3]={0};
+	//printf("%.3e\t %.3e\t %.3e\t\t",mu2_arr[0],mu2_arr[1],mu2_arr[2]);
+	//printf("r== %f\n",r);
 	compute_mu2(r, SUDPAR, mu2_arr,3);//compute mu2, dmu2/dr dd mu2/drdr
-	
+	//printf("%.3e\t %.3e\t %.3e\n",mu2_arr[0],mu2_arr[1],mu2_arr[2]);
 	if((mu2_arr[0]) <LQCD2){
 		printf("integrand::mu2 out of range\n");
 		printf("R %f  Q2 %f x %f r %f mu2 %f\n" , R, Q2, x, r , (mu2_arr[0]) );
 		getchar();
 	}
 	
-	if((mu2_arr[0]) >Q2){
+	if((mu2_arr[0]) < Q2){
 		dels=dsdr(mu2_arr, Q2, SUDPAR);
 		deldels=ddsdrdr(mu2_arr,Q2, SUDPAR);
 #if SUDAKOV==2
@@ -237,7 +240,21 @@ double integrand( double * r_ptr){
 	//printf("%.2e\t" ,val);
 	val*=exp(-sud)*BASE_SIGMA(r,x,Q2,SIGPAR);
 	//printf("%.2e\n" ,val);
-	
+
+	if(isnan(val)!=0){
+		printf("***************INTEGRAND*********************\n");
+		printf("%f %f\n",val, sud);
+		printf("Parameters\n");
+		printf("%f %f %f %f\n",SIGPAR[0],SIGPAR[1],SIGPAR[2],SIGPAR[3]);
+#if SUDAKOV==1  
+		printf("%f %f\n",SUDPAR[0],SUDPAR[1]);
+#elif SUDAKOV==2
+		printf("%f %f %f %f \n",SUDPAR[0],SUDPAR[1],SUDPAR[2],SUDPAR[3] );
+#endif
+		printf("%f %f %f \n", mu2_arr[0],mu2_arr[1],mu2_arr[2]);
+		getchar();
+	}
+
 	return val;
 }
 
@@ -251,20 +268,36 @@ double integral_term(double r, double x, double Q2,const  double * sigmapar,cons
 	VAR[2]=Q2;
 	SIGPAR=sigmapar;
 	SUDPAR=sudpar;
-
+	//printf("%.2e\t%.2e\t%.2e\n" ,x, Q2,r);
 	double result=0;
-	double rmin=1.0e-6;
+	double rmin=1.0e-5;
 	
 	
 	//double mu2;//=rmu2(r, SUDPAR);
 	//compute_mu2(r,SUDPAR, &mu2, 1);
 	
 	//printf("1/rmin^2 =%.1e 1/r^2=%.1e \n" ,invrmin2,1.0/(r*r));
+#if SUDAKOV<=1
 	//if( mu2>Q2 ){ 
 	//	return(0.0);
 	//}
-#if SUDAKOV<=1
-	rmin= pow( rmin2(Q2, SUDPAR ) ,0.5);
+	double rmin_2=rmin2(Q2, SUDPAR );
+	if(rmin_2<(rmin*rmin)){
+		if(rmin_2<0){
+			if(((int)(rmin_2+999))==0){
+				return 0.0;// rmin==-999.0  is used to signal that lower cut off isinfinity.
+			}else{
+				printf("error, rmin2 negative %f\n",rmin_2);
+			}
+		}
+		
+	}else if(rmin_2>r*r){
+		return 0.0;
+	}
+	else{
+	rmin=pow(rmin_2,0.5);
+	}
+	
 #endif
 	//printf("rmin =%.1e r=%.1e \n" ,rmin,r);
 	
@@ -279,9 +312,24 @@ double integral_term(double r, double x, double Q2,const  double * sigmapar,cons
 	double NRel=DGAUSS_PREC;
 	double NAbs=1.0e-10;
 	double error=0;
+	//printf("rmin= %f\trmax =%f\n",rmin, *VAR);
 	dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
 	/////////////////////////////////////////
-	
+	if(isnan(result)!=0){
+		printf("***************INTEGRAL*********************\n");
+		printf("%f \t %f %f\n",result, rmin,VAR[0]);
+		printf("Parameters\n");
+		printf("%f %f %f %f\n",SIGPAR[0],SIGPAR[1],SIGPAR[2],SIGPAR[3]);
+#if SUDAKOV==1  
+		printf("%f %f\n",SUDPAR[0],SUDPAR[1]);
+#elif SUDAKOV==2
+		printf("%f %f %f %f \n",SUDPAR[0],SUDPAR[1],SUDPAR[2],SUDPAR[3] );
+#endif
+		//printf("%f %f %f \n", mu2_arr[0],mu2_arr[1],mu2_arr[2]);
+		getchar();
+	}
+
+
 	return result;
 	
 }
@@ -316,6 +364,18 @@ double sigma_s(double r, double x, double Q2, const double * sigmapar, const dou
 
 	val+=integral_term(r,x,Q2,sigmapar,sudpar);
 	//printf("%.2e \n",val);
+	if(isnan(val)!=0){
+		printf("%f %f\n",val,sud);
+		printf("Parameters\n");
+		printf("%f %f %f %f\n",sigmapar[0],sigmapar[1],sigmapar[2],sigmapar[3]);
+#if SUDAKOV==1  
+		printf("%f %f\n",sudpar[0],sudpar[1]);
+#elif SUDAKOV==2
+		printf("%f %f %f %f \n",sudpar[0],sudpar[1],sudpar[2],sudpar[3] );
+#endif
+		printf("mu2= %f\n",mu2);
+		getchar();
+	}
 	return val;
 }
 

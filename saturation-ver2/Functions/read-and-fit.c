@@ -1,3 +1,9 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                  This is the ugliest file of this project...                                            ///
+//        this will read data and compute F2 to compare with data to get chisq.                            ///
+//         the most important function here is fcn which should be explained in the MINUIT manual.         ///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>

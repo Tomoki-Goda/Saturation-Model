@@ -21,10 +21,10 @@
 //#include"photon-wave-function-2.h"
 
 
-
+//in the directory /usr/include ??
 #include"cfortran.h"
-#include"../minuit.h"
-//#include"./read-and-fit.c"
+#include"minuit.h"
+
 
 #include"./Parameters.h"
 

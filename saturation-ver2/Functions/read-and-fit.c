@@ -45,7 +45,7 @@ static unsigned N_DATA;
 //static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
 static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 /////////////////////////////////////////////
-static const double ep=1.0e-6;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
+static const double ep=1.0e-5;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
 #if R_CHANGE_VAR==1
 static const double r_int_max=0.98;
 #else
@@ -108,8 +108,13 @@ void generate_data_set(const double *par, double *csarray){
 ///////////////  used in the file sudakov.h   /////////////////////////
 	static int counter;
 	counter++;
-	double weight = (10.0 +(counter/( 3*((int)NF-1)) ) )/(1.0+ (counter/(3*((int)NF-1)) ) );//change for every 3 rounds
-	SIGMA_PREC=DGAUSS_PREC*( (weight*weight)/2);
+	int norm=2*( (N_PAR*( N_PAR-1))/2 );
+	int frac=( counter/ norm )*norm;//change for every "norm" rounds
+	double weight = (5*norm + (double)frac )/(norm + (double)frac );
+	SIGMA_PREC=DGAUSS_PREC *( (weight*weight)/2);
+#if PRINT_PROGRESS==1
+	printf("%d \t %d \t %.3e\n",frac,counter, SIGMA_PREC);
+#endif
 	
 //////////////////////////////////////////////////////////////
 	for(unsigned i=0; i<N_DATA;i++){

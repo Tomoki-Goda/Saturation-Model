@@ -289,7 +289,7 @@ double integral_term(double r, double x, double Q2,const  double * sigmapar,cons
 	if(rmin_2<(rmin*rmin)){
 		if(rmin_2<0){
 			if(((int)(rmin_2+999))==0){
-				return 0.0;// rmin==-999.0  is used to signal that lower cut off isinfinity.
+				return 0.0;// rmin==-999.0  is used to signal that lower cut off is infinity.
 			}else{
 				printf("error, rmin2 negative %f\n",rmin_2);
 			}
@@ -314,7 +314,7 @@ double integral_term(double r, double x, double Q2,const  double * sigmapar,cons
 	////////////////////////////////////
 	int seg=1;
 	
-	double NRel=SIGMA_PREC ;
+	double NRel=SIGMA_PREC ; //SIGMA_PREC is global and is controled in read-and-fit.c 
 	//double NRel=DGAUSS_PREC ;
 	double NAbs=1.0e-10;
 	double error=0;

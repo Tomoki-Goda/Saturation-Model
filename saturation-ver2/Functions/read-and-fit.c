@@ -16,6 +16,9 @@
 #define MAXN 600
 #define RESCALE 1.05
 
+
+extern double SIGMA_PREC;
+
 extern double SIGMA(double , double ,double , const double *, const double*);
 extern double psisq_z_int(double, double ,int);
 extern double mod_x(double,double, int);
@@ -101,6 +104,14 @@ void generate_data_set(const double *par, double *csarray){
 	//printf("%.3e %.3e %.3e\n", sigpar[0],sigpar[1],sigpar[2]);
 	//printf("%.3e %.3e %.3e %.3e \n" ,sudpar[0],sudpar[1],sudpar[2],sudpar[3]);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+/////////////////Change precision of integreal ///////////////////////
+///////////////  used in the file sudakov.h   /////////////////////////
+	static int counter;
+	counter++;
+	double weight = (10.0 +(counter/( 3*((int)NF-1)) ) )/(1.0+ (counter/(3*((int)NF-1)) ) );//change for every 3 rounds
+	SIGMA_PREC=DGAUSS_PREC*( (weight*weight)/2);
+	
+//////////////////////////////////////////////////////////////
 	for(unsigned i=0; i<N_DATA;i++){
 		val=0;
 		for(unsigned fl=0;fl<(NF-1);fl++){
@@ -139,6 +150,7 @@ void generate_data_set(const double *par, double *csarray){
 		*(csarray+i)=val*(R_STEP/3);
 		
 	}
+	//printf("%.2e\n",SIGMA_PREC);
 	//printf("crosssection ready\n");
 	//printf("%f\n",val);
 	//printf("*****%.3e %.3e %.3e*******\n", sigpar[0],sigpar[1],sigpar[2]);

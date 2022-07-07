@@ -12,6 +12,10 @@
 #include"./mu2.h"
 
 
+double SIGMA_PREC;
+//extern int N_DATA;
+
+
 //extern double sudakov(double ,double, double* );// in dipole-cross-section
 //extern double BASE_SIGMA(double, double, double, double*);
 extern double sigma_gbw(double, double, double, const double*);
@@ -309,7 +313,9 @@ double integral_term(double r, double x, double Q2,const  double * sigmapar,cons
 	//result=dgauss_(&integrand,&rmin,VAR,&N);
 	////////////////////////////////////
 	int seg=1;
-	double NRel=DGAUSS_PREC;
+	
+	double NRel=SIGMA_PREC ;
+	//double NRel=DGAUSS_PREC ;
 	double NAbs=1.0e-10;
 	double error=0;
 	//printf("rmin= %f\trmax =%f\n",rmin, *VAR);
@@ -335,6 +341,8 @@ double integral_term(double r, double x, double Q2,const  double * sigmapar,cons
 }
 
 double sigma_s(double r, double x, double Q2, const double * sigmapar, const double* sudpar){
+	
+	
 	double sud=0.0;
 	//double mu2=rmu2(r, sudpar);
 	double mu2;
@@ -345,14 +353,7 @@ double sigma_s(double r, double x, double Q2, const double * sigmapar, const dou
 	//printf("%.3e\t%.3e\t%.3e\n",sudpar[0],pow(r,-2.0),pow(sudpar[1],-2.0));
 #if SUDAKOV==0
 	return val;
-#endif
-	//printf("1/rmin^2 =%.1e 1/r^2=%.1e \n" ,invrmin2,1.0/(r*r));
-	//if( mu2>Q2 ){ 
-	//	return(val);
-	//}
-	
-#if SUDAKOV>=1
-	
+#else
 	sud+=sudakov_p(mu2,Q2,sudpar);
 #endif
 #if SUDAKOV==2

@@ -16,7 +16,7 @@ FUNCDIR=./Functions
 
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR}
 
-OPT=-O3 #-O3 #-Ofast
+OPT=-O3 #-Ofast
 
 
 

@@ -37,7 +37,7 @@ static double wdata[MAXN]={0};
 static double Q2_DATA[MAXN]={0};
 static double CS_DATA[MAXN]={0};
 static double ERR_DATA[MAXN]={0};
-static unsigned N_DATA;
+unsigned N_DATA;
 
 //static double FIT_RES[N_PAR+1]={0};
 
@@ -106,7 +106,7 @@ void generate_data_set(const double *par, double *csarray){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 /////////////////Change precision of integreal ///////////////////////
 ///////////////  used in the file sudakov.h   /////////////////////////
-	static int counter;
+	/*static int counter;
 	counter++;
 	int norm=2*( (N_PAR*( N_PAR-1))/2 );
 	int frac=( counter/ norm )*norm;//change for every "norm" rounds
@@ -114,7 +114,7 @@ void generate_data_set(const double *par, double *csarray){
 	SIGMA_PREC=DGAUSS_PREC *( (weight*weight)/2);
 #if PRINT_PROGRESS==1
 	printf("%d \t %d \t %.3e\n",frac,counter, SIGMA_PREC);
-#endif
+#endif*/
 	
 //////////////////////////////////////////////////////////////
 	for(unsigned i=0; i<N_DATA;i++){
@@ -206,7 +206,9 @@ double compute_chisq(const double *par){
 		chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
 	}
 	time-=clock();
-	
+	static int counter;
+	sprintf(outline, "%d  ",counter++);
+	log_printf(log_file,outline);
 	for(unsigned i=0;i<N_PAR;i++){
 		sprintf(outline, "%.3e, ",*(par+i));
 		log_printf(log_file,outline);

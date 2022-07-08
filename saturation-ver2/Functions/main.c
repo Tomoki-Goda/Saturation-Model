@@ -43,6 +43,9 @@
 
 //#define TEST 2
 #define MAXN 600
+extern double SIGMA_PREC;
+extern unsigned N_DATA;
+
 extern int load_data(void);
 extern void generate_psi_set(void);
 //extern void fcn(int , double , double, double ,unsigned ,void (*)(void) );
@@ -145,7 +148,18 @@ int main(int argc, char* argv[]){
 	MNEXCM(fcn,"SET STR",arglist, 1,error_flag,0);
 	
 	/* Minimalization procedure MIGRAD */
-	MNEXCM(fcn,"MIGRAD",0,0,error_flag,0);
+	char command[100];
+	SIGMA_PREC=DGAUSS_PREC*10;
+	sprintf(command , "SIMPLEX %d %d",10*(N_PAR*N_PAR),(N_DATA/100));//get first digit right
+	//sprintf(command , "MIGRAD 500 %d",N_DATA*1000);
+	MNCOMD(fcn,command,error_flag,0);
+	//printf("%s\n", command);
+	
+	SIGMA_PREC=DGAUSS_PREC;
+	//sprintf(command , "SIMPLEX %d %d",1000*(N_PAR*N_PAR), N_DATA/100);
+	sprintf(command , "MIGRAD %d %d",100*(N_PAR*N_PAR), N_DATA*10);//MIGRAD multiplies it by 1.0e-3 *10 is 1% accuracy
+	printf("%s\n", command);
+	MNCOMD(fcn,command,error_flag,0);
 	
 	time_measure-=clock();
 	////////////////////SAVE RESULTS////////////////////////////////
@@ -175,10 +189,15 @@ int main(int argc, char* argv[]){
 	log_printf(out_file,outline);
 	sprintf(outline,"In %.2e minutes\n", -((double)time_measure)/(60*CLOCKS_PER_SEC) );
 	log_printf(out_file,outline);
+	
+	sprintf(outline,"Error Flag %d \n", error_flag );
+	log_printf(out_file,outline);
+	
+	
 	fclose(out_file);
 	fclose(log_file);
 	
-	printf("*************************  Koniec   **************************\n");
+	printf("*************************  End   **************************\n");
 	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
 	printf("R_FIX: %d \t                                               \n",R_FIX );
 	printf("L %.2e S %.2e C %.2e B %.2e\n",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );

@@ -12,39 +12,37 @@ int compute_mu2(double r, const double * sudpar, double * mu2_arr,int opt){
 	
 	*(mu2_arr)=C*(1.0/r2+1.0/rm2);
 	
-	if( (mu2_arr[0]<LQCD2)){
-		printf(" Problem with mu2 = %.3e\n",mu2_arr[0]);
-		*(mu2_arr)=LQCD2;
-		//getchar();
-	}
-	
 	if(opt==1){
-		if( (isnan(mu2_arr[0])!=0) ){
-			printf(" Problem with mu2_arr[0] = %.3e\n",mu2_arr[0]);
-			getchar();
+		if( (mu2_arr[0]<LQCD2)){
+			return 1;		
 		}
-		
+		if( isnan(mu2_arr[0])!=0){
+			return 2;		
+		}
+				
 		return 0;
 	}
+	
 	//first and second derivatives wrt r 
 	mu2_arr[1] = -2.0*C/(r*r2);
 	mu2_arr[2] = 6.0*C/(r2*r2);
 	
 	
-	for(int i=0;i<3;i++){
+	for(int i=1;i<3;i++){
 		if( (isnan(mu2_arr[i])!=0) ){
-			printf("compute_mu2:: Problem with mu2_arr[0] = %.3e\n" ,mu2_arr[0]);
-			printf("compute_mu2::C= %.3e rmax= %.3e r= %.3e \n" ,C,rmax, r);
-			getchar();
+			return 2;
 		}
 		if( (mu2_arr[i]*(pow(-1,i))<0) ){
-			printf(" Problem with mu2_arr[%d] = %.3e\n",i ,mu2_arr[i]);
-			mu2_arr[i]=0;
-			//getchar();
+			return 1;
 		}
 	}
 	
-	return 0;	
+	if(opt==3){
+		return 0;
+	}else{
+		printf("opt is 1 or 3 : %d\n", opt); 
+		return 3;
+	}	
 }
 
 
@@ -69,7 +67,7 @@ int rmin2(double Q2 , const double* sudpar,double *rmin_2){
 		getchar();
 		return 1;
 	}
-	return 0 ;
+	return 0;
 }
 
 
@@ -87,17 +85,12 @@ int compute_mu2(double r, const double * sudpar, double * mu2_arr, int opt){
 	
 	mu2_arr[0]=C/(rm2*(1.0-exprrmax ));
 	
-	if( (mu2_arr[0]<LQCD2)){
-		printf(" Problem with mu2 = %.3e\n",mu2_arr[0]);
-		*(mu2_arr)=LQCD2;
-		//getchar();
-	}
-	
 	if(opt==1){
-		if( (isnan(mu2_arr[0])!=0) ){
-			printf("compute_mu2:: Problem with mu2_arr[0] = %.3e\n" ,mu2_arr[0]);
-			printf("compute_mu2::C= %.3e rmax= %.3e r= %.3e \n" ,C,rmax, r);
-			getchar();
+		if( (mu2_arr[0]<LQCD2)){
+			return 1;		
+		}
+		if( isnan(mu2_arr[0])!=0){
+			return 2;		
 		}
 		return 0;
 	}
@@ -107,18 +100,20 @@ int compute_mu2(double r, const double * sudpar, double * mu2_arr, int opt){
 	mu2_arr[1] = jac*r;
 	mu2_arr[2] = jac*( 1.0- 2* (r2/rm2) *((1.0+exprrmax)/(1.0-exprrmax)) ) ;	
 	
-	for(int i=0;i<3;i++){
+	for(int i=1;i<3;i++){
 		if( (isnan(mu2_arr[i])!=0) ){
-			printf(" Problem with mu2_arr[%d] = %.3e\n",i ,mu2_arr[i]);
-			getchar();
+			return 2;
 		}
 		if( (mu2_arr[i]*(pow(-1,i))<0) ){
-			printf(" Problem with mu2_arr[%d] = %.3e\n",i ,mu2_arr[i]);
-			mu2_arr[i]=0;
-			//getchar();
+			return 1;
 		}
 	}
-	return 0;
+	if(opt==3){
+		return 0;
+	}else{
+		printf("opt is 1 or 3 : %d\n", opt); 
+		return 3;
+	}
 }
 
 

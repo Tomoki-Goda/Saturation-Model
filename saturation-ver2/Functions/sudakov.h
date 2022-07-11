@@ -263,7 +263,13 @@ double integrand( double * r_ptr){
 	
 	double mu2_arr[3]={0};
 
-	compute_mu2(r, SUDPAR, mu2_arr,3);//compute mu2, dmu2/dr dd mu2/drdr
+	int signal=compute_mu2(r, SUDPAR, mu2_arr,3);//compute mu2, dmu2/dr dd mu2/drdr
+///////////return 0 for invalid par/////////////
+	if(signal!=0){
+		printf("integrand:: mu2= %.3e %.3e %.3e r=%.3e  C=%.3e rmax=%.3e\n",mu2_arr[0] ,mu2_arr[1] ,mu2_arr[2] ,r,SUDPAR[0],SUDPAR[1] );
+		return 0;
+	}
+////////////////////////////////////////////////
 	
 	if((mu2_arr[0]) <LQCD2){
 		printf("integrand::mu2 out of range\n");
@@ -330,6 +336,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 		printf( "unrecognized signal from rmin2\n");
 	}
 #endif
+
 //#if (SUDAKOV<=1)
 //	double rmin_2=rmin2(q2, SUDPAR );
 //	if(rmin_2<(rmin*rmin)){//IF negative, either fatal error or -999 to signal rmin=infinity
@@ -388,6 +395,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 }
 
 double sigma_s(double r, double x, double q2, const double * sigmapar, const double* sudpar){
+	
 	VAR[0]=r;
 	VAR[1]=x;
 	VAR[2]=q2;
@@ -406,32 +414,34 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 		return 0;
 	}
 #endif
+	double val=BASE_SIGMA(r,x,q2, sigmapar );
+#if (SUDAKOV==0)
+	return val;
+#endif
 //////////////////////////////////////////////
 	
 	double sud=0.0;
 	double mu2;
-	compute_mu2(r,sudpar, &mu2, 1);
-	
+	int signal=compute_mu2(r, SUDPAR, &mu2,1);//compute mu2, dmu2/dr dd mu2/drdr
 ///////////return 0 for invalid par/////////////
-	if((isnan(mu2)!=0)){
-		printf("sigma_s mu2= %.3e r=%.3e  C=%.3e rmax=%.3e\n",mu2,r,SUDPAR[0],SUDPAR[1] );
+	if(signal!=0){
+		printf("sigma_s:: mu2= %.3e r=%.3e  C=%.3e rmax=%.3e\n",mu2,r,SUDPAR[0],SUDPAR[1] );
 		return 0;
 	}
 ////////////////////////////////////////////////
 	
-	double val=BASE_SIGMA(r,x,q2, sigmapar );
 #if (SUDAKOV==1)  	
 	if(mu2>q2){
 		return val;
 	}
 #endif	
-#if (SUDAKOV==0)
-	return val;
-#endif
+
+
 
 	val*=exp_sud(r,mu2,q2);
-	
+
 	val+=integral_term(r,x,q2,sigmapar,sudpar);
+
 	
 ////////////////////////////////////////////////////////////////////////////////////	
 	if(isnan(val)!=0){
@@ -447,7 +457,6 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 		getchar();
 	}
 ////////////////////////////////////////////////////////////////////////////////////
-	
 	return val;
 }
 

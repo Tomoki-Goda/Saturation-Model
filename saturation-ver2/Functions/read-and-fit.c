@@ -140,11 +140,12 @@ void generate_data_set(const double *par, double *csarray){
 				r=r/(1-r);
 #endif
 				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
-
+				//printf("%.2e\n",term);
 #if (R_CHANGE_VAR==1)
 				term*=pow(1+r,2);
 #endif
-				//printf("%f\n",term);
+				//printf("read-and-fit.c term:: %f\n",term);
+				//getchar();
 				if((j==0)||(j==2*N_SIMPS)){
 					
 				} else if( (j/2)*2==j ){

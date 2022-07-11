@@ -171,8 +171,8 @@ int main(int argc, char* argv[]){
 	/* Set strategy to STRategy from main.h, 0-fast, 1-default, 2-precise */
 	MNCOMD(fcn,"SET STR 0", error_flag,0);
 	
-	//sprintf(command , "SIMPLEX %d %.3e",10*(N_PAR*N_PAR),0.5);//get first digit right
-	//MNCOMD(fcn,command,error_flag,0);
+	sprintf(command , "SIMPLEX %d 1.0",10*(N_PAR*N_PAR));//get first digit right
+	MNCOMD(fcn,command,error_flag,0);
 	
 	sprintf(command , "SET LIMITS");//Having limits seriously deteriorates performance
 	MNCOMD(fcn,command,error_flag,0);
@@ -197,6 +197,9 @@ int main(int argc, char* argv[]){
 	//sprintf(command , "SIMPLEX %d %.3e",50*(N_PAR*N_PAR),0.0001);
 	sprintf(command , "MIGRAD %d %.3e",50*(N_PAR*N_PAR),10.0);
 	MNCOMD(fcn,command,error_flag,0);
+	
+	//sprintf(command , "IMPROVE %d ",50*(N_PAR*N_PAR) );
+	//MNCOMD(fcn,command,error_flag,0);
 	
 	time_measure-=clock();
 /////////////////////////////////////SAVE RESULTS////////////////////////////////

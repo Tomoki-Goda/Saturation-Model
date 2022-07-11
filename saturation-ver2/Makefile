@@ -16,7 +16,7 @@ FUNCDIR=./Functions
 
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR}
 
-OPT=-Ofast
+OPT=-O3
 
 SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
 GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h

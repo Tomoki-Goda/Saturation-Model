@@ -53,7 +53,7 @@ double change_var_compactify_log(double min,double max, double val){
 }
 ////////////////////////////////  indices //////////////////////////////////////////////////
 // chebyshev approximation is done in multi dimension but to treat in the same way, tensor are treated as list. 
-unsigned convert_index(unsigned * index, unsigned * max, unsigned dim){
+unsigned convert_index(const unsigned * index, const unsigned * max, unsigned dim){
 	unsigned unit;
 	unsigned total=0;
 	for(unsigned i=0;i<dim;i++){
@@ -95,7 +95,7 @@ int kronecker(int i,int j){
 	return((i==j)?1:0);
 } 
 
-void sample(double func(double *,double* ), double * par,  unsigned * degree, unsigned dim,  double* sample_arr){
+void sample(double func(const double *,const double* ), const double * par,  const unsigned * degree, unsigned dim,  double* sample_arr){
 ///////////////////precompute the function. i.e make the function descrete. /////////////////////////
 // degree is a list of how many term you want to go in each variable. dim is dimension( no. of variables). 
 //then sample_arr should have length = prod( degree[i] ).
@@ -124,7 +124,7 @@ void sample(double func(double *,double* ), double * par,  unsigned * degree, un
 }
 
 
-double cheb_c_summand(double * sample_arr, unsigned* ind1, unsigned* ind2, unsigned *degree, unsigned dim ){
+double cheb_c_summand(const double * sample_arr,const unsigned* ind1, const unsigned* ind2,const unsigned *degree, unsigned dim ){
 //vec, ind1, ind2, degree are vector of length dim.
 // sum over ind2 is the coefficients in the chebyshev
 	double factor=1;
@@ -140,7 +140,7 @@ double cheb_c_summand(double * sample_arr, unsigned* ind1, unsigned* ind2, unsig
 }
 
 
-double cheb_c(/*double func(double * vec,double* par) */double * sample_arr,/*double * par,*/ unsigned* ind1,unsigned *degree, unsigned dim ){
+double cheb_c(/*double func(double * vec,double* par) */const double * sample_arr,/*double * par,*/const unsigned* ind1,const unsigned *degree, unsigned dim ){
 // do the sum, produce coefficient c of chebyshev \sum c*T
 //vec, ind1,  degree are vector of length dim.
 	unsigned ind2[dim];//={0};
@@ -172,7 +172,7 @@ double cheb_c(/*double func(double * vec,double* par) */double * sample_arr,/*do
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////// Main fnctions of this file //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void cheb_coeff(double func(double * vec,double* par) , double * par,unsigned *degree,unsigned dim, double* coeff  ){
+void cheb_coeff(double func(const double * vec, const double* par) ,const double * par, const unsigned *degree, unsigned dim, double* coeff  ){
 	unsigned ind1[dim];//={0};
 	unsigned len=1;
 	
@@ -196,7 +196,7 @@ void cheb_coeff(double func(double * vec,double* par) , double * par,unsigned *d
 //////////////////////////////////// approximate function ////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double chebyshev(unsigned *degree,unsigned dim, double* coeff ,double* args ){
+double chebyshev(const unsigned *degree,unsigned dim,const double* coeff , double* args ){
 
 	unsigned ind1[dim];
 	unsigned len=1;

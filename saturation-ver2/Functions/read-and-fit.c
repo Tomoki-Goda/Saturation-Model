@@ -23,7 +23,7 @@ extern double SIGMA(double , double ,double , const double *, const double*);
 extern double psisq_z_int(double, double ,int);
 extern double mod_x(double,double, int);
 
-extern void approx_xg(double *);
+extern void approx_xg(const double *);
 
 extern int parameter(const double*,double*,double*);
 ///////////Set in main.c//////////////////
@@ -45,14 +45,16 @@ unsigned N_DATA;
 //static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
 static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 /////////////////////////////////////////////
-static const double ep=1.0e-5;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
-#if R_CHANGE_VAR==1
+static const double ep=R_MIN;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
+#if (R_CHANGE_VAR==1)
 static const double r_int_max=0.98;
 #else
 static const double r_int_max=50.0;
 #endif
 
-static const double R_STEP=r_int_max/(2*N_SIMPS_R);
+//static const double R_STEP=r_int_max/(2*N_SIMPS_R);
+
+int N_SIMPS=N_SIMPS_R;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////   generate grid of z-integrated psi values        ////////////////////////////
@@ -60,19 +62,20 @@ static const double R_STEP=r_int_max/(2*N_SIMPS_R);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////it writes to global PSI...
 void generate_psi_set(){
+	double r_step=r_int_max/(2*N_SIMPS);
 	double r;
 	char outline[200];
-	sprintf(outline,"r integrated from 0 to %f, with step %.3e. \n\n", r_int_max, R_STEP);
+	sprintf(outline,"r integrated from 0 to %f, with step %.3e. \n\n", r_int_max, r_step);
 	log_printf(log_file,outline);
-	sprintf(outline,"nf=%d\tN_SIMPS=%d\tN_DATA=%d.\n\n", (int)NF, N_SIMPS_R,N_DATA);
+	sprintf(outline,"nf=%d\tN_SIMPS=%d\tN_DATA=%d.\n\n", (int)NF, N_SIMPS,N_DATA);
 	log_printf(log_file,outline);
 	
 	for(unsigned fl=0;fl<(NF-1);fl++){
 	
 		for(unsigned i=0; i<N_DATA;i++){
-			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){
-				r=R_STEP*j+ep;
-#if R_CHANGE_VAR==1
+			for(unsigned j=0;j<(2*N_SIMPS+1); j++){
+				r=r_step*j+ep;
+#if (R_CHANGE_VAR==1)
 				r=r/(1-r);
 				//r=-log(r);
 #endif
@@ -81,9 +84,11 @@ void generate_psi_set(){
 			}
 		}
 	}
+#if (PRINT_PROGRESS==1)
 	printf("*****************************************\n");
 	printf("*            Psi ready                  *\n");
 	printf("*****************************************\n");
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +96,11 @@ void generate_psi_set(){
 ///////////////////////////////////////////////////////////////////////////////////////
 
 void generate_data_set(const double *par, double *csarray){
+	if(N_SIMPS>N_SIMPS_R){
+		printf("N_SIMPS can't be larger than N_SIMPS_R:  %d\t %d",N_SIMPS,N_SIMPS_R);
+		getchar();	
+	}
+	double r_step=r_int_max/(2*N_SIMPS);
 	//csarray is counterpart of CS_DATA ...
 	//double integral[N_DATA];
 	double term ,val;
@@ -119,26 +129,23 @@ void generate_data_set(const double *par, double *csarray){
 //////////////////////////////////////////////////////////////
 	for(unsigned i=0; i<N_DATA;i++){
 		val=0;
+		Q2=Q2_DATA[i];
 		for(unsigned fl=0;fl<(NF-1);fl++){
-			for(unsigned j=0;j<(2*N_SIMPS_R+1); j++){
+			xm=mod_x(X_DATA[i], Q2,fl );
+			
+			for(unsigned j=0;j<(2*N_SIMPS+1); j++){
 				
-				r=R_STEP*j+ep;
-#if R_CHANGE_VAR==1
+				r=r_step*j+ep;
+#if (R_CHANGE_VAR==1)
 				r=r/(1-r);
-				//r=-log(r);
 #endif
-				Q2=Q2_DATA[i];
-				xm=mod_x(X_DATA[i], Q2,fl );
-
-				//term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) );//there should be a factor *r coming from dr r d(theta) but we give r^2 to psi and so /r and one r forthe jacobian! ;
-
 				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
 
-#if R_CHANGE_VAR==1
+#if (R_CHANGE_VAR==1)
 				term*=pow(1+r,2);
 #endif
 				//printf("%f\n",term);
-				if((j==0)||(j==2*N_SIMPS_R)){
+				if((j==0)||(j==2*N_SIMPS)){
 					
 				} else if( (j/2)*2==j ){
 					term*=2;
@@ -152,7 +159,7 @@ void generate_data_set(const double *par, double *csarray){
 			}
 		}
 		//printf("%f\n",val);
-		*(csarray+i)=val*(R_STEP/3);
+		*(csarray+i)=val*(r_step/3);
 		
 	}
 	//printf("%.2e\n",SIGMA_PREC);
@@ -196,8 +203,8 @@ double compute_chisq(const double *par){
 	char outline[200];//entry in the log file 
 	double chisq=0.0;
 	double val;
-	clock_t time;
-	time=clock();
+//	clock_t time;
+//	time=clock();
 	double cs[N_DATA];//computed cross-section
 	generate_data_set(par,cs);
 	
@@ -205,33 +212,51 @@ double compute_chisq(const double *par){
 		//chisq+=pow( ( cs[i]-CS_DATA[i] )/(ERR_DATA[i]),2);
 		chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
 	}
-	time-=clock();
-	static int counter;
-	sprintf(outline, "%d  ",counter++);
-	log_printf(log_file,outline);
-	for(unsigned i=0;i<N_PAR;i++){
-		sprintf(outline, "%.3e, ",*(par+i));
-		log_printf(log_file,outline);
-		//*(FIT_RES+i)=*(par+i);
-		//FIT_RES[i]=*(par+i);
-	}
-	//FIT_RES[N_PAR]=chisq;
-	//*(FIT_RES+N_PAR)=chisq;
+//	time-=clock();
+//	static int counter;
+//	sprintf(outline, "%d  ",counter++);
+//	log_printf(log_file,outline);
+//	for(unsigned i=0;i<N_PAR;i++){
+//		sprintf(outline, "%.2e, ",*(par+i));
+//		log_printf(log_file,outline);
+//	}	
+//	sprintf(outline,"   %.2e / %d = %.3e, in %.1e sec\n",chisq, N_DATA-N_PAR, chisq/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
+//	log_printf(log_file,outline);
 	
-	sprintf(outline,"\t%.2e / %d = %.3e, in %.2e sec\n",chisq, N_DATA-N_PAR, chisq/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
-	log_printf(log_file,outline);
-	
-	
-	return(chisq);
+	return(chisq/(N_DATA-N_PAR) );
 }
 
-void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void (*dum)(void) ){
+void fcn(const int *npar, const double grad[], double*fcnval, const double *par,const unsigned *iflag,void (*dum)(void) ){
+	
 	/////////////////////////////////////////
 	//for detail see MINUIT documentatin.
+	char outline[200];//entry in the log file 
+	clock_t time;
+	time=clock();
+	
+	
+	static int counter;
+	
+	sprintf(outline, "%d %d ",counter++,*iflag);
+	log_printf(log_file,outline);
+	
+	for(unsigned i=0;i<(*npar);i++){
+		sprintf(outline, "%.2e, ",*(par+i));
+		log_printf(log_file,outline);
+	}
+	
 #if (MODEL==1||MODEL==3)	
 	approx_xg(par+1);//generate chebyshev coefficients
 #endif
+	
+	
 	*fcnval=compute_chisq(par);
+	
+	
+	time-=clock();
+		
+	sprintf(outline,"    %.3e, in %.1e sec\n",*fcnval, -((double)time)/CLOCKS_PER_SEC);
+	log_printf(log_file,outline);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,7 +298,7 @@ int load_data(){
 	
 	////////////////////////////////////////////////////////////////////////
 	
-#if NEW_DATA==1 
+#if (NEW_DATA==1) 
 	N_DATA=i;
 	
 	//import_points(X_DATA,Q2_DATA);

@@ -10,6 +10,8 @@
 #include"./gluon-chebyshev.h"
 #include"./sudakov.h"
 
+//#include"./mu2.h"
+
 //#define BGK 0
 
 //extern  double xgpdf(double, double);
@@ -29,25 +31,25 @@ int parameter(const double *par,double* const sigpar,double* const sudpar){
 		*(sigpar+i)=*(par+i);
 	}
 	//double* sigpar= par;
-#if MODEL==22||MODEL==2
+#if (MODEL==22||MODEL==2)
 	//double *sudpar;
 	for(int i=0;i<(N_PAR-3);i++){
 		*(sudpar+i)=*(par+3+i);
 	}
 	//printf("%.3e %.3e\n",sudpar[0], sudpar[1]);
 	
-#elif MODEL==3
+#elif (MODEL==3)
 	//double sudpar[10];
 	sudpar[0]=par[3]*par[5] ;//C*C2
-	sudpar[1]=par[4]*sqrt(par[5]);//rmax mu02=C/rmax^2
+	sudpar[1]=par[4]*sqrt(fabs(par[5]));//rmax mu02=C/rmax^2 //fabs is just in case;
 	//printf("%.3e %.3e\n",sudpar[0], sudpar[1]);
 	
-#if SUDAKOV==2
+#if (SUDAKOV==2)
 	sudpar[2]=par[6];
 	sudpar[3]=par[7];
 #endif
 #endif
-	//printf("%.3e %.3e\n",sudpar[0], sudpar[1]);
+	//printf("%.3e %.3e\n",sudpar[2], sudpar[3]);
 	return 0;
 }
 
@@ -85,7 +87,7 @@ double mod_x(double x, double Q2, unsigned flavour) {
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBW ////////////////////////////
 /////////////////////////////////////////////////////////////
-double sigma_gbw(double r,double x,double Q2, const double * par){
+double sigma_gbw(double r,double x,double q2, const double * par){
 	double sigma_0 =par[0];
 	double lambda	=par[1];
 	double x_0	=par[2];
@@ -93,19 +95,19 @@ double sigma_gbw(double r,double x,double Q2, const double * par){
 	return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
 }
 
-double sigma_gbw_ns(double r,double x,double Q2, const double * par){
-	double sigma_0 =par[0];
-	double lambda	=par[1];
-	double x_0	=par[2];
-	return( pow(r * Q0, 2) * pow(x_0/x, lambda)/4   );	
-}
+//double sigma_gbw_ns(double r,double x,double Q2, const double * par){
+//	double sigma_0 =par[0];
+//	double lambda	=par[1];
+//	double x_0	=par[2];
+//	return( pow(r * Q0, 2) * pow(x_0/x, lambda)/4   );	
+//}
 
 
 
 /////////////////////////////////////////////////////////////
 //////////////////////////// BGK ////////////////////////////
 /////////////////////////////////////////////////////////////
-double sigma_bgk(double r, double x, double Q2, const double * par){
+double sigma_bgk(double r, double x, double q2, const double * par){
 	//clock_t tim=clock();
 	double sigma_0		=par[0];
 	double A_g		=par[1];
@@ -115,12 +117,14 @@ double sigma_bgk(double r, double x, double Q2, const double * par){
 	double rmax		=par[4];
 	
 	
-#if STAR==0
-	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
-#elif STAR==1
-	double mu02=C/(rmax*rmax);
-	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
-#endif
+	double mu2;
+	compute_mu2(r, par+3 , &mu2, 1 );
+//#if STAR==0
+//	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
+//#elif STAR==1
+//	double mu02=C/(rmax*rmax);
+//	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
+//#endif
 	
 	double expo = 0.389379*(pow( r* PI,2) * xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	
@@ -130,26 +134,25 @@ double sigma_bgk(double r, double x, double Q2, const double * par){
 	return(val) ;	
 }
 
-double sigma_bgk_ns(double r, double x, double Q2, const double * par){
-	//clock_t tim=clock();
-	double sigma_0		=par[0];
-	double A_g		=par[1];
-	double lambda_g	=par[2];
-	double C		=par[3];
-	//double mu02		=par[4];
-	double rmax		=par[4];
-	
-	
-#if STAR==0
-	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
-#elif STAR==1
-	double mu02=C/(rmax*rmax);
-	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
-#endif
-	
-	double val = (pow( r* PI,2) * xg_chebyshev(x,mu2))/ ( sigma_0); //prefactor, origin unknown...
-	return(val);
-}
+//double sigma_bgk_ns(double r, double x, double Q2, const double * par){
+//	//clock_t tim=clock();
+//	double sigma_0		=par[0];
+//	double A_g		=par[1];
+//	double lambda_g	=par[2];
+//	double C		=par[3];
+//	//double mu02		=par[4];
+//	double rmax		=par[4];
+//	
+//#if STAR==0
+//	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
+//#elif STAR==1
+//	double mu02=C/(rmax*rmax);
+//	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
+//#endif
+//	
+//	double val = (pow( r* PI,2) * xg_chebyshev(x,mu2))/ ( sigma_0); //prefactor, origin unknown...
+//	return(val);
+//}
 
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBS ////////////////////////////
@@ -161,7 +164,7 @@ double sigma_bgk_ns(double r, double x, double Q2, const double * par){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-#if MODEL==2
+#if (MODEL==2)
 
 ////////////////////////////////// CERN INTEGRATION ROUTINE VERSION ////////////////////////////////////
 /// GLOBAL ///
@@ -191,7 +194,7 @@ double integrand_gbs(double *r_ptr){
 
 
 	double val=laplacian_sigma;
-#if SUDAKOV>=1
+#if (SUDAKOV>=1)
         val*=exp(-sudakov(r,Q2,sudpar)) ;
 #endif
 	//printf("integrand return for r=%f, %f. \n",r,val);       

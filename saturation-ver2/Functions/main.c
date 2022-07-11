@@ -45,6 +45,7 @@
 #define MAXN 600
 extern double SIGMA_PREC;
 extern unsigned N_DATA;
+extern int N_SIMPS;
 
 extern int load_data(void);
 extern void generate_psi_set(void);
@@ -65,7 +66,7 @@ void log_printf(FILE* file,char* line){
 	if(file!=stdout){
 		fprintf(file,"%s",line);
 	}
-#if PRINT_PROGRESS==1
+#if (PRINT_PROGRESS==1)
 	fprintf(stdout,"%s",line);
 #endif
 }
@@ -78,7 +79,7 @@ FILE * out_file;
 //////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[]){
-#if R_FIX==1
+#if (R_FIX==1)
 	par_error[4]=0.0; 
 #endif
 	int n_data;
@@ -117,52 +118,88 @@ int main(int argc, char* argv[]){
 	n_data=load_data();
 	//printf("%d\n",N_DATA);
 	printf("%d\n",n_data);
-	generate_psi_set();
+
 	
-	printf("*************************  Starting  **************************\n");
+	printf("----------------------------------  Starting  --------------------------------\n");
 	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
 	printf("R_FIX: %d \t N_PAR %d                                     \n",R_FIX,N_PAR );
 	printf("L %.2e S %.2e C %.2e B %.2e\n",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
 	printf(" STAR %d\n", STAR );
 	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
-	printf("****************************************************************\n");
+	printf("-----------------------------------------------------------------------------\n");
 	
 	
 	
-#if TEST==1
-	double resval=0.0;	
-	double grad[7];
-	fcn(7, grad, &resval , par_start,0, &dum_func );
-	printf("fcn returns %f,\n",resval); 
-	return(0);
-#endif
+//#if (TEST==1)
+//	double resval=0.0;	
+//	double grad[7];
+//	fcn(7, grad, &resval , par_start,0, &dum_func );
+//	printf("fcn returns %f,\n",resval); 
+//	return(0);
+//#endif
 	
-	/* Initialize Minuit */
+//////////////////////////     Initialize Minuit     ////////////////////////////////////////
 	MNINIT(5,6,7);
 	/* Parameters definition */
 	for(unsigned i=0;i<N_PAR;i++){
 		MNPARM(i+1,par_name[i], par_start[i],par_error[i],par_min[i],par_max[i],error_flag);
 	}
-	arglist[0] = STRATEGY;
-	/* Set strategy to STRategy from main.h, 0-fast, 1-default, 2-precise */
-	MNEXCM(fcn,"SET STR",arglist, 1,error_flag,0);
 	
-	/* Minimalization procedure MIGRAD */
+	
 	char command[100];
-	SIGMA_PREC=DGAUSS_PREC*10;
-	sprintf(command , "SIMPLEX %d %d",10*(N_PAR*N_PAR),(N_DATA/100));//get first digit right
-	//sprintf(command , "MIGRAD 500 %d",N_DATA*1000);
+////////////////////////  Minimalization procedure MIGRAD //////////////////////////////////
+	//sprintf(command , "SET ERRORDEF 3");
+	//sprintf(command , "MIGRAD 500 %d %.3e",10*(N_PAR*N_PAR),100.0);
+	//sprintf(command , "SET EPSMACHINE 1.0e-5");
+	//MNCOMD(fcn,command,error_flag,0);
+	
+	
+
+#if (PRINTPROGRESS==1)	
+	sprintf(command , "SET PRINTOUT 3");
 	MNCOMD(fcn,command,error_flag,0);
-	//printf("%s\n", command);
+#endif
+
+	N_SIMPS=(int)(N_SIMPS_R*2.0/4.0);
+	SIGMA_PREC=DGAUSS_PREC*25;
+	generate_psi_set();
+	
+	
+	//sprintf(command , "SET LIMITS");//Having limits seriously deteriorates performance
+	//MNCOMD(fcn,command,error_flag,0);
+
+	/* Set strategy to STRategy from main.h, 0-fast, 1-default, 2-precise */
+	MNCOMD(fcn,"SET STR 0", error_flag,0);
+	
+	//sprintf(command , "SIMPLEX %d %.3e",10*(N_PAR*N_PAR),0.5);//get first digit right
+	//MNCOMD(fcn,command,error_flag,0);
+	
+	sprintf(command , "SET LIMITS");//Having limits seriously deteriorates performance
+	MNCOMD(fcn,command,error_flag,0);
+	
+	sprintf(command , "MIGRAD %d %.3e",10*(N_PAR*N_PAR),10.0);
+	MNCOMD(fcn,command,error_flag,0);
+
+//#if (SUDAKOV>=1)
+//	sprintf(command , "FIX 5");
+//	MNCOMD(fcn,command,error_flag,0);
+//#endif
+//////////////////////////////////////////////////////////////////////////////////////////	
+	
+	arglist[0] = STRATEGY;
 	
 	SIGMA_PREC=DGAUSS_PREC;
-	//sprintf(command , "SIMPLEX %d %d",1000*(N_PAR*N_PAR), N_DATA/100);
-	sprintf(command , "MIGRAD %d %d",100*(N_PAR*N_PAR), N_DATA*10);//MIGRAD multiplies it by 1.0e-3 *10 is 1% accuracy
-	printf("%s\n", command);
+	N_SIMPS=N_SIMPS_R;
+	generate_psi_set();
+	
+	MNEXCM(fcn,"SET STR",arglist, 1,error_flag,0);
+	
+	//sprintf(command , "SIMPLEX %d %.3e",50*(N_PAR*N_PAR),0.0001);
+	sprintf(command , "MIGRAD %d %.3e",50*(N_PAR*N_PAR),10.0);
 	MNCOMD(fcn,command,error_flag,0);
 	
 	time_measure-=clock();
-	////////////////////SAVE RESULTS////////////////////////////////
+/////////////////////////////////////SAVE RESULTS////////////////////////////////
 	
 	char outline[500];
 	sprintf(outline,"Q_up\t%.0f\n",Q2_MAX);
@@ -181,7 +218,7 @@ int main(int argc, char* argv[]){
 	log_printf(out_file,outline);
 	sprintf(outline,"n_data-n_par\t%d\n",n_data-N_PAR);
 	log_printf(out_file,outline);
-	sprintf(outline,"chisq/dof\t%.3e\n",res/(n_data-N_PAR));
+	sprintf(outline,"chisq/dof\t%.3e\n",res);///(n_data-N_PAR));
 	log_printf(out_file,outline);
 	
 	
@@ -203,7 +240,7 @@ int main(int argc, char* argv[]){
 	printf("L %.2e S %.2e C %.2e B %.2e\n",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
 	printf(" STAR %d\n", STAR );
 	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
-	printf("chisq/dof\t%.3e\n",res/(n_data-N_PAR));
+	printf("chisq/dof\t%.3e\n",res);
 	printf("****************************************************************\n");
 	return(0);
  

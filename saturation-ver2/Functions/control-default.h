@@ -48,11 +48,11 @@
 #endif
 
 #ifndef N_SIMPS_R
-	#define N_SIMPS_R 100
+	#define N_SIMPS_R 120
 #endif
 
 #ifndef DGAUSS_PREC
-	#define DGAUSS_PREC 1.0e-3
+	#define DGAUSS_PREC 5.0e-4
 #endif
 
 #ifndef STAR

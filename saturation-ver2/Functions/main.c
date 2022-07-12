@@ -1,47 +1,15 @@
 #include<stdio.h>
 #include<math.h>
 #include<time.h>
+#include<cfortran.h>
+#include<minuit.h>
 
-//#include"./control_tmp.h"
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
 
-
-
-//#include"gluon-chebyshev.h"
-//#include"simpson-integral.h"
-//#include"dipole-cross-section.h"
-
-//#if (MODEL==3||MODEL==22||MODEL==2)
-//#include"sudakov.c"
-//#endif
-
-
-//#include"photon-wave-function-2.h"
-
-
-//in the directory /usr/include ??
-#include"cfortran.h"
-#include"minuit.h"
-
-
 #include"./Parameters.h"
 
-
-
-
-//#else 
-//#include"./Parametersrfix.h"
-//#endif
-
-//#if MODEL==1
-//#include"../gluons.h"
-//#include"../chebyshev.h"
-//#/include"../chebyshev3.h"
-//#endif
-
-//#define TEST 2
 #define MAXN 600
 extern double SIGMA_PREC;
 extern unsigned N_DATA;
@@ -50,15 +18,7 @@ extern int N_SIMPS;
 extern int load_data(void);
 extern void generate_psi_set(void);
 //extern void fcn(int , double , double, double ,unsigned ,void (*)(void) );
-extern void fcn(int npar, double grad[], double*fcnval, double *par,unsigned iflag,void (*dum)(void) );
-
-//static double x_data[MAXN]={0};
-//static double y_data[MAXN]={0};
-//static double w_data[MAXN]={0};
-//static double Q2_data[MAXN]={0};
-//static double cs_data[MAXN]={0};
-//static double err_data[MAXN]={0};
-//extern unsigned N_DATA;
+extern void fcn(int* npar, double grad[], double*fcnval, double *par,unsigned* iflag,void (*dum)(void) );
 
 double arglist[10];
 
@@ -129,15 +89,6 @@ int main(int argc, char* argv[]){
 	printf("-----------------------------------------------------------------------------\n");
 	
 	
-	
-//#if (TEST==1)
-//	double resval=0.0;	
-//	double grad[7];
-//	fcn(7, grad, &resval , par_start,0, &dum_func );
-//	printf("fcn returns %f,\n",resval); 
-//	return(0);
-//#endif
-	
 //////////////////////////     Initialize Minuit     ////////////////////////////////////////
 	MNINIT(5,6,7);
 	/* Parameters definition */
@@ -152,54 +103,55 @@ int main(int argc, char* argv[]){
 	//sprintf(command , "MIGRAD 500 %d %.3e",10*(N_PAR*N_PAR),100.0);
 	//sprintf(command , "SET EPSMACHINE 1.0e-5");
 	//MNCOMD(fcn,command,error_flag,0);
-	
-	
 
-#if (PRINTPROGRESS==1)	
-	sprintf(command , "SET PRINTOUT 3");
-	MNCOMD(fcn,command,error_flag,0);
-#endif
+
 
 	N_SIMPS=(int)(N_SIMPS_R*2.0/4.0);
-	SIGMA_PREC=DGAUSS_PREC*25;
+	SIGMA_PREC=DGAUSS_PREC*50;
 	generate_psi_set();
 	
-	
-	//sprintf(command , "SET LIMITS");//Having limits seriously deteriorates performance
-	//MNCOMD(fcn,command,error_flag,0);
-
 	/* Set strategy to STRategy from main.h, 0-fast, 1-default, 2-precise */
 	MNCOMD(fcn,"SET STR 0", error_flag,0);
 	
-	sprintf(command , "SIMPLEX %d 1.0",10*(N_PAR*N_PAR));//get first digit right
+	sprintf(command , "SIMPLEX %d 2.5D-1 ",10*(N_PAR*N_PAR));//get first digit right
 	MNCOMD(fcn,command,error_flag,0);
 	
 	sprintf(command , "SET LIMITS");//Having limits seriously deteriorates performance
 	MNCOMD(fcn,command,error_flag,0);
 	
-	sprintf(command , "MIGRAD %d %.3e",10*(N_PAR*N_PAR),10.0);
+	//SIGMA_PREC=DGAUSS_PREC*10;
+	
+	sprintf(command , "MIGRAD %d %.3e",100*(N_PAR*N_PAR),5.0);
 	MNCOMD(fcn,command,error_flag,0);
 
-//#if (SUDAKOV>=1)
-//	sprintf(command , "FIX 5");
-//	MNCOMD(fcn,command,error_flag,0);
-//#endif
-//////////////////////////////////////////////////////////////////////////////////////////	
-	
-	arglist[0] = STRATEGY;
-	
+#if (PRINT_PROGRESS==1)	
+	sprintf(command , "SET PRINTOUT 3");
+	MNCOMD(fcn,command,error_flag,0);
+#endif
+////////////////////////////////   FINAL RUN    ///////////////////////////////////////	
 	SIGMA_PREC=DGAUSS_PREC;
 	N_SIMPS=N_SIMPS_R;
 	generate_psi_set();
+	//sprintf(command,"SET ERRORDEF %.3e", 0.25); 
+	//MNCOMD(fcn,command,error_flag,0);
 	
-	MNEXCM(fcn,"SET STR",arglist, 1,error_flag,0);
-	
-	//sprintf(command , "SIMPLEX %d %.3e",50*(N_PAR*N_PAR),0.0001);
-	sprintf(command , "MIGRAD %d %.3e",50*(N_PAR*N_PAR),10.0);
+	sprintf(command,"SET STR %d", STRATEGY); 
 	MNCOMD(fcn,command,error_flag,0);
 	
+	
+	for(int i=0; i<3;i++){
+	
+		sprintf(command , "MIGRAD %d %.3e",200*(N_PAR*N_PAR),2.5);
+		MNCOMD(fcn,command,error_flag,0);
+		if(error_flag==0){
+			break;
+		}
+	}
 	//sprintf(command , "IMPROVE %d ",50*(N_PAR*N_PAR) );
 	//MNCOMD(fcn,command,error_flag,0);
+	//if(error_flag!=0){
+	//	MNCOMD(fcn,command,error_flag,0);
+	//}
 	
 	time_measure-=clock();
 /////////////////////////////////////SAVE RESULTS////////////////////////////////

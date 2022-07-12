@@ -269,6 +269,11 @@ double integrand( double * r_ptr){
 		printf("integrand:: mu2= %.3e %.3e %.3e r=%.3e  C=%.3e rmax=%.3e\n",mu2_arr[0] ,mu2_arr[1] ,mu2_arr[2] ,r,SUDPAR[0],SUDPAR[1] );
 		return 0;
 	}
+#if ((MODEL==22)||(MODEL==2))
+	if(SIGPAR[2]<0){
+		return 0;//also delt with in the sigma_gbw
+	}
+#endif
 ////////////////////////////////////////////////
 	
 	if((mu2_arr[0]) <LQCD2){
@@ -293,8 +298,12 @@ double integrand( double * r_ptr){
 	val=val * exp_sud( r , mu2_arr[0], q2 ) * BASE_SIGMA(r,x,q2,SIGPAR);
 	
 	if(isnan(val)!=0){
-		printf("***************INTEGRAND*********************\n");
-		printf("%f\n",val);
+		printf("\n***************INTEGRAND*********************\n");
+		printf("value= %f for r= %.2e \n",val,r);
+		printf("rho=%.2e Q2=%.2e x=%.2e\n",rho ,q2,x);
+		printf("ds/dr=%.2e dds/drdr= %.2e log(R/r) = %.2e\n",dels,deldels,logrr);
+		printf("sudakov= %.2e sigma=%.2e\n", exp_sud( r , mu2_arr[0], q2 ) ,BASE_SIGMA(r,x,q2,SIGPAR));
+		
 		printf("Parameters\n");
 		printf("%f %f %f %f\n",SIGPAR[0],SIGPAR[1],SIGPAR[2],SIGPAR[3]);
 #if (SUDAKOV==1)  

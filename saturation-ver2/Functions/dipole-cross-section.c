@@ -91,6 +91,10 @@ double sigma_gbw(double r,double x,double q2, const double * par){
 	double sigma_0 =par[0];
 	double lambda	=par[1];
 	double x_0	=par[2];
+	
+	if(x_0<0){//to avoid nan since migrad might give negative x0...
+		return 0;
+	}
 
 	return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
 }

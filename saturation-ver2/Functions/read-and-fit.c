@@ -37,7 +37,7 @@ static double wdata[MAXN]={0};
 static double Q2_DATA[MAXN]={0};
 static double CS_DATA[MAXN]={0};
 static double ERR_DATA[MAXN]={0};
-unsigned N_DATA;
+static unsigned N_DATA;
 
 //static double FIT_RES[N_PAR+1]={0};
 
@@ -224,7 +224,8 @@ double compute_chisq(const double *par){
 //	sprintf(outline,"   %.2e / %d = %.3e, in %.1e sec\n",chisq, N_DATA-N_PAR, chisq/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
 //	log_printf(log_file,outline);
 	
-	return(chisq/(N_DATA-N_PAR) );
+	//return(chisq/(N_DATA-N_PAR) );
+	return(chisq );
 }
 
 void fcn(const int *npar, const double grad[], double*fcnval, const double *par,const unsigned *iflag,void (*dum)(void) ){
@@ -256,7 +257,7 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 	
 	time-=clock();
 		
-	sprintf(outline,"    %.3e, in %.1e sec\n",*fcnval, -((double)time)/CLOCKS_PER_SEC);
+	sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
 	log_printf(log_file,outline);
 }
 

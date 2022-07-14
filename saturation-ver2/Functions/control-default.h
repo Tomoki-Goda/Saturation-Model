@@ -48,7 +48,7 @@
 #endif
 
 #ifndef N_SIMPS_R
-	#define N_SIMPS_R 120
+	#define N_SIMPS_R 100
 #endif
 
 #ifndef DGAUSS_PREC

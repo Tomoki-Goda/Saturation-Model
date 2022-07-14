@@ -118,10 +118,9 @@ int main(int argc, char** argv){
 		//fscanf(resfile,"%s\t%f\t%f\n",name,&chisq, &error );
 		//fprintf(outfile,"& %.2e  ",chisq);
 		fprintf(outfile,"& %.2e  ",value);
-		fscanf(resfile,"%s\t%d\n",name,&ndata);
-		fprintf(outfile,"/ %d  ",ndata);
-		
-		fprintf(outfile,"= %.2f  ",value/(ndata-count));
+		//fscanf(resfile,"%s\t%d\n",name,&ndata);
+		//fprintf(outfile,"/ %d  ",ndata);
+		//fprintf(outfile,"= %.2f  ",value/(ndata-count));
 		fprintf(outfile,"\\\\ \\hline \n");
 			
 		fclose(resfile);	

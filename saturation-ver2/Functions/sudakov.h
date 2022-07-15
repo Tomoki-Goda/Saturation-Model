@@ -400,7 +400,8 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 		printf("%f %f %f %f \n",SUDPAR[0],SUDPAR[1],SUDPAR[2],SUDPAR[3] );
 #endif
 		//printf("%f %f %f \n", mu2_arr[0],mu2_arr[1],mu2_arr[2]);
-		getchar();
+		//getchar();
+		return 0;
 	}
 ////////////////////////////////////////////////////////////////////////////////////
 

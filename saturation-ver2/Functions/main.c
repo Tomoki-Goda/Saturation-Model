@@ -48,6 +48,9 @@ int main(int argc, char* argv[]){
 	return 0;
 #endif
 	RUN_MINUIT(&fcn);
+	//int error_flag;
+	//MNCOMD(*fcn,"SET LIMITS",error_flag,0);
+	//MNCOMD(*fcn,"MINIMIZE 1000 1.0D00 " ,error_flag,0);
 	
 	time_measure-=clock();
 /////////////////////////////////////SAVE RESULTS////////////////////////////////

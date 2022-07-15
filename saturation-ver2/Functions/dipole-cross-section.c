@@ -16,43 +16,64 @@ extern double dgauss_(double (*)(double*), double*,double*,double *  );
 ////////////////// common functions ////////////////////////
 ////////////////////////////////////////////////////////////
 int parameter(const double *par,double* sigpar,double* sudpar){
+///////////////////
+//Sigpar are as we all know it, parameters for dipole sigma.
+//sudpar are {C , r_max, g1, g2} but parameters may be given in terms of mu02 (as in BGK), and C and r_max may be that of BGK.
+//That's why this is so messy...
+////////////////////
 	sigpar[0]=par[0];
 	sigpar[1]=par[1];
 	sigpar[2]=par[2];
+	printf("%.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
 #if(MODEL==1||MODEL==3)
 	sigpar[3]=par[3];
-#if MU0==0
-	sigpar[4]=par[4];
-#else
-	sigpar[4]=sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
-#endif
+	#if MU0==0
+		sigpar[4]=par[4];
+	#else
+		sigpar[4]=sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
+	#endif
+	printf("%.2e %.2e ",sigpar[3],sigpar[4]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
-	//for(int i=0;i<(N_PAR-3);i++){
-	//	*(sudpar+i)=*(par+3+i);
-	//}
-	sudpar[0]=par[3];
-#if MU0==1
-	sudpar[1]=sqrt(fabs(sudpar[0]/par[4]));
-#else
-	sudpar[1]=par[4];
-#endif
-	
+		sudpar[0]=par[3];
+	#if MU0==1
+		sudpar[1]=sqrt(fabs(sudpar[0]/par[4]));
+	#else
+		sudpar[1]=par[4];
+	#endif
+	printf("%.2e %.2e ",sudpar[0],sudpar[1]);
 ///////////////////////////////////////////////////////
 #elif (MODEL==3)
-	sudpar[0]=par[5] ;//C*C2
-#if MU0==0 //if rmax is fit parameter
-	sudpar[1]=par[4];//fabs is just in case;
-#else //if mu02 is the fit parameter
-	sudpar[1]=sqrt(fabs(sudpar[0]/par[4]));
-#endif
+	#if INDEPENDENT_C==1
+		sudpar[0]=par[5] ;
+	#else 
+		sudpar[0]=par[3];
+	#endif
+
+	#if MU0==0 //if rmax is fit parameter
+		#if INDEPENDENT_RMAX==1
+			sudpar[1]=par[6];
+		#else
+			sudpar[1]=par[4];
+		#endif
+
+	#else //if mu02 is the fit parameter
+		#if INDEPENDENT_RMAX==1
+			sudpar[1]=sqrt(fabs(sudpar[0]/(par[6]) ));
+		#else
+			sudpar[1]=sqrt(fabs(sudpar[0]/(par[4]) ));//mu02 is shared
+		#endif
+	#endif
+	printf("%.2e %.2e ",sudpar[0],sudpar[1]);
 #endif
 //////////////////////////////////////////////////////
 #if (SUDAKOV==2)
-	sudpar[2]=par[6];
-	sudpar[3]=par[7];
+	sudpar[2]=par[7];
+	sudpar[3]=par[8];
+	printf("%.2e %.2e ",sudpar[2],sudpar[3]);
 #endif
+	printf("\n");
 	return 0;
 }
 
@@ -109,7 +130,7 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 	//clock_t tim=clock();
 	double sigma_0		=par[0];
 	double A_g		=par[1];
-	double lambda_g	=par[2];
+	double lambda_g		=par[2];
 	//double C		=par[3];
 	//double mu02		=par[4];
 	//double rmax		=par[4];

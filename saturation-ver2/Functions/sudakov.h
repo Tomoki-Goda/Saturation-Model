@@ -274,6 +274,11 @@ double integrand( double * r_ptr){
 		return 0;//also delt with in the sigma_gbw
 	}
 #endif
+#if ((MODEL==3)||(MODEL==1))
+	if(SIGPAR[3]<0){
+		return 0;
+	}
+#endif
 ////////////////////////////////////////////////
 	
 	if((mu2_arr[0]) <LQCD2){
@@ -305,13 +310,13 @@ double integrand( double * r_ptr){
 		printf("sudakov= %.2e sigma=%.2e\n", exp_sud( r , mu2_arr[0], q2 ) ,BASE_SIGMA(r,x,q2,SIGPAR));
 		
 		printf("Parameters\n");
-		printf("%f %f %f %f\n",SIGPAR[0],SIGPAR[1],SIGPAR[2],SIGPAR[3]);
+		printf("SIGPAR: %f %f %f %f\n",SIGPAR[0],SIGPAR[1],SIGPAR[2],SIGPAR[3]);
 #if (SUDAKOV==1)  
-		printf("%f %f\n",SUDPAR[0],SUDPAR[1]);
+		printf("SUDPAR: %f %f\n",SUDPAR[0],SUDPAR[1]);
 #elif (SUDAKOV==2)
-		printf("%f %f %f %f \n",SUDPAR[0],SUDPAR[1],SUDPAR[2],SUDPAR[3] );
+		printf("SUDPAR: %f %f %f %f \n",SUDPAR[0],SUDPAR[1],SUDPAR[2],SUDPAR[3] );
 #endif
-		printf("%f %f %f \n", mu2_arr[0],mu2_arr[1],mu2_arr[2]);
+		printf("mu2 dmu2dr ddmu2/drdr %f %f %f \n", mu2_arr[0],mu2_arr[1],mu2_arr[2]);
 		getchar();
 	}
 
@@ -411,7 +416,7 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 	SIGPAR=sigmapar;
 	SUDPAR=sudpar;
 ///////////return 0 for invalid par/////////////
-	if(sudpar[0]<0){
+	if((sudpar[0]<0)||(sudpar[1]<0)){
 		return 0;
 	}
 	if(sudpar[0]/(pow(sudpar[1],2))<Q0 ){

@@ -71,6 +71,10 @@
 	#define INDEPENDENT_C 1
 #endif
 
+#ifndef INDEPENDENT_RMAX
+	#define INDEPENDENT_RMAX 0
+#endif
+
 #ifndef Z_INTEGRATE
 	#define Z_INTEGRATE 1
 #endif
@@ -123,9 +127,22 @@
 	#if SUDAKOV==0
 		#define N_PAR 5
 	#elif SUDAKOV==1
-		#define N_PAR 6//5
+		#if ((INDEPENDENT_C==1)&&(INDEPENDENT_RMAX==1))
+			#define N_PAR 7
+		#elif ( ((INDEPENDENT_C==0)&&(INDEPENDENT_RMAX==1))||( (INDEPENDENT_C==1)&&(INDEPENDENT_RMAX==0)) )
+			#define N_PAR 6
+		#else
+			#define N_PAR 5
+		#endif
+
 	#elif SUDAKOV==2
-		#define N_PAR 8//7
+		#if ((INDEPENDENT_C==1)&&(INDEPENDENT_RMAX==1))
+			#define N_PAR 9
+		#elif ( ((INDEPENDENT_C==0)&&(INDEPENDENT_RMAX==1))||( (INDEPENDENT_C==1)&&(INDEPENDENT_RMAX==0)) )
+			#define N_PAR 8
+		#else
+			#define N_PAR 7
+		#endif
 	#endif
 #endif
 

@@ -8,26 +8,49 @@ double   par_min[8]	= {	0.0,	0.00,	0.0,		0.1,	0.1 ,	0.0,	0.0};
 double   par_max[8] 	= {	80.0,	1.00,	1.0,		10.0,	1.0,	2.0,	2.0};
 
 #elif (MODEL==1)
+#if MU0==1
+char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"mu02"	};
+double par_start[8]  	= {22.40,	1.35,	0.079,		0.38, 	2.0		}; 
+double par_error[8]  	= { 1.00,  	0.10,	0.05, 		0.1, 	0.1		};
+double   par_min[8] 	= { 0.00,  	0.00,	0.01, 		0.1, 	1.0		};
+double   par_max[8] 	= {50.00,  	5.00,	0.20, 		10.00,	10.00		};
+#else
 char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"r_max"	};
 double par_start[8]  	= {22.40,	1.35,	0.079,		0.38, 	0.4		}; 
 double par_error[8]  	= { 1.00,  	0.10,	0.05, 		0.1, 	0.01		};
 double   par_min[8] 	= { 0.00,  	0.00,	0.01, 		0.1, 	0.1		};
 double   par_max[8] 	= {50.00,  	5.00,	0.20, 		10.00,	1.00		};
+#endif
 
 #elif (MODEL==3)
 #if (INDEPENDENT_C==0)
-char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"r_max",	"C2",	"g1",	"g2"};
-double par_start[8]  	= {22.40,	1.35,	0.079,		0.38, 	0.4,		1.0,	0.1, 	0.1}; 
-double par_error[8]  	= { 1.00,  	0.10,	0.05, 		0.01, 	0.01,		0.0,	0.01,	0.01};
-double   par_min[8] 	= { 0.00,  	0.00,	0.01, 		0.01, 	0.01,		1.0,	0.0,	0.0};
-double   par_max[8] 	= {50.00,  	5.00,	0.20, 		10.00,	1.00,		50,	2.0,	2.0};
-#else 
+#if MU0==1
+char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"mu02",		"C2",	"g1",	"g2"};
+double par_start[8]  	= {22.40,	1.0,	0.05,		0.5, 	2.0,		1.0,	0.1, 	0.1};  
+double par_error[8]  	= { 1.00,  	0.10,	0.01, 		0.01, 	0.1,		0.1,	0.01,	0.01};
+double   par_min[8] 	= { 0.00,  	0.00,	0.00, 		0.01, 	1.0,		0.5,	0.0,	0.0};
+double   par_max[8] 	= {50.00,  	5.00,	0.20, 		10.00,	10.0,		10,	2.0,	2.0};
+#else
 char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"r_max",	"C2",	"g1",	"g2"};
 double par_start[8]  	= {22.40,	1.0,	0.05,		0.5, 	0.4,		1.0,	0.1, 	0.1};  
-//double par_start[8]  	= {22.30,	1.64,	0.0101,	0.20, 	0.30,		20.0,	0.5, 	0.5}; 
 double par_error[8]  	= { 1.00,  	0.10,	0.01, 		0.01, 	0.01,		0.1,	0.01,	0.01};
 double   par_min[8] 	= { 0.00,  	0.00,	0.00, 		0.01, 	0.01,		0.5,	0.0,	0.0};
 double   par_max[8] 	= {50.00,  	5.00,	0.20, 		10.00,	1.00,		10,	2.0,	2.0};
+#endif
+#else
+#if MU0==1
+char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"mu02",		"C2",	"g1",	"g2"};
+double par_start[8]  	= {22.40,	1.0,	0.05,		0.5, 	2.0,		1.0,	0.1, 	0.1};  
+double par_error[8]  	= { 1.00,  	0.10,	0.01, 		0.01, 	0.1,		0.1,	0.01,	0.01};
+double   par_min[8] 	= { 0.00,  	0.00,	0.00, 		0.01, 	1.0,		0.5,	0.0,	0.0};
+double   par_max[8] 	= {50.00,  	5.00,	0.20, 		10.00,	10.0,		10,	2.0,	2.0};
+#else
+char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"r_max",	"C2",	"g1",	"g2"};
+double par_start[8]  	= {22.40,	1.0,	0.05,		0.5, 	0.4,		1.0,	0.1, 	0.1};  
+double par_error[8]  	= { 1.00,  	0.10,	0.01, 		0.01, 	0.01,		0.1,	0.01,	0.01};
+double   par_min[8] 	= { 0.00,  	0.00,	0.00, 		0.01, 	0.01,		0.5,	0.0,	0.0};
+double   par_max[8] 	= {50.00,  	5.00,	0.20, 		10.00,	1.00,		10,	2.0,	2.0};
+#endif
 #endif
 #endif
 

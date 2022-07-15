@@ -113,19 +113,23 @@ double xg_chebyshev(double  x,double q2){
 		//scanf("%c",&ch);
 	}
 	if(q2<Q2_LIM[0]){
-		printf(" q2 too small %.2e",q2);
-		q2=Q2_LIM[0];
+		//printf(" q2 too small %.2e\n",q2);
+		return 0;
+		//q2=Q2_LIM[0];
 	}else if(q2>Q2_LIM[1]){
-		printf(" q2 too large %.2e",q2);
-		q2=Q2_LIM[1];
+		//printf(" q2 too large %.2e\n",q2);
+		return 0;
+		//q2=Q2_LIM[1];
 	}
 	
 	if(x<X_LIM[0]){
-		printf(" x too small %.2e",x);
-		x=X_LIM[0];
+		//printf(" x too small %.2e\n",x);
+		return 0;
+		//x=X_LIM[0];
 	}else if(x>X_LIM[1]){
-		printf(" x too large %.2e",x);
-		x=X_LIM[1];
+		//printf(" x too large %.2e\n",x);
+		return 0;
+		//x=X_LIM[1];
 	}
 	
 	

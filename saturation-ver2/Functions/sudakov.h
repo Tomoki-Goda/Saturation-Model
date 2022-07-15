@@ -377,7 +377,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	double NRel=SIGMA_PREC ; //SIGMA_PREC is global and is controled in main.c or read-and-fit.c 
 	
 	//double NRel=DGAUSS_PREC ;
-	double NAbs=1.0e-6;
+	double NAbs=1.0e-10;
 	double error=0;
 	//printf("rmin= %f\trmax =%f\n",rmin, *VAR);
 	dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;

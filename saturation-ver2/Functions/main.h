@@ -59,22 +59,27 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 
 
 	
-	sprintf(command , "SET EPSMACHINE 1.0e-8");
-	MNCOMD(*fcn,command,error_flag,0);
+	//sprintf(command , "SET EPSMACHINE 1.0e-8");
+	//MNCOMD(*fcn,command,error_flag,0);
 
 	N_SIMPS=(int)(N_SIMPS_R*2.0/4.0);
-	SIGMA_PREC=DGAUSS_PREC*100;
+	SIGMA_PREC=DGAUSS_PREC*5;
 	generate_psi_set();
 	
 	MNCOMD(*fcn, "SET PRINTOUT 3",error_flag,0);	
 #if SUDAKOV>=1			
 	MNCOMD(*fcn,"FIX 5",error_flag,0);
 #endif
-#if (MODEL==3)			
+
+	MNCOMD(*fcn, "SIMPLEX 1000 2",error_flag,0);
+	
+#if (MODEL==3||MODEL==1)			
 	MNCOMD(*fcn, "FIX 2",error_flag,0);
-	MNCOMD(*fcn, "FIX 6",error_flag,0);
 #endif	
+	
 	MNCOMD(*fcn,"SET LIMITS",error_flag,0);
+
+	
 
 	MNCOMD(*fcn, "MIGRAD 1000 2",error_flag,0);
 
@@ -84,18 +89,34 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	printf("************************************\n");
 
 
-#if SUDAKOV>=1			
-	MNCOMD(*fcn,"RELEASE 5",error_flag,0);
-	MNCOMD(*fcn,"SET LIMITS 5",error_flag,0);
-#endif
-#if (MODEL==3)			
+
+#if (MODEL==3||MODEL==1)			
 	MNCOMD(*fcn, "RELEASE 2",error_flag,0);
 	MNCOMD(*fcn,"SET LIMITS 2",error_flag,0);
-	MNCOMD(*fcn, "RELEASE 6",error_flag,0);
-	MNCOMD(*fcn,"SET LIMITS 6",error_flag,0);
+	MNCOMD(*fcn,"FIX 3",error_flag,0);
+	
+#if (MODEL==3||SUDAKOV>=1)
+	MNCOMD(*fcn, "RELEASE 5",error_flag,0);
+#endif
 #endif	
-
+	N_SIMPS=N_SIMPS_R;
+	SIGMA_PREC=DGAUSS_PREC;
+	generate_psi_set();
+	
 	MNCOMD(*fcn, "MIGRAD 1000 1",error_flag, 0);
+#if (MODEL==3||MODEL==1)			
+	MNCOMD(*fcn, "RELEASE 3",error_flag,0);
+	MNCOMD(*fcn,"SET LIMITS 3",error_flag,0);
+	MNCOMD(*fcn, "FIX 5",error_flag,0);
+	MNCOMD(*fcn, "MIGRAD 1000 0.1",error_flag,0);	
+#endif
+	
+	
+#if (MODEL==3||SUDAKOV>=1)
+	MNCOMD(*fcn, "FIX 3",error_flag,0);
+	//MNCOMD(*fcn, "FIX 5",error_flag,0);
+	MNCOMD(*fcn, "MIGRAD 1000 0.1",error_flag,0);	
+#endif
 
 	MNSTAT(val,edm, up, nvpar,npar,istat);
 
@@ -144,7 +165,6 @@ int SAVE_RESULT(FILE* outfile){
 	return(0);
  
 }
-
 int CHECK_COV(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
 	char command[100];
 	int error_flag, istat, nvpar, npar;
@@ -157,12 +177,35 @@ int CHECK_COV(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(vo
 	SIGMA_PREC=DGAUSS_PREC*100;
 	generate_psi_set();
 	
-
+	MNCOMD(*fcn,"SET PARAMETER 2 1.0D0",error_flag,0);	
+	MNCOMD(*fcn,"FIX 2", error_flag,0);
+	//MNCOMD(*fcn,"FIX 5", error_flag,0);
 	MNCOMD(*fcn,"SET PRINTOUT 3",error_flag,0);
-	MNCOMD(*fcn,"SIMPLEX",error_flag,0);
+	MNCOMD(*fcn,"SIMPLEX 300 10D0",error_flag,0);
+	
+	//MNCOMD(*fcn,"FIX 2", error_flag,0);
+	//MNCOMD(*fcn,"FIX 5", error_flag,0);
+
+	MNCOMD(*fcn,"SET LIMITS",error_flag,0);	
+	MNCOMD(*fcn,"MIGRAD 300 1D0",error_flag,0);
+	MNCOMD(*fcn,"RELEASE 2",error_flag,0);
+	MNCOMD(*fcn,"SET LIMITS 2",error_flag,0);
+
+	MNCOMD(*fcn,"FIX 3",error_flag,0);
+	//MNCOMD(*fcn,"RELEAE 5",error_flag,0);
+
+	MNCOMD(*fcn,"MIGRAD 300 1D0",error_flag,0);
+	
+	MNCOMD(*fcn,"RELEASE 3",error_flag,0);
+	MNCOMD(*fcn, "FIX 4 5",error_flag,0);
+	MNCOMD(*fcn,"MIGRAD 300 1D0",error_flag,0);
+	
+
+	MNCOMD(*fcn,"RELEASE 4 5",error_flag, 0);
 	MNCOMD(*fcn,"HESSE",error_flag, 0);
 
-
+	//MNCOMD(*fcn,"RELEASE 2",error_flag,0);
+	//MNCOMD(*fcn,"CONTOUR 2 3",error_flag,0);
 	return 0;
 }
 	

@@ -1,23 +1,12 @@
 #include<stdio.h>
 #include<math.h>
 
-
-//#include"./control_tmp.h"
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
 
 #include"./gluon-chebyshev.h"
 #include"./sudakov.h"
-
-//#include"./mu2.h"
-
-//#define BGK 0
-
-//extern  double xgpdf(double, double);
-//extern  double xg_chebyshev(double,double);
-
-//extern double rmu2( double ,double*  );
 
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
 extern double dgauss_(double (*)(double*), double*,double*,double *  );
@@ -26,30 +15,44 @@ extern double dgauss_(double (*)(double*), double*,double*,double *  );
 ////////////////////////////////////////////////////////////
 ////////////////// common functions ////////////////////////
 ////////////////////////////////////////////////////////////
-int parameter(const double *par,double* const sigpar,double* const sudpar){
-	for(int i=0;i<(N_PAR);i++){
-		*(sigpar+i)=*(par+i);
-	}
-	//double* sigpar= par;
+int parameter(const double *par,double* sigpar,double* sudpar){
+	sigpar[0]=par[0];
+	sigpar[1]=par[1];
+	sigpar[2]=par[2];
+#if(MODEL==1||MODEL==3)
+	sigpar[3]=par[3];
+#if MU0==0
+	sigpar[4]=par[4];
+#else
+	sigpar[4]=sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
+#endif
+#endif
+////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
-	//double *sudpar;
-	for(int i=0;i<(N_PAR-3);i++){
-		*(sudpar+i)=*(par+3+i);
-	}
-	//printf("%.3e %.3e\n",sudpar[0], sudpar[1]);
+	//for(int i=0;i<(N_PAR-3);i++){
+	//	*(sudpar+i)=*(par+3+i);
+	//}
+	sudpar[0]=par[3];
+#if MU0==1
+	sudpar[1]=sqrt(fabs(sudpar[0]/par[4]));
+#else
+	sudpar[1]=par[4];
+#endif
 	
+///////////////////////////////////////////////////////
 #elif (MODEL==3)
-	//double sudpar[10];
-	sudpar[0]=par[3]*par[5] ;//C*C2
-	sudpar[1]=par[4]*sqrt(fabs(par[5]));//rmax mu02=C/rmax^2 //fabs is just in case;
-	//printf("%.3e %.3e\n",sudpar[0], sudpar[1]);
-	
+	sudpar[0]=par[5] ;//C*C2
+#if MU0==0 //if rmax is fit parameter
+	sudpar[1]=par[4];//fabs is just in case;
+#else //if mu02 is the fit parameter
+	sudpar[1]=sqrt(fabs(sudpar[0]/par[4]));
+#endif
+#endif
+//////////////////////////////////////////////////////
 #if (SUDAKOV==2)
 	sudpar[2]=par[6];
 	sudpar[3]=par[7];
 #endif
-#endif
-	//printf("%.3e %.3e\n",sudpar[2], sudpar[3]);
 	return 0;
 }
 
@@ -81,8 +84,6 @@ double mod_x(double x, double Q2, unsigned flavour) {
 	}
 	return (x * (1.0 +( 4.0 * (m_fsq/Q2)) ));
 }
-//in simps.f
-//extern "C" double simps_(double *, double *, double *,double *,double* ,double(*)(double*), double *  ,double *,double* ,double *);
 
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBW ////////////////////////////
@@ -99,13 +100,6 @@ double sigma_gbw(double r,double x,double q2, const double * par){
 	return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
 }
 
-//double sigma_gbw_ns(double r,double x,double Q2, const double * par){
-//	double sigma_0 =par[0];
-//	double lambda	=par[1];
-//	double x_0	=par[2];
-//	return( pow(r * Q0, 2) * pow(x_0/x, lambda)/4   );	
-//}
-
 
 
 /////////////////////////////////////////////////////////////
@@ -116,54 +110,21 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 	double sigma_0		=par[0];
 	double A_g		=par[1];
 	double lambda_g	=par[2];
-	double C		=par[3];
+	//double C		=par[3];
 	//double mu02		=par[4];
-	double rmax		=par[4];
+	//double rmax		=par[4];
 	
 	
 	double mu2;
 	compute_mu2(r, par+3 , &mu2, 1 );
-//#if STAR==0
-//	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
-//#elif STAR==1
-//	double mu02=C/(rmax*rmax);
-//	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
-//#endif
 	
 	double expo = 0.389379*(pow( r* PI,2) * xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	
-	//return( sigma_0*2*(expo/(5+expo) ));	
 	double val=sigma_0*(1-exp(-expo));
 	
 	return(val) ;	
 }
 
-//double sigma_bgk_ns(double r, double x, double Q2, const double * par){
-//	//clock_t tim=clock();
-//	double sigma_0		=par[0];
-//	double A_g		=par[1];
-//	double lambda_g	=par[2];
-//	double C		=par[3];
-//	//double mu02		=par[4];
-//	double rmax		=par[4];
-//	
-//#if STAR==0
-//	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
-//#elif STAR==1
-//	double mu02=C/(rmax*rmax);
-//	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
-//#endif
-//	
-//	double val = (pow( r* PI,2) * xg_chebyshev(x,mu2))/ ( sigma_0); //prefactor, origin unknown...
-//	return(val);
-//}
-
-/////////////////////////////////////////////////////////////
-//////////////////////////// GBS ////////////////////////////
-/////////////////////////////////////////////////////////////
-//#if ((MODEL==2)||(MODEL==3)||(MODEL==22))
-
-//#endif
 //////////////////////////////////////Will be removed in the future/////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////

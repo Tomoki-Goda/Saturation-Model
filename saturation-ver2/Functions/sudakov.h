@@ -399,10 +399,11 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 	SIGPAR=sigmapar;
 	SUDPAR=sudpar;
 ///////////return 0 for invalid par/////////////
-	if((sudpar[0]<0)||(sudpar[1]<0)){
+	//if((sudpar[0]<0)||(sudpar[1]<0)){
+	if(sudpar[0]<0){
 		return 0;
 	}
-	if(sudpar[0]/(pow(sudpar[1],2))<Q0 ){
+	if(sudpar[1]<Q0 ){
 		return 0;
 	}
 	
@@ -423,6 +424,7 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 ///////////return 0 for invalid par/////////////
 	if(signal!=0){
 		printf("sigma_s:: mu2= %.3e r=%.3e  C=%.3e rmax=%.3e\n",mu2,r,SUDPAR[0],SUDPAR[1] );
+		getchar();
 		return 0;
 	}
 ////////////////////////////////////////////////

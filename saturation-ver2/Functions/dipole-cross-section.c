@@ -66,7 +66,7 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 		#if INDEPENDENT_RMAX==1
 			sudpar[1]=par[6];
 		#else
-			sudpar[1]=par[6];//mu02 is shared
+			sudpar[1]=par[4];//mu02 is shared
 		#endif
 	#endif
 	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);

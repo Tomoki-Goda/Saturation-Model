@@ -21,10 +21,14 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 //sudpar are {C , r_max, g1, g2} but parameters may be given in terms of mu02 (as in BGK), and C and r_max may be that of BGK.
 //That's why this is so messy...
 ////////////////////
+	//for(int i=0;i<N_PAR;i++){
+	//	printf("%.2e ",par[i]);
+	//}
+	//printf("\n");
 	sigpar[0]=par[0];
 	sigpar[1]=par[1];
 	sigpar[2]=par[2];
-	//printf("%.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
+	//printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
 #if(MODEL==1||MODEL==3)
 	sigpar[3]=par[3];
 	#if MU0==0
@@ -32,7 +36,7 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 	#else
 		sigpar[4]=sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
 	#endif
-	//printf("%.2e %.2e ",sigpar[3],sigpar[4]);
+	//printf("\tSUDAKOV: %.2e %.2e ",sigpar[3],sigpar[4]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
@@ -42,7 +46,7 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 	#else
 		sudpar[1]=par[4];
 	#endif
-	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);
+	//printf("\tSUDAKOV: %.2e %.2e ",sudpar[0],sudpar[1]);
 ///////////////////////////////////////////////////////
 #elif (MODEL==3)
 	#if INDEPENDENT_C==1

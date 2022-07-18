@@ -47,9 +47,9 @@ static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 /////////////////////////////////////////////
 static const double ep=R_MIN;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
 #if (R_CHANGE_VAR==1)
-static const double r_int_max=0.98;
+static const double r_int_max=0.97;
 #else
-static const double r_int_max=50.0;
+static const double r_int_max=30.0;
 #endif
 
 //static const double R_STEP=r_int_max/(2*N_SIMPS_R);
@@ -242,7 +242,8 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 	sprintf(outline, "%d %d ",counter++,*iflag);
 	log_printf(log_file,outline);
 	
-	for(unsigned i=0;i<(*npar);i++){
+	//for(unsigned i=0;i<(*npar);i++){
+	for(unsigned i=0;i<N_PAR;i++){
 		sprintf(outline, "%.2e, ",*(par+i));
 		log_printf(log_file,outline);
 	}

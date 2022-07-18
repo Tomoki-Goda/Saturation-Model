@@ -317,7 +317,8 @@ double integrand( double * r_ptr){
 		printf("SUDPAR: %f %f %f %f \n",SUDPAR[0],SUDPAR[1],SUDPAR[2],SUDPAR[3] );
 #endif
 		printf("mu2 dmu2dr ddmu2/drdr %f %f %f \n", mu2_arr[0],mu2_arr[1],mu2_arr[2]);
-		getchar();
+		//getchar();
+		return 0;
 	}
 
 	return val;
@@ -469,7 +470,8 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 		printf("%f %f %f %f \n",sudpar[0],sudpar[1],sudpar[2],sudpar[3] );
 #endif
 		printf("mu2= %f\n",mu2);
-		getchar();
+		return 0;
+		//getchar();
 	}
 ////////////////////////////////////////////////////////////////////////////////////
 	return val;

@@ -13,83 +13,8 @@
 #include"control-default.h"
 #include"constants.h"
 
-#define MAXN 600
-#define RESCALE 1.05
+#include"./read-and-fit.h"
 
-
-extern double SIGMA_PREC;
-
-extern double SIGMA(double , double ,double , const double *, const double*);
-extern double psisq_z_int(double, double ,int);
-extern double mod_x(double,double, int);
-
-extern void approx_xg(const double *);
-
-extern int parameter(const double*,double*,double*);
-///////////Set in main.c//////////////////
-extern void log_printf(FILE*,char*);
-extern FILE* log_file;
-
-// ////////GLOBAL to this file...////////////////
-static double X_DATA[MAXN]={0};
-static double Y_DATA[MAXN]={0};
-static double wdata[MAXN]={0};
-static double Q2_DATA[MAXN]={0};
-static double CS_DATA[MAXN]={0};
-static double ERR_DATA[MAXN]={0};
-static unsigned N_DATA;
-
-//static double FIT_RES[N_PAR+1]={0};
-
-//////////////////GLOBAL ARRAY for DATA/////////////////////
-//static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
-static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
-/////////////////////////////////////////////
-static const double ep=R_MIN;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
-#if (R_CHANGE_VAR==1)
-static const double r_int_max=0.97;
-#else
-static const double r_int_max=30.0;
-#endif
-
-//static const double R_STEP=r_int_max/(2*N_SIMPS_R);
-
-int N_SIMPS=N_SIMPS_R;
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////   generate grid of z-integrated psi values        ////////////////////////////
-/////////////////////////////////              for every Q of experimental data   //////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////it writes to global PSI...
-void generate_psi_set(){
-	double r_step=r_int_max/(2*N_SIMPS);
-	double r;
-	char outline[200];
-	sprintf(outline,"r integrated from 0 to %f, with step %.3e. \n\n", r_int_max, r_step);
-	log_printf(log_file,outline);
-	sprintf(outline,"nf=%d\tN_SIMPS=%d\tN_DATA=%d.\n\n", (int)NF, N_SIMPS,N_DATA);
-	log_printf(log_file,outline);
-	
-	for(unsigned fl=0;fl<(NF-1);fl++){
-	
-		for(unsigned i=0; i<N_DATA;i++){
-			for(unsigned j=0;j<(2*N_SIMPS+1); j++){
-				r=r_step*j+ep;
-#if (R_CHANGE_VAR==1)
-				r=r/(1-r);
-				//r=-log(r);
-#endif
-				//printf("%d\n",fl);
-				*(*(*(PSI+fl )+j )+i )=psisq_z_int(r, *(Q2_DATA+i), fl);
-			}
-		}
-	}
-#if (PRINT_PROGRESS==1)
-	printf("*****************************************\n");
-	printf("*            Psi ready                  *\n");
-	printf("*****************************************\n");
-#endif
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////  now integrate over r with Simpsons method    /////////////////////////
@@ -100,74 +25,12 @@ void generate_data_set(const double *par, double *csarray){
 		printf("N_SIMPS can't be larger than N_SIMPS_R:  %d\t %d",N_SIMPS,N_SIMPS_R);
 		getchar();	
 	}
-	double r_step=r_int_max/(2*N_SIMPS);
-	//csarray is counterpart of CS_DATA ...
-	//double integral[N_DATA];
-	double term ,val;
-	double r,Q2,xm;
 	
-///////////////////////////unfortunately positions of parameters are now incompatible between models ....///////////////////
+	sample_integrand(PSI,  SAMPLES ,par);
 
-	double sudpar[10]={0};
-	double sigpar[10]={0};
-	parameter(par,sigpar,sudpar);// problem here if -Ofast is used...?
-	//printf("%.3e %.3e %.3e\n", sigpar[0],sigpar[1],sigpar[2]);
-	//printf("%.3e %.3e %.3e %.3e \n" ,sudpar[0],sudpar[1],sudpar[2],sudpar[3]);
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-/////////////////Change precision of integreal ///////////////////////
-///////////////  used in the file sudakov.h   /////////////////////////
-	/*static int counter;
-	counter++;
-	int norm=2*( (N_PAR*( N_PAR-1))/2 );
-	int frac=( counter/ norm )*norm;//change for every "norm" rounds
-	double weight = (5*norm + (double)frac )/(norm + (double)frac );
-	SIGMA_PREC=DGAUSS_PREC *( (weight*weight)/2);
-#if PRINT_PROGRESS==1
-	printf("%d \t %d \t %.3e\n",frac,counter, SIGMA_PREC);
-#endif*/
-	
+	//simpson_sum(SAMPLES, csarray);	
+	simpson_sum_sorted(SAMPLES, csarray);//intention of this is to add small values first to avoid loss by rounding.	
 //////////////////////////////////////////////////////////////
-	for(unsigned i=0; i<N_DATA;i++){
-		val=0;
-		Q2=Q2_DATA[i];
-		for(unsigned fl=0;fl<(NF-1);fl++){
-			xm=mod_x(X_DATA[i], Q2,fl );
-			
-			for(unsigned j=0;j<(2*N_SIMPS+1); j++){
-				
-				r=r_step*j+ep;
-#if (R_CHANGE_VAR==1)
-				r=r/(1-r);
-#endif
-				term= (*(*(*(PSI+fl )+j )+i )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
-				//printf("%.2e\n",term);
-#if (R_CHANGE_VAR==1)
-				term*=pow(1+r,2);
-#endif
-				//printf("read-and-fit.c term:: %f\n",term);
-				//getchar();
-				if((j==0)||(j==2*N_SIMPS)){
-					
-				} else if( (j/2)*2==j ){
-					term*=2;
-				}
-				else{
-					term*=4;	
-				}
-				//val+=pow(1-r,-2)*term;
-				val+=term;
-				
-			}
-		}
-		//printf("%f\n",val);
-		*(csarray+i)=val*(r_step/3);
-		
-	}
-	//printf("%.2e\n",SIGMA_PREC);
-	//printf("crosssection ready\n");
-	//printf("%f\n",val);
-	//printf("*****%.3e %.3e %.3e*******\n", sigpar[0],sigpar[1],sigpar[2]);
-	//printf("*****%.3e %.3e %.3e %.3e ******\n" ,sudpar[0],sudpar[1],sudpar[2],sudpar[3]);
 }
 
 
@@ -213,18 +76,6 @@ double compute_chisq(const double *par){
 		//chisq+=pow( ( cs[i]-CS_DATA[i] )/(ERR_DATA[i]),2);
 		chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
 	}
-//	time-=clock();
-//	static int counter;
-//	sprintf(outline, "%d  ",counter++);
-//	log_printf(log_file,outline);
-//	for(unsigned i=0;i<N_PAR;i++){
-//		sprintf(outline, "%.2e, ",*(par+i));
-//		log_printf(log_file,outline);
-//	}	
-//	sprintf(outline,"   %.2e / %d = %.3e, in %.1e sec\n",chisq, N_DATA-N_PAR, chisq/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
-//	log_printf(log_file,outline);
-	
-	//return(chisq/(N_DATA-N_PAR) );
 	return(chisq );
 }
 
@@ -251,15 +102,25 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 #if (MODEL==1||MODEL==3)	
 	approx_xg(par+1);//generate chebyshev coefficients
 #endif
+	if(*iflag==3){
+		double error_array[N_DATA];
+		double cs_array[N_DATA];
+		//double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
+		simpson_error(SAMPLES,error_array);
+		simpson_sum(SAMPLES,cs_array);	
+		for(int i=0;i<N_DATA;i++){
+			sprintf(outline,"Q2=%.2e x=%.2e, Data=%.3e :>  %.3e\t%.3e\n",Q2_DATA[i],X_DATA[i],CS_DATA[i], cs_array[i],error_array[i]);
+
+			log_printf(log_file,outline);
+		}
+	}else{	
+		*fcnval=compute_chisq(par);
 	
-	
-	*fcnval=compute_chisq(par);
-	
-	
-	time-=clock();
+		time-=clock();
 		
-	sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
-	log_printf(log_file,outline);
+		sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
+		log_printf(log_file,outline);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

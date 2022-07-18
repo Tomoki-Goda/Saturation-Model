@@ -32,17 +32,17 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 #if(MODEL==1||MODEL==3)
 	sigpar[3]=par[3];
 	#if MU0==0
-		sigpar[4]=par[4];
+		sigpar[4]=sigpar[3]/(par[4]*par[4]);
 	#else
-		sigpar[4]=sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
+		sigpar[4]=par[4];//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
 	#endif
 	//printf("\tSUDAKOV: %.2e %.2e ",sigpar[3],sigpar[4]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
 		sudpar[0]=par[3];
-	#if MU0==1
-		sudpar[1]=sqrt(fabs(sudpar[0]/par[4]));
+	#if MU0==0
+		sudpar[1]=sudpar[0]/(par[4]*par[4]);
 	#else
 		sudpar[1]=par[4];
 	#endif
@@ -57,16 +57,16 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 
 	#if MU0==0 //if rmax is fit parameter
 		#if INDEPENDENT_RMAX==1
-			sudpar[1]=par[6];
+			sudpar[1]=sudpar[0]/(par[6]*par[6]);
 		#else
-			sudpar[1]=par[4];
+			sudpar[1]=sudpar[0]/(par[4]*par[4]);
 		#endif
 
 	#else //if mu02 is the fit parameter
 		#if INDEPENDENT_RMAX==1
-			sudpar[1]=sqrt(fabs(sudpar[0]/(par[6]) ));
+			sudpar[1]=par[6];
 		#else
-			sudpar[1]=sqrt(fabs(sudpar[0]/(par[4]) ));//mu02 is shared
+			sudpar[1]=par[6];//mu02 is shared
 		#endif
 	#endif
 	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);

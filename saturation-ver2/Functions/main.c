@@ -18,6 +18,7 @@
 
 int main(int argc, char* argv[]){
 	char outline[100];
+	int error_flag;
 #if (R_FIX==1)
 	par_error[4]=0.0; 
 #endif
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]){
 	//int error_flag;
 	//MNCOMD(*fcn,"SET LIMITS",error_flag,0);
 	//MNCOMD(*fcn,"MINIMIZE 1000 1.0D00 " ,error_flag,0);
-	
+	MNCOMD(*fcn,"CALLFCN 3",error_flag,0);	
 	time_measure-=clock();
 /////////////////////////////////////SAVE RESULTS////////////////////////////////
 	SAVE_RESULT(out_file);

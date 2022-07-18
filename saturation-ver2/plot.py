@@ -29,6 +29,7 @@ def main():
     sname=""
     axes=["",""]
     plottitle=""
+    column=[0,1]
 
     argv=sys.argv[1:]
     plotcolour=["red", "blue", "green", "cyan", "magenta", "brown", "orange", "purple", "yellow"]
@@ -37,7 +38,7 @@ def main():
     fig,ax=plt.subplots()
  
     try:
-        opts , args =getopt.getopt(argv,"x:y:l:s:a:t:p:c:" )
+        opts , args =getopt.getopt(argv,"x:y:l:s:a:t:p:c:n:" )
         labels=args;
         plotstyle=["-" for i in range(len(args))]
         
@@ -63,13 +64,17 @@ def main():
             plotstyle=arg.split();
         elif opt in ["-c", "--colour"]:
             plotcolour=arg.split()
+        elif opt in ["-n","-number"]:
+            column=[int(i) for i in arg.split()];
+            
+
 
     data_array=[];
     counter=0;
     for i in args:
         print(i)
         data_array=import_array(i)
-        ax.plot(data_array[0],data_array[1],label=labels[counter],linestyle=plotstyle[counter] ,color=plotcolour[counter] ) 
+        ax.plot(data_array[column[0]],data_array[column[1]],label=labels[counter],linestyle=plotstyle[counter] ,color=plotcolour[counter] ) 
         counter+=1
     
     ax.set(title=plottitle,  ylabel=axes[1],    xlabel=axes[0],  xscale= xs ,   yscale=ys )

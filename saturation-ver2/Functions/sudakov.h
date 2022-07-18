@@ -49,11 +49,11 @@ double sudakov_p(double mub2, double q2,const double* par) {
 		//printf("%.3e\t%.3e\t%.3e\n",par[0],pow(r,-2.0),pow(par[1],-2.0));
 		getchar();
 	}
-	double b0 = (11*CA-2*NF)/12;
+	double b0 = ((double)(11*CA-2*NF))/12;
 	double L_Q_l=log(q2/LQCD2);
 	double L_mub_l=log(mub2/LQCD2);
 	
-	double val=CA/(2*b0*PI)*(L_Q_l*(log(L_Q_l /L_mub_l)-1) + L_mub_l );
+	double val=((double)CA)/(2*b0*PI)*(L_Q_l*(log(L_Q_l /L_mub_l)-1) + L_mub_l );
 	
 	if(val<0){
 		if(val<-1.0e-12){
@@ -121,7 +121,7 @@ double dsnpdr(double r, const double * mub2_arr, double q2,const double* sudpar)
 #if (SUDAKOV<=1) 
 	return 0.0;
 #endif 
-	double rmax=sudpar[1];
+	//double rmax=sudpar[1];
 	double g1=sudpar[2];
 	double g2=sudpar[3];
 	double val;
@@ -142,7 +142,7 @@ double ddsnpdrdr(double r,const double * mub2_arr, double q2,const double* sudpa
 #if (SUDAKOV<=1) 
 	return 0.0;
 #endif 	
-	double rmax=sudpar[1];
+//	double rmax=sudpar[1];
 	double g1=sudpar[2];
 	double g2=sudpar[3];
 	double val;
@@ -173,7 +173,7 @@ double dspertdr(const double * mub2_arr,double q2, const  double* sudpar ){
 		printf( "drds:: mu2 out of range");
 	}
 	double jacfirst=mub2_arr[1];
-	double b0= (11.0*CA-2.0*NF)/12.0;
+	double b0= ((double)(11.0*CA-2.0*NF))/12.0;
 	double alpha =1.0/(b0* log( mu2/LQCD2) );
 	
 	double val= - jacfirst* alpha*log(q2/mu2)/mu2;
@@ -198,7 +198,7 @@ double ddspertdrdr(const double * mub2_arr,double q2,const double * sudpar){
         double jacfirst=mub2_arr[1];
 	double jacsecond=mub2_arr[2];
 	
-	double b0 = (11.0*CA-2.0*NF)/12.0;
+	double b0 = ((double)(11.0*CA-2.0*NF))/12.0;
 	double val;
 
 	double logQmu=log(q2/mu2);
@@ -352,25 +352,6 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	}
 #endif
 
-//#if (SUDAKOV<=1)
-//	double rmin_2=rmin2(q2, SUDPAR );
-//	if(rmin_2<(rmin*rmin)){//IF negative, either fatal error or -999 to signal rmin=infinity
-//		if(rmin_2<0){
-//			if(((int)(rmin_2+999))==0){
-//				return 0.0;// rmin==-999.0  is used to signal that lower cut off is infinity.
-//			}else{
-//				printf("error, rmin2 negative %f\n",rmin_2);
-//			}
-//		}
-//		
-//	}else if(rmin_2>r*r){
-//		return 0.0;
-//	}
-//	else{
-//		rmin=pow(rmin_2,0.5);
-//	}
-//#endif
-	
 	////////////////////////////////////////////
 	//int N=96;
 	//result=dgquad_(&integrand,&rmin,VAR,&N);
@@ -451,13 +432,9 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 		return val;
 	}
 #endif	
-
-
-
 	val*=exp_sud(r,mu2,q2);
 
 	val+=integral_term(r,x,q2,sigmapar,sudpar);
-
 	
 ////////////////////////////////////////////////////////////////////////////////////	
 	if(isnan(val)!=0){

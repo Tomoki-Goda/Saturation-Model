@@ -37,9 +37,11 @@ static double SAMPLES[5*(2*N_SIMPS_R +1)*MAXN];
 /////////////////////////////////////////////
 //static const double ep=R_MIN;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
 #if (R_CHANGE_VAR==1)
-static const double R_MAX=0.97;
+static const double INT_R_MAX=((double)R_MAX)/(1+R_MAX);
+static const double INT_R_MIN=((double)R_MIN)/(1+R_MIN);
 #else
-static const double R_MAX=30.0;
+static const double INT_R_MAX=R_MAX;
+static const double INT_R_MIN=R_MIN;
 #endif
 
 //static const double R_STEP=r_int_max/(2*N_SIMPS_R);
@@ -52,10 +54,10 @@ int N_SIMPS=N_SIMPS_R;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////it writes to global PSI...
 void generate_psi_set(){
-	double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
+	double r_step=(INT_R_MAX-INT_R_MIN)/(2*N_SIMPS);
 	double r;
 	char outline[200];
-	sprintf(outline,"r integrated from 0 to %f, with step %.3e. \n\n", R_MAX, r_step);
+	sprintf(outline,"r integrated from 0 to %f, with step %.3e. \n\n",INT_R_MAX, r_step);
 	log_printf(log_file,outline);
 	sprintf(outline,"nf=%d\tN_SIMPS=%d\tN_DATA=%d.\n\n", (int)NF, N_SIMPS,N_DATA);
 	log_printf(log_file,outline);
@@ -64,7 +66,7 @@ void generate_psi_set(){
 	
 		for(unsigned i=0; i<N_DATA;i++){
 			for(unsigned j=0;j<(2*N_SIMPS+1); j++){
-				r=r_step*j+R_MIN;
+				r=r_step*j+INT_R_MIN;
 #if (R_CHANGE_VAR==1)
 				r=r/(1-r);
 				//r=-log(r);
@@ -89,7 +91,7 @@ void generate_psi_set(){
 
 void sample_integrand(const  double *PSI,  double  *samples, const double* par){
 	double xm, r, Q2,term ;
-	double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
+	double r_step=(INT_R_MAX-INT_R_MIN)/(2*N_SIMPS);
 	double sudpar[10]={0};
 	double sigpar[10]={0};
 	parameter(par,sigpar,sudpar);// problem here if -Ofast is used...?
@@ -105,7 +107,7 @@ void sample_integrand(const  double *PSI,  double  *samples, const double* par){
 			
 			for(unsigned j=0;j<(2*N_SIMPS+1); j++){
 				
-				r=r_step*j+R_MIN;
+				r=r_step*j+INT_R_MIN;
 #if (R_CHANGE_VAR==1)
 				r=r/(1-r);
 #endif
@@ -126,7 +128,7 @@ void sample_integrand(const  double *PSI,  double  *samples, const double* par){
 
 void simpson_sum(const double *samples, double * csarray){
 	double term,val;
-	double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
+	double r_step=(INT_R_MAX-INT_R_MIN)/(2*N_SIMPS);
 	for(int data_no=0;data_no<N_DATA;data_no++){
 		val=0;
 		for(int j=0;j<(2*N_SIMPS+1);j++){	
@@ -162,7 +164,7 @@ void simpson_sum_sorted(const double *samples, double * csarray){
 	double summand[(2*N_SIMPS+1)];
 	double term,val;
 
-	double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
+	double r_step=(INT_R_MAX-INT_R_MIN)/(2*N_SIMPS);
 	for(int data_no=0;data_no<N_DATA;data_no++){
 		val=0;
 		for(int j=0;j<(2*N_SIMPS+1);j++){	
@@ -194,7 +196,7 @@ void simpson_sum_sorted(const double *samples, double * csarray){
 
 void simpson_error(const double *samples, double * error_array){
 	double term,val;
-	double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
+	double r_step=(INT_R_MAX-INT_R_MIN)/(2*N_SIMPS);
 	double sum[N_DATA*(2*N_SIMPS+1)];//This is large, may hit the limit...
 	double fourth[N_DATA];
 	for(int data_no=0;data_no<N_DATA;data_no++){
@@ -220,7 +222,7 @@ void simpson_error(const double *samples, double * error_array){
 		for(int j=0;j<(2*N_SIMPS-3);j++){	
 			val= (sum[j]-4.0*sum[j+1]+6.0*sum[j+2]-4.0*sum[j+3]+sum[j+4]);///pow(r_step,4) );
 			if(data_no==(N_DATA/2)){
-				fprintf(file, "%.5e\t%.5e\t%.5e\n",R_MIN+r_step*(j+2), val,sum[j] );
+				fprintf(file, "%.5e\t%.5e\t%.5e\n",INT_R_MIN+r_step*(j+2), val,sum[j] );
 				//fprintf(file, "%.5e\t%.5e\n",R_MIN+r_step*(j+2),sum[j] );
 			};
 			val=fabs(val);
@@ -228,7 +230,7 @@ void simpson_error(const double *samples, double * error_array){
 				fourth[data_no]=val;
 			}
 					}
-		error_array[data_no]=( fourth[data_no]*(R_MAX-R_MIN) )/180;
+		error_array[data_no]=( fourth[data_no]*(INT_R_MAX-INT_R_MIN) )/180;
 		//printf("error : %.3e\n",error_array[data_no]);
 
 	}

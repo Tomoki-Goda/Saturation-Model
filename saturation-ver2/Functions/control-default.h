@@ -1,13 +1,8 @@
 //////////////////////////////////////////////////////////////////
 /////////////////////// regular control //////////////////////////
 //////////////////////////////////////////////////////////////////
-#ifndef X_MAX 
-	#define X_MAX 1.0e-2
-#endif
-#ifndef Q2_MAX 
-	#define Q2_MAX 1.0e+1
-#endif
-
+//////////////     MODEL AND FIXED PARAMETERS             ////////
+//////////////////////////////////////////////////////////////////
 #ifndef MODEL 
 	#define MODEL 2
 #endif
@@ -18,7 +13,6 @@
 	#define SUDAKOV 2
 #endif
 
-/* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2,g1 */
 #ifndef MASS_L2
 	#define MASS_L2 0.0196
 #endif
@@ -32,18 +26,34 @@
 #ifndef MASS_B2
 	#define MASS_B2 21.16
 #endif
-
-#ifndef  SATURATION 
-	#define SATURATION  1
+//////////////SELECTION OF DATA////////////
+#ifndef X_MAX 
+	#define X_MAX 1.0e-2
+#endif
+#ifndef Q2_MAX 
+	#define Q2_MAX 1.0e+1
 #endif
 
+////// upper and lower cut off of r ////////
 #ifndef R_MIN
 	#define R_MIN 1.0e-5
 #endif
+#ifndef R_MAX
+	#define R_MAX 30
+#endif
 
-#ifndef MU0 
+#ifndef MU0
+//if 1 mu02 is the fit parameter if 0 r_max is.
 	#define MU0 1 
 #endif
+
+//////////////////IRREGULAR CONTROL//////////////////////
+#ifndef  SATURATION
+//if 0 use small r limit of model such that it does not have saturation 
+	#define SATURATION  1
+#endif
+
+
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -52,65 +62,82 @@
 #endif
 
 #ifndef N_SIMPS_R
+//number of sampling for R integration, points are 2*N+1. 
 	#define N_SIMPS_R 250 
 #endif
 
-#ifndef DGAUSS_PREC
+#ifndef DGAUSS_PREC 
+//precision of integration for adaptive gauss quadrature integration. or other methods
 	#define DGAUSS_PREC 1.0e-4
 #endif
 
 #ifndef STAR
+//star presctiption for r. 0 is Collins=Soper type, 1 is Golec-Biernat=Sapeta type
 	#define STAR 1
 #endif
 
 #ifndef R_FIX
+//treat r_max or mu02 as constant.
 	#define R_FIX 0
 #endif
 
 #ifndef INDEPENDENT_C
+//treat two C in model3 C/r independently
 	#define INDEPENDENT_C 1
 #endif
 
 #ifndef INDEPENDENT_RMAX
+//treat r_max or mu02 in model 3 independently
 	#define INDEPENDENT_RMAX 0
 #endif
 
-#ifndef Z_INTEGRATE
-	#define Z_INTEGRATE 1
-#endif
-
-#ifndef TEST	
-	#define TEST 0
-#endif
-
-#ifndef SIMPS_GBS 
-	#define SIMPS_GBS 0
-#endif
 
 #ifndef R_CHANGE_VAR
+//use R=r/(1-r) for r integration. //seems to sevferely affect the quality...
 	#define R_CHANGE_VAR 1
 #endif
+#ifndef STRATEGY
+// Strategy for MIGRAD. read MINUIT documentation.
+	#define STRATEGY 1
+#endif
 
+
+///////////////////   IRREGULAR CONTROL ///////////////////////
+//// NOT TESTED, DISCONTINUED, ETC... CHECK WHEN CHANGED //////
+///////////////////////////////////////////////////////////////
 #ifndef NEW_DATA
 	#define NEW_DATA 1 //1 mean only reading new hera
 #endif
 
+#ifndef Z_INTEGRATE
+//integrate photon wave function over Z in advance
+	#define Z_INTEGRATE 1
+#endif
+
+#ifndef TEST
+// can be used for test... not properly defined...
+	#define TEST 0
+#endif
+
+#ifndef SIMPS_GBS
+//DISCONTINUED. use in-house simpson integration for GBS. 
+	#define SIMPS_GBS 0
+#endif
 
 #ifndef SIMPS_Z_INT
+//DISCONTINIED use in-house integration for z integration of photon psi.
 	#define SIMPS_Z_INT 0
 #endif
 
 #ifndef THETA_OFF
+//DISCONTINUED  . allow lower limit of sudakov to be larger than upper limit. 
 	#define THETA_OFF 0
 #endif
 
-#ifndef STRATEGY
-	#define STRATEGY 1
-#endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////
 //////////////////////////////////////////////////////////////////
-
+//N_PAR is number of fit parameters
 #if MODEL ==0 
 	#define N_PAR 3
 #elif MODEL==1
@@ -147,7 +174,7 @@
 #endif
 
 
-
+//dipole sigma 
 #if MODEL==0
 #define SIGMA(r,x,Q2,par, sudpar)  sigma_gbw(r,x,Q2,par)
 #elif MODEL==1
@@ -160,6 +187,7 @@
 #define SIGMA sigma_s
 #endif
 
+//dipole sigma to be combined with sudakov
 #if SATURATION ==1
 	#if (MODEL==3||MODEL==1)
 		#define BASE_SIGMA sigma_bgk

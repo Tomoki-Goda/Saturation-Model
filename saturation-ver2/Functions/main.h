@@ -70,113 +70,74 @@ int MINUIT_INIT(){
 
 
 
-
+/*
 int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
 	char command[100];
 	int error_flag, istat, nvpar, npar;
 	double val, edm, up;
 
-	N_SIMPS=(int)(N_SIMPS_R*2.0/5.0);
+	N_SIMPS=(int)(N_SIMPS_R*3.0/5.0);
 	SIGMA_PREC=DGAUSS_PREC*10;
 	generate_psi_set();
 	
 	MNCOMD(*fcn, "SET PRINTOUT 3",error_flag,0);
 #if (MODEL==3||MODEL==1)		
 	MNCOMD(*fcn, "FIX 3",error_flag,0);
-#if INDEPENDENT_RMAX==1
-	MNCOMD(*fcn, "FIX 7",error_flag,0);
-#endif
-#elif (MODEL==2||MODEL==22)
-	MNCOMD(*fcn, "FIX 2",error_flag,0);
-#endif
-
 #if SUDAKOV>=1			
 	MNCOMD(*fcn,"FIX 5",error_flag,0);
+#endif
 
+#elif (MODEL==2||MODEL==22)
+	MNCOMD(*fcn, "FIX 3",error_flag,0);
+#if SUDAKOV>=1
+	MNCOMD(*fcn, "FIX 5",error_flag,0);
+#endif
 #endif
 
 	MNCOMD(*fcn, "SIMPLEX 1000 2",error_flag,0);
+/////////////////////////////////////////////////////////////////////
 	
-	N_SIMPS=(int)(N_SIMPS_R*3.0/5.0);
-	SIGMA_PREC=DGAUSS_PREC*10;
+	N_SIMPS=(int)(N_SIMPS_R);
+	SIGMA_PREC=DGAUSS_PREC;
 	generate_psi_set();
 	
 	MNCOMD(*fcn,"SET LIMITS",error_flag,0);
+
 	MNCOMD(*fcn,"HESSE",error_flag,0);
-
-//#if (MODEL==3||MODEL==1)
-//	MNCOMD(*fcn,"FIX 2", error_flag,0);	
-//	MNCOMD(*fcn, "FIX 3",error_flag,0);
-//#endif	
-//#if SUDAKOV>=1			
-//	MNCOMD(*fcn,"RELEASE 5",error_flag,0);
-//#if INDEPENDENT_RMAX==1
-//	MNCOMD(*fcn, "RELEASE 7",error_flag,0);
-//#endif
-//#endif
-
 	MNCOMD(*fcn, "MIGRAD 1000 1",error_flag,0);
 
 	MNSTAT(val,edm, up, nvpar,npar,istat);
-	printf("\n************************************\n");
+	printf("\n***********  FIRST RUN  **********\n");
 	printf("ISTAT= %d     FCN/DOF=%.3e     EDM=%.3e\n",istat, val/(N_DATA-N_PAR),edm);	
 	printf("************************************\n");
-
-
-
+	
+	//N_SIMPS=N_SIMPS_R;
+	//SIGMA_PREC=DGAUSS_PREC;
+	//generate_psi_set();
+	
 #if (MODEL==3||MODEL==1)			
 	MNCOMD(*fcn, "RELEASE 3",error_flag,0);
-	MNCOMD(*fcn,"SET LIMITS 3",error_flag,0);
-
-#if INDEPENDENT_RMAX==1
-	MNCOMD(*fcn, "FIX 7",error_flag,0);
-#endif
-//#endif
-	MNCOMD(*fcn,"HESSE",error_flag,0);
-	MNCOMD(*fcn, "MIGRAD 1000 1",error_flag,0);
-	MNCOMD(*fcn, "FIX 3",error_flag,0);
-	MNSTAT(val,edm, up, nvpar,npar,istat);
-	printf("\n************************************\n");
-	printf("ISTAT= %d     FCN/DOF=%.3e     EDM=%.3e\n",istat, val/(N_DATA-N_PAR),edm);	
-	printf("************************************\n");
-#elif (MODEL==2||MODEL==22)			
-	MNCOMD(*fcn, "RELEASE 2",error_flag,0);
-	MNCOMD(*fcn,"SET LIMITS 2",error_flag,0);
-
-	MNCOMD(*fcn,"HESSE",error_flag,0);
-	MNCOMD(*fcn, "MIGRAD 1000 1",error_flag,0);
-	MNCOMD(*fcn, "FIX 2",error_flag,0);
-	MNSTAT(val,edm, up, nvpar,npar,istat);
-	printf("\n************************************\n");
-	printf("ISTAT= %d     FCN/DOF=%.3e     EDM=%.3e\n",istat, val/(N_DATA-N_PAR),edm);	
-	printf("************************************\n");
-#endif	
-
+#if SUDAKOV>=1
 	MNCOMD(*fcn, "RELEASE 5",error_flag,0);
-	//MNCOMD(*fcn,"SET LIMITS 5",error_flag,0);
-	
-	
-	
-	N_SIMPS=N_SIMPS_R;
-	SIGMA_PREC=DGAUSS_PREC;
-	generate_psi_set();
+#endif	
+#elif (MODEL==2||MODEL==22)			
+	MNCOMD(*fcn, "RELEASE 3",error_flag,0);
+#if SUDAKOV>=1
+	MNCOMD(*fcn, "RELEASE 5",error_flag,0);
+#endif
+#endif
 	MNCOMD(*fcn,"HESSE",error_flag,0);
 	MNCOMD(*fcn, "MIGRAD 1000 1",error_flag, 0);
 
 	MNSTAT(val,edm, up, nvpar,npar,istat);
-#if (MODEL==3||MODEL==1)			
-	MNCOMD(*fcn, "RELEASE 3",error_flag,0);
-	MNCOMD(*fcn,"HESSE",error_flag,0);
-	MNCOMD(*fcn, "MIGRAD 1000 1",error_flag, 0);
-#elif (MODEL==2||MODEL==22)			
-	MNCOMD(*fcn, "RELEASE 3",error_flag,0);
-	MNCOMD(*fcn,"HESSE",error_flag,0);
-	MNCOMD(*fcn, "MIGRAD 1000 1",error_flag, 0);
-#endif
+	printf("\n*********   FINAL RUN   ***********\n");
+	printf("ISTAT= %d     FCN/DOF=%.3e     EDM=%.3e\n",istat, val/(N_DATA-N_PAR),edm);	
+	printf("************************************\n");
 
 	return istat;
 }
 
+*/
 int SAVE_RESULT(FILE* outfile){
 	char outline[500];
 	char name[11];
@@ -219,48 +180,149 @@ int SAVE_RESULT(FILE* outfile){
 	return(0);
  
 }
-int CHECK_COV(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
+
+//int CHECK_COV(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
+int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
 	char command[100];
+	double err_mat[N_PAR*N_PAR];
 	int error_flag, istat, nvpar, npar;
 	double val, edm, up;
-	sprintf(command , "SET EPSMACHINE 1.0e-8");
-	MNCOMD(*fcn,command,error_flag,0);
+	//sprintf(command , "SET EPSMACHINE 1.0e-8");
+	//MNCOMD(*fcn,command,error_flag,0);
 	MNCOMD(*fcn ,  "SET PRINTOUT 3",error_flag,0);	
 
-	N_SIMPS=(int)(N_SIMPS_R*2.0/4.0);
-	SIGMA_PREC=DGAUSS_PREC*100;
+	N_SIMPS=(int)(N_SIMPS_R*3.0/5.0);
+	SIGMA_PREC=DGAUSS_PREC*10;
 	generate_psi_set();
 	
-	MNCOMD(*fcn,"SET PARAMETER 2 1.0D0",error_flag,0);	
-	MNCOMD(*fcn,"FIX 2", error_flag,0);
-	//MNCOMD(*fcn,"FIX 5", error_flag,0);
-	MNCOMD(*fcn,"SET PRINTOUT 3",error_flag,0);
-	MNCOMD(*fcn,"SIMPLEX 300 10D0",error_flag,0);
+	MNCOMD(*fcn, "SIMPLEX",error_flag,0);
+#if((MODEL==1)||(MODEL==3))
+	MNCOMD(*fcn,"FIX 5",error_flag,0);
+#elif(((MODEL==2)||(MODEL==22))&&(SUDAKOV>=1))
+	MNCOMD(*fcn,"FIX 5",error_flag,0);
+#endif
+
+	MNCOMD(*fcn,"SET LIMITS",error_flag,0);
+
+	//MNEMAT(*err_mat,N_PAR);
+	//for(int i=0;i<N_PAR;i++){
+	//	for(int j=0;j<N_PAR;j++){
+	//		printf("%.3e\t",err_mat[i*N_PAR+j]);
+	//	}
+	//	printf("\n");
+	//}
 	
-	//MNCOMD(*fcn,"FIX 2", error_flag,0);
-	//MNCOMD(*fcn,"FIX 5", error_flag,0);
+	N_SIMPS=N_SIMPS_R;
+	SIGMA_PREC=DGAUSS_PREC;
+	generate_psi_set();
+	int itermax=3;
+	double corr[N_PAR];
+	int removed[itermax][N_PAR];
+	int off_no=0;
+	double dum;
+	int off=-1;
+	int flag=0;
+	MNCOMD(*fcn,"SET STRATEGY 0",error_flag,0);
+	sprintf(command,"MIGRAD %d, %fD0", 10*N_PAR*N_PAR,5.0); 
+	MNCOMD(*fcn,command,error_flag,0);
 
-	MNCOMD(*fcn,"SET LIMITS",error_flag,0);	
-	MNCOMD(*fcn,"MIGRAD 300 1D0",error_flag,0);
-	MNCOMD(*fcn,"RELEASE 2",error_flag,0);
-	MNCOMD(*fcn,"SET LIMITS 2",error_flag,0);
+	MNCOMD(*fcn,"SET STRATEGY 1",error_flag,0);
 
-	MNCOMD(*fcn,"FIX 3",error_flag,0);
-	//MNCOMD(*fcn,"RELEAE 5",error_flag,0);
+	for(int rec=0;rec<(itermax+1);rec++){
+		printf("\n\n-----------------tryal : %d -------------------\n",rec);
 
-	MNCOMD(*fcn,"MIGRAD 300 1D0",error_flag,0);
-	
-	MNCOMD(*fcn,"RELEASE 3",error_flag,0);
-	MNCOMD(*fcn, "FIX 4 5",error_flag,0);
-	MNCOMD(*fcn,"MIGRAD 300 1D0",error_flag,0);
-	
+		for(int j=0;j<N_PAR;j++){
+			MNCOMD(*fcn,"HESSE",error_flag,0);
+			MNSTAT(val,edm, up, nvpar,npar,istat);
+			if((istat==3)||( rec==itermax )){
+			//if( rec==itermax ){
+				break;
+			}
 
-	MNCOMD(*fcn,"RELEASE 4 5",error_flag, 0);
-	MNCOMD(*fcn,"HESSE",error_flag, 0);
+			printf("Correlation:\t");
+			for(int i=0;i<N_PAR;i++){
+				corr[i]=0;
+				MNERRS(i+1,dum,dum,dum,corr[i]);
+				printf("%.4e ",corr[i]);
+				
+				if(corr[i]>0.99){
+					if((off>=0)&&corr[i]>corr[off]){
+						off=i;
+					}else if(off==-1){
+						off=i;
+					}
+				}
 
-	//MNCOMD(*fcn,"RELEASE 2",error_flag,0);
-	//MNCOMD(*fcn,"CONTOUR 2 3",error_flag,0);
-	return 0;
+			} printf("\n");
+
+			if(off>=0){
+				
+				sprintf(command,"FIX %d",off+1);
+				MNCOMD(*fcn,command,error_flag,0);
+				removed[rec][off_no++]=off;
+				if(rec!=0){
+					flag+=fabs(removed[rec-1][off_no-1]-removed[rec][off_no-1]);
+					printf("flag==%d\n",flag);
+				}else{
+					flag=1;
+				}
+				off=-1;
+			}else{	
+				off=-1;
+				break;
+			}
+		}
+		if(flag==0){
+			for(int i=0;i<off_no;i++){
+				sprintf(command,"RELEASE %d",removed[rec][i]+1);
+				MNCOMD(*fcn,command,error_flag,0);
+			}
+			off_no=0;
+			MNCOMD(*fcn,"HESSE",error_flag,0);
+		}else{
+			flag=0;
+		}
+
+		MNCOMD(*fcn,"MIGRAD ",error_flag,0);
+		MNSTAT(val,edm, up, nvpar,npar,istat);
+		if(off_no==0){
+			if(istat==3){
+				if(rec==itermax){
+					printf("\n FINALLY!! YAY!!\n");
+					break;
+				}else{
+					rec=itermax;
+				}
+			}else{
+				printf("\n\n!!!!!!!!!!!!!Nomore correlation to remove!!!!!!!!!!!!!!!!!!! \n");
+				if(rec==itermax){
+					MNCOMD(*fcn,"HESSE",error_flag,0);
+				}
+			}
+
+		}else{
+			for(int i=0;i<off_no;i++){
+				sprintf(command,"RELEASE %d",removed[rec][i]+1);
+				MNCOMD(*fcn,command,error_flag,0);
+			}
+			if(rec==(itermax-1)){
+//				MNCOMD(*fcn,"RELEASE",error_flag,0);
+#if((MODEL==1)||(MODEL==3))
+				MNCOMD(*fcn,"RELEASE 5",error_flag,0);
+#elif(((MODEL==22)||(MODEL==2))&&(SUDAKOV>=1)) 
+				MNCOMD(*fcn,"RELEASE 5",error_flag,0);
+#endif
+			}
+			off_no=0;
+
+			//MNCOMD(*fcn,"SET LIMITS",error_flag,0);
+			//MNCOMD(*fcn,"MIGRAD ",error_flag,0);
+		}
+
+		
+	}
+
+	return istat;
 }
 	
 

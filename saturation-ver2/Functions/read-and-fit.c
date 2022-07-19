@@ -28,8 +28,8 @@ void generate_data_set(const double *par, double *csarray){
 	
 	sample_integrand(PSI,  SAMPLES ,par);
 
-	//simpson_sum(SAMPLES, csarray);	
-	simpson_sum_sorted(SAMPLES, csarray);//intention of this is to add small values first to avoid loss by rounding.	
+	simpson_sum(SAMPLES, csarray);	
+	//simpson_sum_sorted(SAMPLES, csarray);//intention of this is to add small values first to avoid loss by rounding.	
 //////////////////////////////////////////////////////////////
 }
 

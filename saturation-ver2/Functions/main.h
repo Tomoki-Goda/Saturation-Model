@@ -36,8 +36,8 @@ int MINUIT_INIT(){
 	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
 	printf("R_FIX: %d \t N_PAR %d                                     \n",R_FIX,N_PAR );
 	printf("L %.2e S %.2e C %.2e B %.2e\n",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
-	printf(" STAR %d\n", STAR );
-	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
+	printf("STAR %d R_CHANGE_VAR %d\n", STAR,R_CHANGE_VAR );
+	printf("Gauss eps: %.2e\t Simps N: %d CHEB N: %d \t \n", DGAUSS_PREC,N_SIMPS_R, N_CHEB_R);
 	printf("-----------------------------------------------------------------------------\n");
 	
 	

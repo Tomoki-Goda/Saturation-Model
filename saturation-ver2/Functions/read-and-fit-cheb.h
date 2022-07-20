@@ -54,7 +54,7 @@ extern int N_CHEB;
 ////////////////////////// FORMAT ////////////////////////////////
 double psi_for_cheb(const double *rptr, const double * par){
 	double r=change_var_revert(R_MIN,R_MAX,*rptr);
-	return psisq_z_int(r, par[0],par[1]);// *(Q2_DATA+i), fl);
+	return psisq_z_int(r, par[0],((int)(par[1]+0.1) ));// *(Q2_DATA+i), fl);
 } 
 
 double sigma_for_cheb(const double *rptr,const double *par){
@@ -63,6 +63,7 @@ double sigma_for_cheb(const double *rptr,const double *par){
 	//printf("%.5e\n",par[3]);
  	double val;
  	val= SIGMA(r,par[0] ,par[1], par+2, par+12)/r;
+ 	
  	//CAUTION!! +12 above is not for good reason, simply par is one array and can't pass array. 
  	//both pars are given 10 places . and 2 for x and Q2. 
  	//AND , /r is r/r^2 for r^2 was given to photon wavefunction to remove singularity.
@@ -185,7 +186,7 @@ void generate_data_set(const double *par,const double *psi_arr, double *csarray)
 			 val+=curtis_clenshaw_sum(samples+shift );
 			
 		}
-		csarray[data_no]=val;
+		csarray[data_no]=val*(R_MAX-R_MIN)/2;
 	}
 	//simpson_sum(SAMPLES, csarray);	
 	//simpson_sum_sorted(SAMPLES, csarray);//intention of this is to add small values first to avoid loss by rounding.	

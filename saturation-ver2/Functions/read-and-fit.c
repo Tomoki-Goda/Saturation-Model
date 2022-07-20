@@ -16,8 +16,8 @@
 
 
 
-#include"./read-and-fit.h"
-//#include"./read-and-fit-cheb.h"
+//#include"./read-and-fit.h"
+#include"./read-and-fit-cheb.h"
 
 int N_SIMPS=N_SIMPS_R;
 int N_CHEB=N_CHEB_R;
@@ -66,7 +66,9 @@ double compute_chisq(const double *par){
 //	clock_t time;
 //	time=clock();
 	double cs[N_DATA];//computed cross-section
-	static double psi_arr[(5)*N_CHEB_R*MAXN];
+
+	static double psi_arr[(5)*(( N_SIMPS_R>N_CHEB_R)? N_SIMPS_R : N_CHEB_R  )*MAXN];
+	
 	static int n_cheb,n_simp;
 	static double prec;
 	//if((n_cheb!=N_CHEB)||((n_simp!=N_SIMP)||prec!=SIGMA_PREC) ){

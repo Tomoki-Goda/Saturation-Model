@@ -68,7 +68,7 @@
 
 #ifndef N_CHEB_R
 //number of sampling for R integration, points are 2*N+1. 
-	#define N_CHEB_R 100 
+	#define N_CHEB_R 200 
 #endif
 
 #ifndef DGAUSS_PREC 

@@ -201,7 +201,8 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 #elif(((MODEL==2)||(MODEL==22))&&(SUDAKOV>=1))
 	MNCOMD(*fcn,"FIX 5",error_flag,0);
 #endif
-
+	
+	
 	MNCOMD(*fcn,"SET LIMITS",error_flag,0);
 
 	//MNEMAT(*err_mat,N_PAR);
@@ -227,9 +228,9 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	MNCOMD(*fcn,command,error_flag,0);
 
 	MNCOMD(*fcn,"SET STRATEGY 1",error_flag,0);
-
+	/////////////////decide whether to fix some parameter /////////////////////
 	for(int rec=0;rec<(itermax+1);rec++){
-		printf("\n\n-----------------tryal : %d -------------------\n",rec);
+		printf("\n\n-----------------trial : %d -------------------\n",rec);
 
 		for(int j=0;j<N_PAR;j++){
 			MNCOMD(*fcn,"HESSE",error_flag,0);
@@ -272,6 +273,7 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 				break;
 			}
 		}
+	////////////release if it has already been done ////////////////	
 		if(flag==0){
 			for(int i=0;i<off_no;i++){
 				sprintf(command,"RELEASE %d",removed[rec][i]+1);
@@ -282,21 +284,27 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 		}else{
 			flag=0;
 		}
-
+	///////////////////////////////////////////////////////////////
 		MNCOMD(*fcn,"MIGRAD ",error_flag,0);
 		MNSTAT(val,edm, up, nvpar,npar,istat);
+		
 		if(off_no==0){
 			if(istat==3){
 				if(rec==itermax){
 					printf("\n FINALLY!! YAY!!\n");
 					break;
 				}else{
-					rec=itermax;
+					rec=itermax-1;
 				}
 			}else{
 				printf("\n\n!!!!!!!!!!!!!Nomore correlation to remove!!!!!!!!!!!!!!!!!!! \n");
+				MNCOMD(*fcn,"SIMPLEX",error_flag,0);
 				if(rec==itermax){
 					MNCOMD(*fcn,"HESSE",error_flag,0);
+					MNSTAT(val,edm, up, nvpar,npar,istat);
+					if(istat!=3){
+						rec--;
+					}
 				}
 			}
 
@@ -305,21 +313,21 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 				sprintf(command,"RELEASE %d",removed[rec][i]+1);
 				MNCOMD(*fcn,command,error_flag,0);
 			}
-			if(rec==(itermax-1)){
-//				MNCOMD(*fcn,"RELEASE",error_flag,0);
-#if((MODEL==1)||(MODEL==3))
-				MNCOMD(*fcn,"RELEASE 5",error_flag,0);
-#elif(((MODEL==22)||(MODEL==2))&&(SUDAKOV>=1)) 
-				MNCOMD(*fcn,"RELEASE 5",error_flag,0);
-#endif
-			}
+
 			off_no=0;
 
 			//MNCOMD(*fcn,"SET LIMITS",error_flag,0);
 			//MNCOMD(*fcn,"MIGRAD ",error_flag,0);
 		}
 
-		
+		if(rec==(itermax-1)){
+//				MNCOMD(*fcn,"RELEASE",error_flag,0);
+#if((MODEL==1)||(MODEL==3))
+				MNCOMD(*fcn,"RELEASE 5",error_flag,0);
+#elif(((MODEL==22)||(MODEL==2))&&(SUDAKOV>=1)) 
+				MNCOMD(*fcn,"RELEASE 5",error_flag,0);
+#endif
+		}
 	}
 
 	return istat;

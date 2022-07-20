@@ -159,7 +159,38 @@ int comp_fabs(const void* a, const void* b){
 		return(1);
 	}
 }
-
+double kahn_sum(const double *arr, int len){
+//https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+	double sum=0 ;
+	double c=0;
+	
+	double y,t;
+	for(int i=0;i<len;i++){
+		y=arr[i]-c;
+		t=sum+y;
+		c=(t-sum)-y;
+		sum=t;
+	}
+	return sum;
+}
+double KBN_sum(const double *arr, int len){
+//https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+	double sum=0 ;
+	double c=0;
+	
+	double y,t;
+	for(int i=0;i<len;i++){
+		t=sum+arr[i];
+		if(fabs(sum)>=fabs(arr[i])){
+			c+=(sum-t)+arr[i];
+		}else{
+			c+=(arr[i]-t)+sum;
+		}
+		
+		sum=t;
+	}
+	return (sum+c);
+}
 void simpson_sum_sorted(const double *samples, double * csarray){
 	double summand[(2*N_SIMPS+1)];
 	double term,val;
@@ -184,6 +215,7 @@ void simpson_sum_sorted(const double *samples, double * csarray){
 			summand[j]=term;
 			//val+=term;
 		}
+		val=0;
 		qsort(summand, 2*N_SIMPS+1,sizeof(*summand),&comp_fabs);
 		for(int i=0;i<(2*N_SIMPS+1);i++){
 			val+=summand[i];
@@ -193,6 +225,38 @@ void simpson_sum_sorted(const double *samples, double * csarray){
 	}		
 }
 
+void simpson_kahn_sum(const double *samples, double * csarray){
+	double summand[(2*N_SIMPS+1)];
+	double term,val;
+
+	double r_step=(INT_R_MAX-INT_R_MIN)/(2*N_SIMPS);
+	for(int data_no=0;data_no<N_DATA;data_no++){
+		val=0;
+		for(int j=0;j<(2*N_SIMPS+1);j++){	
+			term=0;
+			for(int fl=0;fl<(NF-1);fl++){
+				//term+=samples[fl][j][data_no];   
+				term+=samples[data_no*((NF-1)*(2*N_SIMPS+1))+j*(NF-1)+fl ];
+			}	
+			if((j==0)||(j==2*N_SIMPS)){
+			
+			} else if( (j/2)*2==j ){
+				term*=2;
+			}
+			else{
+				term*=4;	
+			}
+			summand[j]=term;
+			//val+=term;
+		}
+		val=0;
+		qsort(summand, 2*N_SIMPS+1,sizeof(*summand),&comp_fabs);
+		//val=kahn_sum(summand,2*N_SIMPS+1);
+		val=KBN_sum(summand,2*N_SIMPS+1);
+	
+		*(csarray+data_no)=val*(r_step/3);
+	}		
+}
 
 void simpson_error(const double *samples, double * error_array){
 	double term,val;

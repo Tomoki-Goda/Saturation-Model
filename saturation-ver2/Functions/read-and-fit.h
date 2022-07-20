@@ -2,7 +2,10 @@
 //static double SAMPLES[5][2*N_SIMPS_R+1][MAXN];//sampled points of integrand 
 #define MAXN 600
 #define RESCALE 1.05
+//#include"./kahnsum.h"
 
+extern double KBN_sum(const double *arr,int len);
+extern double kahn_sum(const double *arr,int len);
 
 extern double SIGMA_PREC;
 
@@ -32,8 +35,8 @@ static unsigned N_DATA;
 //static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
 //static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 //static double SAMPLES[5][2*N_SIMPS_R +1][MAXN];
-static double PSI[5*(2*N_SIMPS_R+1)*MAXN];//pre-evaluated sets of psi
-static double SAMPLES[5*(2*N_SIMPS_R +1)*MAXN];
+//static double PSI[5*(2*N_SIMPS_R+1)*MAXN];//pre-evaluated sets of psi
+//static double SAMPLES[5*(2*N_SIMPS_R +1)*MAXN];
 /////////////////////////////////////////////
 //static const double ep=R_MIN;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
 #if (R_CHANGE_VAR==1)
@@ -46,14 +49,15 @@ static const double INT_R_MIN=R_MIN;
 
 //static const double R_STEP=r_int_max/(2*N_SIMPS_R);
 
-int N_SIMPS=N_SIMPS_R;
+extern int N_SIMPS;
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////   generate grid of z-integrated psi values        ////////////////////////////
 /////////////////////////////////              for every Q of experimental data   //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////it writes to global PSI...
-void generate_psi_set(){
+void generate_psi_set(double * psi_arr){
 	double r_step=(INT_R_MAX-INT_R_MIN)/(2*N_SIMPS);
 	double r;
 	char outline[200];
@@ -62,9 +66,8 @@ void generate_psi_set(){
 	sprintf(outline,"nf=%d\tN_SIMPS=%d\tN_DATA=%d.\n\n", (int)NF, N_SIMPS,N_DATA);
 	log_printf(log_file,outline);
 	
-	for(unsigned fl=0;fl<(NF-1);fl++){
-	
-		for(unsigned i=0; i<N_DATA;i++){
+	for(unsigned i=0; i<N_DATA;i++){
+		for(unsigned fl=0;fl<(NF-1);fl++){		
 			for(unsigned j=0;j<(2*N_SIMPS+1); j++){
 				r=r_step*j+INT_R_MIN;
 #if (R_CHANGE_VAR==1)
@@ -73,15 +76,15 @@ void generate_psi_set(){
 #endif
 				//printf("%d\n",fl);
 				//*(*(*(PSI+fl )+j )+i )=psisq_z_int(r, *(Q2_DATA+i), fl);
-				PSI[i*((NF-1)*(2*N_SIMPS+1)) + j*(NF-1) + fl]=psisq_z_int(r, *(Q2_DATA+i), fl);
+				psi_arr[i*((NF-1)*(2*N_SIMPS+1)) + j*(NF-1) + fl]=psisq_z_int(r, *(Q2_DATA+i), fl);
 			}
 		}
 	}
-#if (PRINT_PROGRESS==1)
+//#if (PRINT_PROGRESS==1)
 	printf("*****************************************\n");
 	printf("*            Psi ready                  *\n");
 	printf("*****************************************\n");
-#endif
+//#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +92,7 @@ void generate_psi_set(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void sample_integrand(const  double *PSI,  double  *samples, const double* par){
+void sample_integrand(const  double *psi_arr,  double  *samples, const double* par){
 	double xm, r, Q2,term ;
 	double r_step=(INT_R_MAX-INT_R_MIN)/(2*N_SIMPS);
 	double sudpar[10]={0};
@@ -112,7 +115,7 @@ void sample_integrand(const  double *PSI,  double  *samples, const double* par){
 				r=r/(1-r);
 #endif
 				//term= (*(*(*(PSI+fl )+j )+data_no )) * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
-				term= PSI[data_no*((NF-1)*(2*N_SIMPS+1))+j*(NF-1)+fl ] * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
+				term= psi_arr[data_no*((NF-1)*(2*N_SIMPS+1))+j*(NF-1)+fl ] * ( SIGMA(r,xm,Q2, sigpar,sudpar) )/r;//it should be *r coming from dr r d(theta) but we give r^2 to psi and so /r ;
 				//printf("%.2e\n",term);
 #if (R_CHANGE_VAR==1)
 				term*=pow(1+r,2);
@@ -159,39 +162,8 @@ int comp_fabs(const void* a, const void* b){
 		return(1);
 	}
 }
-double kahn_sum(const double *arr, int len){
-//https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-	double sum=0 ;
-	double c=0;
-	
-	double y,t;
-	for(int i=0;i<len;i++){
-		y=arr[i]-c;
-		t=sum+y;
-		c=(t-sum)-y;
-		sum=t;
-	}
-	return sum;
-}
-double KBN_sum(const double *arr, int len){
-//https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-	double sum=0 ;
-	double c=0;
-	
-	double y,t;
-	for(int i=0;i<len;i++){
-		t=sum+arr[i];
-		if(fabs(sum)>=fabs(arr[i])){
-			c+=(sum-t)+arr[i];
-		}else{
-			c+=(arr[i]-t)+sum;
-		}
-		
-		sum=t;
-	}
-	return (sum+c);
-}
-void simpson_sum_sorted(const double *samples, double * csarray){
+
+/*void simpson_sum_sorted(const double *samples, double * csarray){
 	double summand[(2*N_SIMPS+1)];
 	double term,val;
 
@@ -223,7 +195,7 @@ void simpson_sum_sorted(const double *samples, double * csarray){
 	
 		*(csarray+data_no)=val*(r_step/3);
 	}		
-}
+}*/
 
 void simpson_kahn_sum(const double *samples, double * csarray){
 	double summand[(2*N_SIMPS+1)];
@@ -250,10 +222,29 @@ void simpson_kahn_sum(const double *samples, double * csarray){
 			//val+=term;
 		}
 		val=0;
+#if TEST==1
+		double res1 , res2, res3,res4,res5;
+		res1=0;
+		for(int i=0;i<(2*N_SIMPS+1);i++){
+			res1+=summand[i];
+		}
+
+		res2=kahn_sum(summand,2*N_SIMPS+1);
+		res3=KBN_sum(summand,2*N_SIMPS+1);
+
+
 		qsort(summand, 2*N_SIMPS+1,sizeof(*summand),&comp_fabs);
-		//val=kahn_sum(summand,2*N_SIMPS+1);
+		res4=KBN_sum(summand,2*N_SIMPS+1);
+		val=res4;
+		res5=0;
+		for(int i=0;i<(2*N_SIMPS+1);i++){
+			res5+=summand[i];
+		}
+
+		printf("results: %.6e  %.6e  %.6e  %.6e\t %.5e\n",res3-res1,res3-res2,res3-res4,res3-res5,res3);
+#endif
 		val=KBN_sum(summand,2*N_SIMPS+1);
-	
+
 		*(csarray+data_no)=val*(r_step/3);
 	}		
 }
@@ -299,4 +290,25 @@ void simpson_error(const double *samples, double * error_array){
 
 	}
 	fclose(file);
+}
+
+
+void generate_data_set(const double *par,const double * psi_arr,double *csarray){
+	if(N_SIMPS>N_SIMPS_R){
+		printf("N_SIMPS can't be larger than N_SIMPS_R:  %d\t %d",N_SIMPS,N_SIMPS_R);
+		getchar();	
+	}
+	
+	
+	static double samples[5*N_SIMPS_R*MAXN];
+	
+	sample_integrand(psi_arr,samples,par);
+		
+	simpson_kahn_sum(samples, csarray);
+	//sample_integrand(PSI,  SAMPLES ,par);
+
+	//simpson_sum(SAMPLES, csarray);	
+	//simpson_sum_sorted(SAMPLES, csarray);//intention of this is to add small values first to avoid loss by rounding.	
+	//simpson_kahn_sum(SAMPLES, csarray);
+//////////////////////////////////////////////////////////////
 }

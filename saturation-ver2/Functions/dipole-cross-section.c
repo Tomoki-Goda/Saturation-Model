@@ -139,9 +139,16 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 	//double mu02		=par[4];
 	//double rmax		=par[4];
 	
-	
+	if(par[3]<0||par[4]<0){
+		return 0;
+	}
 	double mu2;
-	compute_mu2(r, par+3 , &mu2, 1 );
+	int signal= compute_mu2(r, par+3 , &mu2, 1 );
+	if(signal!=0){
+		//printf("sigma_bgk:: C %.3e mu02 %.3e\n",par[3],par[4]);
+		//getchar();
+		return 0;
+	} 
 	
 	double expo = 0.389379*(pow( r* PI,2) * xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	

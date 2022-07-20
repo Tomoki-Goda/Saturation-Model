@@ -13,26 +13,21 @@
 #include"control-default.h"
 #include"constants.h"
 
+
+
+
 #include"./read-and-fit.h"
+//#include"./read-and-fit-cheb.h"
+
+int N_SIMPS=N_SIMPS_R;
+int N_CHEB=N_CHEB_R;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////  now integrate over r with Simpsons method    /////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void generate_data_set(const double *par, double *csarray){
-	if(N_SIMPS>N_SIMPS_R){
-		printf("N_SIMPS can't be larger than N_SIMPS_R:  %d\t %d",N_SIMPS,N_SIMPS_R);
-		getchar();	
-	}
-	
-	sample_integrand(PSI,  SAMPLES ,par);
-
-	//simpson_sum(SAMPLES, csarray);	
-	//simpson_sum_sorted(SAMPLES, csarray);//intention of this is to add small values first to avoid loss by rounding.	
-	simpson_kahn_sum(SAMPLES, csarray);
-//////////////////////////////////////////////////////////////
-}
+//extern int N_CHEB, N_SIMP;
 
 
 //extern double sigma_DIS( double ,double, double ,double* );
@@ -71,12 +66,29 @@ double compute_chisq(const double *par){
 //	clock_t time;
 //	time=clock();
 	double cs[N_DATA];//computed cross-section
-	generate_data_set(par,cs);
+	static double psi_arr[(5)*N_CHEB_R*MAXN];
+	static int n_cheb,n_simp;
+	static double prec;
+	//if((n_cheb!=N_CHEB)||((n_simp!=N_SIMP)||prec!=SIGMA_PREC) ){
+	//if(((n_simp!=N_SIMPS)||prec!=SIGMA_PREC) ){
+	if((n_cheb!=N_CHEB)||( n_simp!=N_SIMPS) || ((prec-SIGMA_PREC)>1.0e-10) ){
+		generate_psi_set(psi_arr);
+		prec=SIGMA_PREC;
+		n_cheb=N_CHEB;
+		n_simp=N_SIMPS;
+		printf(" Integral : %.2e SIMP %d, CHEB %d \n",prec,n_simp,n_cheb);
+	}
 	
+	
+	generate_data_set(par, psi_arr, cs);
+	
+	double chiarr[N_DATA];	
 	for(unsigned i=0;i<N_DATA;i++){
 		//chisq+=pow( ( cs[i]-CS_DATA[i] )/(ERR_DATA[i]),2);
-		chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
+		//chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
+		chiarr[i]=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
 	}
+	chisq=KBN_sum(chiarr,N_DATA);
 	return(chisq );
 }
 
@@ -103,25 +115,25 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 #if (MODEL==1||MODEL==3)	
 	approx_xg(par+1);//generate chebyshev coefficients
 #endif
-	if(*iflag==3){
-		double error_array[N_DATA];
-		double cs_array[N_DATA];
-		//double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
-		simpson_error(SAMPLES,error_array);
-		simpson_sum(SAMPLES,cs_array);	
-		for(int i=0;i<N_DATA;i++){
-			sprintf(outline,"Q2=%.2e x=%.2e, Data=%.3e :>  %.3e\t%.3e\n",Q2_DATA[i],X_DATA[i],CS_DATA[i], cs_array[i],error_array[i]);
+//	if(*iflag==3){
+//		double error_array[N_DATA];
+//		double cs_array[N_DATA];
+//		//double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
+//		simpson_error(SAMPLES,error_array);
+//		simpson_sum(SAMPLES,cs_array);	
+//		for(int i=0;i<N_DATA;i++){
+//			sprintf(outline,"Q2=%.2e x=%.2e, Data=%.3e :>  %.3e\t%.3e\n",Q2_DATA[i],X_DATA[i],CS_DATA[i], cs_array[i],error_array[i]);
 
-			log_printf(log_file,outline);
-		}
-	}else{	
+//			log_printf(log_file,outline);
+//		}
+//	}else{	
 		*fcnval=compute_chisq(par);
 	
 		time-=clock();
 		
 		sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
 		log_printf(log_file,outline);
-	}
+//	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

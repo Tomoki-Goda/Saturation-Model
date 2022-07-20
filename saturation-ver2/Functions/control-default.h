@@ -66,6 +66,11 @@
 	#define N_SIMPS_R 250 
 #endif
 
+#ifndef N_CHEB_R
+//number of sampling for R integration, points are 2*N+1. 
+	#define N_CHEB_R 100 
+#endif
+
 #ifndef DGAUSS_PREC 
 //precision of integration for adaptive gauss quadrature integration. or other methods
 	#define DGAUSS_PREC 1.0e-4

@@ -93,7 +93,7 @@ int compute_mu2(double r, const double * sudpar, double * mu2_arr, int opt){
 			return 1;		
 		}
 		if( isnan(mu2_arr[0])!=0){
-			printf("%.3e\n",mu02);
+			//printf("compute_mu2:: nan %.3e\n",mu02);
 			return 2;		
 		}
 		return 0;

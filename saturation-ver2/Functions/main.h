@@ -3,6 +3,8 @@
 extern double SIGMA_PREC;
 static unsigned N_DATA;
 extern int N_SIMPS;
+extern int N_CHEB;
+
 
 extern int load_data(void);
 extern void generate_psi_set(void);
@@ -192,8 +194,10 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	MNCOMD(*fcn ,  "SET PRINTOUT 3",error_flag,0);	
 
 	N_SIMPS=(int)(N_SIMPS_R*3.0/5.0);
+	N_CHEB=(int)(N_CHEB_R*3.0/5.0);
+	
 	SIGMA_PREC=DGAUSS_PREC*10;
-	generate_psi_set();
+	//generate_psi_set();
 	
 	MNCOMD(*fcn, "SIMPLEX",error_flag,0);
 #if((MODEL==1)||(MODEL==3))
@@ -214,8 +218,9 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	//}
 	
 	N_SIMPS=N_SIMPS_R;
+	N_CHEB=N_CHEB_R;
 	SIGMA_PREC=DGAUSS_PREC;
-	generate_psi_set();
+	//generate_psi_set();
 	int itermax=3;
 	double corr[N_PAR];
 	int removed[itermax][N_PAR];

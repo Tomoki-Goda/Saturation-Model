@@ -1,7 +1,7 @@
 #include<math.h>
 #include<stdlib.h>
 #include<stdio.h>
-
+#include"./kahnsum.h"
 #ifndef PI
 	#define PI 3.1415
 #endif
@@ -24,7 +24,10 @@ double change_var_revert(double min,double max, double val){
 	if((val>1)||(val<-1)|| (min>max)){
 		printf("change_var_revert:: wrong input for change_var_revert\n val=%f\t [%f, %f] \n",val, min,max);
 	}
-	return ( (val/2) *(max-min)+ (max+min)/2 );
+	double res=((val+1)*max - (val-1)*min)/2; 
+
+	return(res);
+	//return ( (val/2) *(max-min)+ (max+min)/2 );
 }
 //double change_var_revert(double min,double max, double val){
 double change_var_compactify(double min,double max, double val){
@@ -32,7 +35,9 @@ double change_var_compactify(double min,double max, double val){
 	if(min>max){
 		printf("change_var_compactify:: wrong input for change_var_compactify\n val=%f\t [%f, %f] \n",val, min,max);
 	}
-	return (2*((val-min)/(max-min)) -1);
+	double res=2*((val-min)/(max-min)) -1;
+//	printf("%.6e \n",val-change_var_revert(min,max,res)); 
+	return(res );
 	
 }
 ////////////////////////////////log version ////////////////////////////
@@ -69,6 +74,7 @@ unsigned convert_index(const unsigned * index, const unsigned * max, unsigned di
 void ind_vec_increment(unsigned * vec, const unsigned * max, unsigned dim){
 //increment the vec
 // like in the way increasing (hr,min,sec) second by second. 	
+// in the case of time vec should be int vec[3] max={24,60,60}, and dim=3. 
 	for(int i=(dim-1);i>=0;i--){
 		if(*(vec+i) != (*(max+i)-1) ){
 		//if it is not max then this will be in creased. if it is then back to zero and next index will be increased.
@@ -81,13 +87,37 @@ void ind_vec_increment(unsigned * vec, const unsigned * max, unsigned dim){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-
+/*
 void chebyshevT(double x,unsigned degree, double * T ){
 //iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
 	*(T)=1;
 	*(T+1)=x;
 	for(unsigned i=2;i<(degree);i++){
 		*(T+i)=2*x*(*(T+i-1))-(*(T+i-2));
+	}
+}
+*/
+void chebyshevT(double x,unsigned degree, double * T ){
+//iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
+//with kahn algorithm
+	*(T)=1;
+	*(T+1)=x;
+	double t, c, t0, t1;
+
+	for(unsigned i=2;i<(degree);i++){
+		t1=2*x*(*(T+i-1));
+		t0=-(*(T+i-2));
+
+		t=t1+t0;
+		if(fabs(t1)>fabs(t0)){
+			c=(t1-t)+t0;
+		}else{
+			c=(t0-t)+t1;
+		}
+		if(fabs(c)>1.0e-10){
+			printf("accum= %.3e %.3e \n",c,t);
+		}
+		*(T+i)=t+c;
 	}
 }
 
@@ -140,11 +170,11 @@ double cheb_c_summand(const double * sample_arr,const unsigned* ind1, const unsi
 }
 
 
-double cheb_c(/*double func(double * vec,double* par) */const double * sample_arr,/*double * par,*/const unsigned* ind1,const unsigned *degree, unsigned dim ){
-// do the sum, produce coefficient c of chebyshev \sum c*T
+double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *degree, unsigned dim ){
+// do the sum, produce coefficient c of chebyshev \sum c*T 
+// coefficient c for indices ind1[dim] 
 //vec, ind1,  degree are vector of length dim.
 	unsigned ind2[dim];//={0};
-		
 	double val=0;
 	double dif=0;
 	unsigned len=1;
@@ -153,9 +183,12 @@ double cheb_c(/*double func(double * vec,double* par) */const double * sample_ar
 		len*=degree[i];
 		*(ind2+i)=0;//initialize indices
 	}
+	double arr[len];		
 	for(unsigned j=0;j<len; j++ ){
-		dif=cheb_c_summand(sample_arr, ind1 ,ind2,degree,dim);
-		val+=dif;
+		//dif=cheb_c_summand(sample_arr, ind1 ,ind2,degree,dim);
+		//val+=dif;
+		arr[j]=cheb_c_summand(sample_arr, ind1 ,ind2,degree,dim);
+
 #if CHEBYSHEV_TEST ==1
 		printf("%f\t",dif);
 		
@@ -167,6 +200,7 @@ double cheb_c(/*double func(double * vec,double* par) */const double * sample_ar
 #endif
 		ind_vec_increment(ind2,degree,dim);//increment the ind1; like in the way increasing (hr,min,sec) second by second. 
 	}
+	val=KBN_sum(arr,len);
 	return val;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +231,7 @@ void cheb_coeff(double func(const double * vec, const double* par) ,const double
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 double chebyshev(const unsigned *degree,unsigned dim,const double* coeff , double* args ){
-
+	
 	unsigned ind1[dim];
 	unsigned len=1;
 	unsigned lenT=0;
@@ -230,7 +264,7 @@ double chebyshev(const unsigned *degree,unsigned dim,const double* coeff , doubl
 		*(posit+i+1)=(*(posit+i)+(*(degree+i)) );
 		//printf("%d/%d\n",*(posit+i+1),len);
 	}//Now Tlist is a concatenated list of T 
-	
+	double arr[len];
 	for(unsigned j=0;j<len; j++ ){
 		//posit=0;//position to start counting in tlist since its joined list.
 		val=1;
@@ -240,10 +274,11 @@ double chebyshev(const unsigned *degree,unsigned dim,const double* coeff , doubl
 		}
 		val*=(*(coeff+j));
 		
-		res+=val;	
+		//res+=val;
+		arr[j]=val;	
 		ind_vec_increment(ind1,degree,dim);
 	}
-
+	res=KBN_sum(arr,len);
 	for(unsigned i=0;i<dim;i++){
 		res*=(2.0/degree[i]);	
 	}

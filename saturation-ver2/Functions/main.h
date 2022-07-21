@@ -175,8 +175,8 @@ int SAVE_RESULT(FILE* outfile){
 	printf("Model ID:  %d  \t Q2_up: %.1e \t x_up: %.1e \t  Sudakov: %d\n", MODEL, Q2_MAX,X_MAX, SUDAKOV);
 	printf("R_FIX: %d \t                                               \n",R_FIX );
 	printf("L %.2e S %.2e C %.2e B %.2e\n",MASS_L2,MASS_S2,MASS_C2,MASS_B2 );
-	printf(" STAR %d\n", STAR );
-	printf("Gauss eps: %.2e\t Simps N: %d \t \n", DGAUSS_PREC,N_SIMPS_R);
+	printf("STAR %d R_CHANGE_VAR %d\n", STAR,R_CHANGE_VAR );
+	printf("Gauss eps: %.2e\t Simps N: %d CHEB N: %d \t \n", DGAUSS_PREC,N_SIMPS_R, N_CHEB_R);
 	printf("chisq/dof\t%.3e \nError Matrix %d\n",res/(N_DATA-N_PAR)  , istat);
 	printf("****************************************************************\n");
 	return(0);
@@ -303,7 +303,7 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 				}
 			}else{
 				printf("\n\n!!!!!!!!!!!!!Nomore correlation to remove!!!!!!!!!!!!!!!!!!! \n");
-				MNCOMD(*fcn,"SIMPLEX",error_flag,0);
+				MNCOMD(*fcn,"SIMPLEX 100 0.001",error_flag,0);
 				if(rec==itermax){
 					MNCOMD(*fcn,"HESSE",error_flag,0);
 					MNSTAT(val,edm, up, nvpar,npar,istat);

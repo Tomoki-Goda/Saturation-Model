@@ -186,7 +186,7 @@ void generate_data_set(const double *par,const double *psi_arr, double *csarray)
 			 val+=curtis_clenshaw_sum(samples+shift );
 			
 		}
-		csarray[data_no]=val*(R_MAX-R_MIN)/2;
+		csarray[data_no]=val*(R_MAX-R_MIN)/((double) N_CHEB);//jacobian for ch.var. and 2/N normalization of curtis clenshaw quadrature.
 	}
 	//simpson_sum(SAMPLES, csarray);	
 	//simpson_sum_sorted(SAMPLES, csarray);//intention of this is to add small values first to avoid loss by rounding.	

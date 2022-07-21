@@ -68,7 +68,7 @@
 
 #ifndef N_CHEB_R
 //number of sampling for R integration, points are 2*N+1. 
-	#define N_CHEB_R 100 
+	#define N_CHEB_R 200 
 #endif
 
 #ifndef DGAUSS_PREC 
@@ -98,9 +98,15 @@
 
 
 #ifndef R_CHANGE_VAR
-//use R=r/(1-r) for r integration. //seems to sevferely affect the quality...
+//use R=r/(1-r) for r integration. //seems to severely affect the quality...
 	#define R_CHANGE_VAR 1
 #endif
+
+#ifndef NONLINEAR
+//whether to use nonlinear transformation for fejer-curtis-clenshaw quadrature.
+	#define NONLINEAR 0 
+#endif
+
 #ifndef STRATEGY
 // Strategy for MIGRAD. read MINUIT documentation.
 	#define STRATEGY 1

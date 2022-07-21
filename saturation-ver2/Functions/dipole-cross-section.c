@@ -25,9 +25,18 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 	//	printf("%.2e ",par[i]);
 	//}
 	//printf("\n");
+#if (MODEL==0||MODEL==2||MODEL==22)
 	sigpar[0]=par[0];
 	sigpar[1]=par[1];
-	sigpar[2]=par[2];
+	sigpar[2]=par[2]*1.0e-4;
+#else
+	sigpar[0]=par[0];
+	sigpar[1]=par[1];
+	sigpar[2]=par[2]*1.0e-2;
+#endif
+
+	
+	
 	//printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
 #if(MODEL==1||MODEL==3)
 	sigpar[3]=par[3];

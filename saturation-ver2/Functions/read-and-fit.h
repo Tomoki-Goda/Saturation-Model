@@ -1,7 +1,6 @@
 //static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 //static double SAMPLES[5][2*N_SIMPS_R+1][MAXN];//sampled points of integrand 
 #define MAXN 600
-#define RESCALE 1.05
 //#include"./kahnsum.h"
 
 extern double KBN_sum(const double *arr,int len);
@@ -29,16 +28,6 @@ static double CS_DATA[MAXN]={0};
 static double ERR_DATA[MAXN]={0};
 static unsigned N_DATA;
 
-//static double FIT_RES[N_PAR+1]={0};
-
-//////////////////GLOBAL ARRAY for DATA/////////////////////
-//static double PSI[5][MAXN][2*N_SIMPS_R+1];//pre-evaluated sets of psi
-//static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
-//static double SAMPLES[5][2*N_SIMPS_R +1][MAXN];
-//static double PSI[5*(2*N_SIMPS_R+1)*MAXN];//pre-evaluated sets of psi
-//static double SAMPLES[5*(2*N_SIMPS_R +1)*MAXN];
-/////////////////////////////////////////////
-//static const double ep=R_MIN;//1.0e-6;//for r==0 is divergent or unstable note this value is related to the value chosen for lower limit in chebyshev...
 #if (R_CHANGE_VAR==1)
 static const double INT_R_MAX=((double)R_MAX)/(1+R_MAX);
 static const double INT_R_MIN=((double)R_MIN)/(1+R_MIN);

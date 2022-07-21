@@ -15,6 +15,7 @@
 
 
 
+#define RESCALE 1.05
 
 //#include"./read-and-fit.h"
 #include"./read-and-fit-cheb.h"
@@ -78,7 +79,7 @@ double compute_chisq(const double *par){
 		prec=SIGMA_PREC;
 		n_cheb=N_CHEB;
 		n_simp=N_SIMPS;
-		printf(" Integral : %.2e SIMP %d, CHEB %d \nR_MAX %.2e R_MIN %.2e\n",prec,n_simp,n_cheb,(double)R_MAX,R_MIN);
+		printf("\n====Integral : %.2e SIMP %d, CHEB %d ====\n====R_MAX %.2e R_MIN %.2e====\n",prec,n_simp,n_cheb,(double)R_MAX,R_MIN);
 	}
 	
 	

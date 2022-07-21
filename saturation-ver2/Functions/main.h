@@ -183,6 +183,8 @@ int SAVE_RESULT(FILE* outfile){
  
 }
 
+
+/*
 //int CHECK_COV(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
 int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
 	char command[100];
@@ -279,7 +281,7 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 			}
 		}
 	////////////release if it has already been done ////////////////	
-		if(flag==0){
+		if( (flag==0)&&(off_no!=0)){
 			for(int i=0;i<off_no;i++){
 				sprintf(command,"RELEASE %d",removed[rec][i]+1);
 				MNCOMD(*fcn,command,error_flag,0);
@@ -338,6 +340,6 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	return istat;
 }
 	
-
+*/
 
 

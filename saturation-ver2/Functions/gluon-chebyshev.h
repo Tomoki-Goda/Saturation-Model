@@ -11,11 +11,11 @@
 #include"./gluons.h"
 #include"./chebyshev-1.h"
 
-#define X_DEGREE 21
+#define X_DEGREE 25 
 #define Q2_DEGREE 27
  
 #ifndef SKIP_SAME
-	#define SKIP_SAME 1
+	#define SKIP_SAME 0
 #endif
 
 static int ERROR_FLAG = 1;
@@ -31,22 +31,23 @@ static int ERROR_FLAG = 1;
 extern double alpha_s(double mu2 );
 
 ////////////////Global///////////////////
-static double coeff[X_DEGREE*Q2_DEGREE];
-static  const unsigned dim=2;
-static  unsigned degree[2]={X_DEGREE,Q2_DEGREE};
+static double COEFF[X_DEGREE*Q2_DEGREE];
+static const unsigned DIM=2;
+static const unsigned DEGREE[2]={X_DEGREE,Q2_DEGREE};
 
-static double xlim[2]={1.0e-7,2.0} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
-static double q2lim[2]={LQCD2*2,1.0e+11};
+//static const double X_LIM[2]={1.0e-8,1} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
+static const double X_LIM[2]={1.0e-10,1.25} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
+static const double Q2_LIM[2]={LQCD2*5 , 5.0/(R_MIN*R_MIN) };
 
 /////////////////////////////////////////
 
 ///////////////  format  //////////////////
-double eval_xg( double *var,double *par ){
+double eval_xg(const double *var, const double *par ){
 	set_xg_parameter( par[0] , par[1]);
-	double x= change_var_revert_log(xlim[0],xlim[1],var[0]);
-	double Q2= change_var_revert_log(q2lim[0],q2lim[1] ,var[1]);
-	//double x=(var[0]+1)/2;
-	//double Q2=(1+var[1])/(1-var[1]);
+	//double x= change_var_revert(X_LIM[0],X_LIM[1],var[0]);
+	double x= change_var_revert_log(X_LIM[0],X_LIM[1],var[0]);
+	double Q2= change_var_revert_log(Q2_LIM[0],Q2_LIM[1] ,var[1]);
+	
 	double val=alpha_s(Q2 )* xgpdf(x,Q2);
 	return( val);
 }
@@ -55,31 +56,49 @@ double eval_xg( double *var,double *par ){
 int comp( double a, double b ,double tolarence){
 	return( (int)(fabs(a-b)/(( fabs(a)+fabs(b) )*tolarence)) );
 }
-void approx_xg(double * par){
+void approx_xg(const double * par){
+	//this par is sigmapar+1. shoud be written so in read-and-fit.
 	
-	static double param[2];
+//	if(par[3]/(R_MIN*R_MIN) >  Q2_LIM[1]  ){
+//		printf("Q2_LIM too small: C=%.3e r_min=%.3e Q2_LIM=%.3e\t " ,par[3],R_MIN, Q2_LIM[1] );
+//		Q2_LIM[1]=1.1*par[3]/(R_MIN*R_MIN);
+//		printf("New Q2_LIM=%.3e\n",Q2_LIM[1] );
+//		goto re_evaluate;
+//	}
+	//printf("%.3e %.3e %.3e",par[2],par[3],par[4] );
+	
+//	Q2_LIM[0]=par[2]/(1.1*par[3]*par[3]);
+//	Q2_LIM[1]=1.1*par[2]/(R_MIN*R_MIN);
+	//printf("Q2 for xg() between %.3e %.3e\n", Q2_LIM[0] , Q2_LIM[1]  );
+//	if(Q2_LIM[0]<LQCD2){
+//		printf("Q2 might get less than Lambda QCD: %.3e\n",Q2_LIM[0]);
+//	}
+	
+	//static double param[2];
+	
 	//clock_t time_xg=clock();
 	//printf("*************************       xg(x,Q2)          **************************\n");
-#if SKIP_SAME==1
-	if((comp(*(par+1),param[1] , 1.0e-10)==0)){
-		if((comp(*(par),param[0] , 1.0e-10)==0)){
-			//printf("skip\n");				//both A_g and lambda_g are not changed.
-		}else{	
-			for(unsigned i=0;i<(X_DEGREE*Q2_DEGREE); i++){
-				*(coeff+i)=((*(par))/param[0])*(*(coeff+i));
-			}
-			//printf("skip - normalize\n");			//only A_g is different
-			*(param)   = *(par);
-		}
-		
-	}else{
-#endif
-		*(param)   = *(par);
-		*(param+1) = *(par+1);
-		cheb_coeff( &eval_xg, par,degree,dim, coeff  );	// both A_g and lambda_g are different. 
-#if SKIP_SAME==1
-	}
-#endif
+//#if SKIP_SAME==1
+//	if((comp(*(par+1),param[1] , 1.0e-10)==0)){
+//		if((comp(*(par),param[0] , 1.0e-10)==0)){
+//			//printf("skip\n");				//both A_g and lambda_g are not changed.
+//		}else{	
+//			for(unsigned i=0;i<(X_DEGREE*Q2_DEGREE); i++){
+//				*(coeff+i)=((*(par))/param[0])*(*(coeff+i));
+//			}
+//			//printf("skip - normalize\n");			//only A_g is different
+//			*(param)   = *(par);
+//		}
+//		
+//	}else{
+//		*(param)   = *(par);
+//		*(param+1) = *(par+1);
+//#endif
+//		re_evaluate:
+		cheb_coeff( &eval_xg, par,DEGREE,DIM, COEFF  );	// both A_g and lambda_g are different. 
+//#if SKIP_SAME==1
+//	}
+//#endif
 	//time_xg-=clock();
 	//printf(  "*********************   Chebyshev  done, %.3e seconds    **************************\n", -((double)time_xg)/CLOCKS_PER_SEC);
 	ERROR_FLAG=0;//indicate approxmation is done,
@@ -94,11 +113,33 @@ double xg_chebyshev(double  x,double q2){
 		//char ch;
 		//scanf("%c",&ch);
 	}
-	double args[2];
-	(*args)=change_var_compactify_log(xlim[0],xlim[1],x);
-	(*(args+1))=change_var_compactify_log(q2lim[0],q2lim[1],q2);
+	if(q2<Q2_LIM[0]){
+		//printf(" q2 too small %.2e\n",q2);
+		return 0;
+		//q2=Q2_LIM[0];
+	}else if(q2>Q2_LIM[1]){
+		//printf(" q2 too large %.2e\n",q2);
+		return 0;
+		//q2=Q2_LIM[1];
+	}
 	
-	double val = chebyshev(degree, dim, coeff, args );
+	if(x<X_LIM[0]){
+		//printf(" x too small %.2e\n",x);
+		return 0;
+		//x=X_LIM[0];
+	}else if(x>X_LIM[1]){
+		//printf(" x too large %.2e\n",x);
+		return 0;
+		//x=X_LIM[1];
+	}
+	
+	
+	double args[2];
+	//(*args)=change_var_compactify(X_LIM[0],X_LIM[1],x);
+	(*args)=change_var_compactify_log(X_LIM[0],X_LIM[1],x);
+	(*(args+1))=change_var_compactify_log(Q2_LIM[0],Q2_LIM[1],q2);
+	
+	double val = chebyshev(DEGREE, DIM, COEFF, args );
 	
 	
 	//char ch;

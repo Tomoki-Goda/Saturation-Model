@@ -19,8 +19,8 @@ static double eulergamma = GAMMA_E;
 static double simpsN=500;
 /* Initial condition */
 //double       beta = 9.6;
-double       beta = 6.6;
-double        n_0 = 0.5;       /* Maximal singluraity of integrand */
+static double       beta = 6.6;
+static double        n_0 = 0.5;       /* Maximal singluraity of integrand */
 
 ////from control.h/////////////
 int  gluon_int    = 1;

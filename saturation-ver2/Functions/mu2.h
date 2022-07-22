@@ -2,77 +2,147 @@
 ///////////////Something for the parametrizations of mu2/////////////////////////////////
 ///////////////////////////////Jacobian dmu2/dr and ddmu2/drdr/////////////////////////////////////////
 
-#if STAR ==0
+#if (STAR==0)
 /////////////////////////////////////Type 0//////////////////////////////////////////////
-double rmu2( double r ,double* sudpar){
+int compute_mu2(double r, const double * sudpar, double * mu2_arr,int opt){
 	double C=sudpar[0];
-	double rmax=sudpar[1];
+	//double rmax=sudpar[1];
+	double mu02=sudpar[1];
+	double r2=r*r;
+	//double rm2=rmax*rmax;
 	
-	double mu2=C*(pow(r,-2.0)+pow(rmax,-2.0));
-	return mu2;
-}
-//////////////////////////
-double rmu2_jac_first( double r ,double* sudpar){
-	double C=sudpar[0];
-	double rmax=sudpar[1];
+	*(mu2_arr)=C/r2+mu02;
 	
-	double	jac= -2.0*C/pow(r,3.0);
-	return jac;
-}
-//////////////////////////
-double rmu2_jac_second( double r  ,double* sudpar){
-	double C=sudpar[0];
-	double rmax=sudpar[1];
+	if(opt==1){
+		if( (mu2_arr[0]<LQCD2)){
+			return 1;		
+		}
+		if( isnan(mu2_arr[0])!=0){
+			return 2;		
+		}
+				
+		return 0;
+	}
 	
-	double jac=6.0*C/pow(r,4.0);
-	return jac;
+	//first and second derivatives wrt r 
+	mu2_arr[1] = -2.0*C/(r*r2);
+	mu2_arr[2] = 6.0*C/(r2*r2);
+	
+	
+	for(int i=1;i<3;i++){
+		if( (isnan(mu2_arr[i])!=0) ){
+			return 2;
+		}
+		if( (mu2_arr[i]*(pow(-1,i))<0) ){
+			return 1;
+		}
+	}
+	
+	if(opt==3){
+		return 0;
+	}else{
+		printf("opt is 1 or 3 : %d\n", opt); 
+		return 3;
+	}	
 }
+
 
 /////////////////////////////////////////////
-double rmin2(double Q2 ,double* sudpar){
+int rmin2(double Q2 , const double* sudpar,double *rmin_2){
 	double C=sudpar[0];
-	double rmax=sudpar[1];
+	//double rmax=sudpar[1];
+	double mu02=sudpar[1];
+	double frac=Q2/mu02;//*rmax*rmax/C;
+	if(C<0){
+		printf("negative C, %.3e",C);
+		return 1;
+	}
+	if(frac<1){
+		return 9;
+	}
 	
-	double rmin2=-rmax*rmax*C/(C-Q2*rmax*rmax);
-	return rmin2;
+	
+	*rmin_2=(C/mu02)/(frac-1);
+	
+	if((C/mu02)<0){
+		printf("C/mu02 negative");
+		getchar();
+		return 1;
+	}
+	return 0;
 }
 
-#elif STAR ==1
+
+#elif (STAR==1)
+
 ///////////////////////////////////////type1////////////////////////////////////////////
-double rmu2( double r  ,double* sudpar){
+
+int compute_mu2(double r, const double * sudpar, double * mu2_arr, int opt){
 	double C=sudpar[0];
-	double rmax=sudpar[1];
+	//double rmax=sudpar[1];
+	double mu02=sudpar[1];
+	double r2=r*r;
+	//double rm2=rmax*rmax;
 	
-	double exprrmax=exp(-pow(r/rmax,2));
-	double mu2=C/(rmax*rmax*(1.0-exprrmax ));
-	return mu2;
-}
-//////////////////////////
-double rmu2_jac_first( double r  ,double* sudpar){
-	double C=sudpar[0];
-	double rmax=sudpar[1];
+	double exprrmax=exp(-r2*(mu02/C));
 	
-	double exprrmax=exp(-pow(r/rmax,2));
-	double jac=-2.0*C*(r/pow(rmax,4))*( exprrmax/pow(1.0-exprrmax,2));
-	return jac;
-}
-//////////////////////////
-double rmu2_jac_second( double r ,double* sudpar){
-	double C=sudpar[0];
-	double rmax=sudpar[1];
+	mu2_arr[0]=mu02/((1.0-exprrmax ));
 	
-	double exprrmax=exp(-pow(r/rmax,2));
-	double jac =- 2.0*(C/pow(rmax,4))*(exprrmax/pow(1.0-exprrmax,2))*( 1.0- 2* pow(r/rmax,2)*((1.0+exprrmax)/(1.0-exprrmax)) ) ;
-	return jac;
+	if(opt==1){
+		if( (mu2_arr[0]<LQCD2)){
+			return 1;		
+		}
+		if( isnan(mu2_arr[0])!=0){
+			//printf("compute_mu2:: nan %.3e\n",mu02);
+			return 2;		
+		}
+		return 0;
+	}
+	
+	double jac=-2.0*(mu02*mu02/C)*( exprrmax/((1.0-exprrmax)*(1.0-exprrmax))); 
+	//first and second derivatives wrt r 
+	mu2_arr[1] = jac*r;
+	mu2_arr[2] = jac*( 1.0- 2* (r2*mu02/C) *((1.0+exprrmax)/(1.0-exprrmax)) ) ;	
+	
+	for(int i=1;i<3;i++){
+		if( (isnan(mu2_arr[i])!=0) ){
+			return 2;
+		}
+		if( (mu2_arr[i]*(pow(-1,i))<0) ){
+			return 1;
+		}
+	}
+	if(opt==3){
+		return 0;
+	}else{
+		printf("opt is 1 or 3 : %d\n", opt); 
+		return 3;
+	}
 }
 
+
 /////////////////////////////////////////////
-double rmin2(double Q2 ,double* sudpar){
+int rmin2(double Q2 ,const double* sudpar, double *rmin_2){
 	double C=sudpar[0];
-	double rmax=sudpar[1];
+	//double rmax=sudpar[1];
+	double mu02=sudpar[1];
+	double frac=mu02/Q2;// C/(Q2*rmax*rmax); 
+	if(C<0){
+		printf("negative C, %.3e",C);
+		return 1;
+	}
+	if((frac>1)){
+		return 9;	
+	}
 	
-	double rmin2=-rmax*rmax*log( 1.0-C/(Q2*rmax*rmax) );
-	return rmin2;
+	*rmin_2=-(C/mu02)*log( 1.0-frac);
+	
+	if((C/mu02)<0){
+		printf("C/mu02 negative");
+		getchar();
+		return 1;
+	}
+	return 0;
 }
 #endif
 

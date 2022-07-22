@@ -15,7 +15,7 @@ int main(int argc, char** argv){
 	char name[500];
 	float value;
 	float error;
-	//float chisq;
+	float chisq;
 	int ndata;
 	unsigned count=0;
 	
@@ -38,12 +38,22 @@ int main(int argc, char** argv){
 		//fprintf(outfile,"%.0f",value);
 		char dir[500], mass[50], qup[50], model[50], sudakov[50] ,rfix[50],dum[100];
 		char* chptr;
-		chptr=strtok(argv[i],"/");
-		//printf("%s\n",chptr);
+		char* filenameptr[3];
 
-		chptr=strtok(NULL,"/");
-		sprintf(dir,"%s",chptr);
-		chptr=strtok(NULL,"-");
+		chptr=strtok(argv[i],"/");//split dir at /
+		//printf("%s\n",chptr);
+		while(chptr!=NULL){
+			filenameptr[0]=filenameptr[1];
+			filenameptr[1]=filenameptr[2];
+			filenameptr[2]=chptr;
+			chptr=strtok(NULL,"/");
+		}
+		//files are usually model-name/Mass0.0-Qup650-.../result.txt 
+		//printf("%s\n",filenameptr[0]);
+		//printf("%s\n",filenameptr[1]);
+		sprintf(dir,"%s",filenameptr[0]);
+		
+		chptr=strtok(filenameptr[1],"-");
 		sscanf(chptr,"%4s%s",dum,mass);
 		
 		chptr=strtok(NULL,"-");
@@ -97,23 +107,35 @@ int main(int argc, char** argv){
 		//for(unsigned line =0; (line<(line_n)) ; line++){
 		for(unsigned line =0; line<10 /* > max possible no. of parameter*/; line++){
 			fscanf(resfile,"%s\t%f\t%f\n",name,&value, &error );
+			fprintf(outfile," & %.2e {\\tiny $\\pm$ %.2e } ",value, error);
+			
 			if(strcmp(name,"chisq")==0){
 				printf("%d parameters \n",count);
 				break;	
 			}
-			fprintf(outfile,"& %.2e {\\tiny $\\pm$ %.2e }",value, error);
 			count++;
 			//fprintf(stdout,"& %f $\\pm$ %f \n",value, error);
 		}
 		//fscanf(resfile,"%s\t%f\t%f\n",name,&chisq, &error );
 		//fprintf(outfile,"& %.2e  ",chisq);
-		fprintf(outfile,"& %.2e  ",value);
+		//fprintf(outfile,"& %.2e  ",value);
+		double chisqerr=error;
 		fscanf(resfile,"%s\t%d\n",name,&ndata);
 		fprintf(outfile,"/ %d  ",ndata);
-		
 		fprintf(outfile,"= %.2f  ",value/(ndata-count));
-		fprintf(outfile,"\\\\ \\hline \n");
 			
+		fscanf(resfile,"%s\t%f\n",name,&value);
+	
+		fscanf(resfile,"%s %s\t%d\n",name,name,&ndata);//error_flag
+		if((ndata!=3)||( chisqerr>1.0e-4) ){
+			fprintf(outfile,"& {\\color{red}%d} ",ndata);
+		}else{
+			fprintf(outfile,"& %d  ",ndata);
+		}
+
+		fprintf(outfile,"\\\\ \\hline \n");
+
+
 		fclose(resfile);	
 	}
 	fclose(outfile);

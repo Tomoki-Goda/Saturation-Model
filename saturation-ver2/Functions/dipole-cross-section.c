@@ -1,21 +1,12 @@
 #include<stdio.h>
 #include<math.h>
 
-
-//#include"./control_tmp.h"
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
 
 #include"./gluon-chebyshev.h"
 #include"./sudakov.h"
-
-//#define BGK 0
-
-//extern  double xgpdf(double, double);
-//extern  double xg_chebyshev(double,double);
-
-//extern double rmu2( double ,double*  );
 
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
 extern double dgauss_(double (*)(double*), double*,double*,double *  );
@@ -24,25 +15,85 @@ extern double dgauss_(double (*)(double*), double*,double*,double *  );
 ////////////////////////////////////////////////////////////
 ////////////////// common functions ////////////////////////
 ////////////////////////////////////////////////////////////
-int parameter(double *par,double* sigpar,double* sudpar){
-	for(int i=0;i<(N_PAR);i++){
-		*(sigpar+i)=*(par+i);
-	}
-	//double* sigpar= par;
-#if MODEL==22||MODEL==2
-	//double *sudpar;
-	for(int i=0;i<(N_PAR-3);i++){
-		*(sudpar+i)=*(par+3+i);
-	}
-#elif MODEL==3
-	//double sudpar[10];
-	sudpar[0]=par[3]*par[5] ;//C*C2
-	sudpar[1]=par[4]*sqrt(par[5]);//rmax mu02=C/rmax^2
-#if SUDAKOV==2
-	sudpar[2]=par[6];
-	sudpar[3]=par[7];
+int parameter(const double *par,double* sigpar,double* sudpar){
+///////////////////
+//Sigpar are as we all know it, parameters for dipole sigma.
+//sudpar are {C , r_max, g1, g2} but parameters may be given in terms of mu02 (as in BGK), and C and r_max may be that of BGK.
+//That's why this is so messy...
+////////////////////
+	//for(int i=0;i<N_PAR;i++){
+	//	printf("%.2e ",par[i]);
+	//}
+	//printf("\n");
+#if (MODEL==0||MODEL==2||MODEL==22)
+	sigpar[0]=par[0];
+	sigpar[1]=par[1];
+	sigpar[2]=par[2]*1.0e-4;
+#else
+	sigpar[0]=par[0];
+	sigpar[1]=par[1];
+	sigpar[2]=par[2]*1.0e-2;
+#endif
+
+	
+	
+	//printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
+#if(MODEL==1||MODEL==3)
+	sigpar[3]=par[3];
+	#if MU0==0
+		sigpar[4]=sigpar[3]/(par[4]*par[4]);
+	#else
+		sigpar[4]=par[4];//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
+	#endif
+	//printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
+#endif
+////////////////////////////SUDPAR////////////////////////////////
+#if (MODEL==22||MODEL==2)
+		sudpar[0]=par[3];
+	#if MU0==0
+		sudpar[1]=sudpar[0]/(par[4]*par[4]);
+	#else
+		sudpar[1]=par[4];
+	#endif
+	//printf("\tSUDAKOV: %.2e %.2e ",sudpar[0],sudpar[1]);	
+#if (SUDAKOV==2)
+	sudpar[2]=par[5];
+	sudpar[3]=par[6];
+	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
+#endif
+
+///////////////////////////////////////////////////////
+#elif (MODEL==3)
+	#if INDEPENDENT_C==1
+		sudpar[0]=par[5] ;
+	#else 
+		sudpar[0]=par[3];
+	#endif
+
+	#if MU0==0 //if rmax is fit parameter
+		#if INDEPENDENT_RMAX==1
+			sudpar[1]=sudpar[0]/(par[6]*par[6]);
+		#else
+			sudpar[1]=sudpar[0]/(par[4]*par[4]);
+		#endif
+
+	#else //if mu02 is the fit parameter
+		#if INDEPENDENT_RMAX==1
+			sudpar[1]=par[6];
+		#else
+			sudpar[1]=par[4];//mu02 is shared
+		#endif
+	#endif
+	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);
+
+//////////////////////////////////////////////////////
+#if (SUDAKOV==2)
+	sudpar[2]=par[7];
+	sudpar[3]=par[8];
+	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
 #endif
 #endif
+	//printf("\n");
 	return 0;
 }
 
@@ -74,16 +125,18 @@ double mod_x(double x, double Q2, unsigned flavour) {
 	}
 	return (x * (1.0 +( 4.0 * (m_fsq/Q2)) ));
 }
-//in simps.f
-//extern "C" double simps_(double *, double *, double *,double *,double* ,double(*)(double*), double *  ,double *,double* ,double *);
 
 /////////////////////////////////////////////////////////////
 //////////////////////////// GBW ////////////////////////////
 /////////////////////////////////////////////////////////////
-double sigma_gbw(double r,double x,double Q2, double * par){
+double sigma_gbw(double r,double x,double q2, const double * par){
 	double sigma_0 =par[0];
 	double lambda	=par[1];
 	double x_0	=par[2];
+	
+	if(x_0<0){//to avoid nan since migrad might give negative x0...
+		return 0;
+	}
 
 	return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
 }
@@ -93,47 +146,43 @@ double sigma_gbw(double r,double x,double Q2, double * par){
 /////////////////////////////////////////////////////////////
 //////////////////////////// BGK ////////////////////////////
 /////////////////////////////////////////////////////////////
-double sigma_bgk(double r, double x, double Q2, double * par){
+double sigma_bgk(double r, double x, double q2, const double * par){
 	//clock_t tim=clock();
 	double sigma_0		=par[0];
 	double A_g		=par[1];
-	double lambda_g	=par[2];
-	double C		=par[3];
+	double lambda_g		=par[2];
+	//double C		=par[3];
 	//double mu02		=par[4];
-	double rmax		=par[4];
+	//double rmax		=par[4];
 	
-	
-#if STAR==0
-	double mu2=C*(1.0/(r*r)+1.0/(rmax*rmax)) ;
-#elif STAR==1
-	double mu02=C/(rmax*rmax);
-	double mu2=mu02/(1-exp(-mu02 *pow(r,2)/C) );
-#endif
+	if(par[3]<0||par[4]<0){
+		return 0;
+	}
+	double mu2;
+	int signal= compute_mu2(r, par+3 , &mu2, 1 );
+	if(signal!=0){
+		printf("sigma_bgk:: C %.3e mu02 %.3e\n",par[3],par[4]);
+		getchar();
+		return 0;
+	} 
 	
 	double expo = 0.389379*(pow( r* PI,2) * xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	
-	//return( sigma_0*2*(expo/(5+expo) ));	
 	double val=sigma_0*(1-exp(-expo));
 	
 	return(val) ;	
 }
 
-
-/////////////////////////////////////////////////////////////
-//////////////////////////// GBS ////////////////////////////
-/////////////////////////////////////////////////////////////
-//#if ((MODEL==2)||(MODEL==3)||(MODEL==22))
-
-//#endif
 //////////////////////////////////////Will be removed in the future/////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-#if MODEL==2
+#if (MODEL==2)
+
 ////////////////////////////////// CERN INTEGRATION ROUTINE VERSION ////////////////////////////////////
 /// GLOBAL ///
 static double VAR[3];
-static double *PAR;//its array but need only one because it needs only to point at par;
+static const double *PAR;//its array but need only one because it needs only to point at par;
 
 double integrand_gbs(double *r_ptr){
 	double r=*r_ptr;
@@ -158,14 +207,16 @@ double integrand_gbs(double *r_ptr){
 
 
 	double val=laplacian_sigma;
-#if SUDAKOV>=1
+#if (SUDAKOV>=1)
         val*=exp(-sudakov(r,Q2,sudpar)) ;
 #endif
 	//printf("integrand return for r=%f, %f. \n",r,val);       
 	return(val); //sudakov(r,Q2,sudpar) *laplacian_sigma);
 }
 
-double sigma_gbs(double r, double x, double Q2, double * par){
+double sigma_gbs(double r, double x, double Q2, const double * par){
+	printf("discontinued\n");
+	getchar();
 	*(VAR)=r;
 	*(VAR+1)=x;
 	*(VAR+2)=Q2;

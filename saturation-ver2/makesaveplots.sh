@@ -2,12 +2,12 @@
 
 #mkdir PlotRelated
 
-BGKBGKSDIR=../BGK-BGKS/Mass0.0-Qup650-Model1-Sud0-rfix0
-BGKSDIR=../BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0
-BGKDIR=../BGK/Mass0.0-Qup650-Model1-Sud0-rfix0
-GBWGBWSDIR=../GBW-GBWS/Mass0.0-Qup650-Model0-Sud0-rfix0
-GBWDIR=../GBW/Mass0.0-Qup650-Model0-Sud0-rfix0
-GBWSDIR=./GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0
+BGKBGKSDIR=../Results/BGK-BGKS/Mass0.0-Qup650-Model1-Sud0-rfix0
+BGKSDIR=../Results/BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0
+BGKDIR=../Results/BGK/Mass0.0-Qup650-Model1-Sud0-rfix0
+GBWGBWSDIR=../Results/GBW-GBWS/Mass0.0-Qup650-Model0-Sud0-rfix0
+GBWDIR=../Results/GBW/Mass0.0-Qup650-Model0-Sud0-rfix0
+GBWSDIR=../Results/GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0
 
 #SAVEDIR=./PlotRelated
 SAVEDIR="/media/tomoki/TOMOKI-USB/Saturation-Model/NewPlots"
@@ -255,23 +255,46 @@ SAVEDIR="/media/tomoki/TOMOKI-USB/Saturation-Model/NewPlots"
   -l "GBW 50 GeV:GBW 500 GeV:GBWS 50 GeV:GBWS 500 GeV" \
   -c "cyan magenta blue red" \
   -t "Q dependence of dipole cross-section -  Massless Fits Q_max=650" \
-  -s ${SAVEDIR}/GBWQdependence.png \
+  -s ${SAVEDIR}/GBWQdependence-linear.png \
   -a " r fm : sigma/sigma_0 "\
-   ./GBW/Mass0.0-Qup650-Model0-Sud0-rfix0/dipole-50-5.txt \
-   ./GBW/Mass0.0-Qup650-Model0-Sud0-rfix0/dipole-500-5.txt \
-   ./GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0/dipole-50-5.txt \
-   ./GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0/dipole-500-5.txt 
+   ../Results/GBW/Mass0.0-Qup650-Model0-Sud0-rfix0/dipole-50-5.txt \
+   ../Results/GBW/Mass0.0-Qup650-Model0-Sud0-rfix0/dipole-500-5.txt \
+   ../Results/GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0/dipole-50-5.txt \
+   ../Results/GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0/dipole-500-5.txt 
    
     ./plot.py \
-  -y linear\
+  -y linear \
+   -p "-- -. -- -." \
+  -l "BGK 50 GeV:BGK 500 GeV:BGKS 50 GeV:BGKS 500 GeV" \
+  -c "cyan magenta blue red" \
+  -t "Q dependence of dipole cross-section -  Massless Fits Q_max=650" \
+  -s ${SAVEDIR}/BGKQdependence-linear.png \
+  -a " r fm : sigma/sigma_0 "\
+   ../Results/BGK/Mass0.0-Qup650-Model1-Sud0-rfix0/dipole-50-5.txt \
+   ../Results/BGK/Mass0.0-Qup650-Model1-Sud0-rfix0/dipole-500-5.txt \
+   ../Results/BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0/dipole-50-5.txt \
+   ../Results/BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0/dipole-500-5.txt 
+  ./plot.py \
+  -p "-- -. -- -. " \
+  -l "GBW 50 GeV:GBW 500 GeV:GBWS 50 GeV:GBWS 500 GeV" \
+  -c "cyan magenta blue red" \
+  -t "Q dependence of dipole cross-section -  Massless Fits Q_max=650" \
+  -s ${SAVEDIR}/GBWQdependence.png \
+  -a " r fm : sigma/sigma_0 "\
+   ../Results/GBW/Mass0.0-Qup650-Model0-Sud0-rfix0/dipole-50-5.txt \
+   ../Results/GBW/Mass0.0-Qup650-Model0-Sud0-rfix0/dipole-500-5.txt \
+   ../Results/GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0/dipole-50-5.txt \
+   ../Results/GBWS/Mass0.0-Qup650-Model22-Sud1-rfix0/dipole-500-5.txt 
+   
+    ./plot.py \
    -p "-- -. -- -." \
   -l "BGK 50 GeV:BGK 500 GeV:BGKS 50 GeV:BGKS 500 GeV" \
   -c "cyan magenta blue red" \
   -t "Q dependence of dipole cross-section -  Massless Fits Q_max=650" \
   -s ${SAVEDIR}/BGKQdependence.png \
   -a " r fm : sigma/sigma_0 "\
-   ./BGK/Mass0.0-Qup650-Model1-Sud0-rfix0/dipole-50-5.txt \
-   ./BGK/Mass0.0-Qup650-Model1-Sud0-rfix0/dipole-500-5.txt \
-   ./BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0/dipole-50-5.txt \
-   ./BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0/dipole-500-5.txt 
+   ../Results/BGK/Mass0.0-Qup650-Model1-Sud0-rfix0/dipole-50-5.txt \
+   ../Results/BGK/Mass0.0-Qup650-Model1-Sud0-rfix0/dipole-500-5.txt \
+   ../Results/BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0/dipole-50-5.txt \
+   ../Results/BGKS/Mass0.0-Qup650-Model3-Sud1-rfix0/dipole-500-5.txt 
 

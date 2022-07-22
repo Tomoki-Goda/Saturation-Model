@@ -63,7 +63,7 @@
 
 #ifndef N_SIMPS_R
 //number of sampling for R integration, points are 2*N+1. 
-	#define N_SIMPS_R 250 
+	#define N_SIMPS_R 100 
 #endif
 
 #ifndef N_CHEB_R

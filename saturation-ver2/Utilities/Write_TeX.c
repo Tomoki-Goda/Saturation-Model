@@ -15,7 +15,7 @@ int main(int argc, char** argv){
 	char name[500];
 	float value;
 	float error;
-	//float chisq;
+	float chisq;
 	int ndata;
 	unsigned count=0;
 	
@@ -107,22 +107,35 @@ int main(int argc, char** argv){
 		//for(unsigned line =0; (line<(line_n)) ; line++){
 		for(unsigned line =0; line<10 /* > max possible no. of parameter*/; line++){
 			fscanf(resfile,"%s\t%f\t%f\n",name,&value, &error );
+			fprintf(outfile," & %.2e {\\tiny $\\pm$ %.2e } ",value, error);
+			
 			if(strcmp(name,"chisq")==0){
 				printf("%d parameters \n",count);
 				break;	
 			}
-			fprintf(outfile," & %.2e {\\tiny $\\pm$ %.2e } ",value, error);
 			count++;
 			//fprintf(stdout,"& %f $\\pm$ %f \n",value, error);
 		}
 		//fscanf(resfile,"%s\t%f\t%f\n",name,&chisq, &error );
 		//fprintf(outfile,"& %.2e  ",chisq);
-		fprintf(outfile,"& %.2e  ",value);
-		//fscanf(resfile,"%s\t%d\n",name,&ndata);
-		//fprintf(outfile,"/ %d  ",ndata);
-		//fprintf(outfile,"= %.2f  ",value/(ndata-count));
-		fprintf(outfile,"\\\\ \\hline \n");
+		//fprintf(outfile,"& %.2e  ",value);
+		double chisqerr=error;
+		fscanf(resfile,"%s\t%d\n",name,&ndata);
+		fprintf(outfile,"/ %d  ",ndata);
+		fprintf(outfile,"= %.2f  ",value/(ndata-count));
 			
+		fscanf(resfile,"%s\t%f\n",name,&value);
+	
+		fscanf(resfile,"%s %s\t%d\n",name,name,&ndata);//error_flag
+		if((ndata!=3)||( chisqerr>1.0e-4) ){
+			fprintf(outfile,"& {\\color{red}%d} ",ndata);
+		}else{
+			fprintf(outfile,"& %d  ",ndata);
+		}
+
+		fprintf(outfile,"\\\\ \\hline \n");
+
+
 		fclose(resfile);	
 	}
 	fclose(outfile);

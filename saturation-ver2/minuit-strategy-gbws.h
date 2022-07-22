@@ -54,6 +54,7 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 			MNCOMD(*fcn,"SIMPLEX 150 0.1D-3",error_flag,0);
 			if(i==2){
 				MNCOMD(*fcn,"HESSE ",error_flag,0);
+				MNCOMD(*fcn,"MIGRAD",error_flag,0);
 				MNSTAT(val,edm, up, nvpar,npar,istat);
 			}
 		}

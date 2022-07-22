@@ -115,8 +115,11 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 		log_printf(log_file,outline);
 	}
 	
-#if (MODEL==1||MODEL==3)	
-	approx_xg(par+1);//generate chebyshev coefficients
+		
+#if (MODEL==1||MODEL==3)
+	static double sigpar[10],sudpar[10];	
+	parameter(par,sigpar,sudpar);
+	approx_xg(sigpar+1);//generate chebyshev coefficients
 #endif
 //	if(*iflag==3){
 //		double error_array[N_DATA];

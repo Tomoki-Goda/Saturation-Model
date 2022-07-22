@@ -45,7 +45,7 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 	#else
 		sigpar[4]=par[4];//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
 	#endif
-	//printf("\tSUDAKOV: %.2e %.2e ",sigpar[3],sigpar[4]);
+	//printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
@@ -161,8 +161,8 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 	double mu2;
 	int signal= compute_mu2(r, par+3 , &mu2, 1 );
 	if(signal!=0){
-		//printf("sigma_bgk:: C %.3e mu02 %.3e\n",par[3],par[4]);
-		//getchar();
+		printf("sigma_bgk:: C %.3e mu02 %.3e\n",par[3],par[4]);
+		getchar();
 		return 0;
 	} 
 	

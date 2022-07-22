@@ -35,8 +35,8 @@ static double COEFF[X_DEGREE*Q2_DEGREE];
 static const unsigned DIM=2;
 static const unsigned DEGREE[2]={X_DEGREE,Q2_DEGREE};
 
-static const double X_LIM[2]={1.0e-8,1} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
-//static const double X_LIM[2]={1.0e-10,1.25} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
+//static const double X_LIM[2]={1.0e-8,1} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
+static const double X_LIM[2]={1.0e-10,1.25} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
 static const double Q2_LIM[2]={LQCD2*5 , 5.0/(R_MIN*R_MIN) };
 
 /////////////////////////////////////////

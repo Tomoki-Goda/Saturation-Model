@@ -87,7 +87,7 @@ void sample_integrand(const  double *psi_arr,  double  *samples, const double* p
 	double sudpar[10]={0};
 	double sigpar[10]={0};
 	parameter(par,sigpar,sudpar);// problem here if -Ofast is used...?
-	
+//	printf("%.3e %.3e %.3e %.3e %.3e\n",sigpar[0], sigpar[1],sigpar[2],sigpar[3],sigpar[4]);	
 	//double ep=1.0e-5;
 //////////////////////////////////////////////////////////////
 	for(unsigned data_no=0; data_no<N_DATA;data_no++){

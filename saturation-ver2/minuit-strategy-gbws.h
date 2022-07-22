@@ -27,6 +27,8 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	N_CHEB=N_CHEB_R;
 	SIGMA_PREC=DGAUSS_PREC;
 	
+	MNCOMD(*fcn,"SET STRATEGY 1",error_flag,0);
+
 	MNCOMD(*fcn,"FIX 4",error_flag,0);
 	MNCOMD(*fcn,"FIX 5",error_flag,0);
 	
@@ -40,7 +42,7 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	
 	MNCOMD(*fcn,"RELEASE 5",error_flag,0);
 	MNCOMD(*fcn,"SET LIMITS 5 1.0D0 20.0D0",error_flag,0);
-	
+
 	for(int i=0 ; i<3;i++){
 		MNCOMD(*fcn,"HESSE ",error_flag,0);
 		
@@ -49,10 +51,15 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 		if(istat==3){
 			break;
 		}else{	
-			MNCOMD(*fcn,"SIMPLEX 150 0.001",error_flag,0);
+			MNCOMD(*fcn,"SIMPLEX 150 0.1D-3",error_flag,0);
+			if(i==2){
+				MNCOMD(*fcn,"HESSE ",error_flag,0);
+				MNSTAT(val,edm, up, nvpar,npar,istat);
+			}
 		}
 	}
+
 	
-	//MNSTAT(val,edm, up, nvpar,npar,istat);
+	MNSTAT(val,edm, up, nvpar,npar,istat);
 	return(istat);
 }

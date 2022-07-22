@@ -55,7 +55,13 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 	#else
 		sudpar[1]=par[4];
 	#endif
-	//printf("\tSUDAKOV: %.2e %.2e ",sudpar[0],sudpar[1]);
+	//printf("\tSUDAKOV: %.2e %.2e ",sudpar[0],sudpar[1]);	
+#if (SUDAKOV==2)
+	sudpar[2]=par[5];
+	sudpar[3]=par[6];
+	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
+#endif
+
 ///////////////////////////////////////////////////////
 #elif (MODEL==3)
 	#if INDEPENDENT_C==1
@@ -79,12 +85,13 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 		#endif
 	#endif
 	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);
-#endif
+
 //////////////////////////////////////////////////////
 #if (SUDAKOV==2)
 	sudpar[2]=par[7];
 	sudpar[3]=par[8];
 	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
+#endif
 #endif
 	//printf("\n");
 	return 0;

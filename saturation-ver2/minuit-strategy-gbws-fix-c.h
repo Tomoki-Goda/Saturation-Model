@@ -11,7 +11,6 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	SIGMA_PREC=DGAUSS_PREC*10;
 
 	MNCOMD(*fcn,"FIX 4",error_flag,0);
-//	MNCOMD(*fcn,"FIX 5",error_flag,0);
 
 	MNCOMD(*fcn, "SIMPLEX",error_flag,0);
 	
@@ -43,7 +42,11 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 		if(istat==3){
 			break;
 		}else{	
-			MNCOMD(*fcn,"SIMPLEX 150 0.001",error_flag,0);
+			MNCOMD(*fcn,"SIMPLEX 150 0.1D-3",error_flag,0);
+			if(i==2){
+				MNCOMD(*fcn,"HESSE ",error_flag,0);
+				MNSTAT(val,edm, up, nvpar,npar,istat);
+			}
 		}
 	}
 	return(istat);

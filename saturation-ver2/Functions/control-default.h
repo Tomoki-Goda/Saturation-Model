@@ -63,7 +63,7 @@
 
 #ifndef N_SIMPS_R
 //number of sampling for R integration, points are 2*N+1. 
-	#define N_SIMPS_R 100 
+	#define N_SIMPS_R 150 
 #endif
 
 #ifndef N_CHEB_R
@@ -99,7 +99,7 @@
 
 #ifndef R_CHANGE_VAR
 //use R=r/(1-r) for r integration. //seems to severely affect the quality...
-	#define R_CHANGE_VAR 1
+	#define R_CHANGE_VAR 0
 #endif
 
 #ifndef NONLINEAR
@@ -112,6 +112,9 @@
 	#define STRATEGY 1
 #endif
 
+#ifndef FEJER
+	#define FEJER 0
+#endif
 
 ///////////////////   IRREGULAR CONTROL ///////////////////////
 //// NOT TESTED, DISCONTINUED, ETC... CHECK WHEN CHANGED //////

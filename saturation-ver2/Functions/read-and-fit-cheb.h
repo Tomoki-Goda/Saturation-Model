@@ -42,6 +42,8 @@ static const double INT_R_MAX=R_MAX;
 static const double INT_R_MIN=R_MIN;
 extern int N_CHEB;
 
+static double SAMPLES[(NF-1)*N_CHEB_R*MAXN];
+static double PSI[(NF-1)*N_CHEB_R*MAXN];
 
 ////////////////////////// FORMAT ////////////////////////////////
 double psi_for_cheb(const double *rptr, const double * par){
@@ -167,11 +169,11 @@ double curtis_clenshaw_sum(const double *sample_arr){
 	 
 }
 
-void generate_data_set(const double *par,const double *psi_arr, double *csarray){
+void generate_data_set(const double *par,const double *psi_arr,double *samples, double *csarray){
 	if(2*(N_CHEB/2)!=N_CHEB){
 		printf("N_CHEB has to be multiple of 2\n");
 	}
-	static double samples[5*N_CHEB_R*MAXN];
+	//static double samples[5*N_CHEB_R*MAXN];
 	
 	sample_integrand(psi_arr,samples ,par);
 	

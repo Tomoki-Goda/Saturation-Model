@@ -40,6 +40,8 @@ static const double INT_R_MIN=R_MIN;
 
 extern int N_SIMPS;
 
+static double SAMPLES[(NF-1)*(2*N_SIMPS_R+1)*MAXN];
+static double PSI[(NF-1)*(2*N_SIMPS_R+1)*MAXN];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////   generate grid of z-integrated psi values        ////////////////////////////
@@ -282,14 +284,14 @@ void simpson_error(const double *samples, double * error_array){
 }
 
 
-void generate_data_set(const double *par,const double * psi_arr,double *csarray){
+void generate_data_set(const double *par,const double * psi_arr, double * samples,double *csarray){
 	if(N_SIMPS>N_SIMPS_R){
 		printf("N_SIMPS can't be larger than N_SIMPS_R:  %d\t %d",N_SIMPS,N_SIMPS_R);
 		getchar();	
 	}
 	
 	
-	static double samples[5*N_SIMPS_R*MAXN];
+	//static double samples[5*N_SIMPS_R*MAXN];
 	
 	sample_integrand(psi_arr,samples,par);
 		

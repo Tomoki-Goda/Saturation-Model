@@ -17,8 +17,11 @@
 
 #define RESCALE 1.05
 
-//#include"./read-and-fit.h"
+#if FEJER==1
 #include"./read-and-fit-cheb.h"
+#else
+#include"./read-and-fit.h"
+#endif
 
 int N_SIMPS=N_SIMPS_R;
 int N_CHEB=N_CHEB_R;
@@ -68,22 +71,30 @@ double compute_chisq(const double *par){
 //	time=clock();
 	double cs[N_DATA];//computed cross-section
 
-	static double psi_arr[(5)*(( N_SIMPS_R>N_CHEB_R)? N_SIMPS_R : N_CHEB_R  )*MAXN];
+	//static double psi_arr[(5)*(( N_SIMPS_R>N_CHEB_R)? N_SIMPS_R : N_CHEB_R  )*MAXN];
 	
-	static int n_cheb,n_simp;
+	static int n_int;
 	static double prec;
 	//if((n_cheb!=N_CHEB)||((n_simp!=N_SIMP)||prec!=SIGMA_PREC) ){
 	//if(((n_simp!=N_SIMPS)||prec!=SIGMA_PREC) ){
-	if((n_cheb!=N_CHEB)||( n_simp!=N_SIMPS) || ((prec-SIGMA_PREC)>1.0e-10) ){
-		generate_psi_set(psi_arr);
+#if FEJER==1
+	if(( n_int!=N_CHEB) || ((prec-SIGMA_PREC)>1.0e-10) ){
+		generate_psi_set(PSI);
 		prec=SIGMA_PREC;
-		n_cheb=N_CHEB;
-		n_simp=N_SIMPS;
-		printf("\n====Integral : %.2e SIMP %d, CHEB %d ====\n====R_MAX %.2e R_MIN %.2e====\n",prec,n_simp,n_cheb,(double)R_MAX,R_MIN);
+		n_int=N_CHEB;
+		printf("\n====Integral : %.2e  CHEB %d ====\n====R_MAX %.2e R_MIN %.2e====\n",prec,n_int,(double)R_MAX,R_MIN);
 	}
+#else
+	if(( n_int!=N_SIMPS) || ((prec-SIGMA_PREC)>1.0e-10) ){
+		generate_psi_set(PSI);
+		prec=SIGMA_PREC;
+		n_int=N_SIMPS;
+		printf("\n====Integral : %.2e SIMP %d ====\n====R_MAX %.2e R_MIN %.2e====\n",prec,n_int,(double)R_MAX,R_MIN);
+	}
+
+#endif
 	
-	
-	generate_data_set(par, psi_arr, cs);
+	generate_data_set(par, PSI,SAMPLES, cs);
 	
 	double chiarr[N_DATA];	
 	for(unsigned i=0;i<N_DATA;i++){

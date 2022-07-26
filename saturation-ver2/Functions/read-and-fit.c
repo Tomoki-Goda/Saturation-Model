@@ -13,7 +13,7 @@
 #include"control-default.h"
 #include"constants.h"
 
-
+#include<string.h>
 
 #define RESCALE 1.05
 
@@ -26,6 +26,9 @@
 int N_SIMPS=N_SIMPS_R;
 int N_CHEB=N_CHEB_R;
 
+////////////////////////////////////////////////////////
+char datadir[]="/home/tomoki/Saturation-Model/saturation-ver2/data";
+///////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////  now integrate over r with Simpsons method    /////////////////////////
@@ -162,10 +165,13 @@ int load_data(){
 	unsigned i=0;
 	unsigned j=0;
 	FILE* file;
+	char filename[500];
 	/////////////////////////////// HERA /////////////////////////////////////
 	//fprintf(stdout, "HERA tot\n");
 	fprintf(stdout, "HERA tot\n");
-	file=fopen("./data/hera_tot.dat","r");
+	sprintf(filename,"%s/hera_tot.dat",datadir);
+
+	file=fopen(filename,"r");
 	
 	double alpha =1.0/137 ;//fine structure const 1/137;
 	double xmp0 = 0.93827;//proton mass in GeV

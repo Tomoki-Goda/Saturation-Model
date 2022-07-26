@@ -121,8 +121,8 @@ void chebyshevT(double x,unsigned degree, double * T ){
 	}
 }
 
-int kronecker(int i,int j){
-	return((i==j)?1:0);
+inline int kronecker(int i,int j){
+	return( ( (i==j)?1:0)  );
 } 
 
 void sample(double func(const double *,const double* ), const double * par,  const unsigned * degree, unsigned dim,  double* sample_arr){

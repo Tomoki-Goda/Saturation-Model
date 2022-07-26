@@ -21,6 +21,10 @@
 int main(int argc, char* argv[]){
 	char outline[100];
 	int error_flag;
+	double corr[10];//10 is just enough to hold all par;
+	double err_mat[10*10];
+	double dum;
+	
 #if (R_FIX==1)
 	par_error[4]=0.0; 
 #endif
@@ -28,8 +32,8 @@ int main(int argc, char* argv[]){
 	clock_t time_measure=clock();
 	//FILE* logfile;
 	//FILE * out_file;
-	char resultfile[100];
-	char logfile[100];
+	char resultfile[500];
+	char logfile[500];
 	//char datafile[100];
 	if(argc>1){
 		//FILE * out_file= fopen("./results.txt","w");
@@ -56,6 +60,29 @@ int main(int argc, char* argv[]){
 	//MNCOMD(*fcn,"MINIMIZE 1000 1.0D00 " ,error_flag,0);
 	MNCOMD(*fcn,"CALLFCN 3",error_flag,0);	
 	time_measure-=clock();
+	
+	
+	sprintf(outline,"\n\nCorrelation:\n");
+	log_printf(log_file,outline);
+	for(int i=0;i<N_PAR;i++){
+		corr[i]=0;
+		MNERRS(i+1,dum,dum,dum,corr[i]);
+		sprintf(outline,"%.4f  ",corr[i]);
+		log_printf(log_file,outline);
+				
+	}
+	sprintf(outline,"\n\n");
+	log_printf(log_file,outline);
+	
+	MNEMAT(*err_mat,N_PAR);
+	for(int i=0;i<N_PAR;i++){
+		for(int j=0;j<N_PAR;j++){
+			sprintf(outline,"%.4e\t",err_mat[i*N_PAR+j]);
+			log_printf(log_file,outline);
+		}
+		sprintf(outline,"\n\n");
+		log_printf(log_file,outline);
+	}
 /////////////////////////////////////SAVE RESULTS////////////////////////////////
 	SAVE_RESULT(out_file);
 	

@@ -62,13 +62,13 @@
 #endif
 
 #ifndef N_SIMPS_R
-//number of sampling for R integration, points are 2*N+1. 
-	#define N_SIMPS_R 150 
+//number of sampling for R integration, points are 2*N+1. //comparison with Fejer suggests it needs about 250 
+	#define N_SIMPS_R 200 
 #endif
 
 #ifndef N_CHEB_R
-//number of sampling for R integration, points are 2*N+1. 
-	#define N_CHEB_R 200 
+//number of sampling for R integration, points are N divisible by 8
+	#define N_CHEB_R 120 
 #endif
 
 #ifndef DGAUSS_PREC 

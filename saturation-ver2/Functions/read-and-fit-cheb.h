@@ -153,15 +153,27 @@ double curtis_clenshaw_sum(const double *sample_arr){
 	double val;
 	
 	summand[0]= cheb_c(sample_arr, &ind , &N_CHEB , 1 );
-	
+	//int flag=0;
 	for(int i=1; i<(N_CHEB/2 ) ;i++){
+		//if(flag!=0){
+		//	summand[i]=0;
+		//}
 		ind=2*i;
 		val=cheb_c(sample_arr, &ind , &N_CHEB , 1 );
+		//printf("%.3e\t",val);
 		val*=2.0/( 1-ind*ind );
+		//printf("%.3e\n",val);
 		summand[i]=val;
+		
+		//if((val/summand[0])<1.0e-5){
+		//	flag=i;
+		//}
 	}
+	
 	val =cheb_c(sample_arr, &ind , &N_CHEB , 1 ) ;
+	//printf("%.3e\t",val);
 	val*=1.0/(1-N_CHEB*N_CHEB);
+	//printf("%.3e\n\n",val);
 	summand[N_CHEB/2]=val;
 	
 	

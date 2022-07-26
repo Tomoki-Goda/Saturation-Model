@@ -142,6 +142,7 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 */
 int SAVE_RESULT(FILE* outfile){
 	char outline[500];
+	
 	char name[11];
 	double res_par[N_PAR];
 	double res, error,dum3;
@@ -157,6 +158,8 @@ int SAVE_RESULT(FILE* outfile){
 		*(res_par+i)=res;
 	}
 	
+	
+
 	
 	MNSTAT(res,error,dum3,dum4,dum4,istat);
 	sprintf(outline,"chisq\t%.4e\t%.4e\n",res,error);

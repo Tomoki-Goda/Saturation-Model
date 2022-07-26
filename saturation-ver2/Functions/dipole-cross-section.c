@@ -32,7 +32,7 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 #else
 	sigpar[0]=par[0];
 	sigpar[1]=par[1];
-	sigpar[2]=par[2]*1.0e-2;
+	sigpar[2]=par[2];
 #endif
 
 	

@@ -23,11 +23,11 @@ GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-
 
 ########################################################################################################
 
-all: clean main critical dipole F2 F2-slope psi
+all: clean main critical dipole F2 F2-slope psi Integrand
 
 fit: clean main
 
-plot: critical dipole F2 F2-slope psi
+plot: critical dipole F2 F2-slope psi Integrand
 
 
 main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
@@ -53,6 +53,8 @@ psi: ${DEPS} ${UTILDIR}/Plot-Psi.c ${DIR}/photon-wave-function.o ${DIR}/simpson-
 curvature : ${DEPS} ${UTILDIR}/curvature.c ${UTILDIR}/critical-line.h ${DIR}/dipole-cross-section.o
 	gcc ${UTILDIR}/curvature.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/curvature  ${INC} ${OPT}
 
+Integrand: ${DEPS} ${UTILDIR}/Plot-Integrand.c ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o
+	gcc ${UTILDIR}/Plot-Integrand.c ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/Integrand   ${INC} ${OPT}
 
 
 

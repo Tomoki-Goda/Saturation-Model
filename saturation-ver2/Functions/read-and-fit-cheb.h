@@ -208,22 +208,3 @@ void generate_data_set(const double *par,const double *psi_arr,double *samples, 
 //////////////////////////////////////////////////////////////
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

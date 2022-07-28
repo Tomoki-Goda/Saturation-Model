@@ -68,23 +68,25 @@ int main(int argc, char** argv){
 		if(i==1){
 			if((strcmp(model,"0")*strcmp(model,"2")*strcmp(model,"22"))==0 ){
 				fprintf(outfile,"\\begin{sidewaystable}\n");
+				fprintf(outfile,"\\rowcolors{1}{}{lightgray}\n");
 				fprintf(outfile,"\\resizebox{\\textwidth}{!}{\n");
 				fprintf(outfile,"\\begin{tabular}{|c||c|c|c|c|c|c|c||c|c|}\n\\hline \n");
 				fprintf(outfile,"-& $\\sigma_0$ & $\\lambda$ & $x_0 (10^{-4})$ & $C$ & $\\mu_0^2$ & $g_1$ & $g_2$ & $\\chi^2$ & Flag \\\\ \\hline \\hline \n");
 			}
 			if((strcmp(model,"1")*strcmp(model,"3"))==0 ){
 				fprintf(outfile,"\\begin{sidewaystable}\n");
+				fprintf(outfile,"\\rowcolors{1}{}{lightgray}\n");
 				fprintf(outfile,"\\resizebox{\\textwidth}{!}{\n");
 				fprintf(outfile,"\\begin{tabular}{|c||c|c|c|c|c|c|c|c|c||c|c|} \n\\hline \n");
-				fprintf(outfile,"-& $\\sigma_0$ & $A_g$ & $\\lambda_g (10^{-2})$ & $C$ & $\\mu_0^2$ & $C_s$ & $\\mu_{0s}^2$ & $g_1$ & $g_2$ & $\\chi^2$ & Flag \\\\ \\hline \\hline \n");
+				fprintf(outfile,"-& $\\sigma_0$ & $A_g$ & $\\lambda_g $ & $C$ & $\\mu_0^2$ & $C_s$ & $\\mu_{0s}^2$ & $g_1$ & $g_2$ & $\\chi^2$ & Flag \\\\ \\hline \\hline \n");
 			}
 		}
 				
 		//sscanf(argv[i],"./%s/Mass%s-Qup%s-Model%s-Sud%s-rfix%s/result.txt",dir,mass,qup,model,sudakov,rfix);
 		//printf("./%s/Mass%s-Qup%s-Model%s-Sud%s-rfix%s/result.txt",dir,mass,qup,model,sudakov,rfix);
 		//getchar();
-		//fprintf(outfile,"{\\footnotesize "); 
-		fprintf(outfile,"{\\tiny "); 
+		fprintf(outfile,"{\\footnotesize "); 
+		//fprintf(outfile,"{\\tiny "); 
 		if(strcmp(model,"0")==0){
 			fprintf(outfile,"%s: GBW $m_l=%s$ $Q_{up}=%s$",dir,mass,qup);
 		}else if(strcmp(model,"1")==0){

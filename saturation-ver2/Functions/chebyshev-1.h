@@ -201,6 +201,10 @@ double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *de
 		ind_vec_increment(ind2,degree,dim);//increment the ind1; like in the way increasing (hr,min,sec) second by second. 
 	}
 	val=KBN_sum(arr,len);
+	if(isnan(val)!=0){
+		val=0;
+		printf("cheb_c:: nan encountered. Returning 0.\n");
+	}
 	return val;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

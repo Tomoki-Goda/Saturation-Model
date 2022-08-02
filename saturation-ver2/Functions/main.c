@@ -46,7 +46,6 @@ int main(int argc, char* argv[]){
 		//strcpy(resultfile,"./plot.txt");	
 	}
 	log_file=fopen(logfile,"w");
-	out_file=fopen(resultfile,"w");
 	
 	/////////////Initialize etc//////////////////
 	MINUIT_INIT();
@@ -84,6 +83,7 @@ int main(int argc, char* argv[]){
 		log_printf(log_file,outline);
 	}
 /////////////////////////////////////SAVE RESULTS////////////////////////////////
+	out_file=fopen(resultfile,"w");
 	SAVE_RESULT(out_file);
 	
 	sprintf(outline,"\n\n");

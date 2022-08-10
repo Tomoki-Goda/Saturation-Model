@@ -32,6 +32,7 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 #else
 	sigpar[0]=par[0];
 	sigpar[1]=par[1];
+	//sigpar[1]=pow(fabs(par[1])*1.0e-4,par[2]);
 	sigpar[2]=par[2];
 #endif
 
@@ -149,8 +150,8 @@ double sigma_gbw(double r,double x,double q2, const double * par){
 double sigma_bgk(double r, double x, double q2, const double * par){
 	//clock_t tim=clock();
 	double sigma_0		=par[0];
-	double A_g		=par[1];
-	double lambda_g		=par[2];
+	//double A_g		=par[1];
+	//double lambda_g		=par[2];
 	//double C		=par[3];
 	//double mu02		=par[4];
 	//double rmax		=par[4];

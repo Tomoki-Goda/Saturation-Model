@@ -25,12 +25,17 @@ static double        n_0 = 0.5;       /* Maximal singluraity of integrand */
 ////from control.h/////////////
 int  gluon_int    = 1;
 //////////////////       fit parametr          /////////////////////////
-static double A_g, lambda_g;
+static double A_g, lambda_g , x0;
 ////////////////////////////////////////////////////////////////////////
 
 ///////////////////function to control fitparameter from outside the file////////////////
 void set_xg_parameter(double ag,double lg){
 	A_g=ag;
+	lambda_g=lg;
+}
+///////////////////function to control fitparameter from outside the file////////////////
+void set_xg_parameter2(double ag,double lg){
+	x0=ag;
 	lambda_g=lg;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +60,10 @@ double Yg, tg;
 /* initial condition */
 double xgpdf_init(double x) {
 	return A_g*pow(x,-lambda_g)*pow((1-x),(beta-1));
+}
+
+double xgpdf_init2(double x) {
+	return pow(x/x0,-lambda_g)*pow((1-x),(beta-1));
 }
 
 /* gammatilde function */

@@ -42,10 +42,10 @@ double integrand_sample(double r, double x, double Q2,double* sigpar , double * 
 	double xm;
 	for(int fl=0;fl<(NF-1);fl++){
 		xm=mod_x(x, Q2,fl );
-		val+=psisq_z_int(r, Q2, fl)* SIGMA(r,xm,Q2, sigpar,sudpar) /r;//again r everywhere!! read comment in "read-and-fit.h"
+		val+=psisq_z_int(r, Q2, fl) *SIGMA(r,xm,Q2, sigpar,sudpar) ;
 	}
 	
-	return val;
+	return val/(r);//again r everywhere!! read comment in "read-and-fit.h"
 }
 double generate_points(double r,double **par){
 	double x=**par;
@@ -54,13 +54,14 @@ double generate_points(double r,double **par){
 	double *sudpar=*(par+2);
 	double val;
 	val=integrand_sample( r,  x, Q2, sigpar, sudpar);
+	//printf("%.5e",val);
 	return val;
 }
 
 
 int main(int argc , char ** argv){
 	char file_name[500];
-	int rlen=100;
+	int rlen=50;
 	double rarr[rlen+1];
 	double x, Q2;
 	double param[10];
@@ -78,7 +79,7 @@ int main(int argc , char ** argv){
 	*(par+2)=sudpar;
 
 	for(int i=0 ;i<=rlen;i++){
-		*(rarr+i)=pow(10,-3+3.5*((double)i)/rlen);//*0.1973;
+		*(rarr+i)=pow(10,-2+3*((double)i)/rlen);//*0.1973;
 	}
 #if (MODEL==1||MODEL==3)
 	approx_xg(sigpar+1);

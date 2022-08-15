@@ -23,11 +23,11 @@ GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-
 
 ########################################################################################################
 
-all: clean main critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-critical
+all: clean main critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-gluon-2 tmd-critical tmd-critical-2
 
 fit: clean main
 
-plot: critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-critical
+plot: critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-critical tmd-gluon-2  tmd-critical-2
 
 
 main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
@@ -59,8 +59,14 @@ Integrand: ${DEPS} ${UTILDIR}/Plot-Integrand.c ${DIR}/dipole-cross-section.o ${D
 tmd-gluon: ${DEPS} ${UTILDIR}/tmd-gluon.c ${DIR}/dipole-cross-section.o  ${UTILDIR}/tmd-gluon.h
 	gcc ${UTILDIR}/tmd-gluon.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/tmd-gluon   ${INC} ${OPT}
 	
+tmd-gluon-2: ${DEPS} ${UTILDIR}/tmd-gluon-2.c ${DIR}/dipole-cross-section.o  ${UTILDIR}/tmd-gluon.h
+	gcc ${UTILDIR}/tmd-gluon-2.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/tmd-gluon-2   ${INC} ${OPT}
+	
 tmd-critical: ${DEPS} ${UTILDIR}/tmd-critical.c  ${UTILDIR}/tmd-gluon.h ${DIR}/dipole-cross-section.o 
 	gcc ${UTILDIR}/tmd-critical.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/tmd-critical   ${INC} ${OPT}
+	
+tmd-critical-2: ${DEPS} ${UTILDIR}/tmd-critical-2.c  ${UTILDIR}/tmd-gluon.h ${DIR}/dipole-cross-section.o 
+	gcc ${UTILDIR}/tmd-critical-2.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/tmd-critical-2   ${INC} ${OPT}
 
 
 

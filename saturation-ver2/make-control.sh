@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-RUNDIR=../Run0208
+RUNDIR=../Run1508
 
 rm -r ${RUNDIR}/*/*
 
@@ -16,7 +16,7 @@ for i in GBW GBWS-Fix-S BGK BGKS-Fix-S; do mkdir ${RUNDIR}/${i} ; done
 
  ./Append "#define FEJER 1" ${RUNDIR}/*/M* 
  ./Append "#define INDEPENDENT_RMAX 1" ${RUNDIR}*/BGKS*/M*
- ./Append "#define N_CHEB_R 100" ${RUNDIR}/*/M* 
+ ./Append "#define N_CHEB_R 96" ${RUNDIR}/*/M* 
 # ./Append "#define N_SIMPS_R 50" ${RUNDIR}/*/M* 
 
 #/////////////////////////////////////////////////////////////////////////////

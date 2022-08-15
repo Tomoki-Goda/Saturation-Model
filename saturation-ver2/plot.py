@@ -81,8 +81,8 @@ def main():
     ax.grid("true")
     ax.legend()
     
-    fig.set_figheight(9);
-    fig.set_figwidth(12);
+    fig.set_figheight(4);
+    fig.set_figwidth(5);
 
     if sflag:
         fig.savefig(sname)

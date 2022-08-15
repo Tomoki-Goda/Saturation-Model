@@ -343,6 +343,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 			return 0.0;
 		}
 	}else if(signal==9){
+		//printf("integran_term:: sigmal=9 \n");
 		return 0.0;
 	}else if(signal==1){
 		printf("C is negative\n");
@@ -356,18 +357,18 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	//int N=96;
 	//result=dgquad_(&integrand,&rmin,VAR,&N);
 	///////////////////////////////////////////
-	//double N=DGAUSS_PREC*0.01;
-	//result=dgauss_(&integrand,&rmin,VAR,&N);
+	double N=DGAUSS_PREC;
+	result=dgauss_(&integrand,&rmin,VAR,&N);
 	////////////////////////////////////
-	int seg=1;
+	//int seg=0;
 	
-	double NRel=SIGMA_PREC ; //SIGMA_PREC is global and is controled in main.c or read-and-fit.c 
+	//double NRel=SIGMA_PREC ; //SIGMA_PREC is global and is controled in main.c or read-and-fit.c 
 	
 	//double NRel=DGAUSS_PREC ;
-	double NAbs=1.0e-10;
-	double error=0;
+	//double NAbs=1.0e-10;
+	//double error=0;
 	//printf("rmin= %f\trmax =%f\n",rmin, *VAR);
-	dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
+	//dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
 	
 	
 ////////////////////////////////////////////////////////////////////////////////

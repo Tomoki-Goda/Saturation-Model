@@ -92,16 +92,16 @@ double psisq_z_int(double r,double q2,unsigned f){
 	//double zmax =1.0 - 1.0e-5;
 	double zmax = 0.5;//because psi is symmetric in z<->1-z!!
 
-	//double N=DGAUSS_PREC;
+	double N=DGAUSS_PREC;
 	//int N=96;
 	//res=dgquad_(&psisq_f,&zmin,&zmax,&N);
-	//res=dgauss_(&psisq_f,&zmin,&zmax,&N);
+	res=dgauss_(&psisq_f,&zmin,&zmax,&N);
 	////////////////////////////////////
-	int seg=1;
-	double NRel=DGAUSS_PREC;
-	double NAbs=1.0e-10;
-	double error=0;
-	dadapt_(&psisq_f,&zmin,&zmax,&seg ,&NRel, &NAbs, &res, &error)	;
+	//int seg=0;
+	//double NRel=DGAUSS_PREC;
+	///double NAbs=1.0e-10;
+	//double error=0;
+	//dadapt_(&psisq_f,&zmin,&zmax,&seg ,&NRel, &NAbs, &res, &error)	;
 	/////////////////////////////////////////
 	return(2.0* res);
 

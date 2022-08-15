@@ -2,7 +2,7 @@
 
 double saturation(double step){
 	double k_step=0.1;
-	double k_min=0.5;
+	double k_min=0.1;
 	double k=k_min;
 	double prev=1;
 	double val;
@@ -12,20 +12,24 @@ double saturation(double step){
 		k=k_min;
 		
 		for(int j=0;j<100;j++){
-			
 			val=grad_k(k,step);
 			//printf("%d : %.3e, %.3e, %.3e, %.3e\n",j ,k,k_min, val, prev );
-			
 			if(j!=0 ){
 				if(prev*val<0){
 					k_min=k-k_step;
-					//printf("\n%d : %.3e, %.3e, %.3e, %.3e\n",i ,k,k_min, val, prev );
+					//printf("%d : %.3e, %.3e, %.3e, %.3e\n",i ,k,k_min, val, prev );
 					break;
 				}
+			}
+			if(fabs(val)>fabs(prev)){
+				//printf("error\t%.3e\t%.3e\n",val,prev);
 			}
 			//printf("%f, %f, %f\n",k, val, prev );
 			prev=val;
 			k+=k_step;
+		}
+		if(fabs(prev)<1.0e-5){
+			break;
 		}
 		if(i!=5){
 			k_step*=0.05;
@@ -33,7 +37,9 @@ double saturation(double step){
 		
 	}
 	//printf("\nk=%.3e, val= %.3e, prev= %.3e\n\n",k, val, prev );
-	return(k - k_step/2 );
+	
+	k=k - k_step*fabs(val/(prev-val) );//weighted mid point 	
+	return(k);
 }
 
 int main (int argc, char** argv){
@@ -62,13 +68,13 @@ int main (int argc, char** argv){
 		printf("tmd-gluon:: file can't be opened. %s\n",file_name);
 		return 1;
 	}
-	for (int i=0; i<50; i++){
-		x= pow(10,-5+((double)3*i)/50);
+	for (int i=0; i<=20; i++){
+		x= pow(10,-6+((double)4*i)/20);
 		sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
 		
 		val= saturation(step);
 		//val*=k*k;
-		printf("%.5e\t%.5e\t%.5e\n",x, val, grad_k(val,step));
+		//printf("%.5e\t%.5e\t%.5e\n",x, val, grad_k(val,step));
 		
 		fprintf(file,"%.5e\t%.5e\n",x, val*val);
 	}

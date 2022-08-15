@@ -29,17 +29,17 @@ double generate_points(double r, double** par){
 	//printf("%.2e %.2e %.2e\n" ,r, *(*(par)), *(*(par)+1) );
 	double val = 0;
 	double x;
-	for(int i =0; i<( NF-1);i++){
+	for(int i =0; i<1/*( NF-1)*/;i++){
 		x=mod_x(**par, *((*par)+1),i);
-		val+=SIGMA(r/0.1973,x,*(*(par)+1),*(par+1),*(par+2)) / ( *(*(par+1)) ) ; //0.1973 for GeV<-> fm
+		val+=SIGMA(r/*/0.1973*/,x,*(*(par)+1),*(par+1),*(par+2)) / ( *(*(par+1)) ) ; //0.1973 for GeV<-> fm
 	}
-	return val/(NF-1);
+	return val;
 }
 
 
 int main(int argc , char ** argv){
 	char file_name[500];
-	int rlen=100;
+	int rlen=50;
 	double rarr[rlen+1];
 	double x, Q2;
 	double param[10];
@@ -57,7 +57,7 @@ int main(int argc , char ** argv){
 	*(par+2)=sudpar;
 
 	for(int i=0 ;i<=rlen;i++){
-		*(rarr+i)=pow(10,-2+3*((double)i)/rlen)*0.1973;
+		*(rarr+i)=pow(10,-2+3*((double)i)/rlen)/*0.1973*/;
 	}
 #if (MODEL==1||MODEL==3)
 	approx_xg(sigpar+1);

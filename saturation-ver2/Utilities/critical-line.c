@@ -15,7 +15,7 @@
 
 
 int main(int argc, char ** argv){
-	int xlen=100;
+	int xlen=50;
 	double xarr[xlen+1];
 	char file_name[500];
 	double param[10];

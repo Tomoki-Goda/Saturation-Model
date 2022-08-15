@@ -9,9 +9,9 @@ double f2_slope(double Q2, double**pars){
 	double xdiff=0.01;
 	double logx=log10(**pars);
 	double f2[2];
-	simpson1dA(&f2_integrand,pars,1.0e-5,30,200,f2,&err);
+	simpson1dA(&f2_integrand,pars,1.0e-5,30,250,f2,&err);
 	(*(*pars)) = pow(10.0, logx+xdiff);
-	simpson1dA(&f2_integrand,pars,1.0e-5,30,200,f2+1,&err);
+	simpson1dA(&f2_integrand,pars,1.0e-5,30,250,f2+1,&err);
 	//double slope = (log(f2[0]/ f2[1]) )/(log(10)*xdiff);
 	double slope = (log10(f2[0]/ f2[1]) )/(xdiff);
 	//printf("%f\n",res);
@@ -23,7 +23,7 @@ double f2_slope(double Q2, double**pars){
 
 int main (int argc, char** argv){
 	char file_name[500];
-	int Q2len=25;
+	int Q2len=30;
 	double Q2arr[Q2len+1];
 	double param[10];
 	double x=0;
@@ -33,10 +33,10 @@ int main (int argc, char** argv){
 	//printf("x= %.2e\tQ2= %.2e\n",x,Q2);
 	
 	for(int i =0;i<=Q2len;i++){
-		*(Q2arr+i)=pow(10.0, -1+4*((double)(i))/Q2len);
+		*(Q2arr+i)=pow(10.0, -2+5*((double)(i))/Q2len);
 	}
 
-	double *par[3];
+	double *par[4];
 	double var[2];
 	var[0]=x;
 	var[1]=0;
@@ -49,6 +49,8 @@ int main (int argc, char** argv){
 	parameter(param,sigpar,sudpar);
 	par[1]=sigpar;
 	par[2]=sudpar;
+	double flavour=0;
+	par[3]=&flavour;
 
 #if (MODEL==1||MODEL==3)	
 	approx_xg(sigpar+1);//generate chebyshev coefficients

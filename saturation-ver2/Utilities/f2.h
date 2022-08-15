@@ -25,20 +25,20 @@ double f2_integrand(double r, double ** par){
 	double Q2= *(*(par)+1);
 	double *sigpar=*(par+1);
 	double *sudpar=*(par+2);
+	int fl=(int)(**( par+3)+0.1);
 
 	//parameter(*(par+1),sigpar,sudpar);
 	//printf("%f\t%f\t%f\n",par[1][0],par[1][1],par[1][2]);
 
 	double value=0.0;
 
-	for(unsigned fl=0;fl< NF-1;fl++){
+//	for(unsigned fl=0;fl<1/* NF-1*/;fl++){
 //	for(unsigned fl=0;fl< 1;fl++){
 		//printf("%d",fl);
-		//xm=mod_x(x,Q2,fl);
-		xm=x;
-		value+=psisq_z_int(r, Q2, fl)* SIGMA(r,xm,Q2, sigpar,sudpar)/r ;
+	xm=mod_x(x,Q2,fl);
+	value+=psisq_z_int(r, Q2, fl)* SIGMA(r,xm,Q2, sigpar,sudpar)/r ;
 		
-	}
+//	}
 	//printf("x: %.2e\tx_mod %.2e\t Q2: %.2e\t%f\t%f\t%f\tresult :%f \n", x,mod_x(x,Q2,3),Q2,*(sigpar),*(sigpar+1),*(sigpar+2),value);
 	return(value);
 }

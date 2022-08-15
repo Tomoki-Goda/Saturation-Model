@@ -37,10 +37,13 @@ double sample_sigma(double * sample , double step, double x,double Q2,const doub
 		r=R_MIN+j*step;
 		
 		val=0;
+		//for(int i=0; i<(NF-1); i++){
 		for(int i=0; i<1; i++){
 			xm=mod_x(x,Q2,i);
 			val+=SIGMA(r,xm,Q2,sigpar,sudpar);
-			}
+			//printf("val=%.3e %.3e %.3e %.3e\n",val,r ,xm,Q2);
+		}
+		//printf("%.3e\n",val);
 		sample[j]=val;
 	}
 }
@@ -66,6 +69,10 @@ double simps_sum(double * sample, int len ,  double step){
 	return val;
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+//////////// \nabla^2 Phi ///////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
 double fill_arr(double k,double step){
 	double val=0;
 	double r=0;
@@ -89,6 +96,8 @@ double fill_arr(double k,double step){
 	val=simps_sum(sample_lap,2*n+1,step);
 	return(val);
 }
+
+
 
 
 double grad_k(double k,double step){
@@ -116,3 +125,37 @@ double grad_k(double k,double step){
 }
 
 
+/////////////////////////////////////////////////////////////////////////////////
+//////////// Phi ////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+double fill_arr_2(double k,double step){
+	double val=0;
+	double r=0;
+	double kr=0;
+	for(int j=0;j<(2*n+1);j++){
+		r=R_MIN+j*step;
+		kr=k*(r);
+		val=(dbesj0_(&kr)/(r) * sample[j] );
+		sample_lap[j]=val;
+		//printf("%.3e\n",val);
+	}
+	
+	val=simps_sum(sample_lap,2*n+1,step);
+	//printf("%.3e\n",val);
+	return(val);
+}
+
+double grad_k_2(double k,double step){
+	double val=0;
+	double r=0;
+	double kr=0;
+	for(int j=0;j<(2*n+1);j++){
+		r=R_MIN+j*step;
+		kr=k*(r);
+		val=( dbesj0_(&kr)/r - dbesj1_(&kr) *k) * sample[j] ;
+		sample_lap[j]=val;	
+	}
+	
+	val=simps_sum(sample_lap,2*n+1,step);
+	return(val);
+}

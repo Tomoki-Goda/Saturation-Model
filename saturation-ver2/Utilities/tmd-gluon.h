@@ -23,10 +23,10 @@ extern double SIGMA(double , double ,double , const double *, const double*);
 extern int parameter(const double*,double*,double*);
 extern void approx_xg(const double *);
 
-static const int n=1000;
-static double sample[2*1000+1 +2]={0};
-static double sample_lap[2*1000+1]={0};
-static double summand[2*1000+1]={0};
+static const int n=500;
+static double sample[2*500+1 +2]={0};
+static double sample_lap[2*500+1]={0};
+static double summand[2*500+1]={0};
 
 double sample_sigma(double * sample , double step, double x,double Q2,const double * sigpar, const double * sudpar){ 
 	// one only needs to compute a set of sigma once.

@@ -9,7 +9,7 @@ int main (int argc, char** argv){
 	double param[10];
 	double sudpar[10];
 	double sigpar[10];
-	double step=(60.0)/(2*n);
+	double step=((double)R_MAX)/(2*n);
 	
 	read_options(argc,argv,param,&x,&Q2, file_name);
 	parameter(param,sigpar,sudpar);

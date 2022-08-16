@@ -17,6 +17,7 @@ for i in GBW GBWS-Fix-S BGK BGKS-Fix-S; do mkdir ${RUNDIR}/${i} ; done
  ./Append "#define FEJER 1" ${RUNDIR}/*/M* 
  ./Append "#define INDEPENDENT_RMAX 1" ${RUNDIR}*/BGKS*/M*
  ./Append "#define N_CHEB_R 96" ${RUNDIR}/*/M* 
+ ./Append "#define DGAUSS_PREC 1.0e-5" ${RUNDIR}/*/M* 
 # ./Append "#define N_SIMPS_R 50" ${RUNDIR}/*/M* 
 
 #/////////////////////////////////////////////////////////////////////////////

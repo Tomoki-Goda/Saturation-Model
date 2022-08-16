@@ -39,7 +39,7 @@ double generate_points(double r, double** par){
 
 int main(int argc , char ** argv){
 	char file_name[500];
-	int rlen=50;
+	int rlen=100;
 	double rarr[rlen+1];
 	double x, Q2;
 	double param[10];
@@ -57,7 +57,7 @@ int main(int argc , char ** argv){
 	*(par+2)=sudpar;
 
 	for(int i=0 ;i<=rlen;i++){
-		*(rarr+i)=pow(10,-2+3*((double)i)/rlen)/*0.1973*/;
+		*(rarr+i)=pow(10,-2+3.5*((double)i)/rlen)/*0.1973*/;
 	}
 #if (MODEL==1||MODEL==3)
 	approx_xg(sigpar+1);

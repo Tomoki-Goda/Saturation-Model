@@ -36,7 +36,7 @@ int main(int argc, char** argv){
 		}
 		fscanf(resfile,"%s\t%f",name, &value);//Qup
 		//fprintf(outfile,"%.0f",value);
-		char dir[500], mass[50], qup[50], model[50], sudakov[50] ,rfix[50],dum[100];
+		char dir[500], mass[50], qup[50], model[50], sudakov[50] /*,rfix[50]*/,dum[100];
 		char* chptr;
 		char* filenameptr[3];
 
@@ -60,10 +60,11 @@ int main(int argc, char** argv){
 		sscanf(chptr,"%3s%s",dum,qup);
 		chptr=strtok(NULL,"-");
 		sscanf(chptr,"%5s%s",dum,model);
-		chptr=strtok(NULL,"-");
-		sscanf(chptr,"%3s%s",dum,sudakov);	
+		//chptr=strtok(NULL,"-");
 		chptr=strtok(NULL,"/");
-		sscanf(chptr,"%4s%s",dum,rfix);
+		sscanf(chptr,"%3s%s",dum,sudakov);	
+		//chptr=strtok(NULL,"/");
+		//sscanf(chptr,"%4s%s",dum,rfix);
 		
 		if(i==1){
 			if((strcmp(model,"0")*strcmp(model,"2")*strcmp(model,"22"))==0 ){
@@ -101,9 +102,9 @@ int main(int argc, char** argv){
 					}else{
 						printf("invalid sudakov flag: %s\n",sudakov);
 					}
-					if(strcmp(rfix,"1")==0){
-						fprintf(outfile," rfix");
-					}
+					//if(strcmp(rfix,"1")==0){
+					//	fprintf(outfile," rfix");
+					//}
 		}else if(strcmp(model,"3")==0){
 					if(strcmp(sudakov,"0")==0){
 						fprintf(outfile,"%s: BGK(S) $m_l=%s$ $Q_{up}=%s$",dir, mass,qup);
@@ -114,9 +115,9 @@ int main(int argc, char** argv){
 					}else{
 						printf("invalid sudakov flag: %s\n",sudakov);
 					}		
-					if(strcmp(rfix,"1")==0){
-						fprintf(outfile," rfix");
-					}
+					//if(strcmp(rfix,"1")==0){
+					//	fprintf(outfile," rfix");
+					//}
 		}else{
 			printf(" invalid model id : %s\n",model);
 		}

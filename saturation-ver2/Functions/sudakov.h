@@ -356,19 +356,36 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	////////////////////////////////////////////
 	//int N=96;
 	//result=dgquad_(&integrand,&rmin,VAR,&N);
+	/*int N=96;
+	result=0;
+	double rmax=*VAR;
+	double step=(rmax-rmin)/3;
+	for(int i=0;i<3;i++){
+		rmax=rmin+step;
+		result+=dgquad_(&integrand,&rmin,&rmax,&N);
+		rmin=rmax;
+	}*/
 	///////////////////////////////////////////
-	double N=DGAUSS_PREC;
-	result=dgauss_(&integrand,&rmin,VAR,&N);
+	//double N=DGAUSS_PREC;
+	//result=dgauss_(&integrand,&rmin,VAR,&N);
+	
+	//double N=DGAUSS_PREC;
+	//double rmax=*VAR;
+	//double step=(rmax-rmin)/5;
+	//result=0;
+	//double low, high;
+	//for(int i=0;i<5;i++){
+	//	low=rmin*pow((rmax/rmin),((double)(i))/5);
+	//	high=rmin*pow((rmax/rmin),((double)(i+1))/5);
+	//	result+=dgauss_(&integrand,&low,&high,&N);
+		//rmin=rmax;
+	//}
 	////////////////////////////////////
-	//int seg=0;
-	
-	//double NRel=SIGMA_PREC ; //SIGMA_PREC is global and is controled in main.c or read-and-fit.c 
-	
-	//double NRel=DGAUSS_PREC ;
-	//double NAbs=1.0e-10;
-	//double error=0;
-	//printf("rmin= %f\trmax =%f\n",rmin, *VAR);
-	//dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
+	int seg=5;
+	double NRel=DGAUSS_PREC ;
+	double NAbs=0;//1.0e-10;
+	double error=0;
+	dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
 	
 	
 ////////////////////////////////////////////////////////////////////////////////

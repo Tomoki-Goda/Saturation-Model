@@ -2,7 +2,7 @@
 
 double saturation(double step){
 	double k_step=0.1;
-	double k_min=0.1;
+	double k_min=0.4;
 	double k=k_min;
 	double prev=1;
 	double val;

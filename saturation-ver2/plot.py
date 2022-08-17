@@ -30,7 +30,8 @@ def main():
     axes=["",""]
     plottitle=""
     column=[0,1]
-
+    xlim=[0,0]
+    ylim=[0,0]
     argv=sys.argv[1:]
     plotcolour=["red", "blue", "green", "cyan", "magenta", "brown", "orange", "purple", "yellow"]
  	
@@ -38,7 +39,7 @@ def main():
     fig,ax=plt.subplots()
  
     try:
-        opts , args =getopt.getopt(argv,"x:y:l:s:a:t:p:c:n:" )
+        opts , args =getopt.getopt(argv,"x:y:l:s:a:t:p:c:n:X:Y:" )
         labels=args;
         plotstyle=["-" for i in range(len(args))]
         
@@ -64,6 +65,13 @@ def main():
             plotstyle=arg.split();
         elif opt in ["-c", "--colour"]:
             plotcolour=arg.split()
+        elif opt in ["-X","-Xlim"]:
+        	xlim=arg.split()
+        	xlim=[float(i) for i in xlim]
+        elif opt in ["-Y","-Ylim"]:
+        	ylim=arg.split()
+        	ylim=[float(i) for i in ylim]
+        	
         elif opt in ["-n","-number"]:
             column=[int(i) for i in arg.split()];
             
@@ -78,8 +86,16 @@ def main():
         counter+=1
     
     ax.set(title=plottitle,  ylabel=axes[1],    xlabel=axes[0],  xscale= xs ,   yscale=ys )
+    if(xlim[0]!=xlim[1]):
+        ax.set_xlim(xlim[0],xlim[1])
+    
+    if(ylim[0]!=ylim[1]):
+        ax.set_ylim(ylim[0],ylim[1])
+    	
     ax.grid("true")
     ax.legend()
+   
+    
     
     fig.set_figheight(4);
     fig.set_figwidth(5);

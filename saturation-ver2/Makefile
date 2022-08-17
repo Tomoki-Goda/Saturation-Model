@@ -23,11 +23,11 @@ GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-
 
 ########################################################################################################
 
-all: clean main critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-gluon-2 tmd-critical tmd-critical-2
+all: clean main critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-gluon-2 tmd-critical tmd-critical-2 fcn
 
 fit: clean main
 
-plot: critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-critical tmd-gluon-2  tmd-critical-2
+plot: critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-critical tmd-gluon-2  tmd-critical-2 fcn
 
 
 main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
@@ -68,7 +68,8 @@ tmd-critical: ${DEPS} ${UTILDIR}/tmd-critical.c  ${UTILDIR}/tmd-gluon.h ${DIR}/d
 tmd-critical-2: ${DEPS} ${UTILDIR}/tmd-critical-2.c  ${UTILDIR}/tmd-gluon.h ${DIR}/dipole-cross-section.o 
 	gcc ${UTILDIR}/tmd-critical-2.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/tmd-critical-2   ${INC} ${OPT}
 
-
+fcn: ${DEPS} ${FUNCDIR}/fcn.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
+	gcc ${FUNCDIR}/fcn.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/fcn ${INC} ${OPT} 
 
 ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c 
 	echo ${DIR}

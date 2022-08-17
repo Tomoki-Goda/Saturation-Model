@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #for dir in ../Saturation-Model2207/Run2207*/*/M* # ../Results/BGK/M* ../Results/GBWS/M* ../Results/BGKS/M*
-for dir in ../Run1108/*/M*
+for dir in ../Run1508/*/M*
 
 do
 	for x in 2 4 6

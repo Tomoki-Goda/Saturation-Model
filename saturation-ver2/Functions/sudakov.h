@@ -381,7 +381,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 		//rmin=rmax;
 	//}
 	////////////////////////////////////
-	int seg=5;
+	int seg=10;
 	double NRel=DGAUSS_PREC ;
 	double NAbs=0;//1.0e-10;
 	double error=0;

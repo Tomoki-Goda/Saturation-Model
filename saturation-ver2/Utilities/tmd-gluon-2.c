@@ -9,7 +9,7 @@ int main (int argc, char** argv){
 	double param[10];
 	double sudpar[10];
 	double sigpar[10];
-	double step=((double)R_MAX)/(2*n);
+	double step=(60.0)/(2*n);
 	
 	read_options(argc,argv,param,&x,&Q2, file_name);
 	parameter(param,sigpar,sudpar);
@@ -26,10 +26,10 @@ int main (int argc, char** argv){
 		printf("tmd-gluon:: file can't be opened. %s\n",file_name);
 		return 1;
 	}
-	for (int i=0; i<500; i++){
-		k=1.0e-1 + pow(10,-5+((double)7*i)/500);
-		val=fill_arr(k, step,sudpar,Q2);
-		//val*=k*k;
+	for (int i=0; i<100; i++){
+		k=1.0e-1 + pow(10,-5+((double)7*i)/100);
+		val=fill_arr_2(k, step);
+		val*=k;
 		val*=3.0/(4*PI);
 		
 		fprintf(file,"%.5e\t%.5e\n",k*k, val);

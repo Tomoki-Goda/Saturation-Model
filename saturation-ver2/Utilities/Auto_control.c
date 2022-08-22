@@ -7,14 +7,14 @@
 
 int main(int argc, char** argv){
 	//unsigned i;
-	char filenames[5*5*3*5][200];
+	char filenames[5*10*3*5][200];
 	
 	char def[10]="Default";
 	
 	char* lmass[5];
 	unsigned lmasslen=1;
 	*lmass=def;
-	char* qup[5];
+	char* qup[10];
 	unsigned quplen=1;
 	*qup=def;
 	char* sudakov[3];

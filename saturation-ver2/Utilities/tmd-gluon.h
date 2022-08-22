@@ -9,6 +9,7 @@
 
 #include"./Parameters.h"
 
+
 #include"./plot.c"
 extern double KBN_sum(const double *arr,int len);
 //#include"./kahnsum.h"
@@ -19,9 +20,12 @@ extern double dbesj0_(double*);
 extern double dbesj1_(double*);
 extern double mod_x(double, double,int);
 extern double SIGMA(double , double ,double , const double *, const double*);
+extern double BASE_SIGMA(double , double ,double , const double *);
 
 extern int parameter(const double*,double*,double*);
 extern void approx_xg(const double *);
+
+
 
 static const int n=500;
 static double sample[2*500+1 +2]={0};
@@ -40,7 +44,12 @@ double sample_sigma(double * sample , double step, double x,double Q2,const doub
 		//for(int i=0; i<(NF-1); i++){
 		for(int i=0; i<1; i++){
 			xm=mod_x(x,Q2,i);
+#if (MODEL==0||MODEL==1)
 			val+=SIGMA(r,xm,Q2,sigpar,sudpar);
+#else 
+			val+=BASE_SIGMA(r,xm,Q2,sigpar);
+#endif
+			
 			//printf("val=%.3e %.3e %.3e %.3e\n",val,r ,xm,Q2);
 		}
 		//printf("%.3e\n",val);
@@ -72,17 +81,23 @@ double simps_sum(double * sample, int len ,  double step){
 /////////////////////////////////////////////////////////////////////////////////
 //////////// \nabla^2 Phi ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
+extern double exp_sud(double,double , double);
+extern int compute_mu2(double,const double *,const double *,int);
 
-double fill_arr(double k,double step){
+double fill_arr(double k,double step,double *sudpar,double q2){
 	double val=0;
 	double r=0;
 	double kr=0;
+	double mu2_arr[1]={0};
+	int signal;
 	for(int j=0;j<(2*n+1)+2;j++){
 		r=R_MIN+j*step;
 		if(j>1){
+			signal=compute_mu2(r, sudpar, mu2_arr,1);//compute mu2
 			
 			val=(sample[j]-2*sample[j-1]+sample[j-2])/(step*step) + (sample[j]-sample[j-2])/(2*step* (r-step));
 			
+			val*=exp_sud(r,mu2_arr[0],q2);
 			//val=sample[2*n+1]- sample[j-1];
 			kr=k*(r-step);
 			
@@ -100,16 +115,19 @@ double fill_arr(double k,double step){
 
 
 
-double grad_k(double k,double step){
+double grad_k(double k,double step,double *sudpar,double q2){
 	double val=0;
 	double r=0;
 	double kr=0;
+	double mu2_arr[1]={0};
+	int signal;
 	for(int j=0;j<(2*n+1)+2;j++){
 		r=R_MIN+j*step;
 		if(j>1){
-			
+			signal=compute_mu2(r, sudpar, mu2_arr,1);//compute mu2
+
 			val=(sample[j]-2*sample[j-1]+sample[j-2])/(step*step) + (sample[j]-sample[j-2])/(2*step* (r-step));
-			
+			val*=exp_sud(r,mu2_arr[0],q2);
 			//val=sample[2*n+1]- sample[j-1];
 			kr=k*(r-step);
 			

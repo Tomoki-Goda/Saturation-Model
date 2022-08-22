@@ -23,6 +23,8 @@
 #include"./read-and-fit.h"
 #endif
 
+#include"../Utilities/f2.h"
+
 int N_SIMPS=N_SIMPS_R;
 int N_CHEB=N_CHEB_R;
 
@@ -57,6 +59,18 @@ double maximum (double arg1, double arg2) {
 void dum_func(void){
 	//do nothing
 }
+
+//static int SAVE_POINTS=0;
+//static FILE* F2_FILE;
+//static FILE* F2_RES_FILE;
+
+//void save_f2(char* file_name,char* file_name_res){
+//	SAVE_POINTS=1;
+//	F2_FILE=fopen(file_name,"w");
+//	F2_RES_FILE=fopen(file_name_res,"w");	
+//}
+
+
 
 double compute_chisq(const double *par){
 	
@@ -96,7 +110,6 @@ double compute_chisq(const double *par){
 	}
 
 #endif
-	
 	generate_data_set(par, PSI,SAMPLES, cs);
 	
 	double chiarr[N_DATA];	
@@ -104,9 +117,55 @@ double compute_chisq(const double *par){
 		//chisq+=pow( ( cs[i]-CS_DATA[i] )/(ERR_DATA[i]),2);
 		//chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
 		chiarr[i]=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
+		
 	}
+	
 	chisq=KBN_sum(chiarr,N_DATA);
 	return(chisq );
+}
+
+void export_data(FILE * file,  double * sigpar,  double* sudpar){
+//for plotting x dep f2 plot. slightly out of place but neccessary to acccess data.
+	double res=0;
+	
+	//double sigpar[10],sudpar[10];
+	//parameters(par,sigpar,sudpar);
+	if(file==NULL){
+		printf("F2_FILE has to be open. Use save_f2(char* file_name)" );
+			
+	}else{
+		for(unsigned i=0;i<N_DATA;i++){			
+			res=f2_2(X_DATA[i],Q2_DATA[i], sigpar , sudpar);
+			fprintf(file,"%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",res,CS_DATA[i],ERR_DATA[i],X_DATA[i],Q2_DATA[i]);
+		}
+		
+	}
+		
+}
+
+
+void grid_plot(FILE * file,  double * sigpar,  double* sudpar){
+//for plotting x dep f2 plot. slightly out of place but neccessary to acccess data.
+	double res=0;
+	double x ,q2;
+	//double sigpar[10],sudpar[10];
+	//parameters(par,sigpar,sudpar);
+	if(file==NULL){
+		printf("F2_FILE has to be open. Use save_f2(char* file_name)" );
+			
+	}else{
+		for(unsigned i=0;i<N_DATA;i++){
+			q2=Q2_DATA[i];
+			for(int j=0;j<5;j++){
+				x=(0.5+(3.5)*((double)j)/5)*X_DATA[i];			
+				res=f2_2(x,q2, sigpar , sudpar);
+				//printf("%.3e %.3e %.3e \n",res,x,q2);
+				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,res,Q2_DATA[i]);
+			}
+		}
+		
+	}
+		
 }
 
 void fcn(const int *npar, const double grad[], double*fcnval, const double *par,const unsigned *iflag,void (*dum)(void) ){

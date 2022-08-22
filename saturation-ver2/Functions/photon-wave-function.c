@@ -125,7 +125,7 @@ double psisq_z_int(double r,double q2,unsigned f){
 	//}
 	
 	////////////////////////////////////
-	int seg=5;
+	int seg=10;
 	double NRel=DGAUSS_PREC;
 	double NAbs=0;
 	double error=0;

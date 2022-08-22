@@ -1,8 +1,8 @@
 #include"./tmd-gluon.h"
 
-double saturation(double step,double* sudpar,double Q2){
+double saturation(double step){
 	double k_step=0.1;
-	double k_min=0.4;
+	double k_min=0.1;
 	double k=k_min;
 	double prev=1;
 	double val;
@@ -12,7 +12,7 @@ double saturation(double step,double* sudpar,double Q2){
 		k=k_min;
 		
 		for(int j=0;j<100;j++){
-			val=grad_k(k,step,sudpar,Q2);
+			val=grad_k_2(k,step);
 			//printf("%d : %.3e, %.3e, %.3e, %.3e\n",j ,k,k_min, val, prev );
 			if(j!=0 ){
 				if(prev*val<0){
@@ -72,7 +72,7 @@ int main (int argc, char** argv){
 		x= pow(10,-6+((double)4*i)/20);
 		sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
 		
-		val= saturation(step,sudpar,Q2);
+		val= saturation(step);
 		//val*=k*k;
 		//printf("%.5e\t%.5e\t%.5e\n",x, val, grad_k(val,step));
 		

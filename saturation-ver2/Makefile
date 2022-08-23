@@ -23,7 +23,7 @@ GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-
 
 ########################################################################################################
 
-all: clean main critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-critical fcn export-data
+all: clean main critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data
 
 fit: clean main
 

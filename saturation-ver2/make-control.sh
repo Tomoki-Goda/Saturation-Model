@@ -1,22 +1,28 @@
 #! /usr/bin/env bash
 
-RUNDIR=../Run1708
+RUNDIR=../Run2308
+
+echo "rebuild ${RUNDIR} [y/n]?"
+read ans
+if [ ${ans} != 'y' ]
+then
+	echo ${ans}
+	echo "abortig"	
+	exit 1
+fi
 
 rm -r ${RUNDIR}/*/*
 
 
-for i in GBW GBWS-Fix-S BGK BGKS-Fix-S; do mkdir ${RUNDIR}/${i} ; done 
+for i in GBWS-Fix-S BGKS-Fix-S; do mkdir ${RUNDIR}/${i} ; done 
 
- ./Auto-Control -dir ${RUNDIR}/GBW -sudakov 0 -lmass 0.0 0.0196 -qup 5 10 25 50 75 100 650 -model 0
- ./Auto-Control -dir ${RUNDIR}/GBWS-Fix-S -sudakov 1 2 -lmass 0.0 0.0196 -qup 5 10 25 50 75 100 650 -model 22
-
- ./Auto-Control -dir ${RUNDIR}/BGK -sudakov 0 -lmass 0.0 0.0196 -qup 5 10 25 50 75 100 650 -model 1
- ./Auto-Control -dir ${RUNDIR}/BGKS-Fix-S -sudakov 1 2 -lmass 0.0 0.0196 -qup 5 10 25 50 75 100 650 -model 3
+ ./Auto-Control -dir ${RUNDIR}/GBWS-Fix-S -sudakov 2 -lmass 0.0 0.0196 -qup 650 -model 22
+ ./Auto-Control -dir ${RUNDIR}/BGKS-Fix-S -sudakov 2 -lmass 0.0 0.0196 -qup 650 -model 3
 
 
  ./Append "#define FEJER 1" ${RUNDIR}/*/M* 
  ./Append "#define INDEPENDENT_RMAX 1" ${RUNDIR}*/BGKS*/M*
- ./Append "#define N_CHEB_R 120" ${RUNDIR}/*/M* 
+ ./Append "#define N_CHEB_R 104" ${RUNDIR}/*/M* 
  ./Append "#define DGAUSS_PREC 1.0e-5" ${RUNDIR}/*/M* 
 # ./Append "#define N_SIMPS_R 50" ${RUNDIR}/*/M* 
 

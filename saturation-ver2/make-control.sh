@@ -16,8 +16,11 @@ rm -r ${RUNDIR}/*/*
 
 for i in GBWS-Fix-S BGKS-Fix-S; do mkdir ${RUNDIR}/${i} ; done 
 
- ./Auto-Control -dir ${RUNDIR}/GBWS-Fix-S -sudakov 2 -lmass 0.0 0.0196 -qup 650 -model 22
- ./Auto-Control -dir ${RUNDIR}/BGKS-Fix-S -sudakov 2 -lmass 0.0 0.0196 -qup 650 -model 3
+ ./Auto-Control -dir ${RUNDIR}/GBWS-Fix-S -sudakov 1 -lmass 0.0 0.0196 -qup 5 10 25 50 75 100 650 -model 22
+ ./Auto-Control -dir ${RUNDIR}/BGKS-Fix-S -sudakov 1 -lmass 0.0 0.0196 -qup 5 10 25 50 75 100 650 -model 3
+ ./Auto-Control -dir ${RUNDIR}/GBW -sudakov 0 -lmass 0.0 0.0196 -qup 5 10 25 50 75 100 650 -model 0
+ ./Auto-Control -dir ${RUNDIR}/BGK -sudakov 0 -lmass 0.0 0.0196 -qup 5 10 25 50 75 100 650 -model 1
+
 
 
  ./Append "#define FEJER 1" ${RUNDIR}/*/M* 

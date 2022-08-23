@@ -238,12 +238,15 @@ def main():
         
     
     ################################## chi #########################################
-    chipp=[sum(i)/len(i) for i in (chi1)]
+    chipp=[sum(i) for i in (chi1)]
     print(sum([ sum(i) for i in chi1])/sum([ len(i) for i in chi1]))
-    chipp2=[sum(i)/len(i) for i in (chi2)]
+    chipp2=[sum(i) for i in (chi2)]
     print(sum([ sum(i) for i in chi2])/sum([ len(i) for i in chi2]))
     
     diff=[chipp[i]-chipp2[i] for i in range(len(chipp)) ]
+    
+    chipp=[sum(i)/len(i) for i in (chi1)]
+    chipp2=[sum(i)/len(i) for i in (chi2)]
     
     #chipp2=[sum(i)/len(i) for i in chi2]
     binlabel=[]
@@ -256,18 +259,18 @@ def main():
     fig, (ax1,ax2,ax3)=plt.subplots(3,1,sharey=True,sharex=True,constrained_layout=True)
     ax1.bar(q2set,chipp)
     ax2.bar(q2set,chipp2,tick_label=binlabel)
-    ax3.bar(q2set,diff,tick_label=binlabel,color='green')
+    ax3.bar(q2set,diff,tick_label=binlabel,color='red')
     ax1.grid(visible='true', axis='y')
     ax1.margins(x=0)
     ax2.grid(visible='true', axis='y')
     ax2.margins(x=0)
     ax3.grid(visible='true', axis='y')
     
-    ax3.set_ylabel("difference", loc='center' )
+    ax3.set_ylabel("difference\n$\chi^2$", loc='center' )
     #ax2.set_ylabel("$\chi^2/N$ ", loc='center' )
     #ax1.set_ylabel("$\chi^2/N$", loc='center' )
-    ax1.set_ylabel("Without Sudakov", loc='center' )
-    ax2.set_ylabel("With Sudakov", loc='center' )
+    ax1.set_ylabel("Without Sudakov\n$\chi^2/N$", loc='center' )
+    ax2.set_ylabel("With Sudakov\n$\chi^2/N$", loc='center' )
     
     ax3.set_xlabel("$Q^2$", loc='right' )
     ax3.margins(x=0)

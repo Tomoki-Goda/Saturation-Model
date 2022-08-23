@@ -4,7 +4,7 @@ extern double SIGMA_PREC;
 static unsigned N_DATA;
 extern int N_SIMPS;
 extern int N_CHEB;
-
+extern int N_OFF;//number of arameters fixed
 
 extern int load_data(void);
 extern void generate_psi_set(void);
@@ -164,9 +164,9 @@ int SAVE_RESULT(FILE* outfile){
 	MNSTAT(res,error,dum3,dum4,dum4,istat);
 	sprintf(outline,"chisq\t%.4e\t%.4e\n",res,error);
 	log_printf(out_file,outline);
-	sprintf(outline,"n_data-n_par\t%d\n",N_DATA-N_PAR);
+	sprintf(outline,"n_data\t%d\n",N_DATA);
 	log_printf(out_file,outline);
-	sprintf(outline,"chisq/dof\t%.3e\n",res/(N_DATA-N_PAR));
+	sprintf(outline,"chisq/dof\t%.3e\n",res/(N_DATA-(N_PAR-N_OFF)));
 	log_printf(out_file,outline);
 	
 	

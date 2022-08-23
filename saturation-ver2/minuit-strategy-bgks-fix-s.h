@@ -1,3 +1,5 @@
+int N_OFF=2;
+
 int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
 	char command[100];
 	int error_flag, istat, nvpar, npar;

@@ -1,3 +1,16 @@
+#include<stdio.h>
+#include<math.h>
+#include<stdlib.h>
+#include<cfortran.h>
+
+#include"control.h"
+#include"control-default.h"
+#include"constants.h"
+
+#include"./Parameters.h"
+
+
+#include"./plot.c"
 #include"./tmd-gluon.h"
 
 int main (int argc, char** argv){

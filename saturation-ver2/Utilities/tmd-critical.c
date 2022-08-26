@@ -1,46 +1,19 @@
+#include<stdio.h>
+#include<math.h>
+#include<stdlib.h>
+#include<cfortran.h>
+
+#include"control.h"
+#include"control-default.h"
+#include"constants.h"
+
+#include"./Parameters.h"
+
+
+#include"./plot.c"
+
 #include"./tmd-gluon.h"
 
-double saturation(double step,double* sudpar,double Q2){
-	double k_step=0.1;
-	double k_min=0.4;
-	double k=k_min;
-	double prev=1;
-	double val;
-	
-	for(int i=0;i<6;i++){
-		//printf("%.3e\t%.3e\n",k_min,k_step );
-		k=k_min;
-		
-		for(int j=0;j<100;j++){
-			val=grad_k(k,step,sudpar,Q2);
-			//printf("%d : %.3e, %.3e, %.3e, %.3e\n",j ,k,k_min, val, prev );
-			if(j!=0 ){
-				if(prev*val<0){
-					k_min=k-k_step;
-					//printf("%d : %.3e, %.3e, %.3e, %.3e\n",i ,k,k_min, val, prev );
-					break;
-				}
-			}
-			if(fabs(val)>fabs(prev)){
-				//printf("error\t%.3e\t%.3e\n",val,prev);
-			}
-			//printf("%f, %f, %f\n",k, val, prev );
-			prev=val;
-			k+=k_step;
-		}
-		if(fabs(prev)<1.0e-5){
-			break;
-		}
-		if(i!=5){
-			k_step*=0.05;
-		}
-		
-	}
-	//printf("\nk=%.3e, val= %.3e, prev= %.3e\n\n",k, val, prev );
-	
-	k=k - k_step*fabs(val/(prev-val) );//weighted mid point 	
-	return(k);
-}
 
 int main (int argc, char** argv){
 

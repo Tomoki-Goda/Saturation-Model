@@ -331,7 +331,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	double result=0;
 	double rmin=R_MIN;
 	
-#if (SUDAKOV<=1)
+//#if (SUDAKOV<=1)
 	double rmin_2;
 	int signal=rmin2(q2, SUDPAR,&rmin_2 );
 	if(signal==0){
@@ -351,7 +351,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	}else{
 		printf( "unrecognized signal from rmin2\n");
 	}
-#endif
+//#endif
 
 	////////////////////////////////////////////
 	//int N=96;
@@ -447,7 +447,8 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 	}
 ////////////////////////////////////////////////
 	
-#if (SUDAKOV==1)  	
+//#if (SUDAKOV==1) 
+#if (SUDAKOV>=1) 
 	if(mu2>q2){
 		return val;
 	}

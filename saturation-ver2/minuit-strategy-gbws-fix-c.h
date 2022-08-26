@@ -1,3 +1,4 @@
+int N_OFF=1;
 int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
 	char command[100];
 	int error_flag, istat, nvpar, npar;
@@ -8,14 +9,14 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 
 	MNCOMD(*fcn,"FIX 4",error_flag,0);
 
-	N_SIMPS=(int)((N_SIMPS_R)/4);
-	N_CHEB=(int)((N_CHEB_R)/4);
-	SIGMA_PREC=DGAUSS_PREC*50;
+	N_SIMPS=(int)((N_SIMPS_R)/6);
+	N_CHEB=(int)((N_CHEB_R)/6);
+	SIGMA_PREC=DGAUSS_PREC*100;
 
 	MNCOMD(*fcn, "SIMPLEX",error_flag,0);
 
-	N_SIMPS=(int)((N_SIMPS_R)/2);
-	N_CHEB=(int)((N_CHEB_R)/2);
+	N_SIMPS=(int)((N_SIMPS_R)/3);
+	N_CHEB=(int)((N_CHEB_R)/3);
 	SIGMA_PREC=DGAUSS_PREC*10;
 
 	MNCOMD(*fcn, "SIMPLEX 150 1.0D0",error_flag,0);

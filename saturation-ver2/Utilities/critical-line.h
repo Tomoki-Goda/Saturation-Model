@@ -36,7 +36,7 @@ double plot_curvature(double x,double Q2, double* sigpar, double* sudpar, FILE* 
 }
 
 //double generate_point(double *par,double Q2,double x,char* filename){
-double generate_points(double x, double **param ){
+double generate_points_crit(double x, double **param ){
 	**param=x;
 
 	double step=0.1;

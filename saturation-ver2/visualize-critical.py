@@ -71,6 +71,8 @@ def main():
     ax1[0].set_ylabel("$Q^2_s$",rotation="horizontal",loc='top')
     ax1[1].set_xlabel("$x$",rotation="horizontal",loc='right')
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
+    fig1.set_figheight(4)
+    fig1.set_figwidth(8)
     if saveflag:
         fig1.savefig(save1)
     else:

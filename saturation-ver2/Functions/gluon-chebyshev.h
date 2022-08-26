@@ -11,8 +11,8 @@
 #include"./gluons.h"
 #include"./chebyshev-1.h"
 
-#define X_DEGREE 25 
-#define Q2_DEGREE 27
+#define X_DEGREE 22
+#define Q2_DEGREE 25
  
 #ifndef SKIP_SAME
 	#define SKIP_SAME 0
@@ -36,8 +36,8 @@ static const unsigned DIM=2;
 static const unsigned DEGREE[2]={X_DEGREE,Q2_DEGREE};
 
 //static const double X_LIM[2]={1.0e-8,1} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
-static const double X_LIM[2]={1.0e-8,1.25} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
-static const double Q2_LIM[2]={LQCD2*3 , 5.0/(R_MIN*R_MIN) };
+static const double X_LIM[2]={5.0e-9,1.25} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
+static const double Q2_LIM[2]={LQCD2*2 , 10.0/(R_MIN*R_MIN) };
 
 /////////////////////////////////////////
 
@@ -114,21 +114,21 @@ double xg_chebyshev(double  x,double q2){
 		//scanf("%c",&ch);
 	}
 	if(q2<Q2_LIM[0]){
-		//printf(" q2 too small %.2e\n",q2);
+		printf(" q2 too small %.2e\n",q2);
 		return 0;
 		//q2=Q2_LIM[0];
 	}else if(q2>Q2_LIM[1]){
-		//printf(" q2 too large %.2e\n",q2);
+		printf(" q2 too large %.2e\n",q2);
 		return 0;
 		//q2=Q2_LIM[1];
 	}
 	
 	if(x<X_LIM[0]){
-		//printf(" x too small %.2e\n",x);
+		printf(" x too small %.2e\n",x);
 		return 0;
 		//x=X_LIM[0];
 	}else if(x>X_LIM[1]){
-		//printf(" x too large %.2e\n",x);
+		printf(" x too large %.2e\n",x);
 		return 0;
 		//x=X_LIM[1];
 	}

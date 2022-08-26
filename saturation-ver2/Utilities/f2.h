@@ -5,6 +5,7 @@
 extern void simpson1dA(double(*)(double, double**),double**,double,double,int,double*,double*); 
 extern double dgauss_(double (*)(const double*), double*,double*,double *  );
 extern double dgquad_(double (*)(const double*),  const double*, const double*, const int*  );
+extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
 
 ///////////////////////////////////////Version 1////////////////////////////////////////////////////////
 double f2_integrand(double r, double ** par){
@@ -64,19 +65,32 @@ double f2_integrand_2(const double* R){
 }
 double f2_2(double x,double q2, double *sigpar ,  double *sudpar){
 	double res=0, err=0,val=0;
+	
 	SUDPAR=sudpar;
 	SIGPAR=sigpar;
 	//double prec=
 	X=x;
 	Q2=q2;
-	int n=96;
+	//int n=96;
 	double rmin=R_MIN;
 	double rmax=R_MAX;
+	
+	int seg=0;
+	double NRel=DGAUSS_PREC;
+	double NAbs=0;
+	double error=0;
+	
+	//double N=DGAUSS_PREC;
+	
+	
 	for(int i =0;i<(NF-1);i++){
 		FL=i;
 		res=0;
 		//simpson1dA(&f2_integrand,pars,1.0e-5,30,250,&res,&err);
-		res=dgquad_(&f2_integrand_2,&rmin,&rmax,&n);
+		//res=dgquad_(&f2_integrand_2,&rmin,&rmax,&n);
+		dadapt_(&f2_integrand_2,&rmin,&rmax,&seg ,&NRel, &NAbs, &res, &error);
+		//res=dgauss_(&f2_integrand_2,&rmin,&rmax,&N);
+		printf("%.5e %.5e\n",res,error);
 		val+=res;
 	}
 	//printf("%f \tx=%.5e q2=%.5e fl=%d\n",val,X,Q2,FL);

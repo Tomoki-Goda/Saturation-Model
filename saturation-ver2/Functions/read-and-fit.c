@@ -188,30 +188,35 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 		log_printf(log_file,outline);
 	}
 	
-		
+	
 #if (MODEL==1||MODEL==3)
 	static double sigpar[10],sudpar[10];	
 	parameter(par,sigpar,sudpar);
 	approx_xg(sigpar+1);//generate chebyshev coefficients
 #endif
-//	if(*iflag==3){
-//		double error_array[N_DATA];
-//		double cs_array[N_DATA];
-//		//double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
-//		simpson_error(SAMPLES,error_array);
-//		simpson_sum(SAMPLES,cs_array);	
-//		for(int i=0;i<N_DATA;i++){
-//			sprintf(outline,"Q2=%.2e x=%.2e, Data=%.3e :>  %.3e\t%.3e\n",Q2_DATA[i],X_DATA[i],CS_DATA[i], cs_array[i],error_array[i]);
-
-//			log_printf(log_file,outline);
-//		}
-//	}else{	
-		*fcnval=compute_chisq(par);
 	
-		time-=clock();
-		
-		sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
+	*fcnval=compute_chisq(par);
+	if(*iflag==3){
+#if ((MODEL!=1)&&(MODEL!=3))
+		static double sigpar[10],sudpar[10];	
+		parameter(par,sigpar,sudpar);
+#endif
+		double res, chi=0;
+		for(unsigned i=0;i<N_DATA;i++){
+				res=f2_2(X_DATA[i],Q2_DATA[i], sigpar , sudpar);
+				printf("%.3e %.3e\n",res, CS_DATA[i]);
+				chi+=pow((res-CS_DATA[i])/ERR_DATA[i],2);				
+			}
+	
+		sprintf(outline," fcn diff= %.7e\n",*fcnval-chi);
 		log_printf(log_file,outline);
+		printf("\n\n%s\n\n",outline);
+	}else{
+	time-=clock();
+	
+	sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
+	log_printf(log_file,outline);
+	}
 //	}
 }
 

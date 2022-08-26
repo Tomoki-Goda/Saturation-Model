@@ -1,9 +1,11 @@
 #! /usr/bin/env bash
 
-GBW=../Run1708/GBW/Mass0.0-Qup650-Model0-Sud0
-GBWS=../Run1708/GBWS-Fix-S/Mass0.0-Qup650-Model22-Sud1
-BGK=../Run1708/BGK/Mass0.0-Qup650-Model1-Sud0
-BGKS=../Run1708/BGKS-Fix-S/Mass0.0-Qup650-Model3-Sud1
+DIR=../Run2208
+
+GBW=${DIR}/GBW/Mass0.0-Qup650-Model0-Sud0
+GBWS=${DIR}/GBWS-Fix-S/Mass0.0-Qup650-Model22-Sud1
+BGK=${DIR}/BGK/Mass0.0-Qup650-Model1-Sud0
+BGKS=${DIR}/BGKS-Fix-S/Mass0.0-Qup650-Model3-Sud1
 SAVE=/media/tomoki/TOMOKI-USB/Saturation-Model/Saturation-Notes/Run1708
 
 ./visualize-dipole.py \

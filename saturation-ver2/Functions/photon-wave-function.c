@@ -113,15 +113,17 @@ double psisq_z_int(double r,double q2,unsigned f){
 	//////////////////////////////////
 	//double N=DGAUSS_PREC/100;
 	//res=dgauss_(&psisq_f,&zmin,&zmax,&N);
-	//double step=(zmax-zmin)/1;
-	res=0;
+	////////////////////////////////////
+	//double step=(zmax-zmin)/10;
+	//res=0;
 	//double low=zmin, high;
-	//for(int i=0;i<1;i++){
+	//for(int i=0;i<10;i++){
 	//	high=low+step;
 		//low=zmin*pow((zmax/zmin),((double)(i))/5);
 		//high=zmin*pow((zmax/zmin),((double)(i+1))/5);
 	//	res+=dgauss_(&psisq_f,&low,&high,&N);
-	//	low=high;
+		//printf("%f, %f\n",low,high);
+	//	low=high;	 
 	//}
 	
 	////////////////////////////////////
@@ -129,7 +131,8 @@ double psisq_z_int(double r,double q2,unsigned f){
 	double NRel=DGAUSS_PREC;
 	double NAbs=0;
 	double error=0;
-	dadapt_(&psisq_f,&zmin,&zmax,&seg ,&NRel, &NAbs, &res, &error)	;
+	dadapt_(&psisq_f,&zmin,&zmax,&seg ,&NRel, &NAbs, &res, &error);
+	
 	/////////////////////////////////////////
 	return(2.0* res);
 

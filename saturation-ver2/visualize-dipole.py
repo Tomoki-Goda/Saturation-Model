@@ -66,7 +66,47 @@ def main():
     if saveflag:
         fig1.savefig(save1)
     else:
-        plt.show()             
+        plt.show()      
+    
+    
+    #############################################################
+    dp=[]
+    dpi=[]
+    r=[]
+    ri=[]
+    fig1,ax1=plt.subplots( )
+    leg=[]
+    
+    for j in ['2', '4', '6']:
+        with open(args[0]+'/geometric-650-'+j+'.txt' ,"r") as fi:
+            dpi=[]
+            ri=[]
+            for i in fi:
+                data=i.strip().split("\t")
+                dpi.append(float(data[1]))
+                ri.append(float(data[0]))
+                
+        leg.append( ax1.plot(ri,dpi ,c='blue',ls="--"))
+        ax1.text(ri[0]/1.3,5*dpi[0],"x=$10^{-"+j+"}$")
+        with open(args[1]+'/geometric-650-'+j+'.txt',"r") as fi:
+            dpi=[]
+            ri=[]
+            for i in fi:
+                data=i.strip().split("\t")
+                dpi.append(float(data[1]))
+                ri.append(float(data[0]))
+        leg.append(ax1.plot(ri,dpi ,c='red',ls="-"))
+    
+    ax1.legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
+    ax1.set( xscale= 'log' ,   yscale='log' )
+    ax1.grid('true')
+    ax1.set_ylabel("$\\sigma/\\sigma_0$",rotation="vertical",loc='top')
+    ax1.set_xlabel("$r\;Q_s$",rotation="horizontal",loc='right')
+    fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.95, left=0.11)
+    if saveflag:
+        fig1.savefig(save1+"geometric")
+    else:
+        plt.show()       
             
 main()
     

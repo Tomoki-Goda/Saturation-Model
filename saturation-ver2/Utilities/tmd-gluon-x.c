@@ -1,3 +1,16 @@
+#include<stdio.h>
+#include<math.h>
+#include<stdlib.h>
+#include<cfortran.h>
+
+#include"control.h"
+#include"control-default.h"
+#include"constants.h"
+
+#include"./Parameters.h"
+
+
+#include"./plot.c"
 #include"./tmd-gluon.h"
 
 int main (int argc, char** argv){
@@ -5,7 +18,7 @@ int main (int argc, char** argv){
 	double val;
 	FILE *file;
 	char file_name[500];
-	double k, x , Q2;
+	double k2, x , Q2;
 	double param[10];
 	double sudpar[10];
 	double sigpar[10];
@@ -13,9 +26,9 @@ int main (int argc, char** argv){
 	
 	
 	
-	read_options(argc,argv,param,&k,&Q2, file_name);
+	read_options(argc,argv,param,&k2,&Q2, file_name);
 	parameter(param,sigpar,sudpar);
-	printf("%.3e %.3e\n",x, Q2);
+	printf("%.3e %.3e\n",k2, Q2);
 		
 #if (MODEL==1||MODEL==3)	
 	approx_xg(sigpar+1);//generate chebyshev coefficients
@@ -28,7 +41,7 @@ int main (int argc, char** argv){
 			printf("tmd-gluon:: file can't be opened. %s\n",file_name);
 			return 1;
 		}
-		val=fill_arr(k, step,sudpar,Q2);
+		val=fill_arr(k2, step,sudpar,Q2);
 		//val*=k*k;
 		val*=3.0/(4*PI);
 			

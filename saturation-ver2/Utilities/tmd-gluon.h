@@ -1,16 +1,4 @@
-#include<stdio.h>
-#include<math.h>
-#include<stdlib.h>
-#include<cfortran.h>
 
-#include"control.h"
-#include"control-default.h"
-#include"constants.h"
-
-#include"./Parameters.h"
-
-
-#include"./plot.c"
 extern double KBN_sum(const double *arr,int len);
 //#include"./kahnsum.h"
 //#include"./critical-line.h"
@@ -40,18 +28,18 @@ double sample_sigma(double * sample , double step, double x,double Q2,const doub
 	for(int j=0;j<(2*n+1)+2;j++){
 		r=R_MIN+j*step;
 		
-		val=0;
+		//val=0;
 		//for(int i=0; i<(NF-1); i++){
-		for(int i=0; i<1; i++){
-			xm=mod_x(x,Q2,i);
+		//for(int i=0; i<1; i++){
+		//xm=mod_x(x,Q2,0);
 #if (MODEL==0||MODEL==1)
-			val+=SIGMA(r,xm,Q2,sigpar,sudpar);
+		val=SIGMA(r,x,Q2,sigpar,sudpar);
 #else 
-			val+=BASE_SIGMA(r,xm,Q2,sigpar);
+		val=BASE_SIGMA(r,x,Q2,sigpar);
 #endif
 			
 			//printf("val=%.3e %.3e %.3e %.3e\n",val,r ,xm,Q2);
-		}
+		//}
 		//printf("%.3e\n",val);
 		sample[j]=val;
 	}
@@ -143,6 +131,7 @@ double grad_k(double k,double step,double *sudpar,double q2){
 }
 
 
+
 /////////////////////////////////////////////////////////////////////////////////
 //////////// Phi ////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
@@ -176,4 +165,47 @@ double grad_k_2(double k,double step){
 	
 	val=simps_sum(sample_lap,2*n+1,step);
 	return(val);
+}
+
+//////////////////////////////////////////////////////////////////////////
+double saturation(double step,double* sudpar,double Q2){
+	double k_step=0.1;
+	double k_min=0.4;
+	double k=k_min;
+	double prev=1;
+	double val;
+	
+	for(int i=0;i<6;i++){
+		//printf("%.3e\t%.3e\n",k_min,k_step );
+		k=k_min;
+		
+		for(int j=0;j<100;j++){
+			val=grad_k(k,step,sudpar,Q2);
+			//printf("%d : %.3e, %.3e, %.3e, %.3e\n",j ,k,k_min, val, prev );
+			if(j!=0 ){
+				if(prev*val<0){
+					k_min=k-k_step;
+					//printf("%d : %.3e, %.3e, %.3e, %.3e\n",i ,k,k_min, val, prev );
+					break;
+				}
+			}
+			if(fabs(val)>fabs(prev)){
+				//printf("error\t%.3e\t%.3e\n",val,prev);
+			}
+			//printf("%f, %f, %f\n",k, val, prev );
+			prev=val;
+			k+=k_step;
+		}
+		if(fabs(prev)<1.0e-5){
+			break;
+		}
+		if(i!=5){
+			k_step*=0.05;
+		}
+		
+	}
+	//printf("\nk=%.3e, val= %.3e, prev= %.3e\n\n",k, val, prev );
+	
+	k=k - k_step*fabs(val/(prev-val) );//weighted mid point 	
+	return(k);
 }

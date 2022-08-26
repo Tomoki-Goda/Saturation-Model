@@ -52,6 +52,7 @@ def main():
             save1=arg+"1"
             save2=arg+"2"
             save3=arg+"hist"
+            save4=arg+"hist-diff"
             saveflag=True
             print("SAVE")
         else:
@@ -230,6 +231,8 @@ def main():
     fig2.set_figheight(8)
     fig2.set_figwidth(6)
     #plt.yticks(y,[0.1,1])
+    #fig1.tight_layout()
+    #fig2.tight_layout()
     if saveflag:
         fig1.savefig(save1)
         fig2.savefig(save2)
@@ -257,24 +260,38 @@ def main():
              binlabel.append("")
     
     fig, (ax1,ax2,ax3)=plt.subplots(3,1,sharey=True,sharex=True,constrained_layout=True)
+    
     ax1.bar(q2set,chipp)
     ax2.bar(q2set,chipp2,tick_label=binlabel)
-    ax3.bar(q2set,diff,tick_label=binlabel,color='red')
+    
     ax1.grid(visible='true', axis='y')
     ax1.margins(x=0)
     ax2.grid(visible='true', axis='y')
     ax2.margins(x=0)
-    ax3.grid(visible='true', axis='y')
     
-    ax3.set_ylabel("difference\n$\chi^2$", loc='center' )
+    
+    
     #ax2.set_ylabel("$\chi^2/N$ ", loc='center' )
     #ax1.set_ylabel("$\chi^2/N$", loc='center' )
     ax1.set_ylabel("Without Sudakov\n$\chi^2/N$", loc='center' )
     ax2.set_ylabel("With Sudakov\n$\chi^2/N$", loc='center' )
     
+    
+    
+    #fig.set_figheight(4)
+    #fig.set_figwidth(12)
+    
+    #if saveflag:
+    #    fig.savefig(save3)
+    #else:
+    #	plt.show()
+    #############################################################
+    #fig, ax3=plt.subplots(1,1,sharey=True,sharex=True,constrained_layout=True)
+    ax3.bar(q2set,diff,tick_label=binlabel,color='red')
     ax3.set_xlabel("$Q^2$", loc='right' )
     ax3.margins(x=0)
-    
+    ax3.grid(visible='true', axis='y')
+    ax3.set_ylabel("difference\n$\chi^2$", loc='center' )
     fig.set_figheight(4)
     fig.set_figwidth(12)
     
@@ -282,6 +299,7 @@ def main():
         fig.savefig(save3)
     else:
     	plt.show()
+    
 main()
 
 

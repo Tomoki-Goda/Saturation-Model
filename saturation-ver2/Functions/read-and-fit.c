@@ -204,7 +204,7 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 		double res, chi=0;
 		for(unsigned i=0;i<N_DATA;i++){
 				res=f2_2(X_DATA[i],Q2_DATA[i], sigpar , sudpar);
-				printf("%.3e %.3e\n",res, CS_DATA[i]);
+				//printf("CERNLIB int =%.3e CS=%.3e\n",res, CS_DATA[i]);
 				chi+=pow((res-CS_DATA[i])/ERR_DATA[i],2);				
 			}
 	

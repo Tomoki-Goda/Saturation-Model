@@ -52,13 +52,15 @@ static int FL;
 
 double f2_integrand_2(const double* R){
 	double xm;
+	
 
 	double value=0;
 
 
 	xm=mod_x(X,Q2,FL);
-	double r=*R;
-	value=psisq_z_int(r, Q2, FL)* SIGMA(r,xm,Q2,SIGPAR,SUDPAR)/(r) ;
+	double r=*R/(1-*R);
+	double jac=pow(1-*R,-2);
+	value=jac*psisq_z_int(r, Q2, FL)* SIGMA(r,xm,Q2,SIGPAR,SUDPAR)/(r) ;
 		
 	//printf("val=%.5e r=%.5e q2=%.5e  xm=%.5e\n",value,r ,Q2,xm );
 	return(value);
@@ -74,23 +76,36 @@ double f2_2(double x,double q2, double *sigpar ,  double *sudpar){
 	//int n=96;
 	double rmin=R_MIN;
 	double rmax=R_MAX;
+	rmin=rmin/(1+rmin);
+	rmax=rmax/(1+rmax);
+	//int seg=30;
+	//double NRel=1.0e-1;
+	//double NRel=DGAUSS_PREC;
+	//double NAbs=0;
+	//double error=0;
 	
-	int seg=0;
-	double NRel=DGAUSS_PREC;
-	double NAbs=0;
-	double error=0;
-	
-	//double N=DGAUSS_PREC;
+	double N=DGAUSS_PREC;
+	double step=(rmax-rmin)/5;
+	double high,low;
 	
 	
 	for(int i =0;i<(NF-1);i++){
 		FL=i;
 		res=0;
+		low=rmin;
+		high=rmin;
 		//simpson1dA(&f2_integrand,pars,1.0e-5,30,250,&res,&err);
-		//res=dgquad_(&f2_integrand_2,&rmin,&rmax,&n);
-		dadapt_(&f2_integrand_2,&rmin,&rmax,&seg ,&NRel, &NAbs, &res, &error);
-		//res=dgauss_(&f2_integrand_2,&rmin,&rmax,&N);
-		printf("%.5e %.5e\n",res,error);
+		//dadapt_(&f2_integrand_2,&rmin,&rmax,&seg ,&NRel, &NAbs, &res, &error);
+		//res+=dgauss_(&f2_integrand_2,&rmin,&rmax,&N);
+		//res+=dgquad_(&f2_integrand_2,&rmin,&rmax,&n);
+		for(int i=0;i<5;i++){
+			high+=step;
+			res+=dgauss_(&f2_integrand_2,&low,&high,&N);
+			//res+=dgquad_(&f2_integrand_2,&low,&high,&n);
+			//printf(" %f %f %d\n",rmin,rmax,n);
+			low=high;
+		}
+		//printf("%.5e %.5e\n",res,error);
 		val+=res;
 	}
 	//printf("%f \tx=%.5e q2=%.5e fl=%d\n",val,X,Q2,FL);

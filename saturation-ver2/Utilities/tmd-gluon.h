@@ -88,15 +88,13 @@ double fill_arr(double k,double step,double *sudpar,double q2){
 			val*=exp_sud(r,mu2_arr[0],q2);
 			//val=sample[2*n+1]- sample[j-1];
 			kr=k*(r-step);
-			
 			val*=((r-step)*dbesj0_(&kr));
-			
-			sample_lap[j-2]=val;	
-
+			sample_lap[j-2]=val;
 		}
 	}
 	
 	val=simps_sum(sample_lap,2*n+1,step);
+	//printf("%.5e %.5e %.5e\n",q2, k*k, val);
 	return(val);
 }
 

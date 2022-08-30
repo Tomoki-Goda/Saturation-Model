@@ -18,7 +18,7 @@ struct data{
 	char C2[20];
 	char mu022[20];
 	char chisq[20];
-	char dof[20];
+	char n_data[20];
 	char chisqdof[20];
 	
 
@@ -52,8 +52,8 @@ void read_write_data(struct data *data_struct, const char* name,char* str,const 
 		struc=data_struct->mu022;
 	}else if(strcmp(name,"chisq")==0){
 		struc=data_struct->chisq;
-	}else if(strcmp(name,"n_data-n_par")==0){
-		struc=data_struct->dof;
+	}else if(strcmp(name,"n_data")==0){
+		struc=data_struct->n_data;
 	}else if(strcmp(name,"chisq/dof")==0){
 		struc=data_struct->chisqdof;
 	}else{
@@ -121,26 +121,39 @@ int import_results(FILE * file,struct data *data_struct,struct data *error_struc
 void table_name(const char* key, char* name){
 	if(strcmp(key,"sigma_0")==0){
 		strcpy(name,"$\\sigma_0$");
+		
 	}else if(strcmp(key,"x_0")==0){
 		strcpy(name,"$x_0 (10^{-4})$");
+		
 	}else if(strcmp(key,"lambda")==0){
 		strcpy(name,"$\\lambda$");
+		
 	}else if(strcmp(key,"A_g")==0){
 		strcpy(name,"$A_g$");
+		
 	}else if(strcmp(key,"lambda_g")==0){
 		strcpy(name,"$\\lambda_g$");	
+		
 	}else if(strcmp(key,"C")==0){
 		strcpy(name,"$C$");
+		
 	}else if(strcmp(key,"mu02")==0){
 		strcpy(name,"$\\mu_0^2$");
+		
 	}else if(strcmp(key,"C2")==0){
 		strcpy(name,"$C_S$");
+		
 	}else if(strcmp(key,"mu022")==0){
 		strcpy(name,"$\\mu_{0S}^2$");
+		
+	}else if(strcmp(key,"n_data")==0){
+		strcpy(name,"$N_{data}$");
 	}else if(strcmp(key,"chisq/dof")==0){
 		strcpy(name,"$\\chi^2/dof$");
+		
 	}else if(strcmp(key,"chisq")==0){
 		strcpy(name,"$\\chi^2$");
+		
 	}else{
 		printf("Unknown\n");
 	}
@@ -168,13 +181,13 @@ void interpret_dir(char* dir, char *mass, char * qup, char * model, char *sudako
 		chptr=strtok(NULL,"-");
 		sscanf(chptr,"%5s%s",dum,model);
 		if((strcmp(model,"22")*strcmp(model,"2"))==0){
-			strcpy(model,"$GBWS_{pert}$");
+			strcpy(model,"$\\mathrm{GBWS_{pert}}$");
 		}else if(strcmp(model,"0")==0){
-			strcpy(model,"$GBW$");
+			strcpy(model,"$\\mathrm{GBW}$");
 		}else if(strcmp(model,"1")==0){
-			strcpy(model,"$BGK$");
+			strcpy(model,"$\\mathrm{BGK}$");
 		}else if(strcmp(model,"3")==0){
-			strcpy(model,"$BGKS_{pert}$");
+			strcpy(model,"$\\mathrm{BGKS_{pert}}$");
 		}else{
 			printf("Unknown model %s\n",model);
 		}		
@@ -250,8 +263,13 @@ int main(int argc, char** argv){
 	}
 	//printf("out file \n");
 	file=fopen(argv[output],"w");
+	if(file==NULL){
+		printf("file not found\n");
+		return 1;
+	}
 	//printf("out file open\n");
-	fprintf(file,"\\begin{table}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|");
+	//fprintf(file,"\\begin{table}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|");
+	fprintf(file,"\\resizebox{\\textwidth}{!}{\\begin{tabular}{|");
 	
 	for(int i=0;i<varlen+1;i++){
 		fprintf(file,"c|");
@@ -300,7 +318,8 @@ int main(int argc, char** argv){
 		}
 		fprintf(file,"\\\\ \\hline\n");
 	}
-	fprintf(file,"\\end{tabular} } \\end{table}\n");
+	fprintf(file,"\\end{tabular} }\n");
+	//fprintf(file,"\\end{tabular} } \\end{table}\n");
 	fclose(file);	
 
 }

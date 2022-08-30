@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #for dir in ../Saturation-Model2207/Run2207*/*/M* # ../Results/BGK/M* ../Results/GBWS/M* ../Results/BGKS/M*
-for dir in ../Run2208/*/M*
+for dir in ../Run2808/*/M*
 
 do
 	for x in 2 4 6
@@ -18,14 +18,19 @@ do
 			
 	done
 	for q2 in 5 100 650
-		do	
-			for k in 5 100 650
-			do
-				${dir}/tmd-gluon-x -in ${dir}/result.txt -out ${dir}/gluon-x-${k}-${q2}.txt -Q2 ${q2} -k ${k}
-			done
-			${dir}/critical -in ${dir}/result.txt -out ${dir}/critical-${q2}.txt -Q2 ${q2}
-			${dir}/tmd-critical -in ${dir}/result.txt -out ${dir}/tmd-critical-${q2}.txt -Q2 ${q2}
-			#echo "hello"
+	do	
+		for k in 5 100 650
+		do
+			${dir}/tmd-gluon-x -in ${dir}/result.txt -out ${dir}/gluon-x-${k}-${q2}.txt -Q2 ${q2} -k ${k}
 		done
+		${dir}/critical -in ${dir}/result.txt -out ${dir}/critical-${q2}.txt -Q2 ${q2}
+		${dir}/tmd-critical -in ${dir}/result.txt -out ${dir}/tmd-critical-${q2}.txt -Q2 ${q2}
+		#echo "hello"
+	done
 	
+	${dir}/fcn -in ${dir}/result.txt -out ${dir}/fcn.txt
+	${dir}/export-data -in ${dir}/result.txt -out ${dir}/data.txt
+		
 done
+
+	

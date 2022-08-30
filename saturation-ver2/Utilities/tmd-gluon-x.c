@@ -34,13 +34,15 @@ int main (int argc, char** argv){
 	approx_xg(sigpar+1);//generate chebyshev coefficients
 #endif
 	file=fopen(file_name,"w");
-	for(int i=0;i<500; i++){
-		x=pow(10,-6+4*((double)i)/500);
-		sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
-		if(file==NULL){
+	if(file==NULL){
 			printf("tmd-gluon:: file can't be opened. %s\n",file_name);
 			return 1;
-		}
+	}
+	
+	for(int i=0;i<50; i++){
+		x=pow(10,-6+4*((double)i)/50);
+		sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
+		
 		val=fill_arr(k2, step,sudpar,Q2);
 		//val*=k*k;
 		val*=3.0/(4*PI);

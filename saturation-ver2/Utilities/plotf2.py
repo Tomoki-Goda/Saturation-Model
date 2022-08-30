@@ -122,6 +122,9 @@ def main():
         row2+=1
         
     fig2,ax2=plt.subplots( nrows=row2, ncols=col2,sharex=True,sharey=True,constrained_layout=True)
+
+    fig1.set_constrained_layout_pads(hspace=0,wspace=0)
+    fig2.set_constrained_layout_pads(hspace=0,wspace=0)
     ######################################################################################################
     for i in range(q2len//2 +extra):
         pos=[i//col1,i%col1]
@@ -161,7 +164,7 @@ def main():
         #ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
         ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
         ax1[pos[0]][pos[1]].yaxis.set_minor_locator(plt.NullLocator())
-        ax1[pos[0]][pos[1]].xaxis.set_major_locator(plt.FixedLocator([1.0e-6,1.0e-4,1.0e-2] ))
+        ax1[pos[0]][pos[1]].xaxis.set_major_locator(plt.FixedLocator([1.0e-3,1.0e-5] ))
         ax1[pos[0]][pos[1]].xaxis.set_minor_locator(plt.NullLocator())
         ax1[pos[0]][pos[1]].margins(x=0)
         
@@ -259,8 +262,13 @@ def main():
          else:
              binlabel.append("")
     
-    fig, (ax1,ax2,ax3)=plt.subplots(3,1,sharey=True,sharex=True,constrained_layout=True)
-    
+    #fig, (ax1,ax2 ,ax3)=plt.subplots(3,1,constrained_layout=True, sharex=True,sharey=True)
+    fig=plt.figure(constrained_layout=True)
+    #ax3.clf()
+    ax1=fig.add_subplot(3,1,1)
+    ax2=fig.add_subplot(3,1,2,sharex=ax1,sharey=ax1)
+    ax3=fig.add_subplot(3,1,3,sharex=ax1)
+
     ax1.bar(q2set,chipp)
     ax2.bar(q2set,chipp2,tick_label=binlabel)
     

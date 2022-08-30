@@ -59,7 +59,8 @@ def main():
     #ax1.set(title="",  ylabel="$\\frac{\\log\\partial F_2}{\\log\\partial x}$",    xlabel="$Q^2$",  xscale= 'log' ,   yscale='log' )
     ax1.set( xscale= 'log' ,   yscale='linear' )
     ax1.grid('true')
-    ax1.set_ylabel("$\\frac{\\partial \\log F_2}{\\partial \\log x}$",rotation="horizontal",loc='top')
+    #ax1.set_ylabel("$-\\frac{\\partial \\log F_2}{\\partial \\log x}$",rotation="vertical",loc='top')
+    ax1.set_ylabel("$x-slope $",rotation="vertical",loc='top')
     ax1.set_xlabel("$Q^2$",rotation="horizontal",loc='right')
     fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.9, left=0.13)
     

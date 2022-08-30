@@ -36,7 +36,7 @@ int main (int argc, char** argv){
 	printf("x= %.2e\tQ2= %.2e\n",x,Q2);
 
 	for(int i =0;i<=Q2len;i++){
-		*(Q2arr+i)=pow(10.0, -1+3*((double)(i))/Q2len);
+		*(Q2arr+i)=pow(10.0, -2+5*((double)(i))/Q2len);
 	}
 
 	double *par[4];

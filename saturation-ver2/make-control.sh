@@ -1,19 +1,30 @@
 #! /usr/bin/env bash
 
-RUNDIR=../Run2608
+RUNDIR=../Run2808
 
 echo "rebuild ${RUNDIR} [y/n]?"
 read ans
-if [ ${ans} != 'y' ]
+if [ ${ans} == 'n' ]
 then
 	echo ${ans}
+	
 	echo "abortig"	
 	exit 1
 fi
 
-rm -r ${RUNDIR}/*
+if [ ${ans} == 'y' ]
+then 
+	rm -r ${RUNDIR}/*	
+	for i in GBW BGK GBWS-Fix-S BGKS-Fix-S GBWSnp-Fix-S BGKSnp-Fix-S; do mkdir ${RUNDIR}/${i} ; done 
+	for i in BGKS-Share-rmax BGKSnp-Share-rmax; do mkdir ${RUNDIR}/${i} ; done
 
-for i in GBW BGK GBWS-Fix-S BGKS-Fix-S GBWSnp-Fix-S BGKSnp-Fix-S; do mkdir ${RUNDIR}/${i} ; done 
+fi
+
+#read
+
+#rm  ${RUNDIR}/*/M*/control.h
+#rm  ${RUNDIR}/*/M*/minuit-run.h
+
 
  ./Auto-Control -dir ${RUNDIR}/GBWS-Fix-S -sudakov 1 -lmass 0.0 0.0196 -qup  5 25 50 100 650 -model 22
  ./Auto-Control -dir ${RUNDIR}/BGKS-Fix-S -sudakov 1 -lmass 0.0 0.0196 -qup  5 25 50 100 650 -model 3
@@ -26,13 +37,14 @@ for i in GBW BGK GBWS-Fix-S BGKS-Fix-S GBWSnp-Fix-S BGKSnp-Fix-S; do mkdir ${RUN
 
  ./Append "#define INDEPENDENT_RMAX 1" ${RUNDIR}*/BGKS*/M*
 
- for i in BGKS-Share-rmax BGKSnp-Share-rmax; do mkdir ${RUNDIR}/${i} ; done
+#############################################################################################
  ./Auto-Control -dir ${RUNDIR}/BGKS-Share-rmax -sudakov 1 -lmass 0.0 0.0196 -qup  650 -model 22
  ./Auto-Control -dir ${RUNDIR}/BGKSnp-Share-rmax  -sudakov 2 -lmass 0.0 0.0196 -qup  650 -model 3
  
  
+ ./Append "#define NONLINEAR 1" ${RUNDIR}/*/M* 
  ./Append "#define FEJER 1" ${RUNDIR}/*/M* 
- ./Append "#define N_CHEB_R 120" ${RUNDIR}/*/M* 
+ ./Append "#define N_CHEB_R 96" ${RUNDIR}/*/M* 
  ./Append "#define DGAUSS_PREC 1.0e-8" ${RUNDIR}/*/M* 
 #/////////////////////////////////////////////////////////////////////////////
 

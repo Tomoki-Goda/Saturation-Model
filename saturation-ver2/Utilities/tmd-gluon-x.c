@@ -10,6 +10,8 @@
 #include"./Parameters.h"
 
 
+#define PHI 0
+
 #include"./plot.c"
 #include"./tmd-gluon.h"
 
@@ -42,8 +44,11 @@ int main (int argc, char** argv){
 	for(int i=0;i<50; i++){
 		x=pow(10,-6+4*((double)i)/50);
 		sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
-		
+#if PHI==1		
+		val=fill_arr_2(k2, step);
+#else
 		val=fill_arr(k2, step,sudpar,Q2);
+#endif
 		//val*=k*k;
 		val*=3.0/(4*PI);
 			

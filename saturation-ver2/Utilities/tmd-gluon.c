@@ -9,6 +9,7 @@
 
 #include"./Parameters.h"
 
+#define PHI 1
 
 #include"./plot.c"
 #include"./tmd-gluon.h"
@@ -41,7 +42,11 @@ int main (int argc, char** argv){
 	}
 	for (int i=0; i<500; i++){
 		k=1.0e-1 + pow(10,-5+((double)7*i)/500);
+#if PHI==1
+		val=fill_arr_2(k, step);
+#else
 		val=fill_arr(k, step,sudpar,Q2);
+#endif
 		//val*=k*k;
 		val*=3.0/(4*PI);
 		

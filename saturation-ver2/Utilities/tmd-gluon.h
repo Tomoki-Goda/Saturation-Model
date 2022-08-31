@@ -32,7 +32,7 @@ double sample_sigma(double * sample , double step, double x,double Q2,const doub
 		//for(int i=0; i<(NF-1); i++){
 		//for(int i=0; i<1; i++){
 		//xm=mod_x(x,Q2,0);
-#if (MODEL==0||MODEL==1)
+#if ((MODEL==0||MODEL==1)||(PHI==1))
 		val=SIGMA(r,x,Q2,sigpar,sudpar);
 #else 
 		val=BASE_SIGMA(r,x,Q2,sigpar);

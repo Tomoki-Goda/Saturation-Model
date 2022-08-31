@@ -24,11 +24,11 @@ GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-
 
 ########################################################################################################
 
-all: clean main critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric
+all: clean main critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x
 
 fit: clean main
 
-plot: critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric
+plot: critical dipole F2 F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x
 
 
 main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
@@ -65,6 +65,12 @@ tmd-gluon-x: ${DEPS} ${UTILDIR}/tmd-gluon-x.c ${DIR}/dipole-cross-section.o  ${U
 
 tmd-critical: ${DEPS} ${UTILDIR}/tmd-critical.c  ${UTILDIR}/tmd-gluon.h ${DIR}/dipole-cross-section.o 
 	gcc ${UTILDIR}/tmd-critical.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/tmd-critical   ${INC} ${OPT}
+
+ww-gluon: ${DEPS} ${UTILDIR}/ww-gluon.c ${UTILDIR}/ww-gluon.h ${DIR}/dipole-cross-section.o 
+	gcc ${UTILDIR}/ww-gluon.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/ww-gluon   ${INC} ${OPT}
+
+ww-gluon-x: ${DEPS} ${UTILDIR}/ww-gluon-x.c ${UTILDIR}/ww-gluon.h ${DIR}/dipole-cross-section.o 
+	gcc ${UTILDIR}/ww-gluon-x.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/ww-gluon-x   ${INC} ${OPT}
 
 #geometric-scaling: ${DEPS} ${UTILDIR}/geometric-scaling.c  ${UTILDIR}/critical-line.h ${DIR}/dipole-cross-section.o 
 #	gcc ${UTILDIR}/geometric-scaling.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/geometric   ${INC} ${OPT}

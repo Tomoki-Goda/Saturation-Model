@@ -19,7 +19,7 @@ do
 	done
 	for q2 in 5 100 650
 	do	
-		for k in 5 100 650
+		for k in 0.5 1 2
 		do
 			${dir}/tmd-gluon-x -in ${dir}/result.txt -out ${dir}/gluon-x-${k}-${q2}.txt -Q2 ${q2} -k ${k}
 		done

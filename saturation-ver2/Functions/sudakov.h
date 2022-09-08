@@ -351,8 +351,13 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	}else{
 		printf( "unrecognized signal from rmin2\n");
 	}
+//#elif (SUDAKOV==2)
+//	double rmin_2=1/q2;
+//	if(rmin_2>(r*r)){
+//		return 0;
+//	}
+//	rmin=sqrt(rmin_2);
 //#endif
-
 	////////////////////////////////////////////
 	//int N=96;
 	//result=dgquad_(&integrand,&rmin,VAR,&N);
@@ -452,6 +457,10 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 	if(mu2>q2){
 		return val;
 	}
+//#elif SUDAKOV==2
+//	if(1.0/(r*r)>q2){
+//		return val;
+//	}
 #endif	
 	val*=exp_sud(r,mu2,q2);
 

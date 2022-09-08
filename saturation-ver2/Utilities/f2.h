@@ -7,28 +7,54 @@ extern double dgauss_(double (*)(const double*), double*,double*,double *  );
 extern double dgquad_(double (*)(const double*),  const double*, const double*, const int*  );
 extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
 
+static int FIX_W=0;
+ 
+double mod_x_W(double x, double Q2,double W2,int fl){
+	double mass2;
+
+	switch(fl){
+		case 0:
+			mass2=MASS_L2;
+			break;
+		case 1:
+			mass2=MASS_S2;
+			break;
+		case 2:
+			mass2=MASS_C2;
+			break;
+		case 3:
+			mass2=MASS_B2;
+			break;
+		default:
+			printf("psisq_f::wrong input %d\n",fl);
+			mass2=MASS_L2;
+	}
+	
+	double xm=(Q2+4*mass2)/(Q2+W2);
+	return  xm;
+}
+
 ///////////////////////////////////////Version 1////////////////////////////////////////////////////////
-double f2_integrand(double r, double ** par){
+double f2_integrand(double R, double ** par){
 	double xm;
 	double x = *(*par);
 	double Q2= *(*(par)+1);
 	double *sigpar=*(par+1);
 	double *sudpar=*(par+2);
 	int fl=(int)(**( par+3)+0.1);
-
-	//parameter(*(par+1),sigpar,sudpar);
-	//printf("%f\t%f\t%f\n",par[1][0],par[1][1],par[1][2]);
+	
+	double r=R/(1-R);
+	double jac=pow(1-R,-2);
 
 	double value=0.0;
 
-	//for(unsigned fl=0;fl<1/* NF-1*/;fl++){
-//	for(unsigned fl=0;fl< 1;fl++){
-		//printf("%d",fl);
+if(FIX_W==1){
+		double W2=276*276;
+		xm=mod_x_W(x, Q2, W2,fl);
+	}else{
 		xm=mod_x(x,Q2,fl);
-		value+=psisq_z_int(r, Q2, fl)* SIGMA(r,xm,Q2, sigpar,sudpar)/r ;
-		
-	//}
-	//printf("x: %.2e\tx_mod %.2e\t Q2: %.2e\t%f\t%f\t%f\tresult :%f \n", x,mod_x(x,Q2,3),Q2,*(sigpar),*(sigpar+1),*(sigpar+2),value);
+	}
+	value+=jac*psisq_z_int(r, Q2, fl)* SIGMA(r,xm,Q2, sigpar,sudpar)/r ;
 	return(value);
 }
 double f2(double Q2, double**pars){
@@ -38,7 +64,7 @@ double f2(double Q2, double**pars){
 	for(int i =0;i<(NF-1);i++){
 		pars[3][0]=i;
 		res=0;
-		simpson1dA(&f2_integrand,pars,1.0e-5,30,250,&res,&err);
+		simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,&res,&err);
 		val+=res;
 	}
 	//printf("%f\n",res);
@@ -73,7 +99,7 @@ double f2_2(double x,double q2, double *sigpar ,  double *sudpar){
 	//double prec=
 	X=x;
 	Q2=q2;
-	//int n=96;
+	//
 	double rmin=R_MIN;
 	double rmax=R_MAX;
 	rmin=rmin/(1+rmin);
@@ -85,7 +111,8 @@ double f2_2(double x,double q2, double *sigpar ,  double *sudpar){
 	//double error=0;
 	
 	double N=DGAUSS_PREC;
-	double step=(rmax-rmin)/5;
+	int n=96;
+	double step=(rmax-rmin)/7;
 	double high,low;
 	
 	
@@ -98,10 +125,10 @@ double f2_2(double x,double q2, double *sigpar ,  double *sudpar){
 		//dadapt_(&f2_integrand_2,&rmin,&rmax,&seg ,&NRel, &NAbs, &res, &error);
 		//res+=dgauss_(&f2_integrand_2,&rmin,&rmax,&N);
 		//res+=dgquad_(&f2_integrand_2,&rmin,&rmax,&n);
-		for(int i=0;i<5;i++){
+		for(int i=0;i<7;i++){
 			high+=step;
-			res+=dgauss_(&f2_integrand_2,&low,&high,&N);
-			//res+=dgquad_(&f2_integrand_2,&low,&high,&n);
+			//res+=dgauss_(&f2_integrand_2,&low,&high,&N);
+			res+=dgquad_(&f2_integrand_2,&low,&high,&n);
 			//printf(" %f %f %d\n",rmin,rmax,n);
 			low=high;
 		}

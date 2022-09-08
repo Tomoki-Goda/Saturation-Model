@@ -42,7 +42,7 @@ int main (int argc, char** argv){
 	}
 	
 	for(int i=0;i<50; i++){
-		x=pow(10,-6+4*((double)i)/50);
+		x=pow(10,-7+6*((double)i)/50);
 		sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
 #if PHI==1		
 		val=fill_arr_2(k2, step);

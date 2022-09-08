@@ -62,6 +62,8 @@ def main():
     #ax1.set_ylabel("$-\\frac{\\partial \\log F_2}{\\partial \\log x}$",rotation="vertical",loc='top')
     ax1.set_ylabel("$x-slope $",rotation="vertical",loc='top')
     ax1.set_xlabel("$Q^2$",rotation="horizontal",loc='right')
+    fig1.set_figheight(5)
+    fig1.set_figwidth(6)
     fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.9, left=0.13)
     
     if saveflag:

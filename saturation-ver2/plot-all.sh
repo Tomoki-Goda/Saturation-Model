@@ -24,10 +24,15 @@ SAVE=/media/tomoki/TOMOKI-USB/Saturation-Model/Saturation-Notes/Run2808
 	-s ${SAVE}/gluon-GBW \
 	${GBW} \
 	${GBWS}
+./visualize-gluon-x.py \
+	-s ${SAVE}/gluon-x-GBW \
+	${GBW} \
+	${GBWS}
 ./visualize-critical.py \
 	-s ${SAVE}/critical-GBW \
 	${GBW} \
 	${GBWS}
+	
 ./visualize-dipole.py \
 	-s ${SAVE}/dipole-BGK \
 	${BGK} \
@@ -42,6 +47,10 @@ SAVE=/media/tomoki/TOMOKI-USB/Saturation-Model/Saturation-Notes/Run2808
 	${BGKS}
 ./visualize-gluon.py \
 	-s ${SAVE}/gluon-BGK \
+	${BGK} \
+	${BGKS}
+./visualize-gluon-x.py \
+	-s ${SAVE}/gluon-x-BGK \
 	${BGK} \
 	${BGKS}
 ./visualize-critical.py \

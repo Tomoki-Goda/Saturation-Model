@@ -27,7 +27,7 @@ int read_options(int argc, char ** argv, double* param,double* x,double* Q2,char
 			*x=strtod(argv[2*i],&end) ;
 			*x=pow(10.0,-(*x));
 		}else if( strcmp(argv[2*i-1],"-k")==0 ){//use x for k //this should be fixed in the future
-			*x=strtod(argv[2*i],&end) ;
+			*x=strtof(argv[2*i],&end) ;
 		}else if( strcmp(argv[2*i-1],"-Q2" ) ==0){
 			*Q2=strtod(argv[2*i],&end);
 		}else if( strcmp(argv[2*i-1],"-out")==0 ){

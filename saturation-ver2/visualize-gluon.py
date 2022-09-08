@@ -68,13 +68,15 @@ def main():
         
     
     
-    ax1.legend([leg[0][0],leg[1][0],leg[2][0]],['Without Sudakov','With Sudakov $Q^2=100GeV^2$','With Sudakov $Q^2=650GeV^2$'])
+    ax1.legend([leg[0][0],leg[1][0],leg[2][0]],['Without Sudakov','With Sudakov $Q^2=100\\;\\mathrm{GeV}^2$','With Sudakov $Q^2=650\\;\\mathrm{GeV}^2$'])
     #ax1.set(title="",  ylabel="$\\alpha_s f(x k^2)$",    xlabel="$k^2$",  xscale= 'log' ,   yscale='linear' )
     ax1.set( xscale= 'log' ,   yscale='linear' )
     ax1.grid('true')
-    ax1.set_ylabel('$\\alpha_s f(x k^2)$',rotation="horizontal",loc='top')
-    ax1.set_xlabel("$k^2$",rotation="horizontal",loc='right')
-    fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
+    ax1.set_ylabel('$\\alpha_s \\mathcal{F}(x k^2)$',rotation="vertical",loc='top')
+    ax1.set_xlabel("$k^2\\;(\\mathrm{GeV}^2) $",rotation="horizontal",loc='right')
+    fig1.set_figheight(5)
+    fig1.set_figwidth(6)
+    #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
     if saveflag:
         fig1.savefig(save1)
     else:

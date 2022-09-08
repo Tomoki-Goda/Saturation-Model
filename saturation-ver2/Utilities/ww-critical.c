@@ -6,6 +6,7 @@ int main (int argc, char** argv){
 	FILE *file;
 	char file_name[500];
 	//double k2, x , q2;
+	//double x;
 	double param[10];
 	//double sudpar[10];
 	//double sigpar[10];
@@ -26,13 +27,12 @@ int main (int argc, char** argv){
 			return 1;
 	}
 	
-	for(int i=0;i<30; i++){
-		K=pow(10,-2+3*((double)i)/30);
-		val=ww_integral();
-		//val=ww_grad();
-		//val*=3.0/(4*PI);
-			
-		fprintf(file,"%.5e\t%.5e\n",K,K*val);
+	for (int i=0; i<=5; i++){
+		X= pow(10,-6+((double)4*i)/5);
+		
+		val= ww_saturation();
+		printf("%.5e\t%.5e\t%.5e\n",X,K, 4*val*val);
+		fprintf(file,"%.5e\t%.5e\n",X, 4*val*val);
 	}
 	fclose(file);
 	

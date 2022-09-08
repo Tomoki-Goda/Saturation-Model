@@ -60,8 +60,10 @@ def main():
     ax1.legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
     ax1.set( xscale= 'log' ,   yscale='log' )
     ax1.grid('true')
-    ax1.set_ylabel("$F_2$",rotation="horizontal",loc='top')
-    ax1.set_xlabel("$Q^2$ (GeV)",rotation="horizontal",loc='right')
+    ax1.set_ylabel("$F_2$",rotation="vertical",loc='top')
+    ax1.set_xlabel("$Q^2$ \\;($\\mathrm{GeV^2}$)",rotation="horizontal",loc='right')
+    fig1.set_figheight(5)
+    fig1.set_figwidth(6)
     fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.95, left=0.11)
     if saveflag:
         fig1.savefig(save1)

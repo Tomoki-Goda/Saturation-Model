@@ -16,16 +16,27 @@ SAVE=/media/tomoki/TOMOKI-USB/Saturation-Model/Saturation-Notes/Run2808
 	-s ${SAVE}/slope-GBW \
 	${GBW} \
 	${GBWS}
+
 ./visualize-F2.py \
 	-s ${SAVE}/F2-GBW \
 	${GBW} \
 	${GBWS}
+
+./visualize-FL.py \
+	-s ${SAVE}/FL-GBW \
+	${GBW} \
+	${GBWS}
+
 ./visualize-gluon.py \
 	-s ${SAVE}/gluon-GBW \
 	${GBW} \
 	${GBWS}
 ./visualize-gluon-x.py \
 	-s ${SAVE}/gluon-x-GBW \
+	${GBW} \
+	${GBWS}
+./visualize-ww-gluon.py \
+	-s ${SAVE}/ww-gluon-GBW \
 	${GBW} \
 	${GBWS}
 ./visualize-critical.py \
@@ -37,20 +48,32 @@ SAVE=/media/tomoki/TOMOKI-USB/Saturation-Model/Saturation-Notes/Run2808
 	-s ${SAVE}/dipole-BGK \
 	${BGK} \
 	${BGKS}
+
 ./visualize-slope.py \
 	-s ${SAVE}/slope-BGK \
 	${BGK} \
 	${BGKS}
+
 ./visualize-F2.py \
 	-s ${SAVE}/F2-BGK \
 	${BGK} \
 	${BGKS}
+
+./visualize-FL.py \
+	-s ${SAVE}/FL-BGK \
+	${BGK} \
+	${BGKS}
+
 ./visualize-gluon.py \
 	-s ${SAVE}/gluon-BGK \
 	${BGK} \
 	${BGKS}
 ./visualize-gluon-x.py \
 	-s ${SAVE}/gluon-x-BGK \
+	${BGK} \
+	${BGKS}
+./visualize-ww-gluon.py \
+	-s ${SAVE}/ww-gluon-BGK \
 	${BGK} \
 	${BGKS}
 ./visualize-critical.py \

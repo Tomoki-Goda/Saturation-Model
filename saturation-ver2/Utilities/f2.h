@@ -49,7 +49,7 @@ double f2_integrand(double R, double ** par){
 	double value=0.0;
 
 if(FIX_W==1){
-		double W2=276*276;
+		double W2=pow(*(*(par)),2);
 		xm=mod_x_W(x, Q2, W2,fl);
 	}else{
 		xm=mod_x(x,Q2,fl);

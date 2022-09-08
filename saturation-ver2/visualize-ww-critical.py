@@ -34,15 +34,15 @@ def main():
     dpi=[]
     r=[]
     ri=[]
-    fig1,ax1=plt.subplots(1,1 ,sharey=True,constrained_layout=True)
+    fig1,ax1=plt.subplots(1,1 ,sharey=True,layout='constrained')
     leg=[]
     #q2= ['100','650']
-    #types= ['','tmd-']
-    #names=['Curvature', 'Peak']
-    types= ['tmd-']
-    names=['Peak']
+    #types= ['','tmd-','ww-']
+    #names=['Curvature', 'Peak $\\alpha_s f$','Peak $\\Phi$']
+    types= ['ww-']
+    names=['Peak $\\Phi$']
     for j in range(len(types)):
-        with open(args[0]+'/'+types[j]+'critical-650.txt' ,"r") as fi:
+        with open(args[0]+'/ww-critical-650.txt' ,"r") as fi:
             dpi=[]
             ri=[]
             for i in fi:
@@ -50,11 +50,29 @@ def main():
                 dpi.append(float(data[1]))
                 ri.append(float(data[0]))
         leg.append( ax1.plot(ri,dpi ,c='blue',ls="--"))
-        ax1.set(xscale="log" ,   yscale='linear' )
-        ax1.grid('true')
+ 
+        with open(args[1]+'/ww-critical-5.txt' ,"r") as fi:
+            dpi=[]
+            ri=[]
+            for i in fi:
+                data=i.strip().split("\t")
+                dpi.append(float(data[1]))
+                ri.append(float(data[0]))
+        leg.append(ax1.plot(ri,dpi ,c='red',ls="-"))
+        ax1.text(ri[0]*1.1,dpi[0],'$Q^2=5 \mathrm{GeV^2}$')
+       
+        with open(args[1]+'/ww-critical-100.txt' ,"r") as fi:
+            dpi=[]
+            ri=[]
+            for i in fi:
+                data=i.strip().split("\t")
+                dpi.append(float(data[1]))
+                ri.append(float(data[0]))
+        leg.append(ax1.plot(ri,dpi ,c='red',ls="-"))
+        ax1.text(ri[0]*1.1,dpi[0],'$Q^2=100 \mathrm{GeV^2}$')
+ 
         
-        
-        with open(args[1]+'/'+types[j]+'critical-650.txt' ,"r") as fi:
+        with open(args[1]+'/ww-critical-650.txt' ,"r") as fi:
             dpi=[]
             ri=[]
             for i in fi:
@@ -64,19 +82,24 @@ def main():
         leg.append(ax1.plot(ri,dpi ,c='red',ls="-"))
         ax1.set(xscale="log" ,   yscale='log' )
         ax1.grid('true')
+
+        ax1.text(ri[0]*1.1,dpi[0],'$Q^2=650 \mathrm{GeV^2}$')
         #ax1.text(ri[len(dpi)//2]*2,dpi[len(dpi)//2]*1.5,names[j])
         
     ax1.legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     #ax1.legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
     #ax1.set( xscale= 'log' ,   yscale='log' )
     #ax1.grid('true')
-    ax1.set_ylabel("$Q^2_s \\;(\\mathrm{GeV}^2)$",rotation="vertical",loc='top')
+    ax1.set_ylabel("$Q^2_s$",rotation="horizontal",loc='top')
     ax1.set_xlabel("$x$",rotation="horizontal",loc='right')
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
     fig1.set_figheight(5)
     fig1.set_figwidth(6)
+    
+    fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
+    
     if saveflag:
-        fig1.savefig(save1)
+        plt.savefig(save1)
     else:
         plt.show()       
             

@@ -29,7 +29,9 @@ int read_options(int argc, char ** argv, double* param,double* x,double* Q2,char
 		}else if( strcmp(argv[2*i-1],"-k")==0 ){//use x for k //this should be fixed in the future
 			*x=strtof(argv[2*i],&end) ;
 		}else if( strcmp(argv[2*i-1],"-Q2" ) ==0){
-			*Q2=strtod(argv[2*i],&end);
+			*Q2=strtof(argv[2*i],&end);
+		}else if( strcmp(argv[2*i-1],"-W" ) ==0){
+			*Q2=strtof(argv[2*i],&end);
 		}else if( strcmp(argv[2*i-1],"-out")==0 ){
 			sprintf(outfile,"%s",argv[2*i]);
 		}else if( strcmp(argv[2*i-1],"-in" ) ==0){

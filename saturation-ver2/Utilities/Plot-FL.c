@@ -31,13 +31,13 @@ int main (int argc, char** argv){
 	double Q2arr[Q2len+1];
 	double param[10];
 	double x=0;
-	double Q2=0;
+	double W=0;
 	F_L=1;
 	FIX_W=1;//in f2.h
 	
 	//extern, in photon wave function
-	read_options(argc,argv,param,&x,&Q2,file_name );
-	printf("x= %.2e\tQ2= %.2e\n",x,Q2);
+	read_options(argc,argv,param,&x,&W,file_name );
+	//printf("x= %.2e\tW= %.2e\n",x,W);
 
 	for(int i =0;i<=Q2len;i++){
 		*(Q2arr+i)=pow(10.0, -1+4*((double)(i))/Q2len);
@@ -45,10 +45,10 @@ int main (int argc, char** argv){
 
 	double *par[4];
 	double var[2];
-	var[0]=x;
+	var[0]=W;
 	var[1]=0;
 	
-	//printf("x= %.2e\tQ2= %.2e\n",var[0], var[1]);
+	printf("W= %.2e\n",var[0]);
 	par[0]=var;
 	double sigpar[10];
 	double sudpar[10];

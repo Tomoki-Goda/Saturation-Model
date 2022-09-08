@@ -18,6 +18,8 @@ extern double dgauss_(double (*)(const double*), double*,double*,double *  );
 extern void simpson1dA(double(*)(double ,double**),double**,double,double,int,double*,double*);
 extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
 
+int F_L=0;
+ 
 #if SIMPS_Z_INT==0
 static double Q2;
 static double R;
@@ -66,6 +68,18 @@ double psisq_f (double R, double z, double Q2, unsigned flavourtype/*, unsigned 
 	
 	//pow(r,2) is to suppress singularity at r=0, it is compensated by the sigma
 	//printf("ep=%.5e\n",Qsq2);
+	if(F_L==1){
+	//printf("F_L\n");
+	if(Qsq2<1.0e-5){//small er approximation
+		//printf("small ep\n");
+		value =   pow(2*z*(1-z),2)* Q2 *pow(R* log(Qsq2),2) ;
+		
+	}else{
+		double	bessel_k0_2 = pow(dbesk0_(&Qsq2),2);
+		value = pow(R,2) * ( pow(2*z*(1-z),2)* Q2  * bessel_k0_2);
+	}
+
+	} else{
 	if(Qsq2<1.0e-5){//small er approximation
 		//printf("small ep\n");
 		value =   (z_bar + ( mass2+ pow(2*z*(1-z),2)* Q2 )*pow(R* log(Qsq2),2) );
@@ -74,6 +88,7 @@ double psisq_f (double R, double z, double Q2, unsigned flavourtype/*, unsigned 
 		double	bessel_k0_2 = pow(dbesk0_(&Qsq2),2);
 		double	bessel_k1_2 = pow(dbesk1_(&Qsq2),2);
 		value = pow(R,2) * (z_bar * Qsq_bar * bessel_k1_2 + ( mass2 + pow(2*z*(1-z),2)* Q2 ) * bessel_k0_2);
+	}
 	}
 	//Q2 comes from the factor to multiply F2 to get cross-section.
 	return (Q2 *  (charge_sum) * NORM *value);

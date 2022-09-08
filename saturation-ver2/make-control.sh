@@ -44,8 +44,8 @@ fi
  
  ./Append "#define NONLINEAR 1" ${RUNDIR}/*/M* 
  ./Append "#define FEJER 1" ${RUNDIR}/*/M* 
- ./Append "#define N_CHEB_R 96" ${RUNDIR}/*/M* 
- ./Append "#define DGAUSS_PREC 1.0e-8" ${RUNDIR}/*/M* 
+ ./Append "#define N_CHEB_R 108" ${RUNDIR}/*/M* 
+ ./Append "#define DGAUSS_PREC 1.0e-9" ${RUNDIR}/*/M* 
 #/////////////////////////////////////////////////////////////////////////////
 STRDIR=./Strategies
 export DIR

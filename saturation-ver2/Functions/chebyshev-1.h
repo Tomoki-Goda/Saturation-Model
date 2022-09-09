@@ -56,6 +56,29 @@ double change_var_compactify_log(double min,double max, double val){
 	}
 	return (1-2*(log(val/min) /log(max/min)) );	
 }
+////////////////////////////Frac///////////////////////////////////
+//A little special version. 
+//use negative value for max to make the max infinity
+double change_var_revert_frac(double min, double max, double val){
+	//for val =[-1,1]  return value between min and max
+
+	if((val>1)||(val<-1)){
+		printf("change_var_revert_log:: wrong input for change_var_revert\n val=%f \n",val);
+	}
+	if(max<0){
+		return ((1+2*min-val)/(1+val) ) ;
+	}else{
+		return ((1+2*min-val)*max/(max+2+max*val) ) ;
+	}
+}
+//double change_var_revert(double min,double max, double val){
+double change_var_compactify_frac(double min, double max, double val){
+	if(max<0){
+		return ((1+2*min-val)/(1+val) );	
+	}else{
+		return ((max*(1+2*min)-val*(2+max))/(max*(1+val)) );	
+	}
+}
 ////////////////////////////////  indices //////////////////////////////////////////////////
 // chebyshev approximation is done in multi dimension but to treat in the same way, tensor are treated as list. 
 unsigned convert_index(const unsigned * index, const unsigned * max, unsigned dim){
@@ -201,9 +224,12 @@ double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *de
 		ind_vec_increment(ind2,degree,dim);//increment the ind1; like in the way increasing (hr,min,sec) second by second. 
 	}
 	val=KBN_sum(arr,len);
+	static int licz=0;
 	if(isnan(val)!=0){
 		val=0;
-		printf("cheb_c:: nan encountered. Returning 0.\n");
+		if((licz++)<7){
+			printf("cheb_c:: nan encountered. Returning 0.\n");
+		}
 	}
 	return val;
 }

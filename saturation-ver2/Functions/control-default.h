@@ -36,7 +36,7 @@
 
 ////// upper and lower cut off of r ////////
 #ifndef R_MIN
-	#define R_MIN 1.0e-5
+	#define R_MIN 1.0e-8
 #endif
 #ifndef R_MAX
 	#define R_MAX 30
@@ -53,7 +53,10 @@
 	#define SATURATION  1
 #endif
 
-
+/////////////////////to control mu02 of the Sudakov/////////////
+#ifndef MU202
+	#define MU202 0 //0 to use default set in Parameter.h
+#endif
 
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////

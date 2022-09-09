@@ -6,7 +6,7 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 	double val, edm, up;
 	
 	MNCOMD(*fcn,"SET STRATEGY 0",error_flag,0);
-	MNCOMD(*fcn ,  "SET PRINTOUT 2",error_flag,0);
+	MNCOMD(*fcn,"SET PRINTOUT 2",error_flag,0);
 	MNCOMD(*fcn,"FIX 6",error_flag,0);
 	MNCOMD(*fcn,"FIX 7",error_flag,0);	
 

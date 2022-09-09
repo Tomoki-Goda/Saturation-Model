@@ -54,7 +54,7 @@ int main(int argc, char* argv[]){
 	return 0;
 #endif	
 	
-	MNCOMD(*fcn,"SET EPSMACHINE 1.0D-10 ",error_flag,0);
+	//MNCOMD(*fcn,"SET EPSMACHINE 1.0D-10 ",error_flag,0);
 	RUN_MINUIT(&fcn);
 	//int error_flag;
 	//MNCOMD(*fcn,"SET LIMITS",error_flag,0);

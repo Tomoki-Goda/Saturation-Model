@@ -12,6 +12,7 @@ extern double kahn_sum(const double *arr,int len);
 double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *degree, unsigned dim );
 double change_var_revert(double min,double max, double val);
 double change_var_revert_log(double min,double max, double val);
+double change_var_revert_frac(double , double, double val);
 void sample(double func(const double *,const double* ), const double * par,  const unsigned * degree, unsigned dim,  double* sample_arr);
 
 
@@ -47,26 +48,46 @@ static double PSI[(NF-1)*N_CHEB_R*MAXN];
 
 ////////////////////////// FORMAT ////////////////////////////////
 double psi_for_cheb(const double *rptr, const double * par){
-#if NONLINEAR==1
+#if NONLINEAR==2
+	double r=change_var_revert_frac(0,-1,*rptr);//0 to inf
+#elif NONLINEAR==1
 	double r=change_var_revert_log(R_MIN,R_MAX,*rptr);
 #else
 	double r=change_var_revert(R_MIN,R_MAX,*rptr);
-#endif
+#endif	
+	if(r<R_MIN){
+		r=R_MIN;
+	}
+	//printf("%f\n",r);
 	return psisq_z_int(r, par[0],((int)(par[1]+0.1) ));// *(Q2_DATA+i), fl);
 } 
 
 double sigma_for_cheb(const double *rptr,const double *par){
-#if NONLINEAR==1
+#if NONLINEAR==2
+	double r=change_var_revert_frac(0,-1,*rptr);//0 to inf
+#elif NONLINEAR==1
 	double r=change_var_revert_log(R_MIN,R_MAX,*rptr);
 #else
 	double r=change_var_revert(R_MIN,R_MAX,*rptr);
 #endif
  	double val;
-#if NONLINEAR==1
-	val= SIGMA(r,par[0] ,par[1], par+2, par+12);//one r for jacobian to compactify the integ.
+	double rreg=r;
+	if(r<R_MIN){
+		//when r is small integrand is like const. *r .
+		rreg=R_MIN;
+	}
+#if NONLINEAR==2
+	val= SIGMA(rreg,par[0] ,par[1], par+2, par+12)/(pow(rreg,2));
+	val*=pow(1+rreg,2);
+	//val*=2*pow(1+R_MAX+rreg*R_MAX,2)/( R_MAX*(1+2*R_MAX) );//if not 0 to inf
+	//val*=2*pow(1+R_MAX+rreg*R_MAX,2)/( R_MAX*(1+2*R_MAX+R_MAX*R_MIN) );//if not 0 to inf
+#elif NONLINEAR==1
+	val= SIGMA(rreg,par[0] ,par[1], par+2, par+12)/(rreg);//one r for jacobian to compactify the integ.
 #else
-	val= SIGMA(r,par[0] ,par[1], par+2, par+12)/r;	
+	val= SIGMA(rreg,par[0] ,par[1], par+2, par+12)/(rreg*rreg);	
 #endif
+	val*=r;
+
 	////////////////////////////////////////////////////////////////////////////////////////////
  	//CAUTION!!
 	// +12 above is not for good reason, simply par is one array and can't pass separate arrays. 
@@ -148,36 +169,26 @@ void sample_integrand(const  double *psi_arr,  double  *samples, const double* p
 }
 
 double curtis_clenshaw_sum(const double *sample_arr){
+	//technically Fejer quadrature
+	
 	double summand[N_CHEB/2+1];
 	int ind=0;
 	double val;
 	
 	summand[0]= cheb_c(sample_arr, &ind , &N_CHEB , 1 );
-	//int flag=0;
 	for(int i=1; i<(N_CHEB/2 ) ;i++){
-		//if(flag!=0){
-		//	summand[i]=0;
-		//}
 		ind=2*i;
 		val=cheb_c(sample_arr, &ind , &N_CHEB , 1 );
-		//printf("%.3e\t",val);
 		val*=2.0/( 1-ind*ind );
-		//printf("%.3e\n",val);
 		summand[i]=val;
-		
-		//if((val/summand[0])<1.0e-5){
-		//	flag=i;
-		//}
 	}
-	
-	val =cheb_c(sample_arr, &ind , &N_CHEB , 1 ) ;
-	//printf("%.3e\t",val);
-	val*=1.0/(1-N_CHEB*N_CHEB);
-	//printf("%.3e\n\n",val);
-	summand[N_CHEB/2]=val;
+	//printf("%.5e\n", val);
+	//val =cheb_c(sample_arr, &ind , &N_CHEB , 1 ) ;
+	//val*=1.0/(1-N_CHEB*N_CHEB);
+	//summand[N_CHEB/2]=val;
 	
 	
-	return KBN_sum(summand,N_CHEB/2+1);
+	return KBN_sum(summand,N_CHEB/2);
 	 
 }
 
@@ -191,7 +202,9 @@ void generate_data_set(const double *par,const double *psi_arr,double *samples, 
 	
 	double val;
 	int shift;
-#if NONLINEAR==1
+#if NONLINEAR==2
+	double jac=1;
+#elif NONLINEAR==1	
 	double jac=log(R_MAX/R_MIN);
 #else
 	double jac=(R_MAX-R_MIN);

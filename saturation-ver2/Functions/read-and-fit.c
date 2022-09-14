@@ -27,7 +27,7 @@
 
 int N_SIMPS=N_SIMPS_R;
 int N_CHEB=N_CHEB_R;
-
+double CS_COMP[MAXN];
 ////////////////////////////////////////////////////////
 char datadir[]="/home/tomoki/Saturation-Model/saturation-ver2/data";
 ///////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ double compute_chisq(const double *par){
 	double val;
 //	clock_t time;
 //	time=clock();
-	double cs[N_DATA];//computed cross-section
+	//double cs[N_DATA];//computed cross-section
 
 	//static double psi_arr[(5)*(( N_SIMPS_R>N_CHEB_R)? N_SIMPS_R : N_CHEB_R  )*MAXN];
 	
@@ -110,13 +110,13 @@ double compute_chisq(const double *par){
 	}
 
 #endif
-	generate_data_set(par, PSI,SAMPLES, cs);
+	generate_data_set(par, PSI,SAMPLES,CS_COMP);
 	
 	double chiarr[N_DATA];	
 	for(unsigned i=0;i<N_DATA;i++){
 		//chisq+=pow( ( cs[i]-CS_DATA[i] )/(ERR_DATA[i]),2);
 		//chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
-		chiarr[i]=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
+		chiarr[i]=pow( ( *(CS_COMP+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
 		
 	}
 	
@@ -202,13 +202,19 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 		parameter(par,sigpar,sudpar);
 #endif
 		double res, chi=0;
+		double resarr[N_DATA];
 		for(unsigned i=0;i<N_DATA;i++){
-				res=f2_2(X_DATA[i],Q2_DATA[i], sigpar , sudpar);
+				resarr[i]=f2_2(X_DATA[i],Q2_DATA[i], sigpar , sudpar);
 				//printf("CERNLIB int =%.3e CS=%.3e\n",res, CS_DATA[i]);
-				chi+=pow((res-CS_DATA[i])/ERR_DATA[i],2);				
+				chi+=pow((resarr[i]-CS_DATA[i])/ERR_DATA[i],2);
 			}
 	
-		sprintf(outline," fcn diff= %.7e\n",*fcnval-chi);
+		sprintf(outline,"fcn-cern: fcn diff= %.7e\n",*fcnval-chi);
+		if(fabs(*fcnval-chi)>1.0e-5){
+			for(int i=0; i<N_DATA;i++){
+				printf("array=%.5e\tCERN=%.5e\tdiff= %.5e\t CS=%.5e\tQ2=%.5e\tx=%.5e\n", CS_COMP[i],resarr[i],CS_COMP[i]-resarr[i],CS_DATA[i],Q2_DATA[i],X_DATA[i]);
+			}
+		}
 		log_printf(log_file,outline);
 		printf("\n\n%s\n\n",outline);
 	}else{

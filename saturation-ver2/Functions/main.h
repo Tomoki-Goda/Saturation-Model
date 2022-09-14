@@ -40,7 +40,22 @@ int MINUIT_INIT(){
 	printf("Gauss eps: %.2e\t Simps N: %d CHEB N: %d \t \n", DGAUSS_PREC,N_SIMPS_R, N_CHEB_R);
 	printf("-----------------------------------------------------------------------------\n");
 	
-	
+#if MU202!=0
+#if (MODEL==3 && INDEPENDENT_RMAX==0)
+	printf(" mu202 is not free. Cannot be controlled\n");
+#elif MU0==0
+	printf(" mu202 is not used rmax is. mu202 cannot be controlled\n");
+#else
+	//int pos;
+	for(int i=0;i<N_PAR;i++){
+		if(strcmp(par_name[i],"mu202")==0){
+			par_start[i]=MU202;
+			printf("mu202 set to %.5e\n",par_start[i]);
+			break;
+		}
+	}
+#endif
+#endif
 //////////////////////////     Initialize Minuit     ////////////////////////////////////////
 	MNINIT(5,6,7);
 	/* Parameters definition */

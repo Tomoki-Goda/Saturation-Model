@@ -90,7 +90,8 @@ where
 $m_f$ is the quark mass,
 and $K_1(z)$ and $K_0(z)$ are the modified Bessel's functions.
 
- The dipole cross-section $\sigma_{\mathrm{dp}}$ is related to the gluon density and thus contains non-perturbative effects. Therefore, it has to be modelled. In the region of large dipole size $r$, multi-gluon exchange becomes important and the saturation effects come into play. The present study has roots in the Golec-Biernat W\"usthoff (GBW) model of the dipole cross-section \cite{gbw1998}, which describes the saturation effects in a very simple form.
+The dipole cross-section $\sigma_{\mathrm{dp}}$ is related to the gluon density and thus contains non-perturbative effects. {\color{blue} Therefore, it has to be, to an extent, modelled. Nonetheless, solving appropriate evolution equeations, such as the Balitsky-Kovchegov equation, is computationally expensive, and thus it is useful to have a simple model to describe the saturation effects.}\\
+In the region of large dipole size $r$, multi-gluon exchange becomes important and the saturation effects come into play. The present study has roots in the Golec-Biernat W\"usthoff (GBW) model of the dipole cross-section \cite{gbw1998}, which describes the saturation effects in a very simple form.
 In the next section, two models on which we develop our modified versions, namely the Golec-Biernat W\"usthoff (GBW) model\cite{gbw1998} and the Bartels Golec-Biernat Kowalski (BGK) model\cite{bgk2002}, are briefly summarized.  In sections 3 and 4, a summary of the modification is given. In section 5, the result of fitting to the data from the HERA\cite{hera} is presented. %{\color{blue}correction comment in summary}   
  
 \section{GBW and BGK models }
@@ -193,17 +194,17 @@ As one can see in Eq.~(\ref{eq:impact}), $\sigma_0$ is related to the effective 
 
 %\section{$k_T$ factorization, dipole cross section, unintegrated gluon distribution and more...}
 \section{The Sudakov form factor }
-In this section, we discuss how the Sudakov form factor is implemented in the above saturation models.%{\color{blue} and introduce unintegrated gluon distribution.}
-The dipole cross-section, $\sigma_{\mathrm{dp}}(x, r) $, and the unintegrated gluon distribution, $\mathcal{F}(x,k^2)$, are related to each other by %\footnote{it can also be written$\sigma_{\mathrm{dp}}(x,r) = \frac{4 \pi}{3} \int\frac{d^2 k}{k^4} \alpha_s f(x, k^2) \left(1-e^{\pm i \pairdot{k}{r}}\right) $ considering the independence on the direction of $\mathbf{r}$.}
+In this section, we discuss how the Sudakov form factor is implemented in the above saturation models. %{\color{blue} and introduce unintegrated gluon distribution.}
+The dipole cross-section, $\sigma_{\mathrm{dp}}(x, r) $, and the unintegrated gluon distribution, $\mathcal{F}(x,k^2)$, are related to each other by\footnote{it can also be written $\sigma_{\mathrm{dp}}(x,r) = \frac{4 \pi}{3} \int\frac{d^2 k}{k^4} \alpha_s \mathcal{F}(x, k^2) \left(1-e^{\pm i \pairdot{k}{r}}\right) $ considering it only depends on the relative angle between $\mathbf{r}$ and $\mathbf{k}$.}
 \cite{bgk2002}
 \begin{align} 
-\sigma_{\mathrm{dp}}(x,r) &= \frac{2 \pi}{3} \int\frac{d^2 \mathbf{k} }{k^2} \alpha_s f(x, k^2) |1-e^{-i \pairdot{k}{r}}|^2,
+\sigma_{\mathrm{dp}}(x,r) &= \frac{2 \pi}{3} \int\frac{d^2 \mathbf{k} }{k^2} \alpha_s \mathcal{F}(x, k^2) |1-e^{-i \pairdot{k}{r}}|^2,
 \label{eq:ugdtosigma}\\
 \alpha_s \mathcal{F}(x,k^2) &= \frac{3 }{16 \pi^3}\int d^2 \mathbf{r} e^{i \pairdot{k}{r}}  \nabla^2_{\mathbf{r}} \sigma_{\mathrm{dp}}(x,r),
 \label{eq:sigmatougd}
 \end{align}
-{\color{blue} $|...|^2$ can be seen in Ref.~\cite{bgk2002} Eq.~(15). Expanding \& considering rot. inv. , one can recover $1-e^{-ik\cdot r} $ with a factor 2.} 
-where the unintegrated gluon distribution, $\mathcal{F}(x,k^2)$, is related to the integrated gluon distribution, $g(x,Q^2)$, by the relation, for large $Q^2$ \cite{bgk2002},%{\color{red}(large Q only? bgk)} 
+%{\color{blue} $|...|^2$ can be seen in Ref.~\cite{bgk2002} Eq.~(15). Expanding \& considering rot. inv. , one can recover $1-e^{-ik\cdot r} $ with a factor 2.} 
+where the unintegrated gluon distribution is related to the integrated gluon distribution, $g(x,Q^2)$, by the relation, for large $Q^2$ \cite{bgk2002},%{\color{red}(large Q only? bgk)} 
 \begin{equation}
 \alpha_s(Q^2) x g(x,Q^2)=\int^{Q^2}_{0} d k^2 \alpha_s \mathcal{F}(x,k^2).
 \end{equation}
@@ -420,13 +421,13 @@ Figs.~\ref{fig:gridGBW} and \ref{fig:gridBGK} show the $F_2$ plotted with the HE
 The large-$Q^2$ region of the GBW model is modified significantly while the BGK model and the lower-$Q^2$ region of the GBW model show only slight change, mostly in the gradient. 
 Fig.~\ref{fig:gridGBW} clearly shows that the highest improvement in the GBW model comes from the high-$Q^2$ region. The region of medium values of $Q^2$ also contribute but this is partly due to the large number of data points. (The bottom histogram is not per degrees of freedom.) As for the BGK model (Fig.~\ref{fig:gridBGK}), the improvement comes more evenly from all values of  $Q^2$, but the largest contribution comes from the medium to low-$Q^2$ region, particularly the region around $\mu_0$ and $\mu_{\mathrm{s0}}$.
 
-\begin{figure}[t]
-\resizebox{0.5\textwidth}{!}{
+\begin{figure}[H]
+\resizebox{\textwidth}{!}{
 \includegraphics{./Plots/dipole-GBW.png}
 }
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/dipole-BGK.png}
-}
+%\resizebox{0.5\textwidth}{!}{
+%\includegraphics{./Plots/dipole-BGK.png}
+%}
 \caption{The dipole cross-section $\sigma_{\mathrm{dp}}$ at $Q^2=650\;\mathrm{GeV^2}$, and $x=10^{-2},10^{-4}, 10^{-6}$ (from bottom to top).\\Left: GBW, Right: BGK}
 %\label{dipole-bgk}
 \label{dipole}
@@ -467,34 +468,42 @@ Top: $F_2$. BGK (Dashed blue) and BGKS (Solid red) and HERA data (Error bars), w
 \label{fig:gridBGK}
 \end{figure}
 
-\begin{figure}[t]
-\resizebox{0.5\textwidth}{!}{
+\begin{figure}[H]
+\resizebox{\textwidth}{!}{
 \includegraphics{./Plots/F2-GBW.png}
 }
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/F2-BGK.png}
-}
+%\resizebox{0.5\textwidth}{!}{
+%\includegraphics{./Plots/F2-BGK.png}
+%}
 \caption{The structure function $F_2$ , and $x=10^{-2}, 10^{-4}, 10^{-6}$ (from bottom to top).\\Left: GBW, Right: BGK}
 \label{F2}
 \end{figure}
+\begin{figure}[H]
+\resizebox{\textwidth}{!}{
+\includegraphics{./Plots/slope-GBW.png}
+}
+\caption{The $x$-slope of $F_2$,  $\lambda_{\mathrm{eff}}=-\frac{\partial \log F_2}{\log x}$, at $Q^2=650$GeV, and $x=10^{-2},10^{-4}, 10^{-6}$ (from bottom to top).\\Left: GBW, Right: BGK}
+\label{slope}
+\end{figure}
 
-\begin{figure}[t]
-\resizebox{0.5\textwidth}{!}{
+
+\begin{figure}[H]
+\resizebox{\textwidth}{!}{
 \includegraphics{./Plots/gluon-GBW.png}
 }
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/gluon-BGK.png}
-}
+%\resizebox{0.5\textwidth}{!}{
+%\includegraphics{./Plots/gluon-BGK.png}
+%}
 \caption{$\alpha_s\mathcal{F}(x,k^2)$ plotted for $x=10^{-4}$. Notice the broadening effect of the Sudakov factor.\\Left: GBW, Right: BGK}
 \label{fig:gluon}
 \end{figure}
-\begin{figure}[t]
-\resizebox{0.5\textwidth}{!}{
+\begin{figure}[H]
+\resizebox{\textwidth}{!}{
 \includegraphics{./Plots/gluon-x-GBW.png}
 }
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/gluon-x-BGK.png}
-}
+%\resizebox{0.5\textwidth}{!}{
+%\includegraphics{./Plots/gluon-x-BGK.png}
+%}
 \caption{$\alpha_s\mathcal{F}(x,k^2)$ plotted for $k^2=1\mathrm{GeV^2}$. Notice the broadening effect of the Sudakov factor.\\Left: GBW, Right: BGK}
 \label{fig:gluon-x}
 \end{figure}
@@ -504,13 +513,13 @@ Comparisons of $x$-dependent saturation scale are presented in Fig.~\ref{fig:cri
 
 %{\color{pink}Comparisons of $x$-dependent saturation scale are presented in Fig.~\ref{fig:critical}. While the change in GBW model from the definition Eq.~(\ref{eq:peak}) are only in the slope, the saturation scale of the BGK model and that of the GBW model from the definition Eq.~(\ref{eq:curvature}) becomes higher, implying the saturation effect to show at slightly higher scale than expected from the original models.} %{\color{red}$Q^2$ dependence of the saturation scale? what to show? ``peak'' version has no noticeable dependence. } 
 
-\begin{figure}[t]
-\resizebox{0.5\textwidth}{!}{
+\begin{figure}[H]
+\resizebox{\textwidth}{!}{
 \includegraphics{./Plots/critical-GBW.png}
 }
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/critical-BGK.png}
-}
+%\resizebox{0.5\textwidth}{!}{
+%\includegraphics{./Plots/critical-BGK.png}
+%}
 \caption{Saturation scale $Q_S^2(x)$\\
 %\caption{Saturation scale $Q_S^2(x)$  obtained from two different criteria:\\
 %$\frac{\partial^2 \sigma }{\partial r^2}=0$ (Curvature) \& $\frac{\partial \alpha_s\mathcal{F}(x,k^2) }{\partial k}=0$ (Peak).\\ 
@@ -518,6 +527,19 @@ The line was plotted for $Q^2=650\;\mathrm{ GeV^2}$.\\Left: GBW, Right: BGK }
 \label{fig:critical}
 \end{figure}
 
+
+\begin{figure}[H]
+\resizebox{\textwidth}{!}{
+\includegraphics{./Plots/FL-GBW.png}
+}
+%\resizebox{0.5\textwidth}{!}{
+%\includegraphics{./Plots/FL-BGK.png}
+%}
+\caption{Longitudinal structure function $F_L$ at fixed $W=100, 200, 300$ GeV (from bottom to top).
+The effects of the Sudakov factor is primarily in the large-$Q^2$ region, lifting up the line for both GBW and BGK models.\\ 
+Left: GBW, Right: BGK}
+%\label{fig:critical}
+\end{figure}
 
 \section{Summary}
 In this paper we have presented the effects of the Sudakov form factor in the Golec-Biernat W\"ustfoff (GBW) model and the Bartels Golec-Biernat Kowalski (BGK) model. 
@@ -535,52 +557,31 @@ The results of fittings with the HERA data in the range $0.045\mathrm{GeV} \leq 
 
 
 
-\begin{figure}[H]
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/slope-GBW.png}
-}
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/slope-BGK.png}
-}
-\caption{The $x$-slope of $F_2$  at $Q^2=650$GeV, and $x=10^{-2},10^{-4}, 10^{-6}$ (from bottom to top).\\Left: GBW, Right: BGK}
-\label{slope}
-\end{figure}
 
 \begin{figure}[H]
-\resizebox{0.5\textwidth}{!}{
+\resizebox{\textwidth}{!}{
 \includegraphics{./Plots/ww-gluon-GBW.png}
 }
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/ww-gluon-BGK.png}
-}
+%\resizebox{0.5\textwidth}{!}{
+%\includegraphics{./Plots/ww-gluon-BGK.png}
+%}
 \caption{Weizs\"acke-Williams gluon distrubution $\phi=k\int \frac{d^2r}{r^2} e^{-i r\cdot k} \sigma_{\mathrm{dp}}(x,r,Q^2)$.\\Left: GBW, Right: BGK
 }
 %\label{fig:gluon}
 \end{figure}
 
 \begin{figure}[H]
-\resizebox{0.5\textwidth}{!}{
+\resizebox{\textwidth}{!}{
 \includegraphics{./Plots/ww-critical-GBW.png}
 }
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/ww-critical-BGK.png}
-}
+%\resizebox{0.5\textwidth}{!}{
+%\includegraphics{./Plots/ww-critical-BGK.png}
+%}
 \caption{Saturation scale $Q_s^2(x)$  obtained from the Weiz\"acker-Williams gluon distribution.
 The crieria is analogous to Eq.~(\ref{eq:peak}) for $\phi=k\int \frac{d^2r}{r^2} e^{-i r\cdot k} \sigma_{\mathrm{dp}}(x,r,Q^2)$ but with an extra factor 2 as in the original GBW saturation scale.  i.e., $Q_s=2 k_s$.\\Left: GBW, Right: BGK }
 %\label{fig:critical}
 \end{figure}
 
-\begin{figure}[H]
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/FL-GBW.png}
-}
-\resizebox{0.5\textwidth}{!}{
-\includegraphics{./Plots/FL-BGK.png}
-}
-\caption{Longitudinal structure function $F_L$ at fixed $W=100, 200, 300$ GeV (from bottom to top).
-The effects of the Sudakov factor is primarily in the large-$Q^2$ region, lifting up the line for both GBW and BGK models.\\ 
-Left: GBW, Right: BGK}
-%\label{fig:critical}
-\end{figure}
+
 
 \end{document}

@@ -26,13 +26,13 @@ int main (int argc, char** argv){
 			return 1;
 	}
 	
-	for(int i=0;i<30; i++){
-		K=pow(10,-2+3*((double)i)/30);
+	for(int i=0;i<25; i++){
+		K=pow(10,-1+2*((double)i)/25);
 		val=ww_integral();
 		//val=ww_grad();
 		//val*=3.0/(4*PI);
 			
-		fprintf(file,"%.5e\t%.5e\n",K,K*val);
+		fprintf(file,"%.5e\t%.5e\n",K*K,K*val);
 	}
 	fclose(file);
 	

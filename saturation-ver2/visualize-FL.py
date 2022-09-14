@@ -27,43 +27,43 @@ def main():
             saveflag=True
             print("SAVE")
         else:
-            print("Unknown") 
-        
-    
+            print("Unknown")  
     dp=[]
     dpi=[]
     r=[]
     ri=[]
-    fig1,ax1=plt.subplots( )
+    fig1,ax1=plt.subplots(1,2,constrained_layout=True,sharex=True, sharey=True )
     leg=[]
-    for w in ['100', '200', '300']:   
-        with open(args[0]+'/FL-'+w+'.txt' ,"r") as fi:
-            dpi=[]
-            ri=[]
-            for i in fi:
-                data=i.strip().split("\t")
-                dpi.append(float(data[1]))
-                ri.append(float(data[0]))
-        leg.append( ax1.plot(ri,dpi ,c='blue',ls="--"))
-        ax1.text(float(data[0])/2,float(data[1]),"W="+w+'GeV')
-        
-        with open(args[1]+'/FL-'+w+'.txt',"r") as fi:
-            dpi=[]
-            ri=[]
-            for i in fi:
-                data=i.strip().split("\t")
-                dpi.append(float(data[1]))
-                ri.append(float(data[0]))
-        leg.append(ax1.plot(ri,dpi ,c='red',ls="-"))
-    
-    ax1.legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
-    ax1.set( xscale= 'log' ,   yscale='linear' )
-    ax1.grid('true')
-    ax1.set_ylabel("$F_L$",rotation="vertical",loc='top')
-    ax1.set_xlabel("$Q^2 \\;(\\mathrm{GeV^2})$",rotation="horizontal",loc='right')
+    name=['GBW','BGK']
+    for l in range(2):
+        ax1[l].text(5.0e-1,1.0e-2,name[l],fontsize=25)
+        for w in ['100', '200', '300']:   
+            with open(args[0+2*l]+'/FL-'+w+'.txt' ,"r") as fi:
+                 dpi=[]
+                 ri=[]
+                 for i in fi:
+                     data=i.strip().split("\t")
+                     dpi.append(float(data[1]))
+                     ri.append(float(data[0]))
+            leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
+            ax1[l].text(float(data[0])/2,float(data[1]),"W="+w+'GeV')
+             
+            with open(args[1+2*l]+'/FL-'+w+'.txt',"r") as fi:
+                dpi=[]
+                ri=[]
+                for i in fi:
+                    data=i.strip().split("\t")
+                    dpi.append(float(data[1]))
+                    ri.append(float(data[0]))
+            leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
+        ax1[l].set( xscale= 'log' ,   yscale='linear' )
+        ax1[l].grid('true')
+    ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
+    ax1[0].set_ylabel("$F_L$",rotation="vertical",loc='top')
+    ax1[1].set_xlabel("$Q^2 \\;(\\mathrm{GeV^2})$",rotation="horizontal",loc='right')
     fig1.set_figheight(5)
-    fig1.set_figwidth(6)
-    fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.95, left=0.11)
+    fig1.set_figwidth(10)
+    #fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.95, left=0.11)
     if saveflag:
         fig1.savefig(save1)
     else:

@@ -160,7 +160,7 @@ def main():
         #chi+=pow((float(f2d[j])-float(f2c[j]))/float(f2e[j]),2)
         #count+=1
         ax1[pos[0]][pos[1]].set(  xscale="log" ,   yscale='linear')
-        ax1[pos[0]][pos[1]].text(xarr[0]*3, yarr[0]/1.05,"$Q^2$={val}".format(val=float(q2val)) )
+        ax1[pos[0]][pos[1]].text(xarr[0]*3, yarr[0]/1.05,"$Q^2={val}$".format(val=float(q2val)) )
         #ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
         ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
         ax1[pos[0]][pos[1]].yaxis.set_minor_locator(plt.NullLocator())
@@ -203,7 +203,7 @@ def main():
                 
         ax2[pos[0]][pos[1]].set(xscale="log" ,   yscale='linear' )
         #ax2[pos[0]][pos[1]].legend()
-        ax2[pos[0]][pos[1]].text(1.0e-4, 0.6,"$Q^2$={val}".format(val=float(q2val)) )
+        ax2[pos[0]][pos[1]].text(1.0e-4, 0.6,"$Q^2={val}$".format(val=float(q2val))) 
         #ax2[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
         ax2[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
         ax2[pos[0]][pos[1]].xaxis.set_major_locator(plt.FixedLocator([1.0e-6,1.0e-4,1.0e-2] ))
@@ -222,11 +222,11 @@ def main():
     fig1.set_figheight(8)
     fig1.set_figwidth(6)
     #fig.set_ylabel( "F_2" ,rotation="horizontal",loc='top')
-    fig1.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.95)
-    fig2.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.95)
+    fig1.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.95,fontsize=13)
+    fig2.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.95,fontsize=13)
     
-    fig1.supxlabel("$x$",rotation="horizontal",y=0.015,x=0.99)
-    fig2.supxlabel("$x$",rotation="horizontal",y=0.015,x=0.99)
+    fig1.supxlabel("$x$",rotation="horizontal",y=0.015,x=0.99,fontsize=13)
+    fig2.supxlabel("$x$",rotation="horizontal",y=0.015,x=0.99,fontsize=13)
     #fig1.subplots_adjust(bottom=0.05, right=0.95, top=0.95, left=0.05)
     #fig2.subplots_adjust(bottom=0.05, right=0.95, top=0.95, left=0.05)
     
@@ -281,8 +281,8 @@ def main():
     
     #ax2.set_ylabel("$\chi^2/N$ ", loc='center' )
     #ax1.set_ylabel("$\chi^2/N$", loc='center' )
-    ax1.set_ylabel("Without Sudakov\n$\chi^2/N$", loc='center' )
-    ax2.set_ylabel("With Sudakov\n$\chi^2/N$", loc='center' )
+    ax1.set_ylabel("Without Sudakov\n$\\chi^2/N$", loc='center' )
+    ax2.set_ylabel("With Sudakov\n$\\chi^2/N$", loc='center' )
     
     
     
@@ -296,12 +296,12 @@ def main():
     #############################################################
     #fig, ax3=plt.subplots(1,1,sharey=True,sharex=True,constrained_layout=True)
     ax3.bar(q2set,diff,tick_label=binlabel,color='red')
-    ax3.set_xlabel("$Q^2$", loc='right' )
+    ax3.set_xlabel("$Q^2\\;(\\mathrm{GeV^2})$", loc='right' )
     ax3.margins(x=0)
     ax3.grid(visible='true', axis='y')
-    ax3.set_ylabel("difference\n$\chi^2$", loc='center' )
-    fig.set_figheight(4)
-    fig.set_figwidth(12)
+    ax3.set_ylabel("difference\n$\\chi^2$", loc='center' )
+    fig.set_figheight(5)
+    fig.set_figwidth(13)
     
     if saveflag:
         fig.savefig(save3)

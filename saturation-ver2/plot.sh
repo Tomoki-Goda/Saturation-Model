@@ -6,7 +6,7 @@ for dir in ../Run2808/*/M*
 do
 	for x in 2 4 6
 	do
-		for q2 in 5 100 650
+		for q2 in 1 5 50 100 650
 		do		
 			${dir}/dipole -in ${dir}/result.txt -out ${dir}/dipole-${q2}-${x}.txt -x ${x} -Q2 ${q2}
 			${dir}/tmd-gluon -in ${dir}/result.txt -out ${dir}/gluon-${q2}-${x}.txt -x ${x} -Q2 ${q2}
@@ -17,14 +17,14 @@ do
 		${dir}/F2-slope -in ${dir}/result.txt -out ${dir}/F2-slope-${x}.txt -x ${x}
 			
 	done
-	for q2 in 5 100 650
+	for q2 in 1 5 50 100 650
 	do	
 		for k in 0.5 1 2
 		do
 			${dir}/tmd-gluon-x -in ${dir}/result.txt -out ${dir}/gluon-x-${k}-${q2}.txt -Q2 ${q2} -k ${k}
 		done
 		${dir}/critical -in ${dir}/result.txt -out ${dir}/critical-${q2}.txt -Q2 ${q2}
-		${dir}/tmd-critical -in ${dir}/result.txt -out ${dir}/tmd-critical-${q2}.txt -Q2 ${q2}
+		#${dir}/tmd-critical -in ${dir}/result.txt -out ${dir}/tmd-critical-${q2}.txt -Q2 ${q2}
 		#echo "hello"
 	done
 	

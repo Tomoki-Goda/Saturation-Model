@@ -9,7 +9,7 @@
 
 #include"./Parameters.h"
 
-#define PHI 1
+#define PHI 0 
 
 #include"./plot.c"
 #include"./tmd-gluon.h"
@@ -40,8 +40,8 @@ int main (int argc, char** argv){
 		printf("tmd-gluon:: file can't be opened. %s\n",file_name);
 		return 1;
 	}
-	for (int i=0; i<500; i++){
-		k=1.0e-1 + pow(10,-5+((double)7*i)/500);
+	for (int i=0; i<100; i++){
+		k= pow(10,-1+((double)2*i)/100);
 #if PHI==1
 		val=fill_arr_2(k, step);
 #else

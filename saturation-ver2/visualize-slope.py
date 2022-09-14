@@ -34,37 +34,38 @@ def main():
     dpi=[]
     r=[]
     ri=[]
-    fig1,ax1=plt.subplots( )
+    fig1,ax1=plt.subplots(1,2,constrained_layout=True,sharex=True,sharey=True )
     leg=[]
-    for j in ['2','4','6']:
-        with open(args[0]+'/F2-slope-'+j+'.txt' ,"r") as fi:
-            dpi=[]
-            ri=[]
-            for i in fi:
-                data=i.strip().split("\t")
-                dpi.append(float(data[1]))
-                ri.append(float(data[0]))
-        leg.append( ax1.plot(ri,dpi ,c='blue',ls="--"))
-        ax1.text(ri[(len(ri)//5)*3],dpi[(len(ri)//5)*3],"x=$10^{-"+j+"}$" )
-        with open(args[1]+'/F2-slope-'+j+'.txt',"r") as fi:
-            dpi=[]
-            ri=[]
-            for i in fi:
-                data=i.strip().split("\t")
-                dpi.append(float(data[1]))
-                ri.append(float(data[0]))
-        leg.append(ax1.plot(ri,dpi ,c='red',ls="-"))
-    
-    ax1.legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
-    #ax1.set(title="",  ylabel="$\\frac{\\log\\partial F_2}{\\log\\partial x}$",    xlabel="$Q^2$",  xscale= 'log' ,   yscale='log' )
-    ax1.set( xscale= 'log' ,   yscale='linear' )
-    ax1.grid('true')
+    name=['GBW','BGK']
+    for l in range(2):
+        ax1[l].text(1.0e-2,0.35,name[l],fontsize=25)
+        for j in ['2','4','6']:
+            with open(args[0+2*l]+'/F2-slope-'+j+'.txt' ,"r") as fi:
+                 dpi=[]
+                 ri=[]
+                 for i in fi:
+                     data=i.strip().split("\t")
+                     dpi.append(float(data[1]))
+                     ri.append(float(data[0]))
+            leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
+            ax1[l].text(ri[(len(ri)//5)*3],dpi[(len(ri)//5)*3],"x=$10^{-"+j+"}$" )
+            with open(args[1+2*l]+'/F2-slope-'+j+'.txt',"r") as fi:
+                dpi=[]
+                ri=[]
+                for i in fi:
+                    data=i.strip().split("\t")
+                    dpi.append(float(data[1]))
+                    ri.append(float(data[0]))
+            leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
+        ax1[l].set( xscale= 'log' ,   yscale='linear' )
+        ax1[l].grid('true')
+    ax1[0].legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
     #ax1.set_ylabel("$-\\frac{\\partial \\log F_2}{\\partial \\log x}$",rotation="vertical",loc='top')
-    ax1.set_ylabel("$x-slope $",rotation="vertical",loc='top')
-    ax1.set_xlabel("$Q^2$",rotation="horizontal",loc='right')
+    ax1[0].set_ylabel("$x-slope $",rotation="vertical",loc='top')
+    ax1[1].set_xlabel("$Q^2$",rotation="horizontal",loc='right')
     fig1.set_figheight(5)
-    fig1.set_figwidth(6)
-    fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.9, left=0.13)
+    fig1.set_figwidth(10)
+    #fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.9, left=0.13)
     
     if saveflag:
         fig1.savefig(save1)

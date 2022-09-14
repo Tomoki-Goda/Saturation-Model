@@ -63,7 +63,7 @@ double ww_integrand_grad(const double * r){
 
 double ww_integral(){
 	double res,err;
-	double max=(2)*PI*25/K, min=1.0e-5;
+	double max=(2)*PI*50/K, min=1.0e-5;
 	//int n=96;
 	//res=dgquad_(&ww_integrand,&min,&max,&n);
 	

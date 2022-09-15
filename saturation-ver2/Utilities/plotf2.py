@@ -249,7 +249,7 @@ def main():
     chipp2=[sum(i) for i in (chi2)]
     print(sum([ sum(i) for i in chi2])/sum([ len(i) for i in chi2]))
     
-    diff=[chipp[i]-chipp2[i] for i in range(len(chipp)) ]
+    diff=[chipp2[i]-chipp[i] for i in range(len(chipp)) ]
     
     chipp=[sum(i)/len(i) for i in (chi1)]
     chipp2=[sum(i)/len(i) for i in (chi2)]

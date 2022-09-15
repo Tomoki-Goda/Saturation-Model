@@ -41,7 +41,7 @@ def main():
     for l in range(2):
         ax1[l].text(1.0e-2,10,name[l],fontsize=25)
         for j in ['4']:
-            with open(args[0+2*l]+'/ww-gluon-650-'+j+'.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/ww-gluon-500-'+j+'.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:
@@ -49,7 +49,7 @@ def main():
                     dpi.append(float(data[1]))
                     ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            for k in ['5','50','650']:            
+            for k in ['5','50','500']:            
                 with open(args[1+2*l]+'/ww-gluon-{0}-'.format(k)+j+'.txt',"r") as fi:
                     dpi=[]
                     ri=[]
@@ -66,7 +66,7 @@ def main():
     #ax1.set(title="",  ylabel="$\\alpha_s f(x k^2)$",    xlabel="$k^2$",  xscale= 'log' ,   yscale='linear' )
     ax1[0].set_ylabel('$\\Phi(x, k^2)$',rotation="vertical",loc='top')
     ax1[1].set_xlabel("$k^2$",rotation="horizontal",loc='right')
-    fig1.set_figheight(5)
+    fig1.set_figheight(4)
     fig1.set_figwidth(10)
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
     if saveflag:

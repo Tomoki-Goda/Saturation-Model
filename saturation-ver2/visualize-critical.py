@@ -44,7 +44,7 @@ def main():
     name=['GBW','BGK']
     for l in range(2):
         ax1[l].text(1.0e-6,0.4,name[l],fontsize=25)
-        with open(args[0+2*l]+'/'+types[j]+'critical-650.txt' ,"r") as fi:
+        with open(args[0+2*l]+'/'+types[j]+'critical-100.txt' ,"r") as fi:
             dpi=[]
             ri=[]
             for i in fi:
@@ -56,7 +56,7 @@ def main():
         ax1[l].grid('true')
         
         
-        with open(args[1+2*l]+'/'+types[j]+'critical-650.txt' ,"r") as fi:
+        with open(args[1+2*l]+'/'+types[j]+'critical-100.txt' ,"r") as fi:
             dpi=[]
             ri=[]
             for i in fi:
@@ -71,7 +71,7 @@ def main():
     ax1[0].set_ylabel("$Q^2_s \\;(\\mathrm{GeV}^2)$",rotation="vertical",loc='top')
     ax1[1].set_xlabel("$x$",rotation="horizontal",loc='right')
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
-    fig1.set_figheight(5)
+    fig1.set_figheight(4)
     fig1.set_figwidth(10)
     if saveflag:
         fig1.savefig(save1)

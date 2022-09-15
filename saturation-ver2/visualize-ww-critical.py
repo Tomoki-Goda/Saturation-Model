@@ -45,7 +45,7 @@ def main():
     for l in range(2):
         ax1[l].text(1.0e-6,0.4,name[l],fontsize=25)
         for j in range(len(types)):
-            with open(args[0+2*l]+'/ww-critical-650.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/ww-critical-500.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:
@@ -53,7 +53,7 @@ def main():
                     dpi.append(float(data[1]))
                     ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            for k in ['5','50', '650']:    
+            for k in ['5','50', '500']:    
                 with open(args[1+2*l]+('/ww-critical-{0}.txt'.format(k)) ,"r") as fi:
                     dpi=[]
                     ri=[]
@@ -71,7 +71,7 @@ def main():
     ax1[0].set_ylabel("$Q^2_s$",rotation="horizontal",loc='top')
     ax1[1].set_xlabel("$x$",rotation="horizontal",loc='right')
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
-    fig1.set_figheight(5)
+    fig1.set_figheight(4)
     fig1.set_figwidth(10)
     
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)

@@ -22,9 +22,11 @@ do
 		for k in 0.5 1 2
 		do
 			${dir}/tmd-gluon-x -in ${dir}/result.txt -out ${dir}/gluon-x-${k}-${q2}.txt -Q2 ${q2} -k ${k}
+			${dir}/ww-gluon-x -in ${dir}/result.txt -out ${dir}/ww-gluon-x-${k}-${q2}.txt -Q2 ${q2} -k ${k}
 		done
-		${dir}/critical -in ${dir}/result.txt -out ${dir}/critical-${q2}.txt -Q2 ${q2}
-		#${dir}/tmd-critical -in ${dir}/result.txt -out ${dir}/tmd-critical-${q2}.txt -Q2 ${q2}
+		#${dir}/critical -in ${dir}/result.txt -out ${dir}/critical-${q2}.txt -Q2 ${q2}
+		${dir}/tmd-critical -in ${dir}/result.txt -out ${dir}/tmd-critical-${q2}.txt -Q2 ${q2}
+		#${dir}/ww-critical -in ${dir}/result.txt -out ${dir}/ww-critical-${q2}.txt -Q2 ${q2}
 		#echo "hello"
 	done
 	

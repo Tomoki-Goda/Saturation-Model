@@ -2,30 +2,30 @@
 \usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
 \geometry{a4paper}
 
-
+\usepackage{babel}
 \usepackage[table]{xcolor}
 \usepackage[utf8]{inputenc}
-%\usepackage{multicol}
+%\usepackage[T1]{fontenc}
 \usepackage{amsfonts}
+\usepackage{ragged2e}
 \usepackage{amsmath}
 \usepackage{amssymb}
-%\usepackage{fancyhdr}
-%\usepackage{tabularx,ragged2e,booktabs,caption}
-%\usepackage{breqn}
 \usepackage{graphicx}
-%\usepackage{subcaption}
 \usepackage{wrapfig}
 \usepackage{physics}
 \usepackage{hyperref}
 \usepackage{ragged2e}
-\usepackage{framed}
 \usepackage{float}
 \usepackage{rotating}
+\usepackage{ulem}
+\usepackage{authblk}
+
 \usepackage[
-%backend=bibtex,
-%style=ieee
 backend=bibtex,
-style=phys
+%style=ieee
+maxbibnames=3,
+%backend=bibtex,
+style=ieee
 ]{biblatex}
 \addbibresource{./ref/golec.bib}
 \addbibresource{./ref/gbw1998.bib}
@@ -38,7 +38,7 @@ style=phys
 \addbibresource{./ref/minuit.bib}
 \addbibresource{./ref/hera.bib}
 \addbibresource{./ref/jk2006.bib}
-
+\addbibresource{./ref/FL.bib}
 \addbibresource{./ref/stasto2018.bib}
 \addbibresource{./ref/stebel2020.bib}
 \addbibresource{./ref/ellis1996.bib}
@@ -50,7 +50,8 @@ style=phys
 
 \newcommand{\pairdot}[2]{ \mathbf{#1}\cdot\mathbf{#2}  }
 \begin{document}
-\author{Tomoki Goda}
+\author{Krzystof Kutak, Sebastian Sapeta, Tomoki Goda
+}	 
 \title{ Effects of Sudakov form factor in\\ the
 Golec-Biernat W\"usthoff saturation model}
 \date{\today}
@@ -100,7 +101,7 @@ In Ref.~\cite{gbw1998}, the following form of the dipole cross-section was propo
 \sigma_{\mathrm{GBW}}(x ,r )=\sigma_{0} \left(1-e^{-\frac{r^2}{4} Q_0^2\left(\frac{x_0}{x}\right)^{\lambda} }\right),
 \label{eq:gbw}
 \end{equation}
-and the modified variable 
+and a modified variable 
 \begin{equation}
 x_m=x \left(1+\frac{4 m_f^2}{Q^2}\right),
 \label{eq:modx}
@@ -109,10 +110,6 @@ where $m_f$ is an effective mass of a quark $f$,
 was used in place of the Bjorken scaling variable $x$. In the rest of this paper, the subscript $m$ is dropped. Along with the above modification, effective mass of the light quarks $m_l=0.14\mathrm{GeV}$ was introduced in order to study the photoproduction limit ($Q^2\rightarrow0$) of DIS. 
 
 The GBW model incorporates two main features which characterize two regions of $r$ separated by the saturation scale $Q_s(x)$, which we discuss in detail later.
-%\begin{itemize} 
-%\item $\sigma_{\mathrm{GBW}}(x,r)|_{r\rightarrow 0 }\sim\frac{r^2}{4}Q_0 ^2\left(\frac{x_0}{x}\right)^{\lambda} $,
-%\item $\sigma_{\mathrm{GBW}} (x,r)\sim \sigma_0 $ as $r$ rises ($r\sim 1$ fm).% \cite{golec}).
-%\end{itemize}
 The first behaviour, 
 \begin{align}
 && \sigma(x,r)&\sim r^2 & r&\ll 2/Q_s(x),
@@ -123,28 +120,7 @@ The second behaviour,
 && \sigma(x,r)&\sim \sigma_0 & r&\gg 2/Q_s(x),
 \end{align}
 is related to the saturation phenomenon. \\
-%{\color{green} move the folloing part to the section Saturation Scale ...}
-%{\color{gray}
-%The saturation scale $Q_s(x)$, which is an energy scale, below which saturation effects are important, was defined in terms of $r=R_0(x)$ where it was related to the saturation scale as
-%\begin{equation}
-%R_0(x)=2/Q_s(x).
-%\end{equation}
-%The model was constructed such that the saturation scale satisfies the condition
-%\begin{equation}
-%\frac{r^2}{4} Q_0^2\left(\frac{x_0}{x}\right)^{\lambda} =1.
-%\label{eq:satdef}
-%\end{equation}
-%Hence,
-%\begin{equation}
-%Q_s^2(x) =Q_0^2\left(\frac{x_0}{x}\right)^{\lambda}.
-%\end{equation}
-%The variables $r$ and  $Q$ are related in a way that the $z$ -integrated integrand in Eq.~(\ref{eq:factorization}) peaks around $r=2/Q$. Therefore one expects the behavoir of the dipole cross-section to be affect in the reigon about $Q^2\sim1/r^2$.
-%}
 
-
-%\subsection{Bartels Golec-Biernat Kowalski (DGLAP improved) Model }
-
-%As it will be discussed later in detail (cf. Eq. \ref{eq:smallr}), in the small $r$ limit\cite{bgk2002}, 
 The GBW model in the small-$r$ limit behaves as 
 \begin{equation}
 \sigma_{\mathrm{GBW}}\simeq\frac{r^2}{4} Q_0^2\left(\frac{x_0}{x}\right)^{\lambda}.
@@ -173,14 +149,6 @@ and thus the modification Eq.~(\ref{eq:bgk}) properly introduced the QCD behavio
 While the modification improved the small-$r$ region, % due to the parametrization of $\mu^2$, 
 in the large-$r$ region, where $\mu^2\simeq \mu_0^2$, $\sigma_{\mathrm{BGK}}$ recovers the form of GBW model as desired.  
 
-%{\color{gray}
-%With the definition Eq.~(\ref{eq:satdef}), the saturation scale in the BGK model is given by
-%\begin{equation}
-%Q^2_s(x)= \frac{\pi^2 \alpha_s(\mu^2) x g(x,\mu^2)}{3 \sigma_0}.
-%\end{equation}
-%since $r$ correspondng to the saturation scale is 
-%}
-{\color{blue}
 While, in principle, the dipole cross-section is impact-parameter, $b$, dependent \cite{impact}:\\
 i.e.,
 \begin{equation}
@@ -189,13 +157,13 @@ i.e.,
 \end{equation} 
 we will consider $b$-integrated dipole cross-section.
 As one can see in Eq.~(\ref{eq:impact}), $\sigma_0$ is related to the effective size of the target.% $\sigma_0=2\pi R^2$.
-}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\section{$k_T$ factorization, dipole cross section, unintegrated gluon distribution and more...}
 \section{The Sudakov form factor }
 In this section, we discuss how the Sudakov form factor is implemented in the above saturation models. %{\color{blue} and introduce unintegrated gluon distribution.}
-The dipole cross-section, $\sigma_{\mathrm{dp}}(x, r) $, and the unintegrated gluon distribution, $\mathcal{F}(x,k^2)$, are related to each other by\footnote{it can also be written $\sigma_{\mathrm{dp}}(x,r) = \frac{4 \pi}{3} \int\frac{d^2 k}{k^4} \alpha_s \mathcal{F}(x, k^2) \left(1-e^{\pm i \pairdot{k}{r}}\right) $ considering it only depends on the relative angle between $\mathbf{r}$ and $\mathbf{k}$.}
+The dipole cross-section, $\sigma_{\mathrm{dp}}(x, r) $, and the unintegrated gluon distribution, $\mathcal{F}(x,k^2)$, are related to each other by\footnote{it can also be written $\sigma_{\mathrm{dp}}(x,r) = \frac{4 \pi}{3} \int\frac{d^2 k}{k^4} \alpha_s \mathcal{F}(x, k^2) \left(1-e^{\pm i \pairdot{k}{r}}\right) $, considering it only depends on the relative angle between $\mathbf{r}$ and $\mathbf{k}$.}
 \cite{bgk2002}
 \begin{align} 
 \sigma_{\mathrm{dp}}(x,r) &= \frac{2 \pi}{3} \int\frac{d^2 \mathbf{k} }{k^2} \alpha_s \mathcal{F}(x, k^2) |1-e^{-i \pairdot{k}{r}}|^2,
@@ -222,16 +190,6 @@ The Sudakov form factor, $S(r,Q^2)$, can be included by using the above formula 
 \end{equation}
 The dipole cross-section on the right hand side now depends on the hard scale, $Q^2$.
 
-%Now, by integrating over angles,
-%\begin{equation}
-%\sigma_{\mathrm{dp}}(x,r,Q^2) =\int^\infty_0 \frac{d k}{ k} \left( 1- J_0(k r) \right) \int^\infty_0 d {r'}  {r'}  J_0(k {r'} ) e^{-S_{pert}({r'} ,Q^2)} \nabla^2_{{r'} }\sigma_{\mathrm{dp}}(x,{r'} ).
-%\end{equation}
-%Finally, using 
-%\begin{equation}
-%\int^\infty_0 \frac{d k}{k} J_0({r'} k)(1-J_0(rk))=\log\left(\frac{r}{{r'} }\right)\theta(r-{r'} ),
-%\end{equation}
-%one obtains
-%\begin{framed}
 The above integral can be performed analytically, and one obtains
 \begin{equation}
 \sigma_{\mathrm{dp}}(x,r,Q^2) =\int^r _0 d {r'}   {r'}  \log\left(\frac{r}{{r'} }\right) e^{-S({r'} ,Q^2)} \nabla^2_{{r'} }\sigma_{\mathrm{dp}}(x,{r'} ).
@@ -249,43 +207,43 @@ As discussed above, the saturation limit, $\sigma_0$, is related to the effectiv
 
 In the present study, we focus on the leading order of the perturbative Sudakov factor\cite{xiao2017},
 \begin{equation}
-S^{(1)}_{pert}=\frac{C_A }{2 \pi} \int^{Q^2}_{\mu_b^2  } \alpha(\mu^2 )\frac{d \mu^2}{\mu^2}  \log\left(\frac{Q^2}{\mu^2}\right).
+S^{(1)}_\mathrm{pert}=\frac{C_A }{2 \pi} \int^{Q^2}_{\mu_b^2  } \alpha(\mu^2 )\frac{d \mu^2}{\mu^2}  \log\left(\frac{Q^2}{\mu^2}\right).
 \end{equation}
 For the case of running coupling $\alpha_s(\mu^2)=\frac{1}{b_0 \log\left(\frac{\mu^2}{\Lambda_2}\right) }$, we get
 %\begin{framed}
 \begin{multline}
-S^{(1)}_{pert}(r,Q) =\frac{C_A}{2 \pi b_0} \Big[-\log\left(\frac{Q^2}{\mu^2_b}\right) \\+\left(\frac{1+\alpha(\mu_b^2)  b_0 \log \left(\frac{Q^2}{\mu_b^2}\right) }{\alpha(\mu_b^2)   b_0}\right) \log\left( 1+\alpha(\mu_b^2)   b_0 \log \left(\frac{Q^2}{\mu_b^2}\right) \right) \Big],
+S^{(1)}_\mathrm{pert}(r,Q) =\frac{C_A}{2 \pi b_0} \Big[-\log\left(\frac{Q^2}{\mu^2_b}\right) \\+\left(\frac{1+\alpha(\mu_b^2)  b_0 \log \left(\frac{Q^2}{\mu_b^2}\right) }{\alpha(\mu_b^2)   b_0}\right) \log\left( 1+\alpha(\mu_b^2)   b_0 \log \left(\frac{Q^2}{\mu_b^2}\right) \right) \Big],
 \label{eq:sudakov}
 \end{multline}
 where $b_0=\frac{11 C_A-2 n_f}{12}$.
 %\end{framed}
-The lower limit of the integral $\mu_b=C_s/r$, where $C_s=2e^{-\gamma_E}$, and $\gamma_E \approx 0.577$ is the Euler-Mascheroni constant.\\
+The lower limit of the integral $\mu_b=C_\mathrm{S}/r$, where $C_\mathrm{S}=2e^{-\gamma_\mathrm{E}}$, and $\gamma_\mathrm{E} \approx 0.577$ is the Euler-Mascheroni constant.\\
 Two points have to be clarified in the above expression.
 Firstly, the lower limit of the integration is restricted to the region $\mu_b<Q$ such that for $\mu_b>Q$, $S(r,Q)=0$. That is to say that in the limit $Q^2\rightarrow0$, the effect of the Sudakov factor nil. Consequently, for a fixed value of $Q^2$, the small-$r$ limit of the original dipole cross-section is recovered.   Such restriction is not present in the original CSS formula\cite{css1985} (See also Ref.~\cite{collins2016} for the improved treatment for small $r$.), but as we are concerned with relatively low values of $Q^2$, one needs to consider the region $1/r^2\sim k^2 >Q^2$.
 In short, in the limit $Q\rightarrow 0$ we recover the original GBW/BGK model. Also in the limit $r \rightarrow 0$, again,  we recover the original GBW/BGK model.
 Secondly, as the dipole size $r$ becomes large, the integration enters the non-perturbative region. In order to keep it perturbative, one can use so-called ``$b_*$-prescription'' \cite{css1985}, in which 
 \begin{equation}
-\mu_b^2=C_s^2/r_*^2= C_s^2/r^2+C_s^2/r_{\mathrm{max}}^2.
+\mu_b^2=C_\mathrm{S}^2/r_*^2= C_\mathrm{S}^2/r^2+C_\mathrm{S}^2/r_{\mathrm{max}}^2.
 \end{equation}
-The constant $r_{\mathrm{max}}$ is chosen such that in the large-$r$ region $\mu_b^2\simeq C_s^2/r_{\mathrm{max}}^2>>\Lambda_{\mathrm{QCD}}^2$.
+The constant $r_{\mathrm{max}}$ is chosen such that in the large-$r$ region $\mu_b^2\simeq C_\mathrm{S}^2/r_{\mathrm{max}}^2>>\Lambda_{\mathrm{QCD}}^2$.
 In principle, one can include also the non-perturbative Sudakov factor\cite{css1985, prokudin2015}:
 \begin{equation}
-S(r,Q^2)= S_{pert}(r,Q^2)+S_{np}(r,Q^2),
+S(r,Q^2)= S_\mathrm{pert}(r,Q^2)+S_\mathrm{np}(r,Q^2),
 \end{equation}
 where we assume the form in Ref.~\cite{prokudin2015}
 \begin{equation}
-S_{np}(r,Q^2)=g_1r^2+g_2\log\left(\frac{r}{r_*}\right)\log\left(\frac{Q}{Q_0}\right).
+S_\mathrm{np}(r,Q^2)=g_1r^2+g_2\log\left(\frac{r}{r_*}\right)\log\left(\frac{Q}{Q_0}\right).
 \end{equation}
-Considering that $\nabla^2_r \sigma$ in Eq.~(\ref{eq:gbssigma}) has a factor $e^{-a r^2}$, where $a$ is the appropriate factor in the respective models, it is apparent that the general behaviour of $S_{np}\sim r^2$ is already present in the models. 
-The non-perturbative Sudakov factor is primarily important in the region $1/r<Q\lesssim 1/r_{\mathrm{max}}$. However, in such region, the second term is small compared to the first term, not only because of the suppression by $\log(Q/Q_0)$, but also because in the large-$r$ region, $r^2>\log\left({r}/{r_*}\right)$.  Therefore, one expects the contribution from the second term to be in the small region of not too small $Q$ and not too large $r$. One, however, needs to keep in mind that the Sudakov factor is in the integrand of the dipole cross-section Eq.~(\ref{eq:gbssigma}). That is to say that in the large-$r$ region of the dipole cross-section, it has effect from the small-$r'$ region of the integrand.
-Nevertheless, the improvement by the non-perturbative Sudakov factor is less than 5\% for the BGK model and practically no improvement for the GBW model, and thus we neglect it in this study. Since diffractive DIS is more sensitive to the large-$r$ region, it may become necessary to include the non-perturbative factor in that case.
+Considering that $\nabla^2_r \sigma$ in Eq.~(\ref{eq:gbssigma}) has a factor $e^{-a r^2}$, where $a$ is the appropriate factor in the respective models, it is apparent that the general behaviour of $S_\mathrm{np}\sim r^2$ is already present in the models. 
+The non-perturbative Sudakov factor is primarily important in the region $1/r<Q\lesssim 1/r_{\mathrm{max}}$. However, in such region, the second term is small compared to the first term, not only because of the suppression by $\log(Q/Q_0)$, but also because in the large-$r$ region, $r^2>\log\left({r}/{r_*}\right)$.  Therefore, one expects the contribution of the second term to be comparatively smaller than that of the $\sim r^2$ term, and only possible region where it may contribute is confined in the small region of not too small $Q$ and not too large $r$. One, however, needs to keep in mind that the Sudakov factor is in the integrand of the dipole cross-section Eq.~(\ref{eq:gbssigma}). That is to say that in the large-$r$ region of the dipole cross-section, it has effect from the small-$r'$ region of the integrand.
+Nevertheless, as we briefly discuss later in section~5, the improvement by the non-perturbative Sudakov factor is less than 5\% for the BGK model and practically no improvement for the GBW model, and thus we neglect it in this study. Since diffractive DIS is more sensitive to the large-$r$ region, it may become necessary to include the non-perturbative factor in that case.
 
-In this study, we shall employ an alternative form of $\mu_b$ proposed in Ref.~\cite{gbs2018}:
+In this study, we shall employ for both $g(x,\mu)$ and the Sudakov factor an alternative form of $\mu_b$ proposed in Ref.~\cite{gbs2018}:
 \begin{equation}
 \mu_b^2= \frac{\mu_0^2}{1-e^{-r^2\frac{\mu_0^2}{C} }},
 \label{eq:newstar}
 \end{equation}
-where $\mu_0^2=C/r_{\mathrm{max}}^2$ for both $g(x,\mu)$ and the Sudakov factor.
+where $\mu_0^2=C/r_{\mathrm{max}}^2$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -350,7 +308,7 @@ However, for the Sudakov-improved models, studied in this work, $\sigma_0$ is no
 %4-r^2Q_s^2=0,
 %%\end{equation}
 %recovering the original relation.
-There for one needs to consider an alternative definition of the saturation scale.
+Therefore, one needs to consider an alternative definition of the saturation scale.
 As an alternative form, one considers the unintegrated gluon density $\alpha_s\mathcal{F}(x,k^2)$,
 and defines in terms of the transverse momentum $k$ (i.e., the Fourier conjugate variable of $r$):
 \begin{equation}
@@ -362,7 +320,7 @@ Then, for the GBW model
 \frac{\partial \alpha_s \mathcal{F}(x,k^2)}{\partial k}= \frac{4 k}{Q_s^4} { e^{-\frac{k^2}{Q_s^2}}} \left(Q_s^2-k^2\right).
 \end{equation}
 Therefore, Eq.~\ref{eq:peak} can also be used as a definition.
-The saturation defined by Eq.~(\ref{eq:peak}) corresponds to the scale at with the density of gluons is at its maximum.
+The saturation defined by Eq.~(\ref{eq:peak}) corresponds to the scale at which the density of gluons is at its maximum.
 
 %Alternatively,  one considers the unintegrated gluon density \cite{jk2006} 
 %\begin{equation}
@@ -377,9 +335,18 @@ The saturation defined by Eq.~(\ref{eq:peak}) corresponds to the scale at with t
 
 
 \section{Implementation and results}
+\begin{table}[H]
+\hfill
+\input{./Plots/GBWSnp.tex}
+\hfill
+\input{./Plots/BGKSnp.tex}
+\hfill
+\caption{$\chi^2/\mathrm{dof}$ for fits with and without non-perturbative Sudakov factor, with 5 values of $\mu_{0\mathrm{S}}^2$ for the Sudakov factor. It is clear that when $\mu_{0\mathrm{S}}^2$ is set small, effects of non-perturbative Sudakov factor are negligible. }
+\label{table:Snp}
+\end{table}
+
 In this study, the Sudakov factor (Eq.~(\ref{eq:sudakov})) is incorporated in the GBW and BGK models, as discussed earlier. %(Eq.~\ref{eq:gbssigma}). 
-The values for $C_s$ and $\mu_{0s}^2$ in Eq.~(\ref{eq:newstar}) (The subscript $s$ was added to differentiate from those for the collinear gluon density.) for the Sudakov factor are fixed at 1.26$\approx (2e^{-\gamma_E})^2$ and 2 $\mathrm{GeV^2}$, 
-and thus no additional fit parameters are needed. The choice of $\mu_{0s}^2$  is somewhat arbitrary, and if it was set higher, the effect of the non-perturbative Sudakov factor becomes more relevant. 
+The values for $C_\mathrm{S}$ and $\mu_{0\mathrm{S}}^2$ in Eq.~(\ref{eq:newstar}) (The subscript $\mathrm{S}$ was added to differentiate from those for the collinear gluon density.) for the Sudakov factor are fixed at 1.26$\approx (2e^{-\gamma_\mathrm{E}})^2$ and 2 $\mathrm{GeV^2}$, and thus no additional fit parameters are needed. The choice of $\mu_{0\mathrm{S}}^2$  is somewhat arbitrary, and if it was set higher, the effects of the non-perturbative Sudakov factor become more relevant. {\color{blue}This can be seen in Tab.~\ref{table:Snp}, that at sufficiently small value of $\mu_{0\mathrm{S}}^2$, one can neglect the non-perturbative Sudakov factor. While it is interesting to see in the BGK model, that inclusion of the non-perturbative factor indeed soften the dependence on the choice of $\mu_{0\mathrm{S}}$, since it is preferable to have less parameters for the technical purpose, we chose to use the above value of $\mu_{0\mathrm{S}}^2$ and omit non-perturbative factor.}
 As we fit the model to the data up to $Q^2=650\;\mathrm{GeV^2}$, the charm and bottom quarks are included.  
 The masses for the $c$ and $b$ quarks are 1.3 GeV and 4.6 GeV, respectively, which are the values used in Ref.~\cite{gbs2018}. As for the light quarks, a massive case with $m_l=$0.14 GeV, which is the value used originally in Ref.~\cite{gbw1998}, and the massless case were studied.  The Bjorken scaling variable $x$ was modified as in Eq.~(\ref{eq:modx}). %{\color{red}find the reason behind.}
 The parameters in the GBW and BGK models (and their improved versions), $\{\sigma_0, x_0, \lambda\}$ and  $\{\sigma_0, A_g, \lambda_g, C, \mu_0\}$ respectively, are fitted to $F_2$ from the HERA data\cite{hera} in the range of $0.045\mathrm{GeV^2} \leq Q^2\leq 650 \mathrm{GeV^2}$ and $x \leq0.01$ using MINUIT\cite{minuit} package. % and integration subroutines from \textit{CERNLIB}\cite{cernlib}.
@@ -419,7 +386,7 @@ Tab.~\ref{table:Qup} shows significant improvement in the GBW model for the high
 What is important here is that the Sudakov-improved models have better tolerance for the wide range of the photon virtuality, and the Sudakov-improved BGK model has almost no deterioration for having wide range of $Q^2$.\\
 Figs.~\ref{fig:gridGBW} and \ref{fig:gridBGK} show the $F_2$ plotted with the HERA data and the bottom histograms depict the difference in the $\chi^2$ value in each frame . 
 The large-$Q^2$ region of the GBW model is modified significantly while the BGK model and the lower-$Q^2$ region of the GBW model show only slight change, mostly in the gradient. 
-Fig.~\ref{fig:gridGBW} clearly shows that the highest improvement in the GBW model comes from the high-$Q^2$ region. The region of medium values of $Q^2$ also contribute but this is partly due to the large number of data points. (The bottom histogram is not per degrees of freedom.) As for the BGK model (Fig.~\ref{fig:gridBGK}), the improvement comes more evenly from all values of  $Q^2$, but the largest contribution comes from the medium to low-$Q^2$ region, particularly the region around $\mu_0$ and $\mu_{\mathrm{s0}}$.
+Fig.~\ref{fig:gridGBW} clearly shows that the highest improvement in the GBW model comes from the high-$Q^2$ region. The region of medium values of $Q^2$ also contribute but this is partly due to the large number of data points. (The bottom histogram is not per degrees of freedom.) As for the BGK model (Fig.~\ref{fig:gridBGK}), the improvement comes more evenly from all values of  $Q^2$, but the largest contribution comes from the medium to low-$Q^2$ region, particularly the region around $\mu_0$ and $\mu_{0\mathrm{S}}$.
 
 \begin{figure}[H]
 \resizebox{\textwidth}{!}{
@@ -428,15 +395,15 @@ Fig.~\ref{fig:gridGBW} clearly shows that the highest improvement in the GBW mod
 %\resizebox{0.5\textwidth}{!}{
 %\includegraphics{./Plots/dipole-BGK.png}
 %}
-\caption{The dipole cross-section $\sigma_{\mathrm{dp}}$ at $Q^2=650\;\mathrm{GeV^2}$, and $x=10^{-2},10^{-4}, 10^{-6}$ (from bottom to top).\\Left: GBW, Right: BGK}
+\caption{The dipole cross-section $\sigma_{\mathrm{dp}}$ at $Q^2=100\;\mathrm{GeV^2}$, and $x=10^{-2},10^{-4}, 10^{-6}$ (from bottom to top).\\Left: GBW, Right: BGK}
 %\label{dipole-bgk}
 \label{dipole}
 \end{figure}
 
-The effect of the Sudakov factor in the structure function, $F_2$, is shown in the Fig.~\ref{F2}. The changes are less obvious compared to the dipole cross-section, which is because the large-$r$ region, where the dipole cross-section was affected the most, is largely suppressed by the photon wave function.  Nonetheless, for both models the effect of the modification makes the increase of $F_2$ with $1/x$ milder (i.e. lowering the effective slope $\lambda_{\mathrm{eff}}=-\frac{\partial \log F_2}{\log x}$. cf. Fig~\ref{slope}), %({\color{red} easier to see in the plot of the slope})
+The effect of the Sudakov factor in the structure function, $F_2$, is shown in the Fig.~\ref{F2}. The changes are less obvious compared to the dipole cross-section, which is because the large-$r$ region, where the dipole cross-section was affected the most, is largely suppressed by the photon wave function.  Nonetheless, for both models the effect of the modification makes the increase of $F_2$ with $1/x$ milder (i.e., lowering the effective slope $\lambda_\mathrm{eff}=-\frac{\partial \log F_2}{\log x}$. cf. Fig~\ref{slope}), %({\color{red} easier to see in the plot of the slope})
 and to lower $F_2$ in the large and small-$Q^2$ region (This can also be seen in Figs.~\ref{fig:gridGBW} and \ref{fig:gridBGK}). 
 The unintegrated gluon distributions obtained from the models are shown in Figs.~\ref{fig:gluon} and \ref{fig:gluon-x}. As discussed in the previous section, the unintegrated gluon distributions from the modified models do not vanish in the limit $k^2\rightarrow0$. Both models show large change in the distribution, and the distribution appears to be smeared out both over $k^2$ and $x$, particularly, towards the low-$k^2$ and low-$x$ regions. As a result of the smearing effect, one can see in the BGK model, that the region where the gluon density was negative is lifted up.   
-Although the shape of the distribution changes, the position of the peak remains at about the same place, implying little modification to the saturation scale ( cf. Fig.~\ref{fig:critical}). 
+Although the shape of the distribution changes, the position of the peak remains at about the same place, implying little modification to the saturation scale (cf. Fig.~\ref{fig:critical}). 
 
 
 \begin{figure}[p]
@@ -482,7 +449,7 @@ Top: $F_2$. BGK (Dashed blue) and BGKS (Solid red) and HERA data (Error bars), w
 \resizebox{\textwidth}{!}{
 \includegraphics{./Plots/slope-GBW.png}
 }
-\caption{The $x$-slope of $F_2$,  $\lambda_{\mathrm{eff}}=-\frac{\partial \log F_2}{\log x}$, at $Q^2=650$GeV, and $x=10^{-2},10^{-4}, 10^{-6}$ (from bottom to top).\\Left: GBW, Right: BGK}
+\caption{The $x$-slope of $F_2$,  $\lambda_\mathrm{eff}=-\frac{\partial \log F_2}{\log x}$,  and $x=10^{-2},10^{-4}, 10^{-6}$ (from bottom to top). The slope is generally lowered, and this can be seen also in Figs.~\ref{fig:gridGBW} and \ref{fig:gridBGK}\\Left: GBW, Right: BGK}
 \label{slope}
 \end{figure}
 
@@ -494,7 +461,7 @@ Top: $F_2$. BGK (Dashed blue) and BGKS (Solid red) and HERA data (Error bars), w
 %\resizebox{0.5\textwidth}{!}{
 %\includegraphics{./Plots/gluon-BGK.png}
 %}
-\caption{$\alpha_s\mathcal{F}(x,k^2)$ plotted for $x=10^{-4}$. Notice the broadening effect of the Sudakov factor.\\Left: GBW, Right: BGK}
+\caption{$\alpha_s\mathcal{F}(x,k^2)$ plotted for $x=10^{-4}$ and $Q^2=5, 50 , 500\; \mathrm{GeV^2}$ (from top to bottom). Notice the broadening effect of the Sudakov factor, particularly towards the small value of $k^2$.\\Left: GBW, Right: BGK}
 \label{fig:gluon}
 \end{figure}
 \begin{figure}[H]
@@ -504,13 +471,13 @@ Top: $F_2$. BGK (Dashed blue) and BGKS (Solid red) and HERA data (Error bars), w
 %\resizebox{0.5\textwidth}{!}{
 %\includegraphics{./Plots/gluon-x-BGK.png}
 %}
-\caption{$\alpha_s\mathcal{F}(x,k^2)$ plotted for $k^2=1\mathrm{GeV^2}$. Notice the broadening effect of the Sudakov factor.\\Left: GBW, Right: BGK}
+\caption{$\alpha_s\mathcal{F}(x,k^2)$ plotted for $k^2=1\;\mathrm{GeV^2}$ and $Q^2=5, 50 , 500\; \mathrm{GeV^2}$ (from top to bottom). Notice the broadening effect of the Sudakov factor, particularly towards the small value of $x$.\\Left: GBW, Right: BGK}
 \label{fig:gluon-x}
 \end{figure}
 
 As one can see in Fig.~\ref{dipole}, the dipole cross-section starts to bend somewhat earlier due to the Sudakov factor. For the small value of $Q^2$ near the expected saturation scale, the effect of the Sudakov factor is relatively small, yet this causes the saturation to take effect earlier and at the same time, the transition becomes slower. This means that the critical line becomes less clear as transition becomes milder over a wider range. % As discussed earlier, the definition of the saturation scale in terms of the dipole cross-section becomes less clear.
 Comparisons of $x$-dependent saturation scale are presented in Fig.~\ref{fig:critical}. While the change in the GBW model  are only in the slope, the saturation scale of  BGK model becomes higher for the whole range of $x$, implying the saturation effect to show at slightly higher scale than expected from the original models.
-
+{\color{blue}Finally, we present the longitudinal sturucture function $F_L$ in Fig.~\ref{fig:FL} with H1 data \cite{FL}. Both the GBW and BGK models show similar effects from the Sudakov factor. The main effects are in the large-$Q^2$ region, and for both the models, $F_L$ is higher when the Sudakov factor is present. }
 %{\color{pink}Comparisons of $x$-dependent saturation scale are presented in Fig.~\ref{fig:critical}. While the change in GBW model from the definition Eq.~(\ref{eq:peak}) are only in the slope, the saturation scale of the BGK model and that of the GBW model from the definition Eq.~(\ref{eq:curvature}) becomes higher, implying the saturation effect to show at slightly higher scale than expected from the original models.} %{\color{red}$Q^2$ dependence of the saturation scale? what to show? ``peak'' version has no noticeable dependence. } 
 
 \begin{figure}[H]
@@ -520,10 +487,10 @@ Comparisons of $x$-dependent saturation scale are presented in Fig.~\ref{fig:cri
 %\resizebox{0.5\textwidth}{!}{
 %\includegraphics{./Plots/critical-BGK.png}
 %}
-\caption{Saturation scale $Q_S^2(x)$\\
+\caption{Saturation scale $Q_s^2(x)$.
 %\caption{Saturation scale $Q_S^2(x)$  obtained from two different criteria:\\
 %$\frac{\partial^2 \sigma }{\partial r^2}=0$ (Curvature) \& $\frac{\partial \alpha_s\mathcal{F}(x,k^2) }{\partial k}=0$ (Peak).\\ 
-The line was plotted for $Q^2=650\;\mathrm{ GeV^2}$.\\Left: GBW, Right: BGK }
+The line was plotted for $Q^2=100\;\mathrm{ GeV^2}$.\\Left: GBW, Right: BGK }
 \label{fig:critical}
 \end{figure}
 
@@ -535,16 +502,17 @@ The line was plotted for $Q^2=650\;\mathrm{ GeV^2}$.\\Left: GBW, Right: BGK }
 %\resizebox{0.5\textwidth}{!}{
 %\includegraphics{./Plots/FL-BGK.png}
 %}
-\caption{Longitudinal structure function $F_L$ at fixed $W=100, 200, 300$ GeV (from bottom to top).
-The effects of the Sudakov factor is primarily in the large-$Q^2$ region, lifting up the line for both GBW and BGK models.\\ 
+\caption{The longitudinal structure function, $F_L$, at fixed $W=100, 200, 300$ GeV (from bottom to top).
+The effects of the Sudakov factor is primarily in the large-$Q^2$ region, lifting up the line for both the GBW and BGK models.
+The data are from Ref.~\cite{FL}.\\
 Left: GBW, Right: BGK}
-%\label{fig:critical}
+\label{fig:FL}
 \end{figure}
 
 \section{Summary}
 In this paper we have presented the effects of the Sudakov form factor in the Golec-Biernat W\"ustfoff (GBW) model and the Bartels Golec-Biernat Kowalski (BGK) model. 
 The leading order Sudakov factor was inserted in the model via modifying the unintegrated gluon density. This renders the dipole cross-section $Q^2$-dependent.
-The results of fittings with the HERA data in the range $0.045\mathrm{GeV} \leq Q^2 \leq 650\mathrm{GeV}$ and $x\leq 10^{-2}$ have shown improvements in both models and most importantly, the BGK model exhibits good behaviour over a wide range of $Q^2$.  In terms of the dipole cross-section, the Sudakov factor modifies it in the region $1/r\lesssim Q$ by lowering initially and allowing logarithmic rise in the large-$r$ region.  This, in the light of the saturation effect, means that saturation starts earlier and the transition to the saturation region becomes slower. The effect is stronger for a large value of $Q^2$ and disappears when $Q^2=0$. In other words, the photoproduction is unaffected by the Sudakov factor and the sole change comes from the change in the fit parameters. The present study was conducted for inclusive DIS process, however diffractive DIS is even more sensitive to the large-$r$ region where the effect of the Sudakov factor is more prominent. Therefore, one may gain further insight on the effects by studying the diffractive processes,which we leave for future works.
+The results of fittings with the HERA data in the range $0.045\mathrm{GeV} \leq Q^2 \leq 650\mathrm{GeV}$ and $x\leq 10^{-2}$ have shown improvements in both models and most importantly, the BGK model exhibits good behaviour over a wide range of $Q^2$.  In terms of the dipole cross-section, the Sudakov factor modifies it in the region $1/r\lesssim Q$ by lowering initially and allowing logarithmic rise in the large-$r$ region.  This, in the light of the saturation effect, means that saturation starts earlier and the transition to the saturation region becomes slower. The effect is stronger for a large value of $Q^2$ and disappears when $Q^2=0$. In other words, the photoproduction is unaffected by the Sudakov factor and the sole change comes from the change in the fit parameters. The present study was conducted for inclusive DIS, however diffractive DIS is {\color{blue}even} more sensitive to the large-$r$ region where the effect of the Sudakov factor is more prominent. Therefore, one may gain further insight on the effects by studying the diffractive processes,which we leave for future works.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -581,7 +549,6 @@ The results of fittings with the HERA data in the range $0.045\mathrm{GeV} \leq 
 The crieria is analogous to Eq.~(\ref{eq:peak}) for $\phi=k\int \frac{d^2r}{r^2} e^{-i r\cdot k} \sigma_{\mathrm{dp}}(x,r,Q^2)$ but with an extra factor 2 as in the original GBW saturation scale.  i.e., $Q_s=2 k_s$.\\Left: GBW, Right: BGK }
 %\label{fig:critical}
 \end{figure}
-
 
 
 \end{document}

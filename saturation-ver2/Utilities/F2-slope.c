@@ -27,15 +27,16 @@ double f2_slope(double Q2, double**pars){
 	*(*(pars)+1)=Q2;
 	//printf("x== %.2e\t Q2== %.2e\n", pars[0][0],pars[0][1]);
 	//getchar();
-	double xdiff=0.01;
+	//double xdiff=0.01;
+	double xdiff=(**pars)/10; //this is just a choice. choosing the value of 10x, note its \Delta log10(x) so very small.
 	double logx=log10(**pars);
 	double f2[2];
-	simpson1dA(&f2_integrand,pars,1.0e-5,30,250,f2,&err);
+	simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,f2,&err);//f2 is not over r bur r=R/(1-R)
 	(*(*pars)) = pow(10.0, logx+xdiff);
-	simpson1dA(&f2_integrand,pars,1.0e-5,30,250,f2+1,&err);
+	simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,f2+1,&err);
 	//double slope = (log(f2[0]/ f2[1]) )/(log(10)*xdiff);
 	double slope = (log10(f2[0]/ f2[1]) )/(xdiff);
-	//printf("%f\n",res);
+	printf("%f\t%f\t%f\n",slope,*(f2),*(f2+1));
 	(*(*pars)) = pow(10.0, logx);
 	return slope;
 }

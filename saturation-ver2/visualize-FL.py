@@ -36,7 +36,7 @@ def main():
     leg=[]
     name=['GBW','BGK']
     for l in range(2):
-        ax1[l].text(5.0e-1,1.0e-2,name[l],fontsize=25)
+        ax1[l].text(1.0e-1,2.0e-1,name[l],fontsize=25)
         for w in ['100', '200', '300']:   
             with open(args[0+2*l]+'/FL-'+w+'.txt' ,"r") as fi:
                  dpi=[]
@@ -46,7 +46,7 @@ def main():
                      dpi.append(float(data[1]))
                      ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            ax1[l].text(float(data[0])/2,float(data[1]),"W="+w+'GeV')
+            ax1[l].text(float(data[0])/2,float(data[1])+0.01,"W="+w+'GeV')
              
             with open(args[1+2*l]+'/FL-'+w+'.txt',"r") as fi:
                 dpi=[]
@@ -56,12 +56,33 @@ def main():
                     dpi.append(float(data[1]))
                     ri.append(float(data[0]))
             leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
+###########################################            
+        with open('./data/H1FL.txt','r') as fi:
+            expdata=fi.readlines()
+            expdata=[i.strip().split() for i in expdata]
+            #expdata=np.transpose(expdata)
+            w=[np.sqrt(float(i[0])*(1-float(i[1]))/float(i[1])) for i in expdata]
+            #print(w)
+            expdata=[ [float(i[0]) for i in expdata], [float(i[2]) for i in expdata], [float(i[6]) for i in expdata]]
+            
+        #print(expdata)
+        ax1[l].scatter(expdata[0],expdata[1],c='g')
+        for i in range(len(expdata[0])):
+            #print(expdata[0][i],expdata[1][i],expdata[2][i])
+            ax1[l].errorbar(expdata[0][i],expdata[1][i],yerr=expdata[2][i],c='g')
+            if i%2==0:
+                ax1[l].text(expdata[0][i],0,'{0:.0f}'.format(w[i]),rotation=60)
+            else:
+                ax1[l].text(expdata[0][i],-0.05,'{0:.0f}'.format(w[i]),rotation=60)
+                
         ax1[l].set( xscale= 'log' ,   yscale='linear' )
         ax1[l].grid('true')
+        ax1[l].text(0.5,-0.025,'$W$=')
+#################################################
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     ax1[0].set_ylabel("$F_L$",rotation="vertical",loc='top')
     ax1[1].set_xlabel("$Q^2 \\;(\\mathrm{GeV^2})$",rotation="horizontal",loc='right')
-    fig1.set_figheight(5)
+    fig1.set_figheight(4)
     fig1.set_figwidth(10)
     #fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.95, left=0.11)
     if saveflag:

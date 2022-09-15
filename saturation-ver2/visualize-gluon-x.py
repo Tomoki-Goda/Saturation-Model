@@ -36,12 +36,12 @@ def main():
     ri=[]
     fig1,ax1=plt.subplots(1,2,constrained_layout=True, sharey=True,sharex=True )
     leg=[]
-    q2= ['5','100','650']
+    q2= ['5','50','500']
     name=['GBW',"BGK"]
     for l in range(2): 
         ax1[l].text(1.0e-7,0,name[l],fontsize=25);
         for j in ['1']:
-            with open(args[0+2*l]+'/gluon-x-650-'+j+'.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/gluon-x-500-'+j+'.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:
@@ -67,7 +67,7 @@ def main():
     #ax1.set(title="",  ylabel="$\\alpha_s f(x k^2)$",    xlabel="$k^2$",  xscale= 'log' ,   yscale='linear' )
     ax1[0].set_ylabel('$\\alpha_s \\mathcal{F}(x, k^2)$',rotation="vertical",loc='top')
     ax1[1].set_xlabel("$x$",rotation="horizontal",loc='right')
-    fig1.set_figheight(5)
+    fig1.set_figheight(4)
     fig1.set_figwidth(10)
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
     if saveflag:

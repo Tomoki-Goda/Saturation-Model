@@ -8,7 +8,8 @@ extern double dgquad_(double (*)(const double*),  const double*, const double*, 
 extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
 
 static int FIX_W=0;
- 
+
+
 double mod_x_W(double x, double Q2,double W2,int fl){
 	double mass2;
 
@@ -48,7 +49,7 @@ double f2_integrand(double R, double ** par){
 
 	double value=0.0;
 
-if(FIX_W==1){
+	if(FIX_W==1){
 		double W2=pow(*(*(par)),2);
 		xm=mod_x_W(x, Q2, W2,fl);
 	}else{

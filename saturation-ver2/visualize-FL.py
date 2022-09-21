@@ -81,7 +81,7 @@ def main():
 #################################################
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     ax1[0].set_ylabel("$F_L$",rotation="vertical",loc='top')
-    ax1[1].set_xlabel("$Q^2 \\;(\\mathrm{GeV^2})$",rotation="horizontal",loc='right')
+    ax1[1].set_xlabel("$Q^2 \\;[\\mathrm{GeV^2}]$",rotation="horizontal",loc='right')
     fig1.set_figheight(4)
     fig1.set_figwidth(10)
     #fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.95, left=0.11)

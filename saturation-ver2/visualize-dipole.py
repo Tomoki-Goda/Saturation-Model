@@ -62,7 +62,7 @@ def main():
         ax1[l].grid('true',which='major')
     ax1[0].legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
     ax1[0].set_ylabel("$\\sigma/\\sigma_0$",rotation="vertical",loc='top')
-    ax1[1].set_xlabel("$r\\;(\\mathrm{GeV}^{-1})$",rotation="horizontal",loc='right')
+    ax1[1].set_xlabel("$r\\;[\\mathrm{GeV}^{-1}]$",rotation="horizontal",loc='right')
     fig1.set_figheight(4)
     fig1.set_figwidth(10)
     #fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.95, left=0.11)

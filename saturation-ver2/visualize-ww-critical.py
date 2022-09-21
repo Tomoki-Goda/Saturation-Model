@@ -68,7 +68,7 @@ def main():
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     #ax1.legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
     #ax1.grid('true')
-    ax1[0].set_ylabel("$Q^2_s$",rotation="horizontal",loc='top')
+    ax1[0].set_ylabel("$Q^2_s\\;[\\mathrm{GeV^2}]$",rotation="horizontal",loc='top')
     ax1[1].set_xlabel("$x$",rotation="horizontal",loc='right')
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
     fig1.set_figheight(4)

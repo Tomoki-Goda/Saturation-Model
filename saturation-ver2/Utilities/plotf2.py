@@ -41,7 +41,7 @@ def main():
     saveflag=False
     argv=sys.argv[1:]
     try:
-        opts , args =getopt.getopt(argv,"s:" )
+        opts , args =getopt.getopt(argv,"s:l" )
         labels=args;
         plotstyle=["-" for i in range(len(args))]
     except:
@@ -55,6 +55,8 @@ def main():
             save4=arg+"hist-diff"
             saveflag=True
             print("SAVE")
+        if opt in ['-l','--limit']:
+            limit_plot=True
         else:
             print("Unknown") 
         
@@ -105,26 +107,36 @@ def main():
     chi1=[]
     chi2=[]
     
-    q2set=sorted( list(set(q2)) , key=float)
-   
-    q2len=len(q2set)
-    col1=4
-    row1=(q2len//2)//col1 
-    extra=0
-    if (((q2len//2))%col1 )!= 0 :
-        row1+=1
-    extra=col1*row1-(q2len//2)
+    if limit_plot:
+        #print(q2)
+        q2set=["1.10000e-01","5.00000e-01", "6.50000e+00","1.80000e+01","4.50000e+01","5.00000e+02"]
+        print(q2set)
+        q2len=2*len(q2set)
+        extra=0
+        row1=2
+        col1=3
+        fig1,ax1=plt.subplots( nrows=row1, ncols=col1,sharex="col",sharey="row",constrained_layout=True)
+        fig1.set_constrained_layout_pads(hspace=0,wspace=0)
+    else:
+        q2set=sorted( list(set(q2)) , key=float)
+        q2len=len(q2set)
+        col1=4
+        row1=(q2len//2)//col1 
+        extra=0
+        if (((q2len//2))%col1 )!= 0 :
+            row1+=1
+        extra=col1*row1-(q2len//2)
         
-    fig1,ax1=plt.subplots( nrows=row1, ncols=col1,sharex="col",sharey="row",constrained_layout=True)
-    col2=4
-    row2=(q2len-(q2len//2+extra))//col2
-    if ( (q2len-(q2len//2+extra))%col2 )!= 0 :
-        row2+=1
+        fig1,ax1=plt.subplots( nrows=row1, ncols=col1,sharex="col",sharey="row",constrained_layout=True)
+        col2=4
+        row2=(q2len-(q2len//2+extra))//col2
+        if ( (q2len-(q2len//2+extra))%col2 )!= 0 :
+            row2+=1
         
-    fig2,ax2=plt.subplots( nrows=row2, ncols=col2,sharex=True,sharey=True,constrained_layout=True)
+        fig2,ax2=plt.subplots( nrows=row2, ncols=col2,sharex=True,sharey=True,constrained_layout=True)
 
-    fig1.set_constrained_layout_pads(hspace=0,wspace=0)
-    fig2.set_constrained_layout_pads(hspace=0,wspace=0)
+        fig1.set_constrained_layout_pads(hspace=0,wspace=0)
+        fig2.set_constrained_layout_pads(hspace=0,wspace=0)
     ######################################################################################################
     for i in range(q2len//2 +extra):
         pos=[i//col1,i%col1]
@@ -135,9 +147,11 @@ def main():
         #yarr=[]
         for j in range(len(q2)):
             if(q2[j]==q2set[i]):
+                #print(q2set[i])
                 arr.append([ x[j],f2[j] ])
                 arr2.append([ x2[j],f22[j] ])
         arr=np.transpose(sorted(arr,key=sortingkey))
+        #print(arr)
         arr2=np.transpose(sorted(arr2,key=sortingkey))
         #print( arr)
         xarr=[float(k) for k in arr[0]]
@@ -153,6 +167,7 @@ def main():
         for j in range(len(q2d)):
             if(q2d[j]==q2set[i]):
                 ax1[pos[0]][pos[1]].errorbar(float(xd[j]),float(f2d[j]),yerr=float(f2e[j]),c='green')
+                ax1[pos[0]][pos[1]].scatter(float(xd[j]),float(f2d[j]),s=12,marker="x",c='green')
                 chi1[i].append(pow( (float(f2d[j])-float(f2c[j]))/float(f2e[j]) ,2))
             if(q2d2[j]==q2set[i]):
                 chi2[i].append(pow( (float(f2d2[j])-float(f2c2[j]))/float(f2e2[j]) ,2))
@@ -167,7 +182,19 @@ def main():
         ax1[pos[0]][pos[1]].xaxis.set_major_locator(plt.FixedLocator([1.0e-3,1.0e-5] ))
         ax1[pos[0]][pos[1]].xaxis.set_minor_locator(plt.NullLocator())
         ax1[pos[0]][pos[1]].margins(x=0)
-        
+####################################################################################
+    if limit_plot:
+        fig1.set_figheight(6)
+        fig1.set_figwidth(10)
+        fig1.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.95,fontsize=13)
+        fig1.supxlabel("$x$",rotation="horizontal",y=0.015,x=0.99,fontsize=13)
+        if saveflag:
+            fig1.savefig(save1)
+        else:
+        	plt.show()
+        return(0)
+######################################################################################
+
     for i in range(q2len-(q2len//2+extra)):
         pos=[i//col2,(i)%col2]
         q2val=q2set[i+(q2len//2+extra)];
@@ -308,6 +335,7 @@ def main():
     else:
     	plt.show()
     
+    return(0)
 main()
 
 

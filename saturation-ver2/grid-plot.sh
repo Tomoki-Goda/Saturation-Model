@@ -9,9 +9,9 @@
 RESDIR=../Run2808
 SAVEDIR=../Document/Plots
 
-#./Utilities/plotf2.py -s ${SAVEDIR}/F2-data-GBW ${RESDIR}/GBW/Mass0.0-Qup650-Model0-Sud0 ${RESDIR}/GBWS-Fix-S/Mass0.0-Qup650-Model22-Sud1
+./Utilities/plotf2.py -s ${SAVEDIR}/F2-data-GBW ${RESDIR}/GBW/Mass0.0-Qup650-Model0-Sud0 ${RESDIR}/GBWS-Fix-S/Mass0.0-Qup650-Model22-Sud1
 
-#./Utilities/plotf2.py -s ${SAVEDIR}/F2-data-BGK ${RESDIR}/BGK/Mass0.0-Qup650-Model1-Sud0 ${RESDIR}/BGKS-Fix-S/Mass0.0-Qup650-Model3-Sud1
+./Utilities/plotf2.py -s ${SAVEDIR}/F2-data-BGK ${RESDIR}/BGK/Mass0.0-Qup650-Model1-Sud0 ${RESDIR}/BGKS-Fix-S/Mass0.0-Qup650-Model3-Sud1
 
 ./Utilities/plotf2.py -l -s ${SAVEDIR}/F2-data-GBW-lim ${RESDIR}/GBW/Mass0.0-Qup650-Model0-Sud0 ${RESDIR}/GBWS-Fix-S/Mass0.0-Qup650-Model22-Sud1
 

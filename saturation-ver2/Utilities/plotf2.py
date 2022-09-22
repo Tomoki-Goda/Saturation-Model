@@ -39,6 +39,7 @@ def main():
     #data=[]
     #res=[]
     saveflag=False
+    limit_plot=False
     argv=sys.argv[1:]
     try:
         opts , args =getopt.getopt(argv,"s:l" )
@@ -224,6 +225,7 @@ def main():
         for j in range(len(q2d)):
             if(q2d[j]==q2set[i+q2len//2+extra]):
                 ax2[pos[0]][pos[1]].errorbar(float(xd[j]),float(f2d[j]),yerr=float(f2e[j]),c='green')
+                ax2[pos[0]][pos[1]].scatter(float(xd[j]),float(f2d[j]),s=12,marker="x",c='green')
                 chi1[i+(q2len//2+extra)].append(pow( (float(f2d[j])-float(f2c[j]))/float(f2e[j]) ,2))
             if(q2d2[j]==q2set[i+q2len//2+extra]):
                 chi2[i+(q2len//2+extra)].append(pow( (float(f2d2[j])-float(f2c2[j]))/float(f2e2[j]) ,2))

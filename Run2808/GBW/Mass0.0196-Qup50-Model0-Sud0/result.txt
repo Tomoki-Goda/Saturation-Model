@@ -1,0 +1,11 @@
+Q_up	50
+sigma_0	2.5291e+01	2.5413e-01
+lambda	2.7883e-01	1.6467e-03
+x_0	7.2448e-01	4.1007e-02
+chisq	7.7001e+02	1.4843e-14
+n_data	318
+chisq/dof	2.444e+00
+Error Flag 3 
+
+
+In 3.94e-01 minutes

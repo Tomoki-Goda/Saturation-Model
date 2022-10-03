@@ -131,9 +131,28 @@ double f2_2(double x,double q2, double *sigpar ,  double *sudpar){
 	double step=(rmax-rmin)/7;
 	double high,low;
 	
-	
-	for(int i =0;i<(NF-1);i++){
-		FL=i;
+	if(PLOT_FLAVOUR==0){
+		for(int i =0;i<(NF-1);i++){
+			FL=i;
+			res=0;
+			low=rmin;
+			high=rmin;
+			//simpson1dA(&f2_integrand,pars,1.0e-5,30,250,&res,&err);
+			//dadapt_(&f2_integrand_2,&rmin,&rmax,&seg ,&NRel, &NAbs, &res, &error);
+			//res+=dgauss_(&f2_integrand_2,&rmin,&rmax,&N);
+			//res+=dgquad_(&f2_integrand_2,&rmin,&rmax,&n);
+			for(int i=0;i<7;i++){
+				high+=step;
+				//res+=dgauss_(&f2_integrand_2,&low,&high,&N);
+				res+=dgquad_(&f2_integrand_2,&low,&high,&n);
+				//printf(" %f %f %d\n",rmin,rmax,n);
+				low=high;
+			}
+			//printf("%.5e %.5e\n",res,error);
+			val+=res;
+		}
+	}else {
+		FL=PLOT_FLAVOUR;
 		res=0;
 		low=rmin;
 		high=rmin;

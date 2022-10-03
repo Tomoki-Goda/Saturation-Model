@@ -24,11 +24,11 @@ GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-
 
 ########################################################################################################
 
-all: clean main critical dipole F2 FL F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x ww-critical
+all: clean main critical dipole F2 FL F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x ww-critical heavy-F2
 
 fit: clean main
 
-plot: critical dipole F2 FL F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x ww-critical
+plot: critical dipole F2 FL F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x ww-critical heavy-F2
 
 
 main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
@@ -91,6 +91,10 @@ fcn: ${DEPS} ${FUNCDIR}/fcn.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.
 
 export-data: ${DEPS} ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
 	gcc ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/export-data ${INC} ${OPT} 
+ 
+heavy-F2: ${DEPS} ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
+	gcc ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/heavy-F2 ${INC} ${OPT} 
+
 
 ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c ${UTILDIR}/f2.h
 	echo ${DIR}

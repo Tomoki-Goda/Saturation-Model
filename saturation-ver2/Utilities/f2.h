@@ -8,7 +8,7 @@ extern double dgquad_(double (*)(const double*),  const double*, const double*, 
 extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
 
 static int FIX_W=0;
-
+int PLOT_FLAVOUR=0;
 
 double mod_x_W(double x, double Q2,double W2,int fl){
 	double mass2;
@@ -61,13 +61,28 @@ double f2_integrand(double R, double ** par){
 double f2(double Q2, double**pars){
 	double res=0, err=0,val=0;
 	*(*(pars)+1)=Q2;
+	printf("fl=%d\n",PLOT_FLAVOUR);
+
 	//printf("x== %.2e\t Q2== %.2e\n", pars[0][0],pars[0][1]);
-	for(int i =0;i<(NF-1);i++){
-		pars[3][0]=i;
+	if(PLOT_FLAVOUR==0){
+		for(int i =0;i<(NF-1);i++){
+			pars[3][0]=i;
+			res=0;
+			simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,&res,&err);
+			val+=res;
+		}
+	}else if(PLOT_FLAVOUR==2){
+		pars[3][0]=2;
+		res=0;
+		simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,&res,&err);
+		val+=res;
+	}else if(PLOT_FLAVOUR==3){
+		pars[3][0]=3;
 		res=0;
 		simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,&res,&err);
 		val+=res;
 	}
+	
 	//printf("%f\n",res);
 	return val;
 }

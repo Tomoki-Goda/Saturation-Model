@@ -185,8 +185,8 @@ def main():
         ax1[pos[0]][pos[1]].margins(x=0)
 ####################################################################################
     if limit_plot:
-        fig1.set_figheight(6)
-        fig1.set_figwidth(10)
+        fig1.set_figheight(4.5)
+        fig1.set_figwidth(8)
         fig1.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.95,fontsize=13)
         fig1.supxlabel("$x$",rotation="horizontal",y=0.015,x=0.99,fontsize=13)
         if saveflag:
@@ -291,27 +291,29 @@ def main():
          else:
              binlabel.append("")
     
-    #fig, (ax1,ax2 ,ax3)=plt.subplots(3,1,constrained_layout=True, sharex=True,sharey=True)
-    fig=plt.figure(constrained_layout=True)
+    fig, ax1=plt.subplots(1,1,constrained_layout=True, sharex=True,sharey=True)
+    #fig=plt.figure(constrained_layout=True)
     #ax3.clf()
-    ax1=fig.add_subplot(3,1,1)
-    ax2=fig.add_subplot(3,1,2,sharex=ax1,sharey=ax1)
-    ax3=fig.add_subplot(3,1,3,sharex=ax1)
-
-    ax1.bar(q2set,chipp)
-    ax2.bar(q2set,chipp2,tick_label=binlabel)
+    #ax1=fig.add_subplot(1,1,1)
+    #ax2=fig.add_subplot(1,1,2,sharex=ax1,sharey=ax1)
+    #ax3=fig.add_subplot(1,1,3,sharex=ax1)
+    leg=[]
+    leg.append(ax1.bar(q2set,chipp,fill=False,tick_label=binlabel,edgecolor="blue"))
+    leg.append(ax1.bar(q2set,chipp2,fill=False,tick_label=binlabel,edgecolor="red"))
+    #ax2.bar(q2set,chipp2,tick_label=binlabel,fill=False)
     
     ax1.grid(visible='true', axis='y')
     ax1.margins(x=0)
-    ax2.grid(visible='true', axis='y')
-    ax2.margins(x=0)
+    ax1.legend(leg,["Without Sudakov", "With Sudakov"])
+    #ax2.grid(visible='true', axis='y')
+    #ax2.margins(x=0)
     
     
     
     #ax2.set_ylabel("$\chi^2/N$ ", loc='center' )
     #ax1.set_ylabel("$\chi^2/N$", loc='center' )
-    ax1.set_ylabel("Without Sudakov\n$\\chi^2/N$", loc='center' )
-    ax2.set_ylabel("With Sudakov\n$\\chi^2/N$", loc='center' )
+    ax1.set_ylabel("$\\chi^2/N$", loc='center' )
+    #ax2.set_ylabel("With Sudakov\n$\\chi^2/N$", loc='center' )
     
     
     
@@ -324,13 +326,13 @@ def main():
     #	plt.show()
     #############################################################
     #fig, ax3=plt.subplots(1,1,sharey=True,sharex=True,constrained_layout=True)
-    ax3.bar(q2set,diff,tick_label=binlabel,color='red')
-    ax3.set_xlabel("$Q^2\\;(\\mathrm{GeV^2})$", loc='right' )
-    ax3.margins(x=0)
-    ax3.grid(visible='true', axis='y')
-    ax3.set_ylabel("difference\n$\\chi^2$", loc='center' )
-    fig.set_figheight(5)
-    fig.set_figwidth(13)
+    #ax3.bar(q2set,diff,tick_label=binlabel,color='purple',edgecolor="purple",fill=True)
+    #ax3.set_xlabel("$Q^2\\;(\\mathrm{GeV^2})$", loc='right' )
+    #ax3.margins(x=0)
+    #ax3.grid(visible='true', axis='y')
+    #ax3.set_ylabel("difference\n$\\chi^2$", loc='center' )
+    fig.set_figheight(3)
+    fig.set_figwidth(8)
     
     if saveflag:
         fig.savefig(save3)

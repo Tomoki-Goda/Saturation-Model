@@ -22,7 +22,7 @@ extern double SIGMA(double , double ,double ,double *,double*);
 extern double psisq_z_int(double, double ,int);
 extern double mod_x(double,double, int);
 #include"./f2.h"
-
+extern int PLOT_FLAVOUR;
 
 int main (int argc, char** argv){
 	char file_name[500];
@@ -30,10 +30,13 @@ int main (int argc, char** argv){
 	double Q2arr[Q2len+1];
 	double param[10];
 	double x=0;
-	double Q2=0;
-	
-	read_options(argc,argv,param,&x,&Q2,file_name );
-	printf("x= %.2e\tQ2= %.2e\n",x,Q2);
+	//double Q2=0;
+	//int FL=0;
+	double fldouble;
+
+	read_options(argc,argv,param,&x,&fldouble,file_name );
+	PLOT_FLAVOUR=(int)fldouble;
+	printf("x= %.2e\tQ2= %.2e\n",x,fldouble);
 
 	for(int i =0;i<=Q2len;i++){
 		*(Q2arr+i)=pow(10.0, -2+5*((double)(i))/Q2len);
@@ -44,7 +47,7 @@ int main (int argc, char** argv){
 	var[0]=x;
 	var[1]=0;
 	
-	//printf("x= %.2e\tQ2= %.2e\n",var[0], var[1]);
+	//printf("x= %.2e\tFL= %.2e\n",var[0], var[1]);
 	par[0]=var;
 	double sigpar[10];
 	double sudpar[10];

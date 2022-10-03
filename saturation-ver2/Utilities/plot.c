@@ -36,6 +36,9 @@ int read_options(int argc, char ** argv, double* param,double* x,double* Q2,char
 			sprintf(outfile,"%s",argv[2*i]);
 		}else if( strcmp(argv[2*i-1],"-in" ) ==0){
 			sprintf(parfilename,"%s" ,argv[2*i]);
+		}else if( strcmp(argv[2*i-1],"-fl" ) ==0){
+			*Q2=((float)atoi(argv[2*i]))+ 0.5;
+			printf("plot fl= %f",*Q2);
 		}else{
 			printf("Please Use flag, -x, -out , -in\n\n");
 		}

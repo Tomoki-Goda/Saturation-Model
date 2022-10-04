@@ -26,7 +26,7 @@ q2d=[]
 f2d=[]
 f2e=[]
 f2c=[]
-counter=0;
+counter=0
 def shift_col(val, low, high):
     return( (val-low)/(high-low))
     
@@ -40,9 +40,11 @@ def main():
     #res=[]
     saveflag=False
     limit_plot=False
+    col1=3
+    name="F_2"
     argv=sys.argv[1:]
     try:
-        opts , args =getopt.getopt(argv,"s:l" )
+        opts , args =getopt.getopt(argv,"s:lcb" )
         labels=args;
         plotstyle=["-" for i in range(len(args))]
     except:
@@ -58,6 +60,12 @@ def main():
             print("SAVE")
         if opt in ['-l','--limit']:
             limit_plot=True
+        if opt in ['-c','--charm']:
+            col1=3
+            name="F_2^c"
+        if opt in ['-b','--bottom']:
+            col1=2
+            name="F_2^b"
         else:
             print("Unknown") 
         
@@ -106,26 +114,20 @@ def main():
     
     q2set=sorted( list(set(q2)) , key=float)
     q2len=len(q2set)
-    col1=2
-    row1=(q2len//2)//col1 
-    extra=0
-    if (((q2len//2))%col1 )!= 0 :
-        row1+=1
-    extra=col1*row1-(q2len//2)
+    print(q2len, " frames")
+    #col1=3
+    row1=(q2len)//col1 
+    if((q2len%col1)!=0):
+         row1+=1
+    
+    print(row1,"*", col1)
      
     fig1,ax1=plt.subplots( nrows=row1, ncols=col1,sharex="col",sharey="row",constrained_layout=True)
-    col2=2
-    row2=(q2len-(q2len//2+extra))//col2
-    if ( (q2len-(q2len//2+extra))%col2 )!= 0 :
-        row2+=1
-        
-    fig2,ax2=plt.subplots( nrows=row2, ncols=col2,sharex=True,sharey=True,constrained_layout=True)
-    print(row1,"*", col1,"  ", row2,"*", col2)
 
     fig1.set_constrained_layout_pads(hspace=0,wspace=0)
-    fig2.set_constrained_layout_pads(hspace=0,wspace=0)
     ######################################################################################################
-    for i in range(q2len//2 +extra):
+    legend=[]
+    for i in range(q2len):
         pos=[i//col1,i%col1]
         q2val=q2set[i];
         #print(q2val);
@@ -146,175 +148,33 @@ def main():
         xarr2=[float(k) for k in arr2[0]]
         yarr2=[float(k) for k in arr2[1]]
         #print( xarr, yarr)
-        ax1[pos[0]][pos[1]].plot(xarr,yarr ,c='blue',ls="--")
-        ax1[pos[0]][pos[1]].plot(xarr2,yarr2 ,c='red')    
+
+        legend.append(ax1[pos[0]][pos[1]].plot(xarr,yarr ,c='blue',ls="--"))
+        legend.append(ax1[pos[0]][pos[1]].plot(xarr2,yarr2 ,c='red'))    
         #########################################################################            
-        #chi1.append([])
-        #chi2.append([])
         for j in range(len(q2d)):
             if(q2d[j]==q2set[i]):
                 ax1[pos[0]][pos[1]].errorbar(float(xd[j]),float(f2d[j]),yerr=float(f2e[j]),c='green')
                 ax1[pos[0]][pos[1]].scatter(float(xd[j]),float(f2d[j]),s=12,marker="x",c='green')
-        #        chi1[i].append(pow( (float(f2d[j])-float(f2c[j]))/float(f2e[j]) ,2))
-        #    if(q2d2[j]==q2set[i]):
-        #        chi2[i].append(pow( (float(f2d2[j])-float(f2c2[j]))/float(f2e2[j]) ,2))
         #########################################################################        
-        #chi+=pow((float(f2d[j])-float(f2c[j]))/float(f2e[j]),2)
-        #count+=1
         ax1[pos[0]][pos[1]].set(  xscale="log" ,   yscale='linear')
-        ax1[pos[0]][pos[1]].text(xarr[0]*3, yarr[0]/1.05,"$Q^2={val}$".format(val=float(q2val)) )
-        #ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
+        ax1[pos[0]][pos[1]].text(xarr[0]*0.8, yarr[0],"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)) , fontsize=8)
         ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
         ax1[pos[0]][pos[1]].yaxis.set_minor_locator(plt.NullLocator())
         ax1[pos[0]][pos[1]].xaxis.set_major_locator(plt.FixedLocator([1.0e-3,1.0e-5] ))
         ax1[pos[0]][pos[1]].xaxis.set_minor_locator(plt.NullLocator())
         ax1[pos[0]][pos[1]].margins(x=0)
 ####################################################################################
-
-    for i in range(q2len-(q2len//2+extra)):
-        pos=[i//col2,(i)%col2]
-        q2val=q2set[i+(q2len//2+extra)];
-        #print(q2val);
-        arr=[ ]
-        arr2=[ ]
-        #yarr=[]
-        for j in range(len(q2)):
-            if(q2[j]==q2set[i+(q2len//2+extra)]):
-                arr.append([ x[j],f2[j] ])
-                arr2.append([ x2[j],f22[j] ])
-            
-        arr=np.transpose(sorted(arr,key=sortingkey))
-        arr2=np.transpose(sorted(arr2,key=sortingkey))
-        #print( arr)
-        xarr=[float(k) for k in arr[0]]
-        yarr=[float(k) for k in arr[1]]
-        xarr2=[float(k) for k in arr2[0]]
-        yarr2=[float(k) for k in arr2[1]]
-        #print( xarr, yarr)
-        ax2[pos[0]][pos[1]].plot(xarr,yarr ,c='blue',ls="--")
-        ax2[pos[0]][pos[1]].plot(xarr2,yarr2 ,c='red')
-        #chi=0
-        #count=0
-        #chi1.append([])
-        #chi2.append([])
-        for j in range(len(q2d)):
-            if(q2d[j]==q2set[i+q2len//2+extra]):
-                ax2[pos[0]][pos[1]].errorbar(float(xd[j]),float(f2d[j]),yerr=float(f2e[j]),c='green')
-                ax2[pos[0]][pos[1]].scatter(float(xd[j]),float(f2d[j]),s=12,marker="x",c='green')
-                #chi1[i+(q2len//2+extra)].append(pow( (float(f2d[j])-float(f2c[j]))/float(f2e[j]) ,2))
-         #   if(q2d2[j]==q2set[i+q2len//2+extra]):
-                #chi2[i+(q2len//2+extra)].append(pow( (float(f2d2[j])-float(f2c2[j]))/float(f2e2[j]) ,2))
-                
-        ax2[pos[0]][pos[1]].set(xscale="log" ,   yscale='linear' )
-        #ax2[pos[0]][pos[1]].legend()
-        ax2[pos[0]][pos[1]].text(xarr[0]*3, yarr[0]/1.05,"$Q^2={val}$".format(val=float(q2val)) )
-        #ax2[pos[0]][pos[1]].text(1.0e-4, 0.6,"$Q^2={val}$".format(val=float(q2val))) 
-        #ax2[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
-        ax2[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
-        ax2[pos[0]][pos[1]].xaxis.set_major_locator(plt.FixedLocator([1.0e-6,1.0e-4,1.0e-2] ))
-        ax2[pos[0]][pos[1]].xaxis.set_minor_locator(plt.NullLocator())
-        ax2[pos[0]][pos[1]].margins(x=0)
-        
-        
-    #ax2[0][0].set(label="$F_2$",loc="top")
-    #ax1[0][0].set(label="$F_2$",loc="top")
-        
-        #ax.scatter(x,f2,marker=".");
-        #ax.set(  xscale="log" ,   yscale='linear' )
-        #ax2[pos[0]][pos[1]].set_ylabel( "F_2" ,rotation="horizontal",loc='top')
-    
-    #ax1.set_ylabel( "F_2" ,rotation="horizontal",loc='top')
-    fig1.set_figheight(4)
-    fig1.set_figwidth(6)
-    #fig.set_ylabel( "F_2" ,rotation="horizontal",loc='top')
-    fig1.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.95,fontsize=13)
-    fig2.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.95,fontsize=13)
-    
+    ax1[0][0].legend([legend[0][0],legend[1][0]],["Without Sudakov", "With Sudakov"])
+    fig1.set_figheight(2*row1+1)
+    fig1.set_figwidth(2*col1+1)
+    fig1.supylabel("$"+name+"$",rotation="horizontal",x=0.02,y=0.95,fontsize=13)
     fig1.supxlabel("$x$",rotation="horizontal",y=0.015,x=0.99,fontsize=13)
-    fig2.supxlabel("$x$",rotation="horizontal",y=0.015,x=0.99,fontsize=13)
-    #fig1.subplots_adjust(bottom=0.05, right=0.95, top=0.95, left=0.05)
-    #fig2.subplots_adjust(bottom=0.05, right=0.95, top=0.95, left=0.05)
-    
-    
-    fig2.set_figheight(4)
-    fig2.set_figwidth(6)
-    #plt.yticks(y,[0.1,1])
-    #fig1.tight_layout()
-    #fig2.tight_layout()
     if saveflag:
         fig1.savefig(save1)
-        fig2.savefig(save2)
     else:
     	plt.show()
         
-    
-    ################################## chi #########################################
-    #chipp=[sum(i) for i in (chi1)]
-    #print(sum([ sum(i) for i in chi1])/sum([ len(i) for i in chi1]))
-    #chipp2=[sum(i) for i in (chi2)]
-    #print(sum([ sum(i) for i in chi2])/sum([ len(i) for i in chi2]))
-    # 
-    #diff=[chipp2[i]-chipp[i] for i in range(len(chipp)) ]
-    #
-    #chipp=[sum(i)/len(i) for i in (chi1)]
-    #chipp2=[sum(i)/len(i) for i in (chi2)]
-    #
-    #chipp2=[sum(i)/len(i) for i in chi2]
-    #binlabel=[]
-    #for i in range(len(chipp)):
-    #     if (i%(len(chipp)//4) ==0 ):
-    #         binlabel.append("{val:.2e}".format(val=float(q2set[i]) ) )
-    #     else:
-    #         binlabel.append("")
-    # 
-    #fig, ax1=plt.subplots(1,1,constrained_layout=True, sharex=True,sharey=True)
-    #fig=plt.figure(constrained_layout=True)
-    #ax3.clf()
-    #ax1=fig.add_subplot(1,1,1)
-    #ax2=fig.add_subplot(1,1,2,sharex=ax1,sharey=ax1)
-    #ax3=fig.add_subplot(1,1,3,sharex=ax1)
-    #leg=[]
-    #leg.append(ax1.bar(q2set,chipp,fill=False,tick_label=binlabel,edgecolor="blue"))
-    #leg.append(ax1.bar(q2set,chipp2,fill=False,tick_label=binlabel,edgecolor="red"))
-    #ax2.bar(q2set,chipp2,tick_label=binlabel,fill=False)
-    
-    #ax1.grid(visible='true', axis='y')
-    #ax1.margins(x=0)
-    #ax1.legend(leg,["Without Sudakov", "With Sudakov"])
-    #ax2.grid(visible='true', axis='y')
-    #ax2.margins(x=0)
-    
-    
-    
-    #ax2.set_ylabel("$\chi^2/N$ ", loc='center' )
-    #ax1.set_ylabel("$\chi^2/N$", loc='center' )
-    #ax1.set_ylabel("$\\chi^2/N$", loc='center' )
-    #ax2.set_ylabel("With Sudakov\n$\\chi^2/N$", loc='center' )
-    
-    
-    
-    #fig.set_figheight(4)
-    #fig.set_figwidth(12)
-    
-    #if saveflag:
-    #    fig.savefig(save3)
-    #else:
-    #	plt.show()
-    #############################################################
-    #fig, ax3=plt.subplots(1,1,sharey=True,sharex=True,constrained_layout=True)
-    #ax3.bar(q2set,diff,tick_label=binlabel,color='purple',edgecolor="purple",fill=True)
-    #ax3.set_xlabel("$Q^2\\;(\\mathrm{GeV^2})$", loc='right' )
-    #ax3.margins(x=0)
-    #ax3.grid(visible='true', axis='y')
-    #ax3.set_ylabel("difference\n$\\chi^2$", loc='center' )
-    #fig.set_figheight(3)
-    #fig.set_figwidth(8)
-    # 
-    #if saveflag:
-    #    fig.savefig(save3)
-    #else:
-    #	plt.show()
-    
     return(0)
 main()
 

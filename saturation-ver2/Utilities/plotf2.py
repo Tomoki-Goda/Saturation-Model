@@ -176,7 +176,7 @@ def main():
         #chi+=pow((float(f2d[j])-float(f2c[j]))/float(f2e[j]),2)
         #count+=1
         ax1[pos[0]][pos[1]].set(  xscale="log" ,   yscale='linear')
-        ax1[pos[0]][pos[1]].text(xarr[0]*3, yarr[0]/1.05,"$Q^2={val}$".format(val=float(q2val)) )
+        ax1[pos[0]][pos[1]].text(xarr[0]*1.2, yarr[0],"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=7 )
         #ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
         ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
         ax1[pos[0]][pos[1]].yaxis.set_minor_locator(plt.NullLocator())
@@ -232,7 +232,7 @@ def main():
                 
         ax2[pos[0]][pos[1]].set(xscale="log" ,   yscale='linear' )
         #ax2[pos[0]][pos[1]].legend()
-        ax2[pos[0]][pos[1]].text(1.0e-4, 0.6,"$Q^2={val}$".format(val=float(q2val))) 
+        ax2[pos[0]][pos[1]].text(1.0e-4, 0.6,"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=7) 
         #ax2[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
         ax2[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
         ax2[pos[0]][pos[1]].xaxis.set_major_locator(plt.FixedLocator([1.0e-6,1.0e-4,1.0e-2] ))
@@ -331,7 +331,7 @@ def main():
     #ax3.margins(x=0)
     #ax3.grid(visible='true', axis='y')
     #ax3.set_ylabel("difference\n$\\chi^2$", loc='center' )
-    fig.set_figheight(3)
+    fig.set_figheight(2)
     fig.set_figwidth(8)
     
     if saveflag:

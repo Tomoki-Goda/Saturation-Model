@@ -97,12 +97,15 @@ int main(int argc , char** argv){
 	int j=-1;
 	while(!feof(file)&& ++j<100 ){
 		fscanf(file ,"%s\t%lf\t%lf\t%lf\t%lf\t%lf\t",name,&(DATA[j][0]),&(DATA[j][1]),&dummy,&dummy,&(DATA[j][2]) );
-		for(int i=0; i<13;i++){
-			fscanf(file,"%lf\t",&dummy);
+		fscanf(file ,"%lf\t%lf\t%lf\t",&dummy,&dummy,&(DATA[j][3]) );
+		for(int i=0; i<11;i++){
+			fscanf(file,"%lf",&dummy);
 		}
-		fscanf(file,"%lf\n",&(DATA[j][3]));
 		DATA[j][3]*=(DATA[j][2]/100);
-		//printf("data %d %s Q2=%.5e,x=%.5e, F2=%.5e +- %.5e \n" , j, name,DATA[j][0],DATA[j][1],DATA[j][2],DATA[j][3]);
+		//printf("\t data %d %s Q2=%.5e,x=%.5e, F2=%.5e +- %.5e \n" , j, name,DATA[j][0],DATA[j][1],DATA[j][2],DATA[j][3]);
+		if(feof(file)){
+			break;
+		}
 		if(DATA[j][1]>1.0e-2){
 			continue;
 		}

@@ -4,10 +4,10 @@
 
 
 #define MAXN 600
-//#include"./kahnsum.h"
+#include"./kahnsum.h"
 /////////////////////kahn.h/////////////////////
-extern double KBN_sum(const double *arr,int len);
-extern double kahn_sum(const double *arr,int len);
+//extern double k_group_sum(const double *arr,int len);
+//extern double kahn_sum(const double *arr,int len);
 ////////////////chebyshev-1.h/////////////////////////////
 double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *degree, unsigned dim );
 double change_var_revert(double min,double max, double val);
@@ -188,7 +188,7 @@ double curtis_clenshaw_sum(const double *sample_arr){
 	//summand[N_CHEB/2]=val;
 	
 	
-	return KBN_sum(summand,N_CHEB/2);
+	return k_group_sum(summand,N_CHEB/2);
 	 
 }
 

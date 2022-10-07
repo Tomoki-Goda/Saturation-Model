@@ -10,7 +10,6 @@
 #include"./Parameters.h"
 
 #define PHI 0 
-
 #include"./plot.c"
 #include"./tmd-gluon.h"
 

@@ -12,7 +12,7 @@
 //#include"./kahnsum.h"
 /////////////////////kahn.h/////////////////////
 extern double KBN_sum(const double *arr,int len);
-extern double kahn_sum(const double *arr,int len);
+//extern double kahn_sum(const double *arr,int len);
 ////////////////chebyshev-1.h/////////////////////////////
 double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *degree, unsigned dim );
 double change_var_revert(double min,double max, double val);

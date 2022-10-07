@@ -1,8 +1,9 @@
 
-extern double KBN_sum(const double *arr,int len);
+//extern double k_group_sum(const double *arr,int len);
 //#include"./kahnsum.h"
 //#include"./critical-line.h"
 
+#include"../Functions/kahnsum.h"
 //#include"./main.h"
 extern double dbesj0_(double*);
 extern double dbesj1_(double*);
@@ -61,7 +62,7 @@ double simps_sum(double * sample, int len ,  double step){
 			}
 			summand[j]=term;
 	}
-	val=KBN_sum(summand,2*n+1);
+	val=k_group_sum(summand,2*n+1);
 	val*=(step/3);
 	return val;
 }

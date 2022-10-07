@@ -16,6 +16,7 @@ extern double dbesk1_(double*);
 extern double dgquad_(double (*)(const double*), double*,double*,int*  );
 extern double dgauss_(double (*)(const double*), double*,double*,double *  );
 extern void simpson1dA(double(*)(double ,double**),double**,double,double,int,double*,double*);
+extern double boole_integral(double(*)(double ,double**),double**,double,double,double, double,int,int, double*,double*);
 extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
 
 int F_L=0;
@@ -154,19 +155,24 @@ double psisq_z_int(double r,double q2,unsigned f){
 }
 #else
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double psisq_z_integrand(double z,double **par){
+double psisq_z_integrand(double Z,double **par){
 	const double r=(*(*par));
+	const double z=pow(Z,2)/2;//change of variable
+	//if(r>0.5){
+	//	printf("%.5e %.5e\n", r, **par);
+	//}
+
 	const double Q2=(*((*par)+1));
-	unsigned f =(unsigned) (*((*par)+2) +0.5);//(*(par+1))
+	unsigned f =(int) (*((*par)+2) +0.5);//(*(par+1))
 	
 	double val=psisq_f(r,z,Q2,f);
 	//printf( " r %f  z %f  q2 %f ->%f \n", r,z,Q2,val);
-	return(val);
+	return(val * Z);//jacobian Z
 }
 
 double psisq_z_int(double r,double Q2,unsigned f){
-	printf("psisq_z_int no longer supported \n");
-	getchar();
+	//printf("psisq_z_int no longer supported \n");
+	//getchar();
 		
 	double param[3];
 	*(param)=r;
@@ -178,9 +184,18 @@ double psisq_z_int(double r,double Q2,unsigned f){
 	double res=0;
 	double ep =1.0e-10;
 	double err=0;
-	simpson1dA(&psisq_z_integrand,par,0.0+ep,0.5,100,&res,&err);//zmax is 0.5 because psi is symmetric in z<->1-z!!
-	
+	//simpson1dA(&psisq_z_integrand,par,0.0+ep,0.5,100,&res,&err);//zmax is 0.5 because psi is symmetric in z<->1-z!!
+	double step=(1.0-ep)/5;
+	double min=ep,max=ep,val=0;
+	for(int i=0;i<5;i++){
+		min=max;
+		max+=step;
+		boole_integral(&psisq_z_integrand,par,min,max,DGAUSS_PREC,DGAUSS_PREC,2,7,&val,&err);
+		res+=val;
+		//printf("%f %f %d %f,%f\t%.5e %.5e\n",r,Q2,f,min, max,res,val);
+	}	
 	return(2.0* res);
+
 
 }
 

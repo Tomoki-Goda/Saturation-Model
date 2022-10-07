@@ -223,7 +223,7 @@ double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *de
 #endif
 		ind_vec_increment(ind2,degree,dim);//increment the ind1; like in the way increasing (hr,min,sec) second by second. 
 	}
-	val=KBN_sum(arr,len);
+	val=k_group_sum(arr,len);
 	static int licz=0;
 	if(isnan(val)!=0){
 		val=0;
@@ -308,7 +308,7 @@ double chebyshev(const unsigned *degree,unsigned dim,const double* coeff , doubl
 		arr[j]=val;	
 		ind_vec_increment(ind1,degree,dim);
 	}
-	res=KBN_sum(arr,len);
+	res=k_group_sum(arr,len);
 	for(unsigned i=0;i<dim;i++){
 		res*=(2.0/degree[i]);	
 	}

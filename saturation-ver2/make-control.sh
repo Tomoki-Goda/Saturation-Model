@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-RUNDIR=../Run
+RUNDIR=../TestRun
 
 echo "rebuild ${RUNDIR} [y/n]?"
 read ans

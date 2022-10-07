@@ -24,6 +24,7 @@
 #endif
 
 #include"../Utilities/f2.h"
+//#include"./kahnsum.h"
 
 int N_SIMPS=N_SIMPS_R;
 int N_CHEB=N_CHEB_R;
@@ -120,7 +121,7 @@ double compute_chisq(const double *par){
 		
 	}
 	
-	chisq=KBN_sum(chiarr,N_DATA);
+	chisq=k_group_sum(chiarr,N_DATA);
 	return(chisq );
 }
 

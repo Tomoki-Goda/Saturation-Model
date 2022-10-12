@@ -28,12 +28,12 @@ SAVE=../Document/Plots
 #	${BGK} \
 #	${BGKS}
 
-./visualize-FL.py \
-	-s ${SAVE}/FL-GBW \
-	${GBW} \
-	${GBWS} \
-	${BGK} \
-	${BGKS}
+#./visualize-FL.py \
+#	-s ${SAVE}/FL-GBW \
+#	${GBW} \
+#	${GBWS} \
+#	${BGK} \
+#	${BGKS}
 
 #./visualize-gluon.py \
 #	-s ${SAVE}/gluon-GBW \
@@ -47,12 +47,14 @@ SAVE=../Document/Plots
 #	${GBWS} \
 #	${BGK} \
 #	${BGKS}
-#./visualize-ww-gluon.py \
-#	-s ${SAVE}/ww-gluon-GBW \
-#	${GBW} \
-#	${GBWS} \
-#	${BGK} \
-#	${BGKS}
+
+./visualize-ww-gluon.py \
+	-s ${SAVE}/ww-gluon-GBW \
+	${GBW} \
+	${GBWS} \
+	${BGK} \
+	${BGKS}
+
 #./visualize-critical.py \
 #	-s ${SAVE}/critical-GBW \
 #	${GBW} \

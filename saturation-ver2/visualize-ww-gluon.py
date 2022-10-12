@@ -40,7 +40,7 @@ def main():
     name=['GBW','BGK']
     #for k in ['100','650']:
     for l in range(2):
-        ax1[l].text(1.0e-2,10,name[l],fontsize=25)
+        ax1[l].text(5,0.2,name[l],fontsize=25)
         for j in ['4']:
             with open(args[0+2*l]+'/ww-gluon-500-'+j+'.txt' ,"r") as fi:
                 dpi=[]
@@ -58,15 +58,15 @@ def main():
                         data=i.strip().split("\t")
                         dpi.append(float(data[1]))
                         ri.append(float(data[0]))
-                    pos=int(len(ri)/2.5)
-                    ax1[l].text(ri[pos]*3,dpi[pos],'$Q^2={0}\\mathrm{{GeV^2}}$'.format(k))
+                    pos=int(len(ri)/1.5)
+                    ax1[l].text(ri[pos]*3,dpi[pos]/1.1,'$Q^2={0}\\mathrm{{GeV^2}}$'.format(k))
                 leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
-        ax1[l].set( xscale= 'log' ,   yscale='linear' )
+        ax1[l].set( xscale= 'log' ,   yscale='log',ylim=[1.0e-3,3] )
         ax1[l].grid('true')
-        ax1[l].set_xlabel("$k^2\\;[\\mathrm{GeV^2}]$",rotation="horizontal",loc='right')
+        ax1[l].set_xlabel("$k_t^2\\;[\\mathrm{GeV^2}]$",rotation="horizontal",loc='right')
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     #ax1.set(title="",  ylabel="$\\alpha_s f(x k^2)$",    xlabel="$k^2$",  xscale= 'log' ,   yscale='linear' )
-    ax1[0].set_ylabel('$k\\Phi(x, k^2,Q^2)$',rotation="vertical",loc='top')
+    ax1[0].set_ylabel('$\\Phi(x, k_t^2,Q^2)$',rotation="vertical",loc='top')
     fig1.set_figheight(4)
     fig1.set_figwidth(10.5)
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)

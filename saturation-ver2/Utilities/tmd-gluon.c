@@ -48,7 +48,9 @@ int main (int argc, char** argv){
 #endif
 		//val*=k*k;
 		val*=3.0/(4*PI);
+		val/=(2*PI*2*PI);
 		
+		printf("%.5e\t%.5e\n",k*k, val);
 		fprintf(file,"%.5e\t%.5e\n",k*k, val);
 	}
 	fclose(file);

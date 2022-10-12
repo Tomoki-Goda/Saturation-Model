@@ -33,16 +33,18 @@ extern int parameter(const double*,double*,double*);
 extern void approx_xg(const double *);
 
 ///////////////////////////////////////////////////////////
-static double X, K,Q2,SIGPAR[10], SUDPAR[10];   //////////
+static struct ww_parameters{
+	double X, K,Q2, *SIGPAR, *SUDPAR;
+} ww_par;
 ///////////////////////////////////////////////////////////
 
 double ww_integrand(const double * r){
 	double R=*r;
 	//double jac=1.0/pow(1-R,2);
 	//R=R/(1-R);
-	double kr=K*R;
+	double kr= ww_par.K * R;
 	double bes=dbesj0_(&kr);
-	double val=2*PI*bes* SIGMA(R,X,Q2,SIGPAR,SUDPAR)/R;
+	double val=2*PI*bes* SIGMA(R, ww_par.X, ww_par.Q2, ww_par.SIGPAR, ww_par.SUDPAR)/R;
 	return val;
 
 }
@@ -52,10 +54,10 @@ double ww_integrand_grad(const double * r){
 	//double jac=1.0/pow(1-R,2);
 	//R=R/(1-R);
 	//printf("%f %f\n",R,jac);
-	double kr=K*R;
+	double kr=ww_par.K*R;
 	double bes1=dbesj1_(&kr);
 	double bes0=dbesj0_(&kr);
-	double val=2*PI*(bes0-kr*bes1)* SIGMA(R,X,Q2,SIGPAR,SUDPAR)/R;
+	double val=2*PI*(bes0-kr*bes1)* SIGMA(R,ww_par.X,ww_par.Q2,ww_par.SIGPAR,ww_par.SUDPAR)/R;
 	//printf("%.3e\n",val);
 	return val;
 
@@ -63,20 +65,20 @@ double ww_integrand_grad(const double * r){
 
 double ww_integral(){
 	double res,err;
-	double max=(2)*PI*50/K, min=1.0e-5;
+	double max=(2)*PI*150/ww_par.K, min=1.0e-5;
 	//int n=96;
 	//res=dgquad_(&ww_integrand,&min,&max,&n);
 	
-	double n=1.0e-5;
+	double n=1.0e-8;
 	res=dgauss_(&ww_integrand,&min,&max,&n);
-	
+	printf("%.5e\n",res);	
 	return res;
 }
 
 double ww_grad(){
 
 	double res,err;
-	double max=(2)*PI*25/K, min=1.0e-5;
+	double max=(2)*PI*25/ww_par.K, min=1.0e-5;
 	//int n=96;
 	//res=dgquad_(&ww_integrand,&min,&max,&n);
 	
@@ -86,7 +88,7 @@ double ww_grad(){
 	return res;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
-double ww_saturation(){
+/*double ww_saturation(){
 	double k_step=0.1;
 	double k_min=0.1;
 	//double k=k_min;
@@ -128,3 +130,4 @@ double ww_saturation(){
 	K=K - k_step*fabs(val/(prev-val) );//weighted mid point 
 	return(K);
 }
+*/

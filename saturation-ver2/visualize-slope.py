@@ -35,6 +35,7 @@ def main():
     r=[]
     ri=[]
     fig1,ax1=plt.subplots(1,2,constrained_layout=True,sharex=True,sharey=True )
+    fig1.get_layout_engine().set(wspace=1/10)
     leg=[]
     name=['GBW','BGK']
     for l in range(2):
@@ -59,10 +60,10 @@ def main():
             leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
         ax1[l].set( xscale= 'log' ,   yscale='linear' )
         ax1[l].grid('true')
+        ax1[l].set_xlabel("$Q^2\\;[\\mathrm{{GeV^2}}]$",rotation="horizontal",loc='right')
     ax1[0].legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
     #ax1.set_ylabel("$-\\frac{\\partial \\log F_2}{\\partial \\log x}$",rotation="vertical",loc='top')
     ax1[0].set_ylabel("$x-slope $",rotation="vertical",loc='top')
-    ax1[1].set_xlabel("$Q^2$",rotation="horizontal",loc='right')
     fig1.set_figheight(4)
     fig1.set_figwidth(10)
     #fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.9, left=0.13)

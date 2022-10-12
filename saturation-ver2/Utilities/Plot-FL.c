@@ -13,7 +13,8 @@
 //#include"../dipole-cross-section.h"
 //#include"../photon-wave-function-2.h"
 //#include"../simpson-integral.h"
-#include"./plot.c"
+//#include"./plot.c"
+#include"./options.h"
 
 extern int F_L;
 extern void approx_xg(const double *);
@@ -25,48 +26,62 @@ extern double mod_x(double,double, int);
 #include"./f2.h"
 
 
+
 int main (int argc, char** argv){
-	char file_name[500];
-	int Q2len=30;
-	double Q2arr[Q2len+1];
+	read_options(argc,argv,&OPTIONS);
 	double param[10];
-	double x=0;
-	double W=0;
 	F_L=1;
-	FIX_W=1;//in f2.h
-	
-	//extern, in photon wave function
-	read_options(argc,argv,param,&x,&W,file_name );
-	//printf("x= %.2e\tW= %.2e\n",x,W);
-
-	for(int i =0;i<=Q2len;i++){
-		*(Q2arr+i)=pow(10.0, -1+4*((double)(i))/Q2len);
+	if(((OPTIONS.W)!=((int)0))){
+		FIX_W=1;//in f2.h
+		//extern, in photon wave function
 	}
-
-	double *par[4];
-	double var[2];
-	var[0]=W;
-	var[1]=0;
-	
-	printf("W= %.2e\n",var[0]);
-	par[0]=var;
+	FILE * input=fopen(OPTIONS.input_file_name,"r");
+	read_parameters(input,param);
+	fclose(input);
 	double sigpar[10];
 	double sudpar[10];
 	parameter(param,sigpar,sudpar);
+//////////////////////////////////
+	double *par[4];
+	double var[2];
+	par[0]=var;
 	par[1]=sigpar;
 	par[2]=sudpar;
+	
 	double flavour=0;
 	par[3]=&flavour;
+
+	double val;
+	FILE* out=fopen(OPTIONS.output_file_name,"w");
 #if (MODEL==1||MODEL==3)	
 	approx_xg(sigpar+1);//generate chebyshev coefficients
 #endif
+	if(FIX_W==1){
+		int Q2len=20;
+		for(int i =0;i<=Q2len;i++){
+			var[1]=pow(10.0, 0+3*((double)(i))/Q2len);
+			var[0]=var[1]/(var[1]+pow(OPTIONS.W,2));
+			printf("W= %.2e\n",var[0]);
+			val=f2(var[1],par);
+			fprintf(out,"%.5e\t%.5e\n",var[1],val);		
+		}
+		
+	}else{
 
-	FILE *file=fopen(file_name,"w");
-	if(file==NULL){
-		printf("F2:: file error. %s.\n", file_name);
-	}	
-	plot(&f2,Q2arr,Q2len+1,  par,  file);
-	fclose(file);
+		FILE* data=fopen(OPTIONS.data_file_name,"r");
+		fscanf(data, "%*[^\n]");
+		double x,Q2,f_l,dummy,error;
+
+		while(!feof(data)){
+			fscanf(data,"%lf %lf %lf %lf %lf %lf %lf\n",var+1,var,&f_l,&dummy,&dummy,&dummy,&error );
+			val=f2(var[1],par);
+			fprintf(out,"%.5e\t%.5e\n",var[1],val);
+		}
+		fclose(data);
+
+	}
+	fclose(out);
+///////////////////////////////////
 
 }
 

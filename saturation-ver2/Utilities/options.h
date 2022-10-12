@@ -5,16 +5,18 @@
 #include<string.h>
 #include<stdlib.h>
 
-struct info{
+static struct info{
 	char input_file_name[100];
 	char output_file_name[100];
 	double Q2;
 	double x;
 	double k;
 	int fl;
-};
+	double W;
+	char data_file_name[100];
+} OPTIONS;
 
-int read_options(int argc, char** argv, struct info * data  ){
+static int read_options(int argc, char** argv, struct info * data  ){
 	int c, indexptr;
 	
 	struct option long_options[]={
@@ -24,9 +26,11 @@ int read_options(int argc, char** argv, struct info * data  ){
 		{"flavour",required_argument,0,'f'},
 		{"in",required_argument,0,'i'},
 		{"out",required_argument,0,'o'},
+		{"W",required_argument,0,'w'},
+		{"data",required_argument,0,'d'},
 
 	};
-	char shortopts[]="q:k:x:f:i:o:";
+	char shortopts[]="q:k:x:f:i:o:w:d";
 	
 	while(1){
 		c=getopt_long_only(argc, argv,shortopts,long_options,&indexptr );
@@ -50,6 +54,12 @@ int read_options(int argc, char** argv, struct info * data  ){
 				break;
 			case 'o':
 				strcpy(data->output_file_name,optarg);
+				break;
+			case 'w':
+				data->W=atof(optarg);
+				break;
+			case 'd':
+				strcpy(data->data_file_name,optarg);
 				break;
 			default:
 				printf("Unknown option\n");

@@ -116,7 +116,7 @@ def main():
         extra=0
         row1=2
         col1=3
-        fig1,ax1=plt.subplots( nrows=row1, ncols=col1,sharex="col",sharey="row",constrained_layout=True)
+        fig1,ax1=plt.subplots( nrows=row1, ncols=col1,sharex="col",sharey="row",layout='constrained')
         fig1.set_constrained_layout_pads(hspace=0,wspace=0)
     else:
         q2set=sorted( list(set(q2)) , key=float)
@@ -128,13 +128,13 @@ def main():
             row1+=1
         extra=col1*row1-(q2len//2)
         
-        fig1,ax1=plt.subplots( nrows=row1, ncols=col1,sharex="col",sharey="row",constrained_layout=True)
+        fig1,ax1=plt.subplots( nrows=row1, ncols=col1,sharex="col",sharey="row",layout="compressed")
         col2=4
         row2=(q2len-(q2len//2+extra))//col2
         if ( (q2len-(q2len//2+extra))%col2 )!= 0 :
             row2+=1
         
-        fig2,ax2=plt.subplots( nrows=row2, ncols=col2,sharex=True,sharey=True,constrained_layout=True)
+        fig2,ax2=plt.subplots( nrows=row2, ncols=col2,sharex=True,sharey=True,layout="compressed")
 
         fig1.set_constrained_layout_pads(hspace=0,wspace=0)
         fig2.set_constrained_layout_pads(hspace=0,wspace=0)
@@ -176,7 +176,8 @@ def main():
         #chi+=pow((float(f2d[j])-float(f2c[j]))/float(f2e[j]),2)
         #count+=1
         ax1[pos[0]][pos[1]].set(  xscale="log" ,   yscale='linear')
-        ax1[pos[0]][pos[1]].text(xarr[0]*1.2, yarr[0],"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=7 )
+        #ax1[pos[0]][pos[1]].text(xarr[0]*1.2, yarr[0],"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=7 )
+        ax1[pos[0]][pos[1]].text(0.05,0.9,"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=9,transform=ax1[pos[0]][pos[1]].transAxes) 
         #ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
         ax1[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
         ax1[pos[0]][pos[1]].yaxis.set_minor_locator(plt.NullLocator())
@@ -232,7 +233,8 @@ def main():
                 
         ax2[pos[0]][pos[1]].set(xscale="log" ,   yscale='linear' )
         #ax2[pos[0]][pos[1]].legend()
-        ax2[pos[0]][pos[1]].text(1.0e-4, 0.6,"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=7) 
+        #ax2[pos[0]][pos[1]].text(1.0e-4, 0.6,"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=7) 
+        ax2[pos[0]][pos[1]].text(0.05,0.9,"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=9,transform=ax2[pos[0]][pos[1]].transAxes) 
         #ax2[pos[0]][pos[1]].yaxis.set_major_locator(plt.FixedLocator([0.01,0.05,0.1,0.5,1,2.5]))
         ax2[pos[0]][pos[1]].yaxis.set_major_locator(plt.LogLocator(base=10))
         ax2[pos[0]][pos[1]].xaxis.set_major_locator(plt.FixedLocator([1.0e-6,1.0e-4,1.0e-2] ))
@@ -246,7 +248,8 @@ def main():
         #ax.scatter(x,f2,marker=".");
         #ax.set(  xscale="log" ,   yscale='linear' )
         #ax2[pos[0]][pos[1]].set_ylabel( "F_2" ,rotation="horizontal",loc='top')
-    
+    fig1.get_layout_engine().set(hspace=None, wspace=None)
+    fig2.get_layout_engine().set(hspace=None, wspace=None)
     #ax1.set_ylabel( "F_2" ,rotation="horizontal",loc='top')
     fig1.set_figheight(8)
     fig1.set_figwidth(6)
@@ -291,7 +294,7 @@ def main():
          else:
              binlabel.append("")
     
-    fig, ax1=plt.subplots(1,1,constrained_layout=True, sharex=True,sharey=True)
+    fig, ax1=plt.subplots(1,1,layout='constrained', sharex=True,sharey=True)
     #fig=plt.figure(constrained_layout=True)
     #ax3.clf()
     #ax1=fig.add_subplot(1,1,1)

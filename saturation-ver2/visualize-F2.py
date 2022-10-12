@@ -35,6 +35,7 @@ def main():
     r=[]
     ri=[]
     fig1,ax1=plt.subplots(1,2,constrained_layout=True,sharex=True,sharey=True )
+    fig1.get_layout_engine().set(wspace=1/10)
     leg=[]
     name=['GBW', 'BGK']
     for l in range(2): 
@@ -48,7 +49,7 @@ def main():
                     dpi.append(float(data[1]))
                     ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            ax1[l].text(float(data[0])/2,float(data[1]),"x=$10^{-"+j+"}$")
+            ax1[l].text(float(data[0])/2.5,float(data[1]),"x=$10^{-"+j+"}$")
             
             with open(args[1+2*l]+'/F2-'+j+'.txt',"r") as fi:
                 dpi=[]
@@ -60,12 +61,12 @@ def main():
             leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
         ax1[l].set( xscale= 'log' ,   yscale='log' )
         ax1[l].grid('true')
+        ax1[l].set_xlabel("$Q^2 \\;[\\mathrm{GeV^2}]$",rotation="horizontal",loc='right',fontsize=13)
     
     ax1[0].legend([leg[0][0],leg[3][0]],['Without Sudakov','With Sudakov'])
     ax1[0].set_ylabel("$F_2$",rotation="vertical",loc='top',fontsize=13)
-    ax1[1].set_xlabel("$Q^2 \\;[\\mathrm{GeV^2}]$",rotation="horizontal",loc='right',fontsize=13)
     fig1.set_figheight(4)
-    fig1.set_figwidth(10)
+    fig1.set_figwidth(10.5)
     #fig1.subplots_adjust(bottom=0.11, right=0.95, top=0.95, left=0.11)
     if saveflag:
         fig1.savefig(save1)

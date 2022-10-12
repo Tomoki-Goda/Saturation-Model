@@ -35,6 +35,7 @@ def main():
     r=[]
     ri=[]
     fig1,ax1=plt.subplots(1,2,constrained_layout=True, sharey=True,sharex=True )
+    fig1.get_layout_engine().set(wspace=1/10)
     leg=[]
     q2= ['5','50','500']
     name=['GBW',"BGK"]
@@ -62,13 +63,13 @@ def main():
                 leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
         ax1[l].set( xscale= 'log' ,   yscale='linear' )
         ax1[l].grid('true')
+        ax1[l].set_xlabel("$x$",rotation="horizontal",loc='right')
     #ax1.legend([leg[0][0],leg[1][0],leg[2][0]],['Without Sudakov','With Sudakov $Q^2=100\\;\\mathrm{GeV}^2$','With Sudakov $Q^2=650\\;\\mathrm{GeV}^2$'])
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     #ax1.set(title="",  ylabel="$\\alpha_s f(x k^2)$",    xlabel="$k^2$",  xscale= 'log' ,   yscale='linear' )
-    ax1[0].set_ylabel('$\\alpha_s \\mathcal{F}(x, k^2)$',rotation="vertical",loc='top')
-    ax1[1].set_xlabel("$x$",rotation="horizontal",loc='right')
+    ax1[0].set_ylabel('$\\alpha_s \\mathcal{F}(x, k^2,Q^2)$',rotation="vertical",loc='top')
     fig1.set_figheight(4)
-    fig1.set_figwidth(10)
+    fig1.set_figwidth(10.5)
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
     if saveflag:
         fig1.savefig(save1)

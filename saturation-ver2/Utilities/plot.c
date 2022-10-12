@@ -32,6 +32,8 @@ int read_options(int argc, char ** argv, double* param,double* x,double* Q2,char
 			*Q2=strtof(argv[2*i],&end);
 		}else if( strcmp(argv[2*i-1],"-W" ) ==0){
 			*Q2=strtof(argv[2*i],&end);
+		//}else if( strcmp(argv[2*i-1],"-ys" ) ==0){
+		//	*Q2=strtof(argv[2*i],&end);
 		}else if( strcmp(argv[2*i-1],"-out")==0 ){
 			sprintf(outfile,"%s",argv[2*i]);
 		}else if( strcmp(argv[2*i-1],"-in" ) ==0){

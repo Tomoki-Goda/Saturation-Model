@@ -10,7 +10,7 @@ extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,dou
 static int FIX_W=0;
 int PLOT_FLAVOUR=0;
 
-double mod_x_W(double x, double Q2,double W2,int fl){
+double mod_x_W( double Q2,double W2,int fl){
 	double mass2;
 
 	switch(fl){
@@ -38,7 +38,6 @@ double mod_x_W(double x, double Q2,double W2,int fl){
 ///////////////////////////////////////Version 1////////////////////////////////////////////////////////
 double f2_integrand(double R, double ** par){
 	double xm;
-	double x = *(*par);
 	double Q2= *(*(par)+1);
 	double *sigpar=*(par+1);
 	double *sudpar=*(par+2);
@@ -49,19 +48,21 @@ double f2_integrand(double R, double ** par){
 
 	double value=0.0;
 
-	if(FIX_W==1){
-		double W2=pow(*(*(par)),2);
-		xm=mod_x_W(x, Q2, W2,fl);
-	}else{
+	//if(FIX_W==1){
+	//	double W2=pow(*(*(par)),2);
+	//	xm=mod_x_W( Q2, W2,fl);
+		//xm=Q2*Q2/(**par);
+	//}else{
+		double x = *(*par);
 		xm=mod_x(x,Q2,fl);
-	}
+	//}
 	value+=jac*psisq_z_int(r, Q2, fl)* SIGMA(r,xm,Q2, sigpar,sudpar)/r ;
 	return(value);
 }
 double f2(double Q2, double**pars){
 	double res=0, err=0,val=0;
 	*(*(pars)+1)=Q2;
-	printf("fl=%d\n",PLOT_FLAVOUR);
+	//printf("fl=%d\n",PLOT_FLAVOUR);
 
 	//printf("x== %.2e\t Q2== %.2e\n", pars[0][0],pars[0][1]);
 	if(PLOT_FLAVOUR==0){

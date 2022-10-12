@@ -35,6 +35,7 @@ def main():
     r=[]
     ri=[]
     fig1,ax1=plt.subplots(1,2 ,sharey=True,constrained_layout=True)
+    fig1.get_layout_engine().set(wspace=1/10)
     leg=[]
     #q2= ['100','650']
     #types= ['','tmd-']
@@ -66,13 +67,13 @@ def main():
         leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
         ax1[l].set(xscale="log" ,   yscale='log' )
         ax1[l].grid('true')
+        ax1[l].set_xlabel("$x$",rotation="horizontal",loc='right')
 ################################# 
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     ax1[0].set_ylabel("$Q^2_s \\;[\\mathrm{GeV}^2]$",rotation="vertical",loc='top')
-    ax1[1].set_xlabel("$x$",rotation="horizontal",loc='right')
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)
     fig1.set_figheight(4)
-    fig1.set_figwidth(10)
+    fig1.set_figwidth(10.5)
     if saveflag:
         fig1.savefig(save1)
     else:

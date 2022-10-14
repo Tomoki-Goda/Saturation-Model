@@ -143,6 +143,51 @@ void chebyshevT(double x,unsigned degree, double * T ){
 		*(T+i)=t+c;
 	}
 }
+void chebyshevU(double x,unsigned degree, double * U ){
+//iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
+//with kahn algorithm
+	*(U)=1;
+	*(U+1)=2x;
+	double t, c, t0, t1;
+
+	for(unsigned i=2;i<(degree);i++){
+		t1=2*x*(*(U+i-1));
+		t0=-(*(U+i-2));
+
+		t=t1+t0;
+		if(fabs(t1)>fabs(t0)){
+			c=(t1-t)+t0;
+		}else{
+			c=(t0-t)+t1;
+		}
+		if(fabs(c)>1.0e-10){
+			printf("accum= %.3e %.3e \n",c,t);
+		}
+		*(U+i)=t+c;
+	}
+}
+
+void chebyshev_1(double x, unsigned degree, double *T1){
+	double U[degree];
+	chebyshevU(x,degree,U);
+	for(int i=0;i<degree;i++){
+		T1[i]=i*U[i];
+	}
+}
+
+void chebyshev_2(double x, unsigned degree, double *T2){
+	double U[degree], T[degree];
+	chebtshevT(x,degree,T);
+	chebyshevU(x,degree,U);
+	for(int i=0;i<degree;i++){
+		T2[i]=i*((i+1)*T[i]-U[i])/(x*x-1);
+	}
+}
+
+
+
+
+
 
 inline int kronecker(int i,int j){
 	return( ( (i==j)?1:0)  );
@@ -315,7 +360,70 @@ double chebyshev(const unsigned *degree,unsigned dim,const double* coeff , doubl
 	return res;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////// derivative  /////////////////////////////////////////////////////////
+///////////////////// del is a list n th derivative for args. [1,0,0] for first derivative wrt first arg of three arguments //////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+double d_chebyshev(const unsigned *degree,unsigned dim,const double* coeff , double* args, int* del ){
+	
+	unsigned ind1[dim];
+	unsigned len=1;
+	unsigned lenT=0;
+	double res=0;
+	double val;
+	
+	//double *Tlist[dim];
+	
+	for(unsigned i=0;i<dim;i++){
+		len*=degree[i] ;
+		lenT+=degree[i] ;
+		*(ind1+i)=0;//initialize indices
+	}
+	//evaluate chebyshev polynomials Ti(x)
+	double Tlist[lenT];
+	unsigned posit[10]={0};//max dim=10. This is a list containing where the index move to the next dimension.
+	
+	for(unsigned i=0;i<dim;i++){
+		if(args[i]>1) {
+			printf("chebyshev:: arg too large %f at position %d\n",args[i], i);
+			(args[i])-=2;
+			getchar();			
+		}
+		if(args[i]<-1) {
+			printf("chebyshev:: arg too small %f at position %d\n",args[i], i);
+			(args[i])+=2;			
+			getchar();			
+		}
+		if(del[i]>2){
+			printf("DERIVATIVE HIGHER THAN 2 IS NOT IMPLEMENTED\n");
+		}
+		if(del[i]==2){
+			chebyshev_del_2(args[i],degree[i],Tlist+*(posit+i));
+		}else if(del[i]==1){
+			chebyshev_del_1(args[i],degree[i],Tlist+*(posit+i));
+		}else{
+			chebyshevT(args[i], degree[i], Tlist+*(posit+i));
+		}	
+		*(posit+i+1)=(*(posit+i)+(*(degree+i)) );
+		//printf("%d/%d\n",*(posit+i+1),len);
+	}//Now Tlist is a concatenated list of T 
+	double arr[len];
+	for(unsigned j=0;j<len; j++ ){
+		//posit=0;//position to start counting in tlist since its joined list.
+		val=1;
+		for(unsigned i=0;i<dim;i++){
+			val *=( ((double)(2-kronecker(ind1[i],0)) )/2);
+			val *=Tlist[posit[i]+ind1[i]];
+		}
+		val*=(*(coeff+j));
+		
+		//res+=val;
+		arr[j]=val;	
+		ind_vec_increment(ind1,degree,dim);
+	}
+	res=k_group_sum(arr,len);
+	for(unsigned i=0;i<dim;i++){
+		res*=(2.0/degree[i]);	
+	}
+	return res;
+}
 

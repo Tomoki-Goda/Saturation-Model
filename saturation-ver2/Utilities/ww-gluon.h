@@ -37,20 +37,40 @@ static struct ww_parameters{
 	double X, K,Q2, *SIGPAR, *SUDPAR;
 } ww_par;
 ///////////////////////////////////////////////////////////
-
+///////////////////in sudakov.h//////////////////
+extern double sudakov_p(double, double ,const double*);
+extern double sudakov_np(double, double, double ,const double*);
+extern int compute_mu2(double,const double*,double*,int);
+/////////////////////////////////////////////////
+//
 double ww_integrand(const double * r){
 	double R=*r;
 	//double jac=1.0/pow(1-R,2);
 	//R=R/(1-R);
 	double kr= ww_par.K * R;
 	double bes=dbesj0_(&kr);
-	double val=2*PI*bes* SIGMA(R, ww_par.X, ww_par.Q2, ww_par.SIGPAR, ww_par.SUDPAR)/R;
+	double q2=ww_par.Q2;
+
+	double sigma=BASE_SIGMA(R, ww_par.X, ww_par.Q2, ww_par.SIGPAR)/(*(ww_par.SIGPAR));
+	double val=2*PI*bes*(2*sigma-sigma*sigma)*(*(ww_par.SIGPAR))/R;
+
+	double sud=1;
+#if SUDAKOV>=1
+	double  mu2;
+	compute_mu2(R,ww_par.SUDPAR,&mu2,1);
+	sud*=exp(-sudakov_p(mu2,q2,ww_par.SUDPAR));
+#if SUDAKOV==2
+	sud*=exp(-sudakov_np(R,mu2,q2,ww_par.SUDPAR));
+#endif
+#endif
+	val*=sud;
 	return val;
 
 }
 
 double ww_integrand_grad(const double * r){
 	double R=*r;
+	printf("DISCONTINUED RESULT IS WRONG!!!!\n");
 	//double jac=1.0/pow(1-R,2);
 	//R=R/(1-R);
 	//printf("%f %f\n",R,jac);

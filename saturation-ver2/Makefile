@@ -24,7 +24,8 @@ GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-
 
 ########################################################################################################
 
-all: clean main critical dipole F2 FL F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x ww-critical heavy-F2 
+all: clean main #critical dipole F2 FL F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x ww-critical heavy-F2 
+grid: gluon-grid
 
 fit: clean main
 
@@ -35,6 +36,12 @@ main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-sectio
 	gcc ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${DIR}/boole-int.o ${LIBS} -o ${DIR}/main ${INC} ${OPT} 
 
 
+gluon-grid: ${DEPS} ${UTILDIR}/gluon-grid.c ${DIR}/dipole-cross-section.o  ${UTILDIR}/tmd-gluon.h
+	gcc ${UTILDIR}/gluon-grid.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/gluon-grid   ${INC} ${OPT}
+
+
+dipole-grid: ${DEPS} ${UTILDIR}/dipole-grid.c ${DIR}/dipole-cross-section.o
+	gcc ${UTILDIR}/dipole-grid.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/dipole-grid  ${INC} ${OPT}
 
 critical : ${DEPS} ${UTILDIR}/critical-line.c ${UTILDIR}/critical-line.h ${DIR}/dipole-cross-section.o
 	gcc ${UTILDIR}/critical-line.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/critical   ${INC} ${OPT}
@@ -83,9 +90,6 @@ ww-gluon: ${DEPS} ${UTILDIR}/ww-gluon.c ${UTILDIR}/ww-gluon.h ${DIR}/dipole-cros
 #geometric: ${DEPS} ${UTILDIR}/geometric-scaling.c  ${UTILDIR}/tmd-gluon.h ${DIR}/dipole-cross-section.o 
 #	gcc ${UTILDIR}/geometric-scaling.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/geometric   ${INC} ${OPT}
 
-dipole-grid: ${DEPS} ${UTILDIR}/generate-dipole-grid.c ${DIR}/dipole-cross-section.o
-	gcc ${UTILDIR}/generate-dipole-grid.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/dipole-grid  ${INC} ${OPT}
-
 #tmd-critical-2: ${DEPS} ${UTILDIR}/tmd-critical-2.c  ${UTILDIR}/tmd-gluon.h ${DIR}/dipole-cross-section.o 
 #	gcc ${UTILDIR}/tmd-critical-2.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/tmd-critical-2   ${INC} ${OPT}
 
@@ -108,7 +112,7 @@ ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c ${UTILDIR}/f2.h
 	gcc -c ${FUNCDIR}/read-and-fit.c   ${LIBS}  ${INC}  -o ${DIR}/read-and-fit.o ${OPT}
 
        
-${DIR}/dipole-cross-section.o: ${DEPS} ${FUNCDIR}/dipole-cross-section.c ${GLUDEP} ${SUDDEP}
+${DIR}/dipole-cross-section.o: ${DEPS} ${FUNCDIR}/dipole-cross-section.c ${GLUDEP} ${SUDDEP} ${FUNCDIR}/laplacian.h
 	gcc -c ${FUNCDIR}/dipole-cross-section.c  ${LIBS}   ${INC}  -o ${DIR}/dipole-cross-section.o  ${OPT}
 
 

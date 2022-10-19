@@ -11,7 +11,7 @@
 
 #define PHI 0 
 #include"./plot.c"
-#include"./tmd-gluon.h"
+#include"./tmd-gluon-2.h"
 
 int main (int argc, char** argv){
 
@@ -32,7 +32,7 @@ int main (int argc, char** argv){
 	approx_xg(sigpar+1);//generate chebyshev coefficients
 #endif
 
-	sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
+	//sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
 	file=fopen(file_name,"w");
 
 	if(file==NULL){
@@ -41,11 +41,12 @@ int main (int argc, char** argv){
 	}
 	for (int i=0; i<100; i++){
 		k= pow(10,-1+((double)2*i)/100);
-#if PHI==1
+/*#if PHI==1
 		val=fill_arr_2(k, step);
 #else
 		val=fill_arr(k, step,sudpar,Q2);
-#endif
+#endif*/
+		val=af(x,k,Q2,sigpar);
 		//val*=k*k;
 		val*=3.0/(4*PI);
 		val/=(2*PI*2*PI);

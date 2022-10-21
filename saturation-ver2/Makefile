@@ -112,7 +112,7 @@ ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c ${UTILDIR}/f2.h
 	gcc -c ${FUNCDIR}/read-and-fit.c   ${LIBS}  ${INC}  -o ${DIR}/read-and-fit.o ${OPT}
 
        
-${DIR}/dipole-cross-section.o: ${DEPS} ${FUNCDIR}/dipole-cross-section.c ${GLUDEP} ${SUDDEP} ${FUNCDIR}/laplacian.h
+${DIR}/dipole-cross-section.o: ${DEPS} ${FUNCDIR}/dipole-cross-section.c ${GLUDEP} ${SUDDEP}
 	gcc -c ${FUNCDIR}/dipole-cross-section.c  ${LIBS}   ${INC}  -o ${DIR}/dipole-cross-section.o  ${OPT}
 
 

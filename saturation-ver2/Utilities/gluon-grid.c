@@ -41,17 +41,17 @@ int main (int argc, char** argv){
 			return 1;
 	}
 	
-	int gridsize[3]={100,100,100};
+	int gridsize[3]={75,75,75};
 #if (SUDAKOV==0)
 	gridsize[2]=1;
 #endif
 	for(int i=0;i<gridsize[0]; i++){
-		x=pow(10,-7+6*((double)i)/gridsize[0]);
+		x=pow(10,-8+7*((double)i)/(gridsize[0]-1) );
 		//x=1.0e-4;
 		for(int j=0;j<gridsize[1];j++){
-			k=pow(10,-4+8*((double)j)/gridsize[1]);
+			k=pow(10,(-2+6*((double)j)/(gridsize[1]-1) )/2 );
 			for(int l=0;l<gridsize[2];l++){
-				Q2=pow(10, -2+5*((double)l)/gridsize[2] );
+				Q2=pow(10, -2+6*((double)l)/(gridsize[2]-1) );
 				//Q2=5;
 				//sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
 				val=af(x,k,Q2,sigpar,sudpar);
@@ -59,9 +59,9 @@ int main (int argc, char** argv){
 				//val=fill_arr(k, step,sudpar,Q2);
 				val*=3.0/(4*PI);
 				val/=(2*PI*2*PI);
+				//fprintf(file,"%.10e\t%.10e\n",k*k, val);
 #if (SUDAKOV==0)	
 				fprintf(file,"%.10e\t%.10e\t%.10e\n",log(x),2*log(k), val);
-				//fprintf(file,"%.10e\t%.10e\n",k*k, val);
 #else
 				fprintf(file,"%.10e\t%.10e\t%.10e\t%.10e\n",log(x),2*log(k),log(Q2), val);
 #endif

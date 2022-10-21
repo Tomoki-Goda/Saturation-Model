@@ -3,7 +3,7 @@
 #include<stdio.h>
 #include"./kahnsum.h"
 #ifndef PI
-	#define PI 3.1415
+	#define PI 3.1415926535897932384626433832795
 #endif
 
 #ifndef CHEBYSHEV_TEST 
@@ -147,7 +147,7 @@ void chebyshevU(double x,unsigned degree, double * U ){
 //iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
 //with kahn algorithm
 	*(U)=1;
-	*(U+1)=2x;
+	*(U+1)=2*x;
 	double t, c, t0, t1;
 
 	for(unsigned i=2;i<(degree);i++){
@@ -170,16 +170,19 @@ void chebyshevU(double x,unsigned degree, double * U ){
 void chebyshev_1(double x, unsigned degree, double *T1){
 	double U[degree];
 	chebyshevU(x,degree,U);
-	for(int i=0;i<degree;i++){
-		T1[i]=i*U[i];
+	T1[0]=0;
+	for(int i=1;i<degree;i++){
+		T1[i]=i*U[i-1];
 	}
 }
 
 void chebyshev_2(double x, unsigned degree, double *T2){
 	double U[degree], T[degree];
-	chebtshevT(x,degree,T);
+	chebyshevT(x,degree,T);
 	chebyshevU(x,degree,U);
-	for(int i=0;i<degree;i++){
+	T2[0]=0;
+	T2[1]=0;
+	for(int i=2;i<degree;i++){
 		T2[i]=i*((i+1)*T[i]-U[i])/(x*x-1);
 	}
 }
@@ -397,9 +400,9 @@ double d_chebyshev(const unsigned *degree,unsigned dim,const double* coeff , dou
 			printf("DERIVATIVE HIGHER THAN 2 IS NOT IMPLEMENTED\n");
 		}
 		if(del[i]==2){
-			chebyshev_del_2(args[i],degree[i],Tlist+*(posit+i));
+			chebyshev_2(args[i],degree[i],Tlist+*(posit+i));
 		}else if(del[i]==1){
-			chebyshev_del_1(args[i],degree[i],Tlist+*(posit+i));
+			chebyshev_1(args[i],degree[i],Tlist+*(posit+i));
 		}else{
 			chebyshevT(args[i], degree[i], Tlist+*(posit+i));
 		}	

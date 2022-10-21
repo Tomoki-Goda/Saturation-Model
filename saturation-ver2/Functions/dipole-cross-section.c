@@ -285,22 +285,28 @@ double Qs2(double r , double x, double *par){
 }
 
 
-double laplacian_sigma(double x ,double r, double *par){
+double laplacian_sigma(double r,double x,double q2, double *par,double *sudpar){
 	SIGPARAM.x=x;
 	SIGPARAM.sigpar=par;
 	double val;
-	double bound=1.0e-3;
+	double bound=7.5e-3;
 	if(r<bound){
-		//val=par[0]*Qs2(r,x,par);
-		val=laplacian2(&sigma_for_lap,bound,bound/2);
+		val=laplacian2(&sigma_for_lap,bound,bound/10);
 		//val=laplacian2(&sigma_for_lap,r,r/5);
 	}else if(r>3){
 		double qs2=Qs2(r,x,par);
 
 		val=par[0]*(1-r*r*qs2/4)*qs2*exp(-r*r*qs2/4);//(par[0]-BASE_SIGMA(r,x,1,par));
 	}else{
-		val=laplacian2(&sigma_for_lap,r,bound);
+		val=laplacian2(&sigma_for_lap,r,bound/10);
 	}
+#if SUDAKOV>=1
+	double mu2;
+	int signal=compute_mu2(r,sudpar, &mu2,1);//compute mu2
+	if(q2>mu2){
+		val*=exp_sud(r,mu2,q2);
+	}
+#endif
 	return val;
 }
 

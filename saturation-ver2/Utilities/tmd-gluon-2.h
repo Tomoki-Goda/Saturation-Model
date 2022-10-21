@@ -2,7 +2,7 @@
 //extern double k_group_sum(const double *arr,int len);
 //#include"./kahnsum.h"
 //#include"./critical-line.h"
-
+//#include"../Functions/sudakov.h"
 #include"../Functions/kahnsum.h"
 //#include"./main.h"
 extern double dbesj0_(double*);
@@ -10,7 +10,7 @@ extern double dbesj1_(double*);
 extern double mod_x(double, double,int);
 extern double SIGMA(double , double ,double , const double *, const double*);
 extern double BASE_SIGMA(double , double ,double , const double *);
-extern double laplacian_sigma(double ,double,double,double *);
+extern double laplacian_sigma(double ,double,double,double*,double *);
 
 extern int parameter(const double*,double*,double*);
 extern void approx_xg(const double *);
@@ -39,13 +39,9 @@ static double integrand_af(double* r ){
 	double jac=1.0/pow(1-*r,2);
 
 	double kr=PARAM.k * r2;
-	double val=jac * 2*PI*dbesj0_(&kr)*(r2)*laplacian_sigma(PARAM.x, r2, PARAM.Q2,PARAM.sigpar);
-#if SUDAKOV>=1
-	double *mu2;
-	signal=compute_mu2(r2, PARAM.sudpar, mu2,1);//compute mu2
-	val*=exp_sud(r2,*mu2,PARAM.Q2);
-#endif
-	//printf("%.5e\tr=%.5e\n",val,*r);
+	double val=jac * 2*PI*dbesj0_(&kr)*(r2)*laplacian_sigma(r2,PARAM.x, PARAM.Q2,PARAM.sigpar,PARAM.sudpar);
+
+ 	//printf("%.5e\tr=%.5e\n",val,*r);
 	return val;
 }
 extern double dgquad_(double(*)(double *), double*, double*,int*);
@@ -57,10 +53,10 @@ double af(double x,double k,double q2,double * sigpar,double *sudpar){
 	PARAM.sigpar=sigpar;
 	PARAM.sudpar=sudpar;
 	PARAM.k=k;
-	double eps=1.0e-12;
-	//double epsabs=0;
-	//int seg=10;
-	//double val, err;
+	double eps=1.0e-8;
+	double epsabs=0;
+	int seg=1;
+	double val, err;
 	double lim[2];
 	//lim[0]=R_MIN;
 	//lim[1]=R_MAX;
@@ -68,18 +64,19 @@ double af(double x,double k,double q2,double * sigpar,double *sudpar){
 	lim[1]=((double)R_MAX)/(1+R_MAX);
 	//printf("k= %.5e integ lim = %.5e %.5e\n" ,k, lim[0],lim[1]);
 	//double step=(lim[1]-lim[0])/15, high=lim[0],low=lim[0];
-	double val=0;
+	//double val=0;
 	//int N=96;
-	/*for(int i =0;i<15;i++){
-		high=low+step;
-		val+=dgauss_(&integrand_af,&low,&high, &eps);
-		//val+=dgquad_(&integrand_af,&low,&high,&N);
-		low=high;
-	}*/
+	//double low,high,step=(lim[1]-lim[0])/15;
+	//for(int i =0;i<15;i++){
+	//	high=low+step;
+	//	val+=dgauss_(&integrand_af,&low,&high, &eps);
+	//	//val+=dgquad_(&integrand_af,&low,&high,&N);
+	//	low=high;
+	//}
 	val=dgauss_(&integrand_af,lim,lim+1,&eps);
 	//dadapt_(&integrand_af,lim,lim+1,&seg,&eps,&epsabs,&val,&err);
 	//double val=dgquad_(&integrand_af,lim,lim+1,&N);
-	printf("af= %.5e\n",val);
+	printf("af= %.5e+-%.5e \tk^2=%.5e \n",val,err,k*k);
 	return val;
 }
 

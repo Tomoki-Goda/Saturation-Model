@@ -7,6 +7,7 @@
 
 #include"./gluon-chebyshev.h"
 #include"./sudakov.h"
+//#include"./laplacian.h"
 
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
 extern double dgauss_(double (*)(double*), double*,double*,double *  );
@@ -32,7 +33,8 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 #else
 	sigpar[0]=par[0];
 	sigpar[1]=par[1];
-	sigpar[2]=par[2]*1.0e-2;
+	//sigpar[1]=pow(fabs(par[1])*1.0e-4,par[2]);
+	sigpar[2]=par[2];
 #endif
 
 	
@@ -149,8 +151,8 @@ double sigma_gbw(double r,double x,double q2, const double * par){
 double sigma_bgk(double r, double x, double q2, const double * par){
 	//clock_t tim=clock();
 	double sigma_0		=par[0];
-	double A_g		=par[1];
-	double lambda_g		=par[2];
+	//double A_g		=par[1];
+	//double lambda_g		=par[2];
 	//double C		=par[3];
 	//double mu02		=par[4];
 	//double rmax		=par[4];
@@ -172,6 +174,146 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 	
 	return(val) ;	
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+//derivatives
+///////////////////////////////////////////////////////////////////////////////////////
+/*
+extern double dderiv_(double(*)(double*), double*, double*, double*, double*);
+double dderiv2_(double(*func )(double*), double* var , double* del, double*dfdx, double*err){
+	double vars[4];
+	double val[4];
+	double varmid=*var;
+	int fact=5;
+	double grad1,grad2 ;
+	double h1;
+	//for(int i=0;i<1;i++){
+		if(varmid<0.005){
+			h1=varmid/5;
+		}else{
+			h1=1.0e-3;
+		}
+		vars[0]=varmid-2*h1;
+		vars[1]=varmid-h1;
+		vars[2]=varmid+h1;
+		vars[3]=varmid+2*h1;
+	
+		val[0]=(*func)(vars);
+		val[1]=(*func)(vars+1);
+		val[2]=(*func)(vars+2);
+		val[3]=(*func)(vars+3);
+
+		grad1=((-val[3]+8*val[2]-8*val[1]+val[0])/(12*h1));
+		//grad1=((val[1]-val[0]))/(2*h1);
+	//	if(grad1<1.0e-12){
+	//		break;
+	//	}	
+	//	if(i>1&&(fabs((grad1-grad2)/grad2)<1.0e-8)){
+	//			break;
+	///	}
+	//	if(i==4){
+			//printf("reached max\t%.5e\t%.5e\t%.5e\t%.5e \n",*var,grad1,grad2,fabs((grad1-grad2)/grad2) );
+			//getchar();
+	//	}
+	//	grad2=grad1;
+	//	fact++;
+	//}
+	*dfdx=grad1;
+	return *dfdx;
+}
+*/
+struct parameters{
+	double x;
+	double Q2;
+	double *sigpar;
+} SIGPARAM;
+
+void set_sigmapar(double x,double Q2 ,double*sigpar){
+	SIGPARAM.x=x;
+	SIGPARAM.Q2=Q2;
+	SIGPARAM.sigpar=sigpar;
+}
+
+double sigma_for_lap(double *r){
+	//double x=PARAM.x;
+	double val=BASE_SIGMA(*r,SIGPARAM.x,1,SIGPARAM.sigpar);
+	//double val=sigma_gbw(*r,SIGPARAM.x,1,SIGPARAM.sigpar);
+	//printf("s=%.5e  r=%.5e\n",val,*r);
+	return val;
+}
+double laplacian2(double (*func)(double*), double r,double step ){
+	double arr[5];
+	double x[5]={r-step,r-step/2,r,r+step/2,r+step};
+	for(int i =0;i<5;i++){
+		arr[i]=(*func)(x+i);
+	}
+	double d1=(-arr[4]+8*arr[3]-8*arr[1]+arr[0])/(6*step);
+	double d2=(-arr[4]+16*arr[3]-30*arr[2]+16*arr[1]-arr[0])/(3*step*step);
+
+	double val=d2+d1/r;//(arr[2]-2*arr[1]+arr[0])/(step*step)+(arr[2]-arr[0])/(r*step);
+	return val;
+}
+/*	
+double dsigma(double *r){
+//	PARAM.x=x;
+//	PARAM.par=par;
+	double delta=10,dfdx,rerr;
+	dderiv2_(&sigma_for_lap, r,&delta,&dfdx,&rerr);
+	
+	return dfdx;
+}
+
+double d2sigma(double *r){
+//	PARAM.x=x;
+//	PARAM.par=par;
+	double delta=1,dfdx,rerr;
+	//dfdx=dsigma(r);
+	dderiv2_(&dsigma, r,&delta,&dfdx,&rerr);
+	return dfdx;
+}
+*/
+double Qs2(double r , double x, double *par){
+#if(MODEL==0||MODEL==2||MODEL==22)
+	double qs2=pow(par[2]/x,par[1]);
+#else
+	double mu2;
+	int signal= compute_mu2(r, par+3 , &mu2, 1 );
+	double qs2 =4* 0.389379*(pow(  PI,2) * xg_chebyshev(x,mu2))/ (3* par[0]); //prefactor, origin unknown...
+#endif
+	return qs2;
+}
+
+
+double laplacian_sigma(double r,double x,double q2, double *par,double *sudpar){
+	SIGPARAM.x=x;
+	SIGPARAM.sigpar=par;
+	double val;
+	double bound=7.5e-3;
+	if(r<bound){
+		val=laplacian2(&sigma_for_lap,bound,bound/10);
+		//val=laplacian2(&sigma_for_lap,r,r/5);
+	}else if(r>3){
+		double qs2=Qs2(r,x,par);
+
+		val=par[0]*(1-r*r*qs2/4)*qs2*exp(-r*r*qs2/4);//(par[0]-BASE_SIGMA(r,x,1,par));
+	}else{
+		val=laplacian2(&sigma_for_lap,r,bound/10);
+	}
+#if SUDAKOV>=1
+	double mu2;
+	int signal=compute_mu2(r,sudpar, &mu2,1);//compute mu2
+	if(q2>mu2){
+		val*=exp_sud(r,mu2,q2);
+	}
+#endif
+	return val;
+}
+
+
+
+
+
 
 //////////////////////////////////////Will be removed in the future/////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -11,8 +11,8 @@
 #include"./gluons.h"
 #include"./chebyshev-1.h"
 
-#define X_DEGREE 25 
-#define Q2_DEGREE 27
+#define X_DEGREE 30
+#define Q2_DEGREE 30
  
 #ifndef SKIP_SAME
 	#define SKIP_SAME 0
@@ -36,8 +36,8 @@ static const unsigned DIM=2;
 static const unsigned DEGREE[2]={X_DEGREE,Q2_DEGREE};
 
 //static const double X_LIM[2]={1.0e-8,1} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
-static const double X_LIM[2]={1.0e-10,1.25} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
-static const double Q2_LIM[2]={LQCD2*5 , 5.0/(R_MIN*R_MIN) };
+static const double X_LIM[2]={5.0e-9,1.25} ;//x upper lim is not 0.01 for it is x_mod... that can even be >1 for small Q/m but in practice 2m/Q is bound by pair production threshold.
+static const double Q2_LIM[2]={LQCD2*2 , 10.0/(R_MIN*R_MIN) };
 
 /////////////////////////////////////////
 
@@ -45,6 +45,8 @@ static const double Q2_LIM[2]={LQCD2*5 , 5.0/(R_MIN*R_MIN) };
 double eval_xg(const double *var, const double *par ){
 	set_xg_parameter( par[0] , par[1]);
 	//double x= change_var_revert(X_LIM[0],X_LIM[1],var[0]);
+	//double x= change_var_revert_log(X_LIM[0],X_LIM[1],var[0]);
+	//double Q2= change_var_revert_log(Q2_LIM[0],Q2_LIM[1] ,var[1]);
 	double x= change_var_revert_log(X_LIM[0],X_LIM[1],var[0]);
 	double Q2= change_var_revert_log(Q2_LIM[0],Q2_LIM[1] ,var[1]);
 	
@@ -136,6 +138,8 @@ double xg_chebyshev(double  x,double q2){
 	
 	double args[2];
 	//(*args)=change_var_compactify(X_LIM[0],X_LIM[1],x);
+	//(*args)=change_var_compactify_log(X_LIM[0],X_LIM[1],x);
+	//(*(args+1))=change_var_compactify_log(Q2_LIM[0],Q2_LIM[1],q2);
 	(*args)=change_var_compactify_log(X_LIM[0],X_LIM[1],x);
 	(*(args+1))=change_var_compactify_log(Q2_LIM[0],Q2_LIM[1],q2);
 	

@@ -1,3 +1,4 @@
+
 extern double SIGMA(double ,double, double ,double*,double *);
 extern void approx_xg(double*);
 extern int parameter(double*,double*,double*);
@@ -35,7 +36,7 @@ double plot_curvature(double x,double Q2, double* sigpar, double* sudpar, FILE* 
 }
 
 //double generate_point(double *par,double Q2,double x,char* filename){
-double generate_points(double x, double **param ){
+double generate_points_crit(double x, double **param ){
 	**param=x;
 
 	double step=0.1;
@@ -49,7 +50,7 @@ double generate_points(double x, double **param ){
 		if(sample[i]>1){
 			for(int j =1 ;j<=i;j++){
 				if((sample[i]*sample[i-j])<0){
-					points[0]=pow(10,1-2*((double)i)/max_n);;
+					points[0]=pow(10,1-2*((double)i)/max_n);
 					points[1]=pow(10,1-2*((double)(i-j))/max_n);
 					break;
 				}
@@ -58,7 +59,7 @@ double generate_points(double x, double **param ){
 		}
 	}
 	if(points[0]==0||points[1]==0){
-		printf("not found \n");
+	printf("not found \n");
 		getchar();
 	}else{
 	//	printf("do between %.3e %.3e\n",points[0],points[1]);

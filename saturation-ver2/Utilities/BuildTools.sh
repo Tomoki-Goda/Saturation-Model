@@ -8,3 +8,4 @@ gcc ${DIR}/Append-control.c -o Append
 
 
 gcc ${DIR}/Write_TeX.c -o Write_TeX
+gcc ${DIR}/make-table.c -o make-table

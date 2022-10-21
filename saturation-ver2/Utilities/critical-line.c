@@ -15,7 +15,7 @@
 
 
 int main(int argc, char ** argv){
-	int xlen=100;
+	int xlen=50;
 	double xarr[xlen+1];
 	char file_name[500];
 	double param[10];
@@ -27,7 +27,8 @@ int main(int argc, char ** argv){
 
 	read_options(argc,argv,param,&x,&Q2, file_name);
 	parameter(param,sigpar,sudpar);
-	double var[2];
+	double var[3];
+	//var[0]=x;
 	var[1]=Q2;
 	//*par={x,Q2};
 	*(par)=var;
@@ -49,7 +50,7 @@ int main(int argc, char ** argv){
 	if(file==NULL){
 		printf(" critical line :: file error. %s.\n", file_name);
 	}	
-	plot(&generate_points,xarr,xlen+1,par,file);
+	plot(&generate_points_crit,xarr,xlen+1,par,file);
 	fclose(file);
 	
 	return 0;

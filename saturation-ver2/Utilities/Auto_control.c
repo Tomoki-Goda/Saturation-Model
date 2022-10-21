@@ -7,14 +7,14 @@
 
 int main(int argc, char** argv){
 	//unsigned i;
-	char filenames[5*5*3*5*2][200];
+	char filenames[5*10*3*5][200];
 	
 	char def[10]="Default";
 	
 	char* lmass[5];
 	unsigned lmasslen=1;
 	*lmass=def;
-	char* qup[5];
+	char* qup[10];
 	unsigned quplen=1;
 	*qup=def;
 	char* sudakov[3];
@@ -23,9 +23,9 @@ int main(int argc, char** argv){
 	char* model[5];
 	unsigned modellen=1;
 	*model=def;
-	char* rfix[2];
-	unsigned rfixlen=1;
-	*rfix=def;
+//	char* rfix[2];
+//	unsigned rfixlen=1;
+//	*rfix=def;
 	char *dir;
 	
 	//this function is used to generate control.h for different settings.
@@ -58,11 +58,11 @@ int main(int argc, char** argv){
 			for (sudakovlen=0;(i< (argc-1))&&(argv[i+1][0]!='-');sudakovlen++ ){
 				*(sudakov+sudakovlen)=argv[++i];									
 			}				
-		}else if(strcmp(argv[i],"-rfix" )==0){
+		}/*else if(strcmp(argv[i],"-rfix" )==0){
 			for (rfixlen=0;(i< (argc-1))&&(argv[i+1][0]!='-');rfixlen++ ){
 				*(rfix+rfixlen)=argv[++i];								
 			}
-		}else if(strcmp(argv[i],"-dir" )==0){
+		}*/else if(strcmp(argv[i],"-dir" )==0){
 			dir=argv[++i];
 		}else{
 			printf("Unknown option?? %s\n",argv[i] );
@@ -73,24 +73,24 @@ int main(int argc, char** argv){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//unsigned totallen=(++lmasslen)*(++quplen)*(++sudakovlen)*(++modellen)*(++rfixlen);
 	char command[500];
-	unsigned totallen=(lmasslen)*(quplen)*(sudakovlen)*(modellen)*(rfixlen);
-	unsigned lm, q,s,mod,rf;
+	unsigned totallen=(lmasslen)*(quplen)*(sudakovlen)*(modellen);
+	unsigned lm, q,s,mod;
 	
 	FILE* file;
 	
 	for(unsigned i=0;i<totallen;i++){
 		//Now write files...
-		lm=i/(quplen*sudakovlen*modellen*rfixlen);
-		q= (i-(lm*quplen*sudakovlen*modellen*rfixlen))/( sudakovlen*modellen*rfixlen);
-		s= (i-(lm*quplen*sudakovlen*modellen*rfixlen)-(q*sudakovlen*modellen*rfixlen) )/(modellen*rfixlen);
-		mod= (i-(lm*quplen*sudakovlen*modellen*rfixlen)-(q*sudakovlen*modellen*rfixlen)-(s*modellen*rfixlen))/(rfixlen);
-		rf= (i-(lm*quplen*sudakovlen*modellen*rfixlen)-(q*sudakovlen*modellen*rfixlen)-(s*modellen*rfixlen)-( mod*rfixlen));
+		lm=i/(quplen*sudakovlen*modellen);
+		q= (i-(lm*quplen*sudakovlen*modellen))/( sudakovlen*modellen);
+		s= (i-(lm*quplen*sudakovlen*modellen)-(q*sudakovlen*modellen) )/(modellen);
+		mod= (i-(lm*quplen*sudakovlen*modellen)-(q*sudakovlen*modellen)-(s*modellen) );
+		//rf= (i-(lm*quplen*sudakovlen*modellen*rfixlen)-(q*sudakovlen*modellen*rfixlen)-(s*modellen*rfixlen)-( mod*rfixlen));
 		
-		sprintf(command ,"mkdir %s/Mass%s-Qup%s-Model%s-Sud%s-rfix%s",dir,lmass[lm],qup[q],model[mod],sudakov[s],rfix[rf]);
+		sprintf(command ,"mkdir %s/Mass%s-Qup%s-Model%s-Sud%s",dir,lmass[lm],qup[q],model[mod],sudakov[s]);
 		printf("%s\n",command );
 		system(command);	
 		
-		sprintf(filenames[i],"%s/Mass%s-Qup%s-Model%s-Sud%s-rfix%s/control.h",dir,lmass[lm],qup[q],model[mod],sudakov[s],rfix[rf]);
+		sprintf(filenames[i],"%s/Mass%s-Qup%s-Model%s-Sud%s/control.h",dir,lmass[lm],qup[q],model[mod],sudakov[s]);
 		printf("%s\n",filenames[i]);	
 		
 		file=fopen(filenames[i],"w");
@@ -111,9 +111,9 @@ int main(int argc, char** argv){
 		 if(strcmp(sudakov[s],"Default")!=0){
 		 	fprintf(file,"#define SUDAKOV %s\n",sudakov[s]);		 	
 		 }
-		 if(strcmp(rfix[rf],"Default")!=0){
-		 	fprintf(file,"#define R_FIX %s\n",rfix[rf]);		 	
-		 }
+		 //if(strcmp(rfix[rf],"Default")!=0){
+		 //	fprintf(file,"#define R_FIX %s\n",rfix[rf]);		 	
+		// }
 		 fclose(file);
 	}
 	

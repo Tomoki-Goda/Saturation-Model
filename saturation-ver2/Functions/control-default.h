@@ -36,7 +36,7 @@
 
 ////// upper and lower cut off of r ////////
 #ifndef R_MIN
-	#define R_MIN 1.0e-5
+	#define R_MIN 1.0e-8
 #endif
 #ifndef R_MAX
 	#define R_MAX 30
@@ -53,6 +53,10 @@
 	#define SATURATION  1
 #endif
 
+/////////////////////to control mu02 of the Sudakov/////////////
+#ifndef MU202
+	#define MU202 0 //0 to use default set in Parameter.h
+#endif
 
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
@@ -62,13 +66,13 @@
 #endif
 
 #ifndef N_SIMPS_R
-//number of sampling for R integration, points are 2*N+1. 
-	#define N_SIMPS_R 100 
+//number of sampling for R integration, points are 2*N+1. //comparison with Fejer suggests it needs about 250 
+	#define N_SIMPS_R 200 
 #endif
 
 #ifndef N_CHEB_R
-//number of sampling for R integration, points are 2*N+1. 
-	#define N_CHEB_R 200 
+//number of sampling for R integration, points are N divisible by 8
+	#define N_CHEB_R 120 
 #endif
 
 #ifndef DGAUSS_PREC 
@@ -99,7 +103,7 @@
 
 #ifndef R_CHANGE_VAR
 //use R=r/(1-r) for r integration. //seems to severely affect the quality...
-	#define R_CHANGE_VAR 1
+	#define R_CHANGE_VAR 0
 #endif
 
 #ifndef NONLINEAR
@@ -112,6 +116,9 @@
 	#define STRATEGY 1
 #endif
 
+#ifndef FEJER
+	#define FEJER 0
+#endif
 
 ///////////////////   IRREGULAR CONTROL ///////////////////////
 //// NOT TESTED, DISCONTINUED, ETC... CHECK WHEN CHANGED //////

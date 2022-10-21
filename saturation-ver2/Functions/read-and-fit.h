@@ -1,10 +1,10 @@
 //static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 //static double SAMPLES[5][2*N_SIMPS_R+1][MAXN];//sampled points of integrand 
 #define MAXN 600
-//#include"./kahnsum.h"
+#include"./kahnsum.h"
 
-extern double KBN_sum(const double *arr,int len);
-extern double kahn_sum(const double *arr,int len);
+//extern double k_group_sum(const double *arr,int len);
+//extern double kahn_sum(const double *arr,int len);
 
 extern double SIGMA_PREC;
 
@@ -40,6 +40,8 @@ static const double INT_R_MIN=R_MIN;
 
 extern int N_SIMPS;
 
+static double SAMPLES[(NF-1)*(2*N_SIMPS_R+1)*MAXN];
+static double PSI[(NF-1)*(2*N_SIMPS_R+1)*MAXN];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////   generate grid of z-integrated psi values        ////////////////////////////
@@ -211,7 +213,7 @@ void simpson_kahn_sum(const double *samples, double * csarray){
 			//val+=term;
 		}
 		val=0;
-#if TEST==1
+/*#if TEST==1
 		double res1 , res2, res3,res4,res5;
 		res1=0;
 		for(int i=0;i<(2*N_SIMPS+1);i++){
@@ -219,11 +221,11 @@ void simpson_kahn_sum(const double *samples, double * csarray){
 		}
 
 		res2=kahn_sum(summand,2*N_SIMPS+1);
-		res3=KBN_sum(summand,2*N_SIMPS+1);
+		res3=k_group_sum(summand,2*N_SIMPS+1);
 
 
 		qsort(summand, 2*N_SIMPS+1,sizeof(*summand),&comp_fabs);
-		res4=KBN_sum(summand,2*N_SIMPS+1);
+		res4=k_group_sum(summand,2*N_SIMPS+1);
 		val=res4;
 		res5=0;
 		for(int i=0;i<(2*N_SIMPS+1);i++){
@@ -231,8 +233,8 @@ void simpson_kahn_sum(const double *samples, double * csarray){
 		}
 
 		printf("results: %.6e  %.6e  %.6e  %.6e\t %.5e\n",res3-res1,res3-res2,res3-res4,res3-res5,res3);
-#endif
-		val=KBN_sum(summand,2*N_SIMPS+1);
+#endif*/
+		val=k_group_sum(summand,2*N_SIMPS+1);
 
 		*(csarray+data_no)=val*(r_step/3);
 	}		
@@ -282,14 +284,14 @@ void simpson_error(const double *samples, double * error_array){
 }
 
 
-void generate_data_set(const double *par,const double * psi_arr,double *csarray){
+void generate_data_set(const double *par,const double * psi_arr, double * samples,double *csarray){
 	if(N_SIMPS>N_SIMPS_R){
 		printf("N_SIMPS can't be larger than N_SIMPS_R:  %d\t %d",N_SIMPS,N_SIMPS_R);
 		getchar();	
 	}
 	
 	
-	static double samples[5*N_SIMPS_R*MAXN];
+	//static double samples[5*N_SIMPS_R*MAXN];
 	
 	sample_integrand(psi_arr,samples,par);
 		

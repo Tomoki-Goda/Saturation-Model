@@ -36,7 +36,7 @@ int main(int argc, char** argv){
 		}
 		fscanf(resfile,"%s\t%f",name, &value);//Qup
 		//fprintf(outfile,"%.0f",value);
-		char dir[500], mass[50], qup[50], model[50], sudakov[50] ,rfix[50],dum[100];
+		char dir[500], mass[50], qup[50], model[50], sudakov[50] /*,rfix[50]*/,dum[100];
 		char* chptr;
 		char* filenameptr[3];
 
@@ -60,15 +60,34 @@ int main(int argc, char** argv){
 		sscanf(chptr,"%3s%s",dum,qup);
 		chptr=strtok(NULL,"-");
 		sscanf(chptr,"%5s%s",dum,model);
-		chptr=strtok(NULL,"-");
-		sscanf(chptr,"%3s%s",dum,sudakov);	
+		//chptr=strtok(NULL,"-");
 		chptr=strtok(NULL,"/");
-		sscanf(chptr,"%4s%s",dum,rfix);
-
+		sscanf(chptr,"%3s%s",dum,sudakov);	
+		//chptr=strtok(NULL,"/");
+		//sscanf(chptr,"%4s%s",dum,rfix);
+		
+		if(i==1){
+			if((strcmp(model,"0")*strcmp(model,"2")*strcmp(model,"22"))==0 ){
+				fprintf(outfile,"\\begin{sidewaystable}\n");
+				fprintf(outfile,"\\rowcolors{1}{}{lightgray}\n");
+				fprintf(outfile,"\\resizebox{\\textwidth}{!}{\n");
+				fprintf(outfile,"\\begin{tabular}{|c||c|c|c|c|c|c|c||c|c|}\n\\hline \n");
+				fprintf(outfile,"-& $\\sigma_0$ & $\\lambda$ & $x_0 (10^{-4})$ & $C$ & $\\mu_0^2$ & $g_1$ & $g_2$ & $\\chi^2$ & Flag \\\\ \\hline \\hline \n");
+			}
+			if((strcmp(model,"1")*strcmp(model,"3"))==0 ){
+				fprintf(outfile,"\\begin{sidewaystable}\n");
+				fprintf(outfile,"\\rowcolors{1}{}{lightgray}\n");
+				fprintf(outfile,"\\resizebox{\\textwidth}{!}{\n");
+				fprintf(outfile,"\\begin{tabular}{|c||c|c|c|c|c|c|c|c|c||c|c|} \n\\hline \n");
+				fprintf(outfile,"-& $\\sigma_0$ & $A_g$ & $\\lambda_g $ & $C$ & $\\mu_0^2$ & $C_s$ & $\\mu_{0s}^2$ & $g_1$ & $g_2$ & $\\chi^2$ & Flag \\\\ \\hline \\hline \n");
+			}
+		}
 				
 		//sscanf(argv[i],"./%s/Mass%s-Qup%s-Model%s-Sud%s-rfix%s/result.txt",dir,mass,qup,model,sudakov,rfix);
 		//printf("./%s/Mass%s-Qup%s-Model%s-Sud%s-rfix%s/result.txt",dir,mass,qup,model,sudakov,rfix);
 		//getchar();
+		fprintf(outfile,"{\\footnotesize "); 
+		//fprintf(outfile,"{\\tiny "); 
 		if(strcmp(model,"0")==0){
 			fprintf(outfile,"%s: GBW $m_l=%s$ $Q_{up}=%s$",dir,mass,qup);
 		}else if(strcmp(model,"1")==0){
@@ -83,9 +102,9 @@ int main(int argc, char** argv){
 					}else{
 						printf("invalid sudakov flag: %s\n",sudakov);
 					}
-					if(strcmp(rfix,"1")==0){
-						fprintf(outfile," rfix");
-					}
+					//if(strcmp(rfix,"1")==0){
+					//	fprintf(outfile," rfix");
+					//}
 		}else if(strcmp(model,"3")==0){
 					if(strcmp(sudakov,"0")==0){
 						fprintf(outfile,"%s: BGK(S) $m_l=%s$ $Q_{up}=%s$",dir, mass,qup);
@@ -96,48 +115,90 @@ int main(int argc, char** argv){
 					}else{
 						printf("invalid sudakov flag: %s\n",sudakov);
 					}		
-					if(strcmp(rfix,"1")==0){
-						fprintf(outfile," rfix");
-					}
+					//if(strcmp(rfix,"1")==0){
+					//	fprintf(outfile," rfix");
+					//}
 		}else{
 			printf(" invalid model id : %s\n",model);
 		}
-
+		fprintf(outfile,"} ");
+		
+		int skip=0;
+		if(strcmp(sudakov,"1")*strcmp(sudakov,"2")==0){
+			skip=2;
+		}
 
 		//for(unsigned line =0; (line<(line_n)) ; line++){
 		for(unsigned line =0; line<10 /* > max possible no. of parameter*/; line++){
+			////////////////////////////////
+			
+			if(( strcmp(model,"0")*(abs( strcmp(model,"22")*strcmp(model,"2"))+abs(strcmp(sudakov,"0")) ))==0  ){
+				if((3<=line)&&(line<=6)){
+					fprintf(outfile," & %c ",'-');
+					continue;
+				}
+			}
+			if(( strcmp(model,"1")*( abs(strcmp(model,"3"))+abs(strcmp(sudakov,"0")) ) )==0  ){
+				if((5<=line)&&(line<=8)){
+					fprintf(outfile," & %c ",'-');
+					continue;
+				}
+			}
+			if(( abs(strcmp(model,"22")*strcmp(model,"2"))+abs(strcmp(sudakov,"1")))==0  ){
+				if((5<=line)&&(line<=6)){
+					fprintf(outfile," & %c ",'-');
+					continue;
+				}
+			}
+			if(( ( abs(strcmp(model,"3"))+abs(strcmp(sudakov,"1"))))==0  ){
+				if((7<=line)&&(line<=8)){
+					fprintf(outfile," & %c ",'-');
+					continue;
+				}
+			}
+			
+			///////////////////////////////
 			fscanf(resfile,"%s\t%f\t%f\n",name,&value, &error );
-			fprintf(outfile," & %.2e {\\tiny $\\pm$ %.2e } ",value, error);
+			//fprintf(outfile," & %.2e {\\tiny $\\pm$ %.2e } ",value, error);
 			
 			if(strcmp(name,"chisq")==0){
 				printf("%d parameters \n",count);
 				break;	
 			}
 			count++;
-			//fprintf(stdout,"& %f $\\pm$ %f \n",value, error);
+			fprintf(outfile," & %.2e {\\tiny $\\pm$ %.2e } ",value, error);
 		}
+		fprintf(outfile," &{\\footnotesize %.2e} {\\tiny $\\pm$ %.2e } ",value, error);
 		//fscanf(resfile,"%s\t%f\t%f\n",name,&chisq, &error );
 		//fprintf(outfile,"& %.2e  ",chisq);
 		//fprintf(outfile,"& %.2e  ",value);
 		double chisqerr=error;
+
 		fscanf(resfile,"%s\t%d\n",name,&ndata);
-		fprintf(outfile,"/ %d  ",ndata);
-		fprintf(outfile,"= %.2f  ",value/(ndata-count));
+		fprintf(outfile,"{\\footnotesize / %d }=",(ndata+skip));
+		fprintf(outfile," %.2f  ",value/(ndata+skip));
 			
 		fscanf(resfile,"%s\t%f\n",name,&value);
-	
-		fscanf(resfile,"%s %s\t%d\n",name,name,&ndata);//error_flag
-		if((ndata!=3)||( chisqerr>1.0e-4) ){
-			fprintf(outfile,"& {\\color{red}%d} ",ndata);
-		}else{
-			fprintf(outfile,"& %d  ",ndata);
-		}
+		printf(	"%s\t%f\n",name,value);
 
-		fprintf(outfile,"\\\\ \\hline \n");
+		fscanf(resfile,"%s %s\t%d\n",name,name,&ndata);//error_flag
+		fprintf(outfile,"&{\\footnotesize");
+		if((ndata!=3)||( chisqerr>1.0e-4) ){
+			fprintf(outfile," {\\color{red}%d} ",ndata);
+		}else{
+			fprintf(outfile," %d  ",ndata);
+		}
+		
+		fprintf(outfile,"}\\\\ \n\\hline \n");
 
 
 		fclose(resfile);	
 	}
+	fprintf(outfile,"\\end{tabular}\n");
+	fprintf(outfile,"}\n");
+	fprintf(outfile,"\\end{sidewaystable}\n");
+
+
 	fclose(outfile);
 	return 0;
 }

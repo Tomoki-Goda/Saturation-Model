@@ -4,7 +4,7 @@ extern double SIGMA_PREC;
 static unsigned N_DATA;
 extern int N_SIMPS;
 extern int N_CHEB;
-
+extern int N_OFF;//number of arameters fixed
 
 extern int load_data(void);
 extern void generate_psi_set(void);
@@ -40,7 +40,22 @@ int MINUIT_INIT(){
 	printf("Gauss eps: %.2e\t Simps N: %d CHEB N: %d \t \n", DGAUSS_PREC,N_SIMPS_R, N_CHEB_R);
 	printf("-----------------------------------------------------------------------------\n");
 	
-	
+#if MU202!=0
+#if (MODEL==3 && INDEPENDENT_RMAX==0)
+	printf(" mu202 is not free. Cannot be controlled\n");
+#elif MU0==0
+	printf(" mu202 is not used rmax is. mu202 cannot be controlled\n");
+#else
+	//int pos;
+	for(int i=0;i<N_PAR;i++){
+		if(strcmp(par_name[i],"mu202")==0){
+			par_start[i]=MU202;
+			printf("mu202 set to %.5e\n",par_start[i]);
+			break;
+		}
+	}
+#endif
+#endif
 //////////////////////////     Initialize Minuit     ////////////////////////////////////////
 	MNINIT(5,6,7);
 	/* Parameters definition */
@@ -142,6 +157,7 @@ int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(v
 */
 int SAVE_RESULT(FILE* outfile){
 	char outline[500];
+	
 	char name[11];
 	double res_par[N_PAR];
 	double res, error,dum3;
@@ -158,12 +174,14 @@ int SAVE_RESULT(FILE* outfile){
 	}
 	
 	
+
+	
 	MNSTAT(res,error,dum3,dum4,dum4,istat);
 	sprintf(outline,"chisq\t%.4e\t%.4e\n",res,error);
 	log_printf(out_file,outline);
-	sprintf(outline,"n_data-n_par\t%d\n",N_DATA-N_PAR);
+	sprintf(outline,"n_data\t%d\n",N_DATA);
 	log_printf(out_file,outline);
-	sprintf(outline,"chisq/dof\t%.3e\n",res/(N_DATA-N_PAR));
+	sprintf(outline,"chisq/dof\t%.3e\n",res/(N_DATA-(N_PAR-N_OFF)));
 	log_printf(out_file,outline);
 	
 	
@@ -182,164 +200,5 @@ int SAVE_RESULT(FILE* outfile){
 	return(0);
  
 }
-
-
-/*
-//int CHECK_COV(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
-int RUN_MINUIT(void(*fcn)(int* , double*, double*, double *,unsigned*,void (*)(void) ) ){
-	char command[100];
-	double err_mat[N_PAR*N_PAR];
-	int error_flag, istat, nvpar, npar;
-	double val, edm, up;
-	//sprintf(command , "SET EPSMACHINE 1.0e-8");
-	//MNCOMD(*fcn,command,error_flag,0);
-	MNCOMD(*fcn ,  "SET PRINTOUT 3",error_flag,0);	
-
-	N_SIMPS=(int)(N_SIMPS_R*3.0/5.0);
-	N_CHEB=(int)(N_CHEB_R*3.0/5.0);
-	
-	SIGMA_PREC=DGAUSS_PREC*10;
-	//generate_psi_set();
-	
-	MNCOMD(*fcn, "SIMPLEX",error_flag,0);
-#if((MODEL==1)||(MODEL==3))
-	MNCOMD(*fcn,"FIX 5",error_flag,0);
-#elif(((MODEL==2)||(MODEL==22))&&(SUDAKOV>=1))
-	MNCOMD(*fcn,"FIX 5",error_flag,0);
-#endif
-	
-	
-	MNCOMD(*fcn,"SET LIMITS",error_flag,0);
-
-	//MNEMAT(*err_mat,N_PAR);
-	//for(int i=0;i<N_PAR;i++){
-	//	for(int j=0;j<N_PAR;j++){
-	//		printf("%.3e\t",err_mat[i*N_PAR+j]);
-	//	}
-	//	printf("\n");
-	//}
-	
-	N_SIMPS=N_SIMPS_R;
-	N_CHEB=N_CHEB_R;
-	SIGMA_PREC=DGAUSS_PREC;
-	//generate_psi_set();
-	int itermax=3;
-	double corr[N_PAR];
-	int removed[itermax][N_PAR];
-	int off_no=0;
-	double dum;
-	int off=-1;
-	int flag=0;
-	MNCOMD(*fcn,"SET STRATEGY 0",error_flag,0);
-	sprintf(command,"MIGRAD %d, %fD0", 10*N_PAR*N_PAR,5.0); 
-	MNCOMD(*fcn,command,error_flag,0);
-
-	MNCOMD(*fcn,"SET STRATEGY 1",error_flag,0);
-	/////////////////decide whether to fix some parameter /////////////////////
-	for(int rec=0;rec<(itermax+1);rec++){
-		printf("\n\n-----------------trial : %d -------------------\n",rec);
-
-		for(int j=0;j<N_PAR;j++){
-			MNCOMD(*fcn,"HESSE",error_flag,0);
-			MNSTAT(val,edm, up, nvpar,npar,istat);
-			if((istat==3)||( rec==itermax )){
-			//if( rec==itermax ){
-				break;
-			}
-
-			printf("Correlation:\t");
-			for(int i=0;i<N_PAR;i++){
-				corr[i]=0;
-				MNERRS(i+1,dum,dum,dum,corr[i]);
-				printf("%.4e ",corr[i]);
-				
-				if(corr[i]>0.99){
-					if((off>=0)&&corr[i]>corr[off]){
-						off=i;
-					}else if(off==-1){
-						off=i;
-					}
-				}
-
-			} printf("\n");
-
-			if(off>=0){
-				
-				sprintf(command,"FIX %d",off+1);
-				MNCOMD(*fcn,command,error_flag,0);
-				removed[rec][off_no++]=off;
-				if(rec!=0){
-					flag+=fabs(removed[rec-1][off_no-1]-removed[rec][off_no-1]);
-					printf("flag==%d\n",flag);
-				}else{
-					flag=1;
-				}
-				off=-1;
-			}else{	
-				off=-1;
-				break;
-			}
-		}
-	////////////release if it has already been done ////////////////	
-		if( (flag==0)&&(off_no!=0)){
-			for(int i=0;i<off_no;i++){
-				sprintf(command,"RELEASE %d",removed[rec][i]+1);
-				MNCOMD(*fcn,command,error_flag,0);
-			}
-			off_no=0;
-			MNCOMD(*fcn,"HESSE",error_flag,0);
-		}else{
-			flag=0;
-		}
-	///////////////////////////////////////////////////////////////
-		MNCOMD(*fcn,"MIGRAD ",error_flag,0);
-		MNSTAT(val,edm, up, nvpar,npar,istat);
-		
-		if(off_no==0){
-			if(istat==3){
-				if(rec==itermax){
-					printf("\n FINALLY!! YAY!!\n");
-					break;
-				}else{
-					rec=itermax-1;
-				}
-			}else{
-				printf("\n\n!!!!!!!!!!!!!Nomore correlation to remove!!!!!!!!!!!!!!!!!!! \n");
-				MNCOMD(*fcn,"SIMPLEX 100 0.001",error_flag,0);
-				if(rec==itermax){
-					MNCOMD(*fcn,"HESSE",error_flag,0);
-					MNSTAT(val,edm, up, nvpar,npar,istat);
-					if(istat!=3){
-						rec--;
-					}
-				}
-			}
-
-		}else{
-			for(int i=0;i<off_no;i++){
-				sprintf(command,"RELEASE %d",removed[rec][i]+1);
-				MNCOMD(*fcn,command,error_flag,0);
-			}
-
-			off_no=0;
-
-			//MNCOMD(*fcn,"SET LIMITS",error_flag,0);
-			//MNCOMD(*fcn,"MIGRAD ",error_flag,0);
-		}
-
-		if(rec==(itermax-1)){
-//				MNCOMD(*fcn,"RELEASE",error_flag,0);
-#if((MODEL==1)||(MODEL==3))
-				MNCOMD(*fcn,"RELEASE 5",error_flag,0);
-#elif(((MODEL==22)||(MODEL==2))&&(SUDAKOV>=1)) 
-				MNCOMD(*fcn,"RELEASE 5",error_flag,0);
-#endif
-		}
-	}
-
-	return istat;
-}
-	
-*/
 
 

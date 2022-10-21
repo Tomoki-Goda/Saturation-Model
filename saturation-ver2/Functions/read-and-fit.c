@@ -13,16 +13,25 @@
 #include"control-default.h"
 #include"constants.h"
 
-
+#include<string.h>
 
 #define RESCALE 1.05
 
-//#include"./read-and-fit.h"
+#if FEJER==1
 #include"./read-and-fit-cheb.h"
+#else
+#include"./read-and-fit.h"
+#endif
+
+#include"../Utilities/f2.h"
+//#include"./kahnsum.h"
 
 int N_SIMPS=N_SIMPS_R;
 int N_CHEB=N_CHEB_R;
-
+double CS_COMP[MAXN];
+////////////////////////////////////////////////////////
+char datadir[]="/home/tomoki/Saturation-Model/saturation-ver2/data";
+///////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////  now integrate over r with Simpsons method    /////////////////////////
@@ -52,6 +61,18 @@ void dum_func(void){
 	//do nothing
 }
 
+//static int SAVE_POINTS=0;
+//static FILE* F2_FILE;
+//static FILE* F2_RES_FILE;
+
+//void save_f2(char* file_name,char* file_name_res){
+//	SAVE_POINTS=1;
+//	F2_FILE=fopen(file_name,"w");
+//	F2_RES_FILE=fopen(file_name_res,"w");	
+//}
+
+
+
 double compute_chisq(const double *par){
 	
 	//////////////////////////////////////////
@@ -66,33 +87,86 @@ double compute_chisq(const double *par){
 	double val;
 //	clock_t time;
 //	time=clock();
-	double cs[N_DATA];//computed cross-section
+	//double cs[N_DATA];//computed cross-section
 
-	static double psi_arr[(5)*(( N_SIMPS_R>N_CHEB_R)? N_SIMPS_R : N_CHEB_R  )*MAXN];
+	//static double psi_arr[(5)*(( N_SIMPS_R>N_CHEB_R)? N_SIMPS_R : N_CHEB_R  )*MAXN];
 	
-	static int n_cheb,n_simp;
+	static int n_int;
 	static double prec;
 	//if((n_cheb!=N_CHEB)||((n_simp!=N_SIMP)||prec!=SIGMA_PREC) ){
 	//if(((n_simp!=N_SIMPS)||prec!=SIGMA_PREC) ){
-	if((n_cheb!=N_CHEB)||( n_simp!=N_SIMPS) || ((prec-SIGMA_PREC)>1.0e-10) ){
-		generate_psi_set(psi_arr);
+#if FEJER==1
+	if(( n_int!=N_CHEB) || ((prec-SIGMA_PREC)>1.0e-10) ){
+		generate_psi_set(PSI);
 		prec=SIGMA_PREC;
-		n_cheb=N_CHEB;
-		n_simp=N_SIMPS;
-		printf("\n====Integral : %.2e SIMP %d, CHEB %d ====\n====R_MAX %.2e R_MIN %.2e====\n",prec,n_simp,n_cheb,(double)R_MAX,R_MIN);
+		n_int=N_CHEB;
+		printf("\n====Integral : %.2e  CHEB %d ====\n====R_MAX %.2e R_MIN %.2e====\n",prec,n_int,(double)R_MAX,R_MIN);
 	}
-	
-	
-	generate_data_set(par, psi_arr, cs);
+#else
+	if(( n_int!=N_SIMPS) || ((prec-SIGMA_PREC)>1.0e-10) ){
+		generate_psi_set(PSI);
+		prec=SIGMA_PREC;
+		n_int=N_SIMPS;
+		printf("\n====Integral : %.2e SIMP %d ====\n====R_MAX %.2e R_MIN %.2e====\n",prec,n_int,(double)R_MAX,R_MIN);
+	}
+
+#endif
+	generate_data_set(par, PSI,SAMPLES,CS_COMP);
 	
 	double chiarr[N_DATA];	
 	for(unsigned i=0;i<N_DATA;i++){
 		//chisq+=pow( ( cs[i]-CS_DATA[i] )/(ERR_DATA[i]),2);
 		//chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
-		chiarr[i]=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
+		chiarr[i]=pow( ( *(CS_COMP+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
+		
 	}
-	chisq=KBN_sum(chiarr,N_DATA);
+	
+	chisq=k_group_sum(chiarr,N_DATA);
 	return(chisq );
+}
+
+void export_data(FILE * file,  double * sigpar,  double* sudpar){
+//for plotting x dep f2 plot. slightly out of place but neccessary to acccess data.
+	double res=0;
+	
+	//double sigpar[10],sudpar[10];
+	//parameters(par,sigpar,sudpar);
+	if(file==NULL){
+		printf("F2_FILE has to be open. Use save_f2(char* file_name)" );
+			
+	}else{
+		for(unsigned i=0;i<N_DATA;i++){			
+			res=f2_2(X_DATA[i],Q2_DATA[i], sigpar , sudpar);
+			fprintf(file,"%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",res,CS_DATA[i],ERR_DATA[i],X_DATA[i],Q2_DATA[i]);
+		}
+		
+	}
+		
+}
+
+
+void grid_plot(FILE * file,  double * sigpar,  double* sudpar){
+//for plotting x dep f2 plot. slightly out of place but neccessary to acccess data.
+	double res=0;
+	double x ,q2;
+	//double sigpar[10],sudpar[10];
+	//parameters(par,sigpar,sudpar);
+	if(file==NULL){
+		printf("F2_FILE has to be open. Use save_f2(char* file_name)" );
+			
+	}else{
+		for(unsigned i=0;i<N_DATA;i++){
+			q2=Q2_DATA[i];
+			for(int j=0;j<5;j++){
+				x=(0.5+(3.5)*((double)j)/5)*X_DATA[i];			
+				res=f2_2(x,q2, sigpar , sudpar);
+				//printf("%.3e %.3e %.3e \n",res,x,q2);
+				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,res,Q2_DATA[i]);
+			}
+		}
+		
+	}
+		
 }
 
 void fcn(const int *npar, const double grad[], double*fcnval, const double *par,const unsigned *iflag,void (*dum)(void) ){
@@ -115,30 +189,41 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 		log_printf(log_file,outline);
 	}
 	
-		
+	
 #if (MODEL==1||MODEL==3)
 	static double sigpar[10],sudpar[10];	
 	parameter(par,sigpar,sudpar);
 	approx_xg(sigpar+1);//generate chebyshev coefficients
 #endif
-//	if(*iflag==3){
-//		double error_array[N_DATA];
-//		double cs_array[N_DATA];
-//		//double r_step=(R_MAX-R_MIN)/(2*N_SIMPS);
-//		simpson_error(SAMPLES,error_array);
-//		simpson_sum(SAMPLES,cs_array);	
-//		for(int i=0;i<N_DATA;i++){
-//			sprintf(outline,"Q2=%.2e x=%.2e, Data=%.3e :>  %.3e\t%.3e\n",Q2_DATA[i],X_DATA[i],CS_DATA[i], cs_array[i],error_array[i]);
-
-//			log_printf(log_file,outline);
-//		}
-//	}else{	
-		*fcnval=compute_chisq(par);
 	
-		time-=clock();
-		
-		sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
+	*fcnval=compute_chisq(par);
+	if(*iflag==3){
+#if ((MODEL!=1)&&(MODEL!=3))
+		static double sigpar[10],sudpar[10];	
+		parameter(par,sigpar,sudpar);
+#endif
+		double res, chi=0;
+		double resarr[N_DATA];
+		for(unsigned i=0;i<N_DATA;i++){
+				resarr[i]=f2_2(X_DATA[i],Q2_DATA[i], sigpar , sudpar);
+				//printf("CERNLIB int =%.3e CS=%.3e\n",res, CS_DATA[i]);
+				chi+=pow((resarr[i]-CS_DATA[i])/ERR_DATA[i],2);
+			}
+	
+		sprintf(outline,"fcn-cern: fcn diff= %.7e\n",*fcnval-chi);
+		if(fabs(*fcnval-chi)>1.0e-5){
+			for(int i=0; i<N_DATA;i++){
+				printf("array=%.5e\tCERN=%.5e\tdiff= %.5e\t CS=%.5e\tQ2=%.5e\tx=%.5e\n", CS_COMP[i],resarr[i],CS_COMP[i]-resarr[i],CS_DATA[i],Q2_DATA[i],X_DATA[i]);
+			}
+		}
 		log_printf(log_file,outline);
+		printf("\n\n%s\n\n",outline);
+	}else{
+	time-=clock();
+	
+	sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
+	log_printf(log_file,outline);
+	}
 //	}
 }
 
@@ -151,10 +236,13 @@ int load_data(){
 	unsigned i=0;
 	unsigned j=0;
 	FILE* file;
+	char filename[500];
 	/////////////////////////////// HERA /////////////////////////////////////
 	//fprintf(stdout, "HERA tot\n");
 	fprintf(stdout, "HERA tot\n");
-	file=fopen("./data/hera_tot.dat","r");
+	sprintf(filename,"%s/hera_tot.dat",datadir);
+
+	file=fopen(filename,"r");
 	
 	double alpha =1.0/137 ;//fine structure const 1/137;
 	double xmp0 = 0.93827;//proton mass in GeV

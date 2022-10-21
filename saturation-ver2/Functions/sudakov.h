@@ -331,7 +331,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	double result=0;
 	double rmin=R_MIN;
 	
-#if (SUDAKOV<=1)
+//#if (SUDAKOV<=1)
 	double rmin_2;
 	int signal=rmin2(q2, SUDPAR,&rmin_2 );
 	if(signal==0){
@@ -343,6 +343,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 			return 0.0;
 		}
 	}else if(signal==9){
+		//printf("integran_term:: sigmal=9 \n");
 		return 0.0;
 	}else if(signal==1){
 		printf("C is negative\n");
@@ -350,23 +351,45 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	}else{
 		printf( "unrecognized signal from rmin2\n");
 	}
-#endif
-
+//#elif (SUDAKOV==2)
+//	double rmin_2=1/q2;
+//	if(rmin_2>(r*r)){
+//		return 0;
+//	}
+//	rmin=sqrt(rmin_2);
+//#endif
 	////////////////////////////////////////////
 	//int N=96;
 	//result=dgquad_(&integrand,&rmin,VAR,&N);
+	/*int N=96;
+	result=0;
+	double rmax=*VAR;
+	double step=(rmax-rmin)/3;
+	for(int i=0;i<3;i++){
+		rmax=rmin+step;
+		result+=dgquad_(&integrand,&rmin,&rmax,&N);
+		rmin=rmax;
+	}*/
 	///////////////////////////////////////////
-	//double N=DGAUSS_PREC*0.01;
+	//double N=DGAUSS_PREC;
 	//result=dgauss_(&integrand,&rmin,VAR,&N);
+	
+	//double N=DGAUSS_PREC;
+	//double rmax=*VAR;
+	//double step=(rmax-rmin)/5;
+	//result=0;
+	//double low, high;
+	//for(int i=0;i<5;i++){
+	//	low=rmin*pow((rmax/rmin),((double)(i))/5);
+	//	high=rmin*pow((rmax/rmin),((double)(i+1))/5);
+	//	result+=dgauss_(&integrand,&low,&high,&N);
+		//rmin=rmax;
+	//}
 	////////////////////////////////////
-	int seg=1;
-	
-	double NRel=SIGMA_PREC ; //SIGMA_PREC is global and is controled in main.c or read-and-fit.c 
-	
-	//double NRel=DGAUSS_PREC ;
-	double NAbs=1.0e-10;
+	int seg=10;
+	double NRel=DGAUSS_PREC ;
+	double NAbs=0;//1.0e-10;
 	double error=0;
-	//printf("rmin= %f\trmax =%f\n",rmin, *VAR);
 	dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
 	
 	
@@ -429,10 +452,15 @@ double sigma_s(double r, double x, double q2, const double * sigmapar, const dou
 	}
 ////////////////////////////////////////////////
 	
-#if (SUDAKOV==1)  	
+//#if (SUDAKOV==1) 
+#if (SUDAKOV>=1) 
 	if(mu2>q2){
 		return val;
 	}
+//#elif SUDAKOV==2
+//	if(1.0/(r*r)>q2){
+//		return val;
+//	}
 #endif	
 	val*=exp_sud(r,mu2,q2);
 

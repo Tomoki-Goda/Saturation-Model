@@ -23,14 +23,22 @@ static double       beta = 6.6;
 static double        n_0 = 0.5;       /* Maximal singluraity of integrand */
 
 ////from control.h/////////////
-int  gluon_int    = 1;
+int  gluon_int    = 2;
+extern double dgquad_(double(*)(double *),double*,double*,int*);
+extern double dgauss_(double(* )(double*),double*,double*,double*); 
+extern double dadapt_(double(* )(double*),double*,double*,int*,double*,double* ,double*,double*);
 //////////////////       fit parametr          /////////////////////////
-static double A_g, lambda_g;
+static double A_g, lambda_g , x0;
 ////////////////////////////////////////////////////////////////////////
 
 ///////////////////function to control fitparameter from outside the file////////////////
 void set_xg_parameter(double ag,double lg){
 	A_g=ag;
+	lambda_g=lg;
+}
+///////////////////function to control fitparameter from outside the file////////////////
+void set_xg_parameter2(double ag,double lg){
+	x0=ag;
 	lambda_g=lg;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +63,10 @@ double Yg, tg;
 /* initial condition */
 double xgpdf_init(double x) {
 	return A_g*pow(x,-lambda_g)*pow((1-x),(beta-1));
+}
+
+double xgpdf_init2(double x) {
+	return pow(x/x0,-lambda_g)*pow((1-x),(beta-1));
 }
 
 /* gammatilde function */
@@ -198,7 +210,15 @@ double xgpdf(double x, double QQ) {
 			
     int    i;
     double fr[N+1];
-
+/////////////////////////////////////////////////	
+    //int N_quad=96;
+    //double step=(c-a)/5, d=a+step;
+    //double N_quad=1.0e-10;
+    int seg=10;
+    double NRel=1.0e-10 ;
+    double NAbs=0;//1.0e-10;
+    double error=0;
+///////////////////////////////////////////////////
     bprim = 33.0/6.0-n_f/3.0;
     Yg = log(1/x);
     tg = (1/bprim)*log(log(QQ/Lambda2)/log(Q0/Lambda2));
@@ -222,6 +242,11 @@ double xgpdf(double x, double QQ) {
         }
 	//printf("simpsN %d\n",N);
         value = dsimps_(fr,&a,&b,&N);
+        break;
+	
+	case 2: 
+		value=0;
+		dadapt_(&xgpdf_integrand,&a,&c,&seg ,&NRel, &NAbs, &value, &error)	;
         break;
     }
     return  normalization*value;

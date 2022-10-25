@@ -49,7 +49,7 @@ def main():
                     dpi.append(float(data[1]))
                     ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            ax1[l].text(float(data[0])/2.5,float(data[1]),"x=$10^{-"+j+"}$")
+            #ax1[l].text(float(data[0])/2.5,float(data[1]),"x=$10^{-"+j+"}$")
             
             with open(args[1+2*l]+'/F2-'+j+'.txt',"r") as fi:
                 dpi=[]

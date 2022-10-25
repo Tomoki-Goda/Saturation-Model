@@ -49,7 +49,7 @@ def main():
                      dpi.append(float(data[1]))
                      ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            ax1[l].text(ri[(len(ri)//5)*3],dpi[(len(ri)//5)*3],"x=$10^{-"+j+"}$" )
+            #ax1[l].text(ri[(len(ri)//5)*3],dpi[(len(ri)//5)*3],"x=$10^{-"+j+"}$" )
             with open(args[1+2*l]+'/F2-slope-'+j+'.txt',"r") as fi:
                 dpi=[]
                 ri=[]

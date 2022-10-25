@@ -39,7 +39,8 @@ def main():
     for l in range(2):
         ax1[l].text(0.75,3.5e-1,name[l],fontsize=25)
         #for w in ['100', '200', '300']:   
-        for w in ['200','data']:   
+        #for w in ['200','data']:   
+        for w in ['200']:   
             with open(args[0+2*l]+'/FL-'+w+'.txt' ,"r") as fi:
                  dpi=[]
                  ri=[]

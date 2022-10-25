@@ -61,7 +61,7 @@ def main():
                         dpi.append(float(data[1]))
                         ri.append(float(data[0]))
                     pos=int(len(dpi)/2)
-                    ax1[l].text(ri[pos]*3,dpi[pos], '$Q^2={0}\\;\\mathrm{{ GeV^2}}$'.format(q2[k]) )
+                    #ax1[l].text(ri[pos]*3,dpi[pos], '$Q^2={0}\\;\\mathrm{{ GeV^2}}$'.format(q2[k]) )
                 leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
 
         ax1[l].set( xscale= 'log' ,   yscale='linear' )

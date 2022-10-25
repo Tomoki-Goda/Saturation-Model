@@ -301,7 +301,7 @@ def main():
     #ax2=fig.add_subplot(1,1,2,sharex=ax1,sharey=ax1)
     #ax3=fig.add_subplot(1,1,3,sharex=ax1)
     leg=[]
-    leg.append(ax1.bar(q2set,chipp,fill=False,tick_label=binlabel,edgecolor="blue"))
+    leg.append(ax1.bar(q2set,chipp,fill=False,tick_label=binlabel,edgecolor="blue",ls="--"))
     leg.append(ax1.bar(q2set,chipp2,fill=False,tick_label=binlabel,edgecolor="red"))
     #ax2.bar(q2set,chipp2,tick_label=binlabel,fill=False)
     

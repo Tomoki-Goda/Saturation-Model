@@ -60,7 +60,7 @@ def main():
                         ri.append(float(data[0]))
                     pos=int(len(ri)/1.4)
                     #ax1[l].text(ri[pos],pow(10*dpi[pos],3),'$Q^2={0}\\mathrm{{GeV^2}}$'.format(k))
-                    ax1[l].text(ri[0],dpi[0],'$Q^2={0}\\mathrm{{GeV^2}}$'.format(k))
+                    #ax1[l].text(ri[0],dpi[0],'$Q^2={0}\\mathrm{{GeV^2}}$'.format(k))
                 leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
         ax1[l].set( xscale= 'log' ,   yscale='log',ylim=[1.0e-3,3] )
         ax1[l].grid('true')

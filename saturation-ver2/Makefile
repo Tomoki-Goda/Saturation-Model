@@ -102,6 +102,8 @@ export-data: ${DEPS} ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipol
 heavy-F2: ${DEPS} ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o  
 	gcc ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/heavy-F2 ${INC} ${OPT} 
 
+diffraction: ${DEPS} ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o   
+	g++ ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o ${LIBS} -o ${DIR}/diffraction ${INC} -std=c++17 -O1
 
 ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c ${UTILDIR}/f2.h
 	echo ${DIR}

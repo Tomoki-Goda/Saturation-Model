@@ -66,6 +66,7 @@ static int read_options(int argc, char** argv, struct info * data  ){
 		};
 
 	}
+	return( 0);
 }
 
 int read_parameters(FILE * parfile, double *param){

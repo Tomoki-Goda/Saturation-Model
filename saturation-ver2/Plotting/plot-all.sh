@@ -9,33 +9,33 @@ BGKS=${DIR}/BGKS-Fix-S/Mass0.0-Qup650-Model3-Sud1
 SAVE=../Document/Plots
 PLOT=./Plotting
 
-${PLOT}/visualize-dipole.py \
-	-s ${SAVE}/dipole \
-	${GBW} \
-	${GBWS} \
-	${BGK} \
-	${BGKS}
+#${PLOT}/visualize-dipole.py \
+#	-s ${SAVE}/dipole \
+#	${GBW} \
+#	${GBWS} \
+#	${BGK} \
+#	${BGKS}
 
-${PLOT}/visualize-slope.py \
-	-s ${SAVE}/slope \
-	${GBW} \
-	${GBWS} \
-	${BGK} \
-	${BGKS}
+#${PLOT}/visualize-slope.py \
+#	-s ${SAVE}/slope \
+#	${GBW} \
+#	${GBWS} \
+#	${BGK} \
+#	${BGKS}
 
-${PLOT}/visualize-F2.py \
-	-s ${SAVE}/F2 \
-	${GBW} \
-	${GBWS} \
-	${BGK} \
-	${BGKS}
+#${PLOT}/visualize-F2.py \
+#	-s ${SAVE}/F2 \
+#	${GBW} \
+#	${GBWS} \
+#	${BGK} \
+#	${BGKS}
 
-${PLOT}/visualize-FL.py \
-	-s ${SAVE}/FL \
-	${GBW} \
-	${GBWS} \
-	${BGK} \
-	${BGKS}
+#${PLOT}/visualize-FL.py \
+#	-s ${SAVE}/FL \
+#	${GBW} \
+#	${GBWS} \
+#	${BGK} \
+#	${BGKS}
 
 ${PLOT}/visualize-gluon.py \
 	-s ${SAVE}/gluon \
@@ -58,12 +58,12 @@ ${PLOT}/visualize-ww-gluon.py \
 	${BGK} \
 	${BGKS}
 
-${PLOT}/visualize-critical.py \
-	-s ${SAVE}/critical \
-	${GBW} \
-	${GBWS} \
-	${BGK} \
-	${BGKS}
+#${PLOT}/visualize-critical.py \
+#	-s ${SAVE}/critical \
+#	${GBW} \
+#	${GBWS} \
+#	${BGK} \
+#	${BGKS}
 #./visualize-ww-critical.py \
 #	-s ${SAVE}/ww-critical-GBW \
 #	${GBW} \

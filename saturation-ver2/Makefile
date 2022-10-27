@@ -29,7 +29,7 @@ grid: gluon-grid
 
 fit: clean main
 
-plot: critical dipole F2 FL F2-slope psi Integrand tmd-gluon tmd-gluon-x tmd-critical fcn export-data geometric ww-gluon ww-gluon-x ww-critical heavy-F2 
+plot: critical dipole F2 FL F2-slope tmd-gluon tmd-gluon-x tmd-critical fcn export-data  ww-gluon 
 
 
 main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 

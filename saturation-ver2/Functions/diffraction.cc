@@ -46,31 +46,40 @@ class impact{
 //////  stores global variables /////
 static struct impact diff_param;
 ////////////////////////////////////
-#define INTSTR 1
-double integrate(double (*func)(double*), double min,double max ){
+//#define INTSTR 2  
+double integrate(double (*func)(double*), double min,double max, double rel, int type ){
 	/////////////quad//////////////
-#if INTSTR==0
-	int N=96;
-	double val=dgquad_(func,&min,&max,&N);
-#elif INTSTR==1
-	int N=96;
-	int count=30;
-	double high=min,low=min,step=(max-min)/count;
 	double val=0;
-	for (int i=0;i<count;i++){
-		high+=step;
-		val+=dgquad_(func,&low,&high,&N);
-		low=high;
+//#if INTSTR==0
+	if(type==0){
+		int N=96;
+		val=dgquad_(func,&min,&max,&N);
+//#elif INTSTR==1
+	}else if(type==1){
+		int N=96;
+		int count=10;
+		double high=min,low=min,step=(max-min)/count;
+		val=0;
+		for (int i=0;i<count;i++){
+			high+=step;
+			val+=dgquad_(func,&low,&high,&N);
+			low=high;
+		}
+//#elif INTSTR==2
+	} else if(type==2){
+		//double rel=1.0e-5;
+	        double	abs=0;
+		int seg=1;
+		double err;
+		dadapt_(func, &min,&max,&seg,&rel,&abs,&val,&err);
+//#elif INTSTR==3
+	}else if(type==3){
+		//double eps=rel;//1.0e-5;
+		val=dgauss_(func,&min,&max,&rel);
+//#endif
+	}else{
+		printf("Unknown integration");
 	}
-#elif INTSTR==2
-	double rel=1.0e-5; abs=0;
-	int seg=1;
-	int val,err;
-	dadapt_(func, &min,&max,&seg,&rel,&abs,&val,&err);
-#elif INTSTR==3
-	double eps=1.0e-5;
-	double val=dgauss_(func,&min,&max,&eps);
-#endif
 	return(val);	
 }
 
@@ -96,7 +105,7 @@ double phi(int index,double z){
 	//double val=0,min=1.0e-5,max=0.99;
 	//double eps=1.0e-6;
 	//val=dgauss_(&phi_integrand,&min,&max,&eps);
-	double val=integrate(&phi_integrand,1.0e-5,0.99);
+	double val=integrate(&phi_integrand,1.0e-5,0.99,1.0e-6,3);
 	return(val);
 }
 
@@ -117,16 +126,10 @@ double phi2_integrand_u(double *U){
 
 double phi2_integrand_kt(double *K){
 	double kt2=*K;
+
 	diff_param.kt2=kt2;
-	//double min=1.0e-5, max=0.99;
-	//int N=96;
-	//double phi2=dgquad_(&phi2_integrand_u,&min,&max,&N );
-	//double phi2=0;
-	//double rel=1.0e-5, abs=0,err;
-	//int seg=1;
-	//dadapt_(&phi2_integrand_u,&min,&max,&seg,&rel,&abs,&phi2,&err);
-	//double eps=1.0e-6;
-	double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99);
+
+	double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99, 1.0e-5,1);
 	double z=diff_param.z, Q2=diff_param.Q2;
 	double val=phi2*phi2*std::log((1-z)*Q2/(kt2));
 	return(val);
@@ -158,13 +161,7 @@ double FD_g_integrand(double *Z){
 	double beta=diff_param.beta;
 	int N=96;
 	double val,min=1.0e-4,max=(1-z)*diff_param.Q2;
-	val=integrate(&phi2_integrand_kt, min,max);
-	//double rel=1.0e-5, abs=0,err;
-	//int seg=1;
-	//dadapt_(&phi2_integrand_kt,&min,&max,&seg,&rel,&abs,&val,&err);
-
-	//double eps=1.0e-5;
-	//val=dgauss_(&phi2_integrand_kt,&min,&max,&eps);
+	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,3);
 	
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);
 	return(val);
@@ -204,22 +201,7 @@ double xFD_LT(int pol){
 			printf("error:: choose polarizaion\n");
 		}
 
-	//int N=96;
-	//double res=dgquad_(funcptr,&min,&max, &N);
-	//std::cout<<"min= "<<min<<"\tmax= "<<max<<std::endl;
-	//double res=0;
-	/*double high=min,low=min,step=(max-min)/10;
-	for(int i=0;i<10;i++){
-		high=low+step;
-		res+=dgquad_(funcptr,&low,&high,&N);
-		low=high;
-	}*/
-	//double err =0, abs=1.0e-5,rel=1.0e-5;
-	//int seg=3;
-	//dadapt_(funcptr,&min,&max,&seg,&rel,&abs,&res,&err);
-
-	double eps=1.0e-3;
-	double res=dgauss_(funcptr,&min,&max,&eps);
+	double res=integrate(funcptr,min,max,1.0e-5,2);
 	//res*=2;//see the comm. above.
 	std::cout<<"pol="<<pol<<"\t"<<res;
 
@@ -271,8 +253,8 @@ int main(int argc,char** argv){
 	file.open(OPTIONS.output_file_name,std::fstream::out);
 	char type[3]={'t','l','g'};
 
-	for(int i=0;i<50;i++){
-		xp=pow(10,-4+3*((double)i)/50);
+	for(int i=0;i<5;i++){
+		xp=pow(10,-4+3*((double)i)/5);
 		diff_param.set_extern(beta,xp,Q2,mf2);
 		val=0;
 		for(int j=0;j<3;j++){

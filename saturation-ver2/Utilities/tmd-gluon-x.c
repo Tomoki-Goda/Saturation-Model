@@ -13,14 +13,14 @@
 #define PHI 0
 
 #include"./plot.c"
-#include"./tmd-gluon.h"
+#include"./tmd-gluon-2.h"
 
 int main (int argc, char** argv){
 
 	double val;
 	FILE *file;
 	char file_name[500];
-	double k2, x , Q2;
+	double k, x , Q2;
 	double param[10];
 	double sudpar[10];
 	double sigpar[10];
@@ -28,9 +28,9 @@ int main (int argc, char** argv){
 	
 	
 	
-	read_options(argc,argv,param,&k2,&Q2, file_name);
+	read_options(argc,argv,param,&k,&Q2, file_name);
 	parameter(param,sigpar,sudpar);
-	printf("%.3e %.3e\n",k2, Q2);
+	printf("%.3e %.3e\n",k, Q2);
 		
 #if (MODEL==1||MODEL==3)	
 	approx_xg(sigpar+1);//generate chebyshev coefficients
@@ -43,12 +43,14 @@ int main (int argc, char** argv){
 	
 	for(int i=0;i<50; i++){
 		x=pow(10,-7+6*((double)i)/50);
-		sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
-#if PHI==1		
+		//sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
+/*#if PHI==1		
 		val=fill_arr_2(k2, step);
 #else
 		val=fill_arr(k2, step,sudpar,Q2);
-#endif
+#endif*/
+
+		val=af(x,k,Q2,sigpar,sudpar);
 		//val*=k*k;
 		val*=3.0/(4*PI);
 		val/=(2*PI*2*PI);

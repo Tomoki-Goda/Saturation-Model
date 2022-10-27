@@ -46,7 +46,7 @@ int main (int argc, char** argv){
 #else
 		val=fill_arr(k, step,sudpar,Q2);
 #endif*/
-		val=af(x,k,Q2,sigpar);
+		val=af(x,k,Q2,sigpar,sudpar);
 		//val*=k*k;
 		val*=3.0/(4*PI);
 		val/=(2*PI*2*PI);

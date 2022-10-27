@@ -39,7 +39,7 @@ def main():
     leg=[]
     name=['GBW','BGK']
     for l in range(2):
-        ax1[l].text(1.0e-2,0.06,name[l],fontsize=25);
+        ax1[l].text(1.0e-2,0.25,name[l],fontsize=25);
         for j in ['4']:
             with open(args[0+2*l]+'/gluon-500-'+j+'.txt' ,"r") as fi:
                 dpi=[]

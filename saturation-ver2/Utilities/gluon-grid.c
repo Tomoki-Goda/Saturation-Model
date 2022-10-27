@@ -49,9 +49,9 @@ int main (int argc, char** argv){
 		x=pow(10,-8+7*((double)i)/(gridsize[0]-1) );
 		//x=1.0e-4;
 		for(int j=0;j<gridsize[1];j++){
-			k=pow(10,(-2+6*((double)j)/(gridsize[1]-1) )/2 );
+			k=pow(10,(-4+9*((double)j)/(gridsize[1]-1) )/2 );
 			for(int l=0;l<gridsize[2];l++){
-				Q2=pow(10, -2+6*((double)l)/(gridsize[2]-1) );
+				Q2=pow(10, -1+6*((double)l)/(gridsize[2]-1) );
 				//Q2=5;
 				//sample_sigma( sample ,  step,  x, Q2, sigpar,  sudpar);
 				val=af(x,k,Q2,sigpar,sudpar);

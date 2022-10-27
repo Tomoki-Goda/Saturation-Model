@@ -31,7 +31,8 @@ int main (int argc, char** argv){
 	read_options(argc,argv,&OPTIONS);
 	double param[10];
 	F_L=1;
-	if(((OPTIONS.W)!=((int)0))){
+	if(((int)(OPTIONS.W))!=0 ){
+		printf("W=%e\n",OPTIONS.W);
 		FIX_W=1;//in f2.h
 		//extern, in photon wave function
 	}
@@ -61,7 +62,7 @@ int main (int argc, char** argv){
 		for(int i =0;i<=Q2len;i++){
 			var[1]=pow(10.0, 0+3*((double)(i))/Q2len);
 			var[0]=var[1]/(var[1]+pow(OPTIONS.W,2));
-			printf("W= %.2e\n",var[0]);
+			printf("x= %.2e\n",var[0]);
 			val=f2(var[1],par);
 			fprintf(out,"%.5e\t%.5e\n",var[1],val);		
 		}

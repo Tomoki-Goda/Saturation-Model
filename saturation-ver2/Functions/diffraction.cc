@@ -1,6 +1,7 @@
 #include<cmath>
 #include<iostream>
 #include<fstream>
+#include<string>
 
 #include"constants.h"
 #include"control.h"
@@ -33,13 +34,19 @@ class impact{
 		xp=a3;
 		Q2=a4;
 		mf2=a5;
-		//std::cout<<beta<<"\t "<<xp<<"\t "<<Q2<<"\t "<<mf2<<std::endl;
 		}
 	void set_z(double a1){
+		if(a1>1||a1<0){
+			printf("z = %f\n",z);
+		}
 		z=a1;
 		ep=sqrt(fabs(z*(1-z)*Q2+mf2));
 		k=sqrt(fabs(z*(1-z)*Q2*(1-beta)/beta -mf2));
 		//std::cout<<"z= "<<z<<"\tk= "<<k<<"\tep= "<<ep<<std::endl;
+	}
+	void current(){
+		std::cout<<"beta: "<<beta<<"\t xp: "<<xp<<"\t Q2: "<<Q2<<"\t mf2: "<<mf2<<std::endl;
+		std::cout<<"z: "<<z<<"\t "<<"k: "<<k<<"\t "<<"ep: "<<ep<<std::endl;
 	}
 };
 /////////////////////////////////////
@@ -47,7 +54,7 @@ class impact{
 static struct impact diff_param;
 ////////////////////////////////////
 //#define INTSTR 2  
-double integrate(double (*func)(double*), double min,double max, double rel, int type ){
+double integrate(double (*func)(double*),double min, double max, double rel, const int type ){
 	/////////////quad//////////////
 	double val=0;
 //#if INTSTR==0
@@ -78,7 +85,7 @@ double integrate(double (*func)(double*), double min,double max, double rel, int
 		val=dgauss_(func,&min,&max,&rel);
 //#endif
 	}else{
-		printf("Unknown integration");
+		printf("Unknown integration\n");
 	}
 	return(val);	
 }
@@ -93,6 +100,9 @@ double phi_integrand(double *R){
 	double x=diff_param.xp;//Q2*(1/xp-1);
 	
 	double val=r*std::cyl_bessel_j(index,k*r)*std::cyl_bessel_k(index, ep*r);//	*(diff_param.func)(r,x,Q2,sigpar);
+	if(isnan(r)==1){
+		printf("%f passed from integral func, makes r=%f\n",*R,r);
+	}
 	val*=SIGMA(r,x,diff_param.Q2,diff_param.sigpar,diff_param.sudpar);
 	val*=jac;
 	return(val);
@@ -105,7 +115,7 @@ double phi(int index,double z){
 	//double val=0,min=1.0e-5,max=0.99;
 	//double eps=1.0e-6;
 	//val=dgauss_(&phi_integrand,&min,&max,&eps);
-	double val=integrate(&phi_integrand,1.0e-5,0.99,1.0e-6,3);
+	double val=integrate(&phi_integrand,1.0e-5,0.99,1.0e-6,1);
 	return(val);
 }
 
@@ -119,14 +129,22 @@ double phi2_integrand_u(double *U){
 	double x=xp;//Q2*(1/xp-1);
 	
 	double val=u*std::cyl_bessel_k(index,std::sqrt(z/(1-z))*u)*std::cyl_bessel_j(index, u );//	*(diff_param.func)(r,x,Q2,sigpar);
+	if(isnan(u/kt)==1){
+		printf("%f passed from integral func, makes u=%f\t kt2=%f\n ",*U,u,diff_param.kt2);
+	}
 	val*=SIGMA(u/kt,x,Q2,diff_param.sigpar,diff_param.sudpar);
 	val*=jac;
 	return(val);
 }
 
 double phi2_integrand_kt(double *K){
+	
 	double kt2=*K;
-
+	if(kt2<0){
+		diff_param.current();
+		getchar();
+		//return(0);
+	}
 	diff_param.kt2=kt2;
 
 	double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99, 1.0e-5,1);
@@ -161,7 +179,11 @@ double FD_g_integrand(double *Z){
 	double beta=diff_param.beta;
 	int N=96;
 	double val,min=1.0e-4,max=(1-z)*diff_param.Q2;
-	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,3);
+	if(min<0){
+		printf("%f !!!!!\n",min);
+		getchar();
+	}
+	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,1);
 	
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);
 	return(val);
@@ -201,7 +223,7 @@ double xFD_LT(int pol){
 			printf("error:: choose polarizaion\n");
 		}
 
-	double res=integrate(funcptr,min,max,1.0e-5,2);
+	double res=integrate(funcptr,min,max,1.0e-5,3);
 	//res*=2;//see the comm. above.
 	std::cout<<"pol="<<pol<<"\t"<<res;
 
@@ -239,22 +261,32 @@ int main(int argc,char** argv){
 	diff_param.sudpar=sudpar;
 
        	fclose(infile);
-	
+	//FILE* controlfile=fopen(argv[argc-1],"r" );
+	double Q2,beta,xmin,xmax;
+	//fscanf(controlfile,"%lf\t%lf\t%lf%lf",&beta,&Q2,&xmin,&xmax );
+	//fclose(controlfile);	
 #if ((MODEL==1)||(MODEL==3))
 	approx_xg(sigpar+1);
 #endif
 
-	double beta=0.4;
-	double Q2=8.5;
+	beta=0.4;
+	Q2=3.0;
 	double mf2=MASS_L2;
 	double xp;
 	double val;
 	std::fstream file;
+	
+	//char name[150];
+	//sprintf(name,"%s-%.4f-%.3f.txt",OPTIONS.output_file_name,beta,Q2);
+
 	file.open(OPTIONS.output_file_name,std::fstream::out);
 	char type[3]={'t','l','g'};
-
+	
+	xmin=1.0e-4;
+	xmax=1.0e-1;	
 	for(int i=0;i<5;i++){
-		xp=pow(10,-4+3*((double)i)/5);
+		xp=pow(10,log10(xmin)  + log10(xmax/xmin )*((double)i)/5);
+		printf("%.5e\t %.5e\t %.5e\n",xp,beta,Q2);
 		diff_param.set_extern(beta,xp,Q2,mf2);
 		val=0;
 		for(int j=0;j<3;j++){

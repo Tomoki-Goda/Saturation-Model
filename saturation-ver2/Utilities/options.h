@@ -14,6 +14,7 @@ static struct info{
 	int fl;
 	double W;
 	char data_file_name[100];
+	double xmax,xmin,beta;
 } OPTIONS;
 
 static int read_options(int argc, char** argv, struct info * data  ){
@@ -28,9 +29,12 @@ static int read_options(int argc, char** argv, struct info * data  ){
 		{"out",required_argument,0,'o'},
 		{"W",required_argument,0,'w'},
 		{"data",required_argument,0,'d'},
+		{"xmax",required_argument,0,'M'},
+		{"xmin",required_argument,0,'m'},
+		{"beta",required_argument,0,'b'}
 
 	};
-	char shortopts[]="q:k:x:f:i:o:w:d";
+	char shortopts[]="q:k:x:f:i:o:w:d:M:m:b:";
 	
 	while(1){
 		c=getopt_long_only(argc, argv,shortopts,long_options,&indexptr );
@@ -60,6 +64,15 @@ static int read_options(int argc, char** argv, struct info * data  ){
 				break;
 			case 'd':
 				strcpy(data->data_file_name,optarg);
+				break;
+			case 'M':
+				data->xmax=atof(optarg);
+				break;
+			case 'm':
+				data->xmin=atof(optarg);
+				break;
+			case 'b':
+				data->beta=atof(optarg);
 				break;
 			default:
 				printf("Unknown option\n");

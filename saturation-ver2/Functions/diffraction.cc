@@ -37,7 +37,7 @@ class impact{
 		}
 	void set_z(double a1){
 		if(a1>1||a1<0){
-			printf("z = %f\n",z);
+			printf("set_z:: can not set  z = %f\n",z);
 		}
 		z=a1;
 		ep=sqrt(fabs(z*(1-z)*Q2+mf2));
@@ -64,7 +64,7 @@ double integrate(double (*func)(double*),double min, double max, double rel, con
 //#elif INTSTR==1
 	}else if(type==1){
 		int N=96;
-		int count=10;
+		int count=25;
 		double high=min,low=min,step=(max-min)/count;
 		val=0;
 		for (int i=0;i<count;i++){
@@ -157,6 +157,9 @@ double phi2_integrand_kt(double *K){
 double FD_L_integrand(double *Z){
 	//std::cout<<"FDL z= "<<*Z<<std::endl;
 	double z=*Z;
+	if(z<0||z>1){
+		printf("FD_L_integrand:: z = %.5e\n",z);
+	}
 	double phi0=phi(0,z);
 	double val=phi0*phi0*pow(z * (1-z),3);
 	return(val);
@@ -164,6 +167,9 @@ double FD_L_integrand(double *Z){
 double FD_T_integrand(double *Z){
 	//std::cout<<"FDT z= "<<*Z<<std::endl;
 	double z=*Z;
+	if(z<0||z>1){
+		printf("FD_T_integrand:: z = %.5e\n",z);
+	}
 	double phi0=phi(0,z);
 	double phi1=phi(1,z);
 	//!!! NOTE !!!, in the phi function diff_parameters k and ep are modified as they depend on z.
@@ -174,6 +180,9 @@ double FD_T_integrand(double *Z){
 }	
 double FD_g_integrand(double *Z){
 	double z=*Z;
+	if(z<0||z>1){
+		printf("FD_g_integrand:: z = %.5e\n",z);
+	}
 	//diff_param.index=index;
 	diff_param.set_z(z);
 	double beta=diff_param.beta;
@@ -183,7 +192,7 @@ double FD_g_integrand(double *Z){
 		printf("%f !!!!!\n",min);
 		getchar();
 	}
-	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,1);
+	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,3);
 	
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);
 	return(val);
@@ -225,11 +234,11 @@ double xFD_LT(int pol){
 
 	double res=integrate(funcptr,min,max,1.0e-5,3);
 	//res*=2;//see the comm. above.
-	std::cout<<"pol="<<pol<<"\t"<<res;
+	std::cout<<"pol="<<(char)pol<<"\tIntegral= "<<res;
 
 	res*=factor;
 	res*=2.0/3.0;//sum of charges uds;
-	std::cout<<"  "<<res<<std::endl;
+	std::cout<<"\tResult=  "<<res<<std::endl;
 	return(res);
 }
 
@@ -269,8 +278,8 @@ int main(int argc,char** argv){
 	approx_xg(sigpar+1);
 #endif
 
-	beta=0.4;
-	Q2=3.0;
+	beta=OPTIONS.beta;
+	Q2=OPTIONS.Q2;
 	double mf2=MASS_L2;
 	double xp;
 	double val;
@@ -280,19 +289,21 @@ int main(int argc,char** argv){
 	//sprintf(name,"%s-%.4f-%.3f.txt",OPTIONS.output_file_name,beta,Q2);
 
 	file.open(OPTIONS.output_file_name,std::fstream::out);
+	printf("%s\n", OPTIONS.output_file_name);
 	char type[3]={'t','l','g'};
 	
-	xmin=1.0e-4;
-	xmax=1.0e-1;	
+	xmin=(OPTIONS.xmin )/2;
+	xmax=(OPTIONS.xmax )*2;
+	std::cout<<"Q2= "<<Q2<<"\tbeta= "<<beta<<std::endl;
 	for(int i=0;i<5;i++){
-		xp=pow(10,log10(xmin)  + log10(xmax/xmin )*((double)i)/5);
+		xp=pow(10,log10(xmin)  + log10(xmax/xmin )*((double)i)/(5-1));
 		printf("%.5e\t %.5e\t %.5e\n",xp,beta,Q2);
 		diff_param.set_extern(beta,xp,Q2,mf2);
 		val=0;
 		for(int j=0;j<3;j++){
 			val+=xFD_LT(type[j]);
 		}
-		std::cout<<xp<<"\t"<<val<<std::endl;
+		std::cout<<"xp= "<<xp<<"\tval= "<<val<<std::endl;
 		file<<xp<<"\t"<<val<<std::endl;
 	}
 	file.close();

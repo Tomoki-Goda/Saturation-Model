@@ -18,7 +18,7 @@ def main():
             input_file=arg
             print("in ", arg);
         elif opt in ["-o","-out"]:
-            output_file=arg
+            outdir=arg
 
     data=[]
     with open(input_file,"r") as fi:
@@ -40,12 +40,34 @@ def main():
         for beta in betaset:
             tf2=data["beta"]==beta
             frame=betaframe.where(tf2).dropna()
-            print(frame)
+            #print(frame)
             betaset=np.array(list(set(frame['xp'].values)))
             xmax=max(betaset)
             xmin=min(betaset)
 
-            os.system("echo file -in reufile -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out file-{q2_:}-{beta_:}.txt ".format(q2_=q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
+            os.system("{DIR}/diffraction -in {DIR}/result.txt -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out {DIR}/file-{q2_:}-{beta_:}.txt ".format(DIR=outdir,q2_=q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
+            fd3=[]
+            xp=[]
+            with open("{DIR}/file-{q2_:}-{beta_:}.txt".format(q2_=q2,beta_=beta,DIR=outdir)) as fi:
+                for line in fi:
+                    plot_data=line.strip().split("\t")
+                    fd3.append(float(plot_data[1]))
+                    xp.append(float(plot_data[0]))
+
+            plt.plot(xp,fd3)
+            datapt=np.transpose(frame[['xp','xF']].values)
+            error=frame[["stat","sys+","sys-"]].values
+            errp=[np.sqrt(float(i[0])**2+float(i[1])**2 ) for i in error]
+            errn=[np.sqrt(float(i[0])**2+float(i[2])**2) for i in error]
+
+            plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=[errn,errp] , c='b')
+            plt.scatter([float(i) for i in datapt[0]],[float(i) for i in datapt[1]] ,c='black')
+            
+            plt.xscale('log')
+            
+            plt.show()
+
+    
 
 if __name__=="__main__":
     main()

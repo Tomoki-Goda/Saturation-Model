@@ -217,8 +217,8 @@ def main():
         xarr2=[float(k) for k in arr2[0]]
         yarr2=[float(k) for k in arr2[1]]
         #print( xarr, yarr)
-        ax2[pos[0]][pos[1]].plot(xarr,yarr ,c='blue',ls="--")
-        ax2[pos[0]][pos[1]].plot(xarr2,yarr2 ,c='red')
+        leg1=(ax2[pos[0]][pos[1]].plot(xarr,yarr ,c='blue',ls="--"))
+        leg2=(ax2[pos[0]][pos[1]].plot(xarr2,yarr2 ,c='red'))
         #chi=0
         #count=0
         chi1.append([])
@@ -230,7 +230,7 @@ def main():
                 chi1[i+(q2len//2+extra)].append(pow( (float(f2d[j])-float(f2c[j]))/float(f2e[j]) ,2))
             if(q2d2[j]==q2set[i+q2len//2+extra]):
                 chi2[i+(q2len//2+extra)].append(pow( (float(f2d2[j])-float(f2c2[j]))/float(f2e2[j]) ,2))
-                
+       
         ax2[pos[0]][pos[1]].set(xscale="log" ,   yscale='linear' )
         #ax2[pos[0]][pos[1]].legend()
         #ax2[pos[0]][pos[1]].text(1.0e-4, 0.6,"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(q2val)),fontsize=7) 
@@ -241,7 +241,7 @@ def main():
         ax2[pos[0]][pos[1]].xaxis.set_minor_locator(plt.NullLocator())
         ax2[pos[0]][pos[1]].margins(x=0)
         
-        
+    #ax2[row2-1][col2-1].legend([leg1[0],leg2[0]],['Without Sudakov','With Sudakov'])
     #ax2[0][0].set(label="$F_2$",loc="top")
     #ax1[0][0].set(label="$F_2$",loc="top")
         
@@ -307,7 +307,7 @@ def main():
     
     ax1.grid(visible='true', axis='y')
     ax1.margins(x=0)
-    ax1.legend(leg,["Without Sudakov", "With Sudakov"])
+    ax1.legend([leg1[0],leg2[0]],["Without Sudakov", "With Sudakov"])
     #ax2.grid(visible='true', axis='y')
     #ax2.margins(x=0)
     

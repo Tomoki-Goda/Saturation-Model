@@ -108,8 +108,8 @@ ${DIR}/dgauss.o: ${FUNCDIR}/dgauss.c
 ${DIR}/dcurtis.o: ${FUNCDIR}/dcurtis.c
 	gcc -c ${FUNCDIR}/dcurtis.c ${LIBS} ${INC} -o ${DIR}/dcurtis.o ${OPT}
 
-diffraction: ${DEPS} ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o  ${DIR}/dcurtis.o 
-	g++ ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/diffraction ${INC} -std=c++17 -O1
+diffraction: ${DEPS} ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o  ${DIR}/dgauss.o ${DIR}/dcurtis.o 
+	g++ ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o $${DIR}/dgauss.o ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/diffraction ${INC} -std=c++17 -O1
 
 ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c ${UTILDIR}/f2.h
 	echo ${DIR}

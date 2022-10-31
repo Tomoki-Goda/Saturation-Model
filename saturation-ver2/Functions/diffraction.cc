@@ -21,7 +21,7 @@ extern "C" double dgquad_(double (*func)(double*),double*, double *, int*);
 extern "C" double dgauss_(double (*)(double*),double*,double*,double*);
 extern "C" int dadapt_(double (*)(double *), double*,double*,int*,double*,double*,double*,double*);
 //extern "C" double dgauss20(double (*)(double*), double,double,double);
-//extern "C" double dgauss40(double (*)(double*), double,double,double);
+extern "C" double dgauss40(double (*)(double*), double,double,double);
 
 extern "C" double dcurtis(double (*)(double*), double,double,double);
 
@@ -89,6 +89,7 @@ double integrate(double (*func)(double*),double min, double max, double rel, con
 //#endif
 	}else if (type==4){
 		val=dcurtis(func,min,max,rel);
+		//val=dgauss40(func,min,max,rel);
 
 	}else{
 		printf("Unknown integration\n");

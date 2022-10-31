@@ -66,7 +66,8 @@ double dcurtis(double (*func)(double*),double min, double max,double  eps){
 			//printf("%.3e\t%.3e\n",arg1,arg2);
 			sample[i]=(*func)(&arg1)+(*func)(&arg2);
 		       	if(isnan(sample[i])==1){
-				printf("DCURTIS %.5e nan encountered\n", sample[i]);
+				printf("DCURTIS %.5e encountered function(%.3e)+function(%.3e)\n", sample[i],arg1,arg2 );
+				printf("%.3e %.3e %.3e %.3e\n",min,max,smin,smax);
 				getchar();
 			}	
 		}
@@ -107,7 +108,7 @@ double dcurtis(double (*func)(double*),double min, double max,double  eps){
 		val16*=2*scale/N;
 		val8*=4*scale/N;
 
-		printf("val16= %.3e  val8= %.3e diff=%.3e [%.3e, %.3e] of [%.3e, %.3e]\n",val16,val8, fabs(val16-val8), smin,smax,min,max);	
+		//printf("val16= %.3e  val8= %.3e diff=%.3e [%.3e, %.3e] of [%.3e, %.3e]\n",val16,val8, fabs(val16-val8), smin,smax,min,max);	
 		//getchar();
 		if(fabs(val16-val8)< eps*(1+fabs(val16) )){
 			total=Kahn(total,val16,&carry_total);

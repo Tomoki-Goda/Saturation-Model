@@ -20,7 +20,10 @@ extern "C" int approx_xg(double*);
 extern "C" double dgquad_(double (*func)(double*),double*, double *, int*);
 extern "C" double dgauss_(double (*)(double*),double*,double*,double*);
 extern "C" int dadapt_(double (*)(double *), double*,double*,int*,double*,double*,double*,double*);
+//extern "C" double dgauss20(double (*)(double*), double,double,double);
+//extern "C" double dgauss40(double (*)(double*), double,double,double);
 
+extern "C" double dcurtis(double (*)(double*), double,double,double);
 
 class impact{
 ///	private:
@@ -84,6 +87,9 @@ double integrate(double (*func)(double*),double min, double max, double rel, con
 		//double eps=rel;//1.0e-5;
 		val=dgauss_(func,&min,&max,&rel);
 //#endif
+	}else if (type==4){
+		val=dcurtis(func,min,max,rel);
+
 	}else{
 		printf("Unknown integration\n");
 	}
@@ -115,7 +121,7 @@ double phi(int index,double z){
 	//double val=0,min=1.0e-5,max=0.99;
 	//double eps=1.0e-6;
 	//val=dgauss_(&phi_integrand,&min,&max,&eps);
-	double val=integrate(&phi_integrand,1.0e-5,0.99,1.0e-6,1);
+	double val=integrate(&phi_integrand,1.0e-5,0.99,1.0e-6,4);
 	return(val);
 }
 
@@ -138,8 +144,9 @@ double phi2_integrand_u(double *U){
 }
 
 double phi2_integrand_kt(double *K){
+	double kt2=pow(*K,2);
+	double jac=2**K;
 	
-	double kt2=*K;
 	if(kt2<0){
 		diff_param.current();
 		getchar();
@@ -147,10 +154,10 @@ double phi2_integrand_kt(double *K){
 	}
 	diff_param.kt2=kt2;
 
-	double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99, 1.0e-5,1);
+	double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99, 1.0e-5,4);
 	double z=diff_param.z, Q2=diff_param.Q2;
 	double val=phi2*phi2*std::log((1-z)*Q2/(kt2));
-	return(val);
+	return(jac*val);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -187,12 +194,14 @@ double FD_g_integrand(double *Z){
 	diff_param.set_z(z);
 	double beta=diff_param.beta;
 	int N=96;
-	double val,min=1.0e-4,max=(1-z)*diff_param.Q2;
+	double val,min=1.0e-6,max=(1-z)*diff_param.Q2;
+	max=sqrt(max);
+
 	if(min<0){
 		printf("%f !!!!!\n",min);
 		getchar();
 	}
-	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,3);
+	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,4);
 	
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);
 	return(val);
@@ -232,7 +241,7 @@ double xFD_LT(int pol){
 			printf("error:: choose polarizaion\n");
 		}
 
-	double res=integrate(funcptr,min,max,1.0e-5,3);
+	double res=integrate(funcptr,min,max,1.0e-2,4);
 	//res*=2;//see the comm. above.
 	std::cout<<"pol="<<(char)pol<<"\tIntegral= "<<res;
 

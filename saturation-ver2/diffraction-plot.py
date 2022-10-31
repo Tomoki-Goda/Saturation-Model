@@ -65,8 +65,9 @@ def main():
             
             plt.xscale('log')
             
-            plt.show()
-
+            #plt.show()
+            plt.savefig("{DIR}/plot-{q2_:}-{beta_:}.png".format(DIR=outdir,beta_=beta,q2_=q2))
+            plt.clf()
     
 
 if __name__=="__main__":

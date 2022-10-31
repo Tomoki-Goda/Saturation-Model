@@ -93,14 +93,14 @@ ww-gluon: ${DEPS} ${UTILDIR}/ww-gluon.c ${UTILDIR}/ww-gluon.h ${DIR}/dipole-cros
 #tmd-critical-2: ${DEPS} ${UTILDIR}/tmd-critical-2.c  ${UTILDIR}/tmd-gluon.h ${DIR}/dipole-cross-section.o 
 #	gcc ${UTILDIR}/tmd-critical-2.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/tmd-critical-2   ${INC} ${OPT}
 
-fcn: ${DEPS} ${FUNCDIR}/fcn.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o 
-	gcc ${FUNCDIR}/fcn.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${LIBS} -o ${DIR}/fcn ${INC} ${OPT} 
+fcn: ${DEPS} ${FUNCDIR}/fcn.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o ${DIR}/dcurtis.o 
+	gcc ${FUNCDIR}/fcn.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o   ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/fcn ${INC} ${OPT} 
 
-export-data: ${DEPS} ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o  
-	gcc ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/export-data ${INC} ${OPT} 
+export-data: ${DEPS} ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o  ${DIR}/dcurtis.o
+	gcc ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/export-data ${INC} ${OPT} 
  
-heavy-F2: ${DEPS} ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o  
-	gcc ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/heavy-F2 ${INC} ${OPT} 
+heavy-F2: ${DEPS} ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/simpson-integral.o  ${DIR}/dcurtis.o  
+	gcc ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/simpson-integral.o ${DIR}/photon-wave-function.o  ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/heavy-F2 ${INC} ${OPT} 
 
 ${DIR}/dgauss.o: ${FUNCDIR}/dgauss.c
 	gcc -c ${FUNCDIR}/dgauss.c ${LIBS} ${INC} -o ${DIR}/dgauss.o ${OPT}
@@ -116,8 +116,8 @@ ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c ${UTILDIR}/f2.h
 	gcc -c ${FUNCDIR}/read-and-fit.c   ${LIBS}  ${INC}  -o ${DIR}/read-and-fit.o ${OPT}
 
        
-${DIR}/dipole-cross-section.o: ${DEPS} ${FUNCDIR}/dipole-cross-section.c ${GLUDEP} ${SUDDEP}
-	gcc -c ${FUNCDIR}/dipole-cross-section.c  ${LIBS}   ${INC}  -o ${DIR}/dipole-cross-section.o  ${OPT}
+${DIR}/dipole-cross-section.o: ${DEPS} ${FUNCDIR}/dipole-cross-section.c ${GLUDEP} ${SUDDEP}  
+	gcc -c ${FUNCDIR}/dipole-cross-section.c  ${LIBS}   ${INC}   -o ${DIR}/dipole-cross-section.o ${OPT}
 
 
 ${DIR}/photon-wave-function.o: ${DEPS}  ${FUNCDIR}/photon-wave-function.c 

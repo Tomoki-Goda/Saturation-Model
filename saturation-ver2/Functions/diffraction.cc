@@ -91,6 +91,9 @@ double integrate(double (*func)(double*),double min, double max, double rel, con
 		val=dcurtis(func,min,max,rel);
 		//val=dgauss40(func,min,max,rel);
 
+	}else if (type==5){
+		val=dgauss40(func,min,max,rel);
+		//val=dgauss40(func,min,max,rel);
 	}else{
 		printf("Unknown integration\n");
 	}
@@ -112,6 +115,11 @@ double phi_integrand(double *R){
 	}
 	val*=SIGMA(r,x,diff_param.Q2,diff_param.sigpar,diff_param.sudpar);
 	val*=jac;
+
+	if((isnan(val)+isinf(val))!=0){
+		diff_param.current();
+		printf("val=%.3e,r= %.3e\n",val,*R);
+	}
 	return(val);
 }
 
@@ -165,16 +173,23 @@ double phi2_integrand_kt(double *K){
 double FD_L_integrand(double *Z){
 	//std::cout<<"FDL z= "<<*Z<<std::endl;
 	double z=*Z;
+	//double z=pow(*Z,2)/2;
+	double jac=1;//*Z;
 	if(z<0||z>1){
 		printf("FD_L_integrand:: z = %.5e\n",z);
 	}
 	double phi0=phi(0,z);
 	double val=phi0*phi0*pow(z * (1-z),3);
-	return(val);
+	//if(isinf(val)==1||isnan(val)==1){
+	//	printf("FD_L_integrand:: z=%.3e phi0=%.3e val=%.3e\n",*Z,phi0,val);
+	//}
+	return(jac*val);
 }
 double FD_T_integrand(double *Z){
 	//std::cout<<"FDT z= "<<*Z<<std::endl;
 	double z=*Z;
+	//double z=pow(*Z,2)/2;
+	double jac=1;//*Z;
 	if(z<0||z>1){
 		printf("FD_T_integrand:: z = %.5e\n",z);
 	}
@@ -184,7 +199,10 @@ double FD_T_integrand(double *Z){
 	double val=pow(diff_param.ep,2)*(z*z+(1-z)*(1-z))*phi1*phi1;
 	val+=diff_param.mf2*phi0*phi0;
 	val*=z*(1-z);
-	return(val);
+	//if(isinf(val)==1||isnan(val)==1){
+	//	printf("FD_T_integrand::  z=%.3e phi0=%.3e, phi1=%.3e val=%.3e\n",*Z,phi0,phi1,val);
+	//}
+	return(jac*val);
 }	
 double FD_g_integrand(double *Z){
 	double z=*Z;
@@ -197,6 +215,9 @@ double FD_g_integrand(double *Z){
 	int N=96;
 	double val,min=1.0e-6,max=(1-z)*diff_param.Q2;
 	max=sqrt(max);
+	if(min>max){
+		return(0);
+	}
 
 	if(min<0){
 		printf("%f !!!!!\n",min);
@@ -205,6 +226,9 @@ double FD_g_integrand(double *Z){
 	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,4);
 	
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);
+	if(isinf(val)==1||isnan(val)==1){
+		printf("FD_g_intregrand:: z=%.3e val=%.3e\n",*Z,val);
+	}
 	return(val);
 }
 
@@ -222,6 +246,8 @@ double xFD_LT(int pol){
 			//Half the regon. cf. GBW int over k for Q2(1-beta)/(4*beta)>k2>0.
 			// sym. z<->1-z. so factor 2.
 			min=(1-std::sqrt(1-4*(diff_param.mf2*diff_param.beta/(diff_param.Q2*(1-diff_param.beta))) ) )/2;
+			//max=sqrt(2*max);
+			min=((min>1.0e-10)?(min):(1.0e-10));
 			break;
 
 		case 'l':
@@ -229,7 +255,9 @@ double xFD_LT(int pol){
 			funcptr=&FD_L_integrand;
 			max=0.5;
 			min=(1-std::sqrt(1-4*(diff_param.mf2*diff_param.beta/(diff_param.Q2*(1-diff_param.beta))) ) )/2;
-
+			//max=sqrt(2*max);
+			//min=sqrt(2*min);
+			min=((min>1.0e-10)?(min):(1.0e-10));
 			break;
 		case 'g':
 			factor=81*diff_param.beta*alpha_s/(512*pow(PI,5)*hc22*BD);
@@ -241,7 +269,7 @@ double xFD_LT(int pol){
 		default:
 			printf("error:: choose polarizaion\n");
 		}
-
+	//std::cout<<"z integral ["<<min<<", "<<max<<"]"<<std::endl;
 	double res=integrate(funcptr,min,max,1.0e-2,4);
 	//res*=2;//see the comm. above.
 	std::cout<<"pol="<<(char)pol<<"\tIntegral= "<<res;
@@ -305,13 +333,21 @@ int main(int argc,char** argv){
 	xmin=(OPTIONS.xmin )/2;
 	xmax=(OPTIONS.xmax )*2;
 	std::cout<<"Q2= "<<Q2<<"\tbeta= "<<beta<<std::endl;
+	double y;
+
 	for(int i=0;i<5;i++){
 		xp=pow(10,log10(xmin)  + log10(xmax/xmin )*((double)i)/(5-1));
 		printf("%.5e\t %.5e\t %.5e\n",xp,beta,Q2);
 		diff_param.set_extern(beta,xp,Q2,mf2);
 		val=0;
 		for(int j=0;j<3;j++){
-			val+=xFD_LT(type[j]);
+			if(type[j]=='l'){
+				y=Q2/(318.12*318.12*xp*beta);//H1 sqrt(s)=318.12 GeV
+				val+=2*((1-y)/(1+(1-y)*(1-y)))*xFD_LT(type[j]);
+
+			}else{
+				val+=xFD_LT(type[j]);
+			}
 		}
 		std::cout<<"xp= "<<xp<<"\tval= "<<val<<std::endl;
 		file<<xp<<"\t"<<val<<std::endl;

@@ -25,7 +25,7 @@ extern double sigma_bgk(double, double, double, const double*);
 extern double dgauss_(double(* )(double*),double*,double*,double*); 
 extern double dgquad_(double(* )(double*),double*,double*,int*);
 extern double dadapt_(double(* )(double*),double*,double*,int*,double*,double* ,double*,double*);
-
+extern double dcurtis(double(* )(double*),double,double,double);
 static double VAR[3];
 //static double DUMMY_ARRAY[20];
 static const double *SIGPAR;//=DUMMY_ARRAY;
@@ -391,7 +391,7 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 	double NAbs=0;//1.0e-10;
 	double error=0;
 	dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
-	
+	//result=dcurtis(&integrand,rmin,*VAR,DGAUSS_PREC );	
 	
 ////////////////////////////////////////////////////////////////////////////////
 	if(isnan(result)!=0){

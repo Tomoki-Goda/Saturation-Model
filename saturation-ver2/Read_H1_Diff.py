@@ -18,22 +18,27 @@ def main():
             outdir=arg
 
 
-    read_file="./data/H1diff2006.txt"
-    data=pd.read_csv(read_file,sep=" ")
-    #print(data)
+    #read_file="./data/H1diff2006.txt"
+    data=pd.read_csv(read_file,sep=" ",index_col=None)
+    print(data)
     #print(sorted(list(set(data["Q2"].values))))
     data= data[data['Q2']<=90]
+    if not('xp' in data):
+        xp=data['x']/data['beta']
+        data['xp']=xp
+
     Q2_set=sorted(list(set(data["Q2"].values)))
     print(sorted(list(set(data["beta"].values))))
     print(sorted(list(set(data["xp"].values))))
-
-    print(Q2_set)
+    #input()
+    print("Q2 ",Q2_set,"\n\n")
     for Q2 in Q2_set:
         data_Q2=data[data['Q2']==Q2]
         beta_set=sorted(list(set(data_Q2["beta"].values)))
-        print("beta  ",  beta_set)
+        print("beta  ",  beta_set,"\n\n")
         for beta in beta_set:
             data_beta=data_Q2[data_Q2['beta']==beta]
+            #xp_set=sorted(list(set(data_beta["xp"].values)))
             xp_set=sorted(list(set(data_beta["xp"].values)))
             print(data_beta)
             xmax=max(xp_set)
@@ -62,7 +67,7 @@ def main():
             
             plt.xscale('log')
             
-            plt.show()
+            #plt.show()
             plt.savefig("{DIR}/plot-{q2_:}-{beta_:}.png".format(DIR=outdir,beta_=beta,q2_=Q2))
             plt.clf()
 

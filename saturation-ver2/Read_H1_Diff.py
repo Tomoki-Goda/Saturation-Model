@@ -5,9 +5,15 @@ import matplotlib.pyplot as plt
 import sys, getopt , os
 
 def main():
-
+    plot_only=False
+    indir=["."]
+    savedir="."
+    outdir="."
+    readfile=""
+    plotcolor=['b','r','g']
+    plotstyle=['--','-',':']
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],"i:o:",["in","out"] )
+        opts, args = getopt.gnu_getopt(sys.argv[1:],"i:o:ps:",["in","out","plot",'save'] )
     except getopt.GetoptError as err:
         print("Error reading option")
 
@@ -16,6 +22,15 @@ def main():
             read_file=arg
         elif opt in ['-o','-out']:
             outdir=arg
+            if not(plot_only):
+                indir=[outdir]
+        elif opt in ['-p','-plot']:
+            plot_only=True
+            #indir=arg.strip().split(':');
+            indir=args
+        elif opt in ['-s','--save']:
+            savedir=arg
+
 
 
     #read_file="./data/H1diff2006.txt"
@@ -30,46 +45,64 @@ def main():
     Q2_set=sorted(list(set(data["Q2"].values)))
     print(sorted(list(set(data["beta"].values))))
     print(sorted(list(set(data["xp"].values))))
-    #input()
+    lengthQ2=len(list(set(data['Q2'])))
+    lengthbeta=len(list(set(data['beta'])))
+
+    #plt.ion()
+    plt.margins(0)
+    fig,ax=plt.subplots(lengthQ2,lengthbeta, sharex=True,sharey=True,layout="constrained")
+    fig.get_layout_engine().set(wspace=0,hspace=0,w_pad=0,h_pad=0)
+    #fig.xscale('log')
+    print(lengthQ2, ",  " ,lengthbeta)
+    fig.set_figheight(lengthQ2)
+    fig.set_figwidth(1.2*lengthbeta)
+    beta_set=sorted(list(set(data["beta"].values)))
+
     print("Q2 ",Q2_set,"\n\n")
-    for Q2 in Q2_set:
+    for i in range(len(Q2_set)):
+        Q2=Q2_set[i]
         data_Q2=data[data['Q2']==Q2]
-        beta_set=sorted(list(set(data_Q2["beta"].values)))
-        print("beta  ",  beta_set,"\n\n")
-        for beta in beta_set:
+        #beta_set=sorted(list(set(data_Q2["beta"].values)))
+        print("beta ",i," ",  beta_set,"\n\n")
+        for j in range(len(beta_set)):
+            beta=beta_set[j]
             data_beta=data_Q2[data_Q2['beta']==beta]
+            if len(data_beta)==0:
+                continue
             #xp_set=sorted(list(set(data_beta["xp"].values)))
             xp_set=sorted(list(set(data_beta["xp"].values)))
-            print(data_beta)
+            #print(data_beta)
             xmax=max(xp_set)
             xmin=min(xp_set)
-
-            os.system("{DIR}/diffraction -in {DIR}/result.txt -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out {DIR}/file-{q2_:}-{beta_:}.txt ".format(DIR=outdir,q2_=Q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
-            fd3=[]
-            xp=[]
-            with open("{DIR}/file-{q2_:}-{beta_:}.txt".format(q2_=Q2,beta_=beta,DIR=outdir)) as fi:
-                for line in fi:
-                    plot_data=line.strip().split("\t")
-                    fd3.append(float(plot_data[1]))
-                    xp.append(float(plot_data[0]))
-
-            plt.plot(xp,fd3)
-            #datapt=np.transpose(frame[['xp','xF']].values)
-            datapt=np.transpose(data_beta[['xp','xp*sigmaD(3)']].values)
-            error=data_beta['dtot'].values
-            error=error*datapt[1]/100
-            #error=frame[["stat","sys+","sys-"]].values
-            #errp=[np.sqrt(float(i[0])**2+float(i[1])**2 ) for i in error]
-            #errn=[np.sqrt(float(i[0])**2+float(i[2])**2) for i in error]
-            #plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=[errn,errp] , c='b')
-            plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=error , c='b')
-            plt.scatter([float(i) for i in datapt[0]],[float(i) for i in datapt[1]] ,c='black')
+            if not(plot_only):
+                os.system("{DIR}/diffraction -in {DIR}/result.txt -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out {DIR}/file-{q2_:}-{beta_:}.txt ".format(DIR=outdir,q2_=Q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
             
-            plt.xscale('log')
             
+            for k in range(len(indir)):
+                fd3=[]
+                xp=[]
+                with open("{DIR}/file-{q2_:}-{beta_:}.txt".format(q2_=Q2,beta_=beta,DIR=indir[k])) as fi:
+                    for line in fi:
+                        plot_data=line.strip().split("\t")
+                        fd3.append(1.23*float(plot_data[1]))
+                        xp.append(float(plot_data[0]))
+                ax[i][j].plot(xp,fd3,c=plotcolor[k],ls=plotstyle[k])
+                #datapt=np.transpose(frame[['xp','xF']].values)
+                datapt=np.transpose(data_beta[['xp','xp*sigmaD(3)']].values)
+                error=data_beta['dtot'].values
+                error=error*datapt[1]/100
+                #error=frame[["stat","sys+","sys-"]].values
+                #errp=[np.sqrt(float(i[0])**2+float(i[1])**2 ) for i in error]
+                #errn=[np.sqrt(float(i[0])**2+float(i[2])**2) for i in error]
+                #plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=[errn,errp] , c='b')
+            ax[i][j].errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=error , c='black',marker="x",fmt='none')
+            ax[i][j].scatter([float(i) for i in datapt[0]],[float(i) for i in datapt[1]] ,c='black',s=2)
+                
+            ax[i][j].set(xscale='log')
+            ax[i][j].tick_params(direction='in')
             #plt.show()
-            plt.savefig("{DIR}/plot-{q2_:}-{beta_:}.png".format(DIR=outdir,beta_=beta,q2_=Q2))
-            plt.clf()
+    plt.savefig("{DIR}/plot-diff.png".format(DIR=savedir,beta_=beta,q2_=Q2))
+    #plt.clf()
 
 
     

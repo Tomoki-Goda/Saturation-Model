@@ -26,6 +26,7 @@ extern double dgauss_(double(* )(double*),double*,double*,double*);
 extern double dgquad_(double(* )(double*),double*,double*,int*);
 extern double dadapt_(double(* )(double*),double*,double*,int*,double*,double* ,double*,double*);
 extern double dcurtis(double(* )(double*),double,double,double);
+extern double dclenshaw(double(* )(double*),double,double,double);
 static double VAR[3];
 //static double DUMMY_ARRAY[20];
 static const double *SIGPAR;//=DUMMY_ARRAY;
@@ -288,8 +289,10 @@ double integrand( double * r_ptr){
 	}
 
 #if (SUDAKOV==1)	
-	if((mu2_arr[0]) > q2){
-		printf("integrand:: mu2=%.3e Q2=%.3e\n",mu2_arr[0], q2 );
+	if(mu2_arr[0]-q2>0 ){
+		if(fabs(q2-mu2_arr[0])>1.0e-5){
+			printf("integrand:: mu2=%.3e Q2=%.3e, 1-difference = %3.e\n",mu2_arr[0], q2,(q2-mu2_arr[0]) );
+		}
 		return(0.0);
 	}
 #endif
@@ -386,12 +389,13 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 		//rmin=rmax;
 	//}
 	////////////////////////////////////
-	int seg=10;
-	double NRel=DGAUSS_PREC ;
-	double NAbs=0;//1.0e-10;
-	double error=0;
-	dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
-	//result=dcurtis(&integrand,rmin,*VAR,DGAUSS_PREC );	
+	//int seg=10;
+	//double NRel=DGAUSS_PREC ;
+	//double NAbs=0;//1.0e-10;
+	//double error=0;
+	//dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
+	
+	result=dclenshaw(&integrand,rmin,*VAR,DGAUSS_PREC );	
 	
 ////////////////////////////////////////////////////////////////////////////////
 	if(isnan(result)!=0){

@@ -231,7 +231,7 @@ double FD_g_integrand(double *Z){
 		printf("%f !!!!!\n",min);
 		getchar();
 	}
-	val=integrate(&phi2_integrand_kt, min,max,1.0e-5,4);
+	val=integrate(&phi2_integrand_kt, min,max,1.0e-3,4);
 	
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);
 	if(isinf(val)==1||isnan(val)==1){

@@ -5,7 +5,7 @@
 //#include<stdlib.h>
 
 
-#define PI 3.1415926535897932384626433
+#define PI 3.141592653589793238462643383279502884197
 static double Kahn(double a,double b,double *c){
 	//double c;
 	double	sum=a+b;
@@ -20,11 +20,23 @@ static double Kahn(double a,double b,double *c){
 	return(sum);
 }
 
-static const double x16[]={1.000000000000000,	0.980785280403230,	0.923879532511287,	0.831469612302545,	0.707106781186548,	0.555570233019602,	0.382683432365090,	0.195090322016128,	0.000000000000000};	
-static const double w16[]={0.062745098039216,	0.298949622697645,	0.603858652345215,	0.871244420655128,	1.111651746945865,	1.305381314253627,	1.451790273891947,	1.540110916903405,	1.571281006575124};	
-static const double w8[]={0.126984126984127,	0.584874596864073,	1.117460317460317,	1.446871434881959,	1.574603174603175};	
+static const double x16[]={1.000000000000000000000000000000e+00, 9.807852804032304506194118511447e-01, 9.238795325112867619863336960547e-01, 8.314696123025452498358628945367e-01, 7.071067811865475460497457679922e-01, 5.555702330196022565633495419049e-01, 3.826834323650898141569391948192e-01, 1.950903220161283203970903689557e-01, 0.000000000000000000000000000000e+00};	
+static const double w16[]={6.274509803921572703711007079619e-02, 2.989496226976449054167638106882e-01, 6.038586523452146797285979221456e-01, 8.712444206551274286632311850505e-01, 1.111651746945864560764091023555e+00, 1.305381314253626384086121496437e+00, 1.451790273891946807960151513108e+00, 1.540110916903405124741484817321e+00, 1.571281006575124188778813660861e+00 };	
+static const double w8[]={1.269841269841270256502063773496e-01, 5.848745968640726177649829569567e-01, 1.117460317460317429023630586917e+00, 1.446871434881959070257763581104e+00, 1.574603174603174567114383108901e+00};
+double dclenshaw(double(*func)(double*),double a,double b,double eps){
+	double sign, max,min;
 
-double dclenshaw(double(*func)(double*),double min,double max,double eps){
+	if((1-(a-b))==1){
+		return(0);
+	}else if(a>b){
+		max=a;
+		min=b;
+		sign=-1;
+	}else{
+		min=a;
+		max=b;
+		sign=1;
+	}
 	double smin,smax;
 	double scale,mid;
 	double val16,val8;
@@ -35,11 +47,13 @@ double dclenshaw(double(*func)(double*),double min,double max,double eps){
 	smin=min;
 	smax=max;
 	double f[N/2+1];
-		
+	if(fabs(min-max)<1.0e-15){
+		return(0);
+	}		
 	while(1){
 		scale=(smax-smin)/2;
-		if(scale<1.0e-15){
-			printf("Clenshaw_Curtis::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] \n",smin,smax,min,max);
+		if(scale<2.0e-15){
+			printf("Clenshaw_Curtis::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] scale = %.5e\n",smin,smax,min,max,scale);
 			getchar();
 		}
 		mid=(smax+smin)/2;
@@ -48,10 +62,16 @@ double dclenshaw(double(*func)(double*),double min,double max,double eps){
 			arg1=mid+scale*x16[i];
 			arg2=mid-scale*x16[i];
 			f[i]=(*func)(&arg1)+(*func)(&arg2);
+			if((isnan(f[i])+isinf(f[i]))!=0){
+				printf("%.3e encountered at %.3e or %.3e\n",f[i],arg1,arg2 );
+			}
 		}
 		f[0]/=2;
 		f[N/2]=(*func)(&mid);
 
+		if((isnan(f[0]*f[N/2])+isinf(f[0]*f[N/2]))!=0){
+			printf("%.3e encountered at %.3e \n",f[N/2],mid );
+		}
 		val16=0;
 		for(int i=0;i<=N/2;i++){
 			val16+=f[i]*w16[i];
@@ -70,14 +90,14 @@ double dclenshaw(double(*func)(double*),double min,double max,double eps){
 			total=Kahn(total,val16,&accum);
 			
 			if(fabs(smax-max)<1.0e-15){
-			return(total+accum);
+				return(sign*(total+accum) );
 			//bereak;
 			}
 			smin=smax;
 			smax=max;
 		}else{
 			//smax=mid;
-			smax=smin+(scale/2);
+			smax=smin+(scale/4);
 		}
 	}
 }

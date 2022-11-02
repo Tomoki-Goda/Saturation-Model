@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-RUNDIR=../Run
+RUNDIR=../Run3
 
 echo "rebuild ${RUNDIR} [y/n]?"
 read ans
@@ -32,8 +32,7 @@ fi
 
  ./Append "#define INDEPENDENT_RMAX 1" ${RUNDIR}*/BGKS*/M*
 
- 
- ./Append "#define NONLINEAR 1" ${RUNDIR}/*/M* 
+  ./Append "#define NONLINEAR 1" ${RUNDIR}/*/M* 
  ./Append "#define FEJER 1" ${RUNDIR}/*/M* 
  ./Append "#define N_CHEB_R 108" ${RUNDIR}/*/M* 
  ./Append "#define DGAUSS_PREC 1.0e-9" ${RUNDIR}/*/M* 

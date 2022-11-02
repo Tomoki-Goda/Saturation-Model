@@ -15,6 +15,7 @@ extern double dbesk1_(double*);
 
 extern double dgquad_(double (*)(const double*), double*,double*,int*  );
 extern double dgauss_(double (*)(const double*), double*,double*,double *  );
+extern double dclenshaw(double (*)(const double*), double,double,double  );
 extern void simpson1dA(double(*)(double ,double**),double**,double,double,int,double*,double*);
 extern double boole_integral(double(*)(double ,double**),double**,double,double,double, double,int,int, double*,double*);
 extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
@@ -103,8 +104,8 @@ double psisq_z_int(double r,double q2,unsigned f){
 	R=r;
 	Q2=q2;
 	double res=0;
-	double zmin=0.0;
-	//double zmin=1.0e-10;
+	//double zmin=0.0;
+	double zmin=1.0e-10;
 	//double zmax =1.0 - 1.0e-5;
 	double zmax = 0.5;//because psi is symmetric in z<->1-z!!
 
@@ -143,13 +144,14 @@ double psisq_z_int(double r,double q2,unsigned f){
 	//}
 	
 	////////////////////////////////////
-	int seg=10;
-	double NRel=DGAUSS_PREC;
-	double NAbs=0;
-	double error=0;
-	dadapt_(&psisq_f,&zmin,&zmax,&seg ,&NRel, &NAbs, &res, &error);
+	//int seg=10;
+	//double NRel=DGAUSS_PREC;
+	//double NAbs=0;
+	//double error=0;
+	//dadapt_(&psisq_f,&zmin,&zmax,&seg ,&NRel, &NAbs, &res, &error);
 	
 	/////////////////////////////////////////
+	res=dclenshaw(&psisq_f,zmin,zmax,DGAUSS_PREC);
 	return(2.0* res);
 
 }

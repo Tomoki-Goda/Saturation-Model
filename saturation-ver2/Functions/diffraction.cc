@@ -7,7 +7,7 @@
 #include"control.h"
 #include"control-default.h"
 #include"../Utilities/options.h"
-
+#include"./clenshaw-curtis.hh"
 
 //double      cyl_bessel_k( double v, double x );
 ////////////////////////////////////////////////////////////////////////////
@@ -24,6 +24,11 @@ extern "C" int dadapt_(double (*)(double *), double*,double*,int*,double*,double
 extern "C" double dgauss40(double (*)(double*), double,double,double);
 
 extern "C" double dcurtis(double (*)(double*), double,double,double);
+
+extern "C" double dclenshaw(double (*)(double*), double,double,double);
+//class Clenshaw_Curtis;
+//extern double Clenshaw_Curtis::integrate(double(*)(double*), double,double,double);
+
 
 class impact{
 ///	private:
@@ -55,6 +60,7 @@ class impact{
 /////////////////////////////////////
 //////  stores global variables /////
 static struct impact diff_param;
+Clenshaw_Curtis integral(32);
 ////////////////////////////////////
 //#define INTSTR 2  
 double integrate(double (*func)(double*),double min, double max, double rel, const int type ){
@@ -87,11 +93,13 @@ double integrate(double (*func)(double*),double min, double max, double rel, con
 		//double eps=rel;//1.0e-5;
 		val=dgauss_(func,&min,&max,&rel);
 //#endif
-	}else if (type==4){
-		val=dcurtis(func,min,max,rel);
-		//val=dgauss40(func,min,max,rel);
-
+	}else if (type==6){
+		val=integral.integrate(func,min,max,rel);
 	}else if (type==5){
+		val=dcurtis(func,min,max,rel);
+	}else if (type==4){
+		val=dclenshaw(func,min,max,rel);
+	}else if (type==7){
 		val=dgauss40(func,min,max,rel);
 		//val=dgauss40(func,min,max,rel);
 	}else{
@@ -311,7 +319,9 @@ int main(int argc,char** argv){
 	//FILE* controlfile=fopen(argv[argc-1],"r" );
 	double Q2,beta,xmin,xmax;
 	//fscanf(controlfile,"%lf\t%lf\t%lf%lf",&beta,&Q2,&xmin,&xmax );
-	//fclose(controlfile);	
+	//fclose(controlfile);
+	//Clenshaw_Curtis integral(16);
+
 #if ((MODEL==1)||(MODEL==3))
 	approx_xg(sigpar+1);
 #endif

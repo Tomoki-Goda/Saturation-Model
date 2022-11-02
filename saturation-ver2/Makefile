@@ -108,8 +108,16 @@ ${DIR}/dgauss.o: ${FUNCDIR}/dgauss.c
 ${DIR}/dcurtis.o: ${FUNCDIR}/dcurtis.c
 	gcc -c ${FUNCDIR}/dcurtis.c ${LIBS} ${INC} -o ${DIR}/dcurtis.o ${OPT}
 
-diffraction: ${DEPS} ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o  ${DIR}/dgauss.o ${DIR}/dcurtis.o 
-	g++ ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o $${DIR}/dgauss.o ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/diffraction ${INC} -std=c++17 -O1
+${DIR}/clenshaw.o: ${FUNCDIR}/clenshaw.c
+	gcc -c ${FUNCDIR}/clenshaw.c ${LIBS} ${INC} -o ${DIR}/clenshaw.o ${OPT}
+
+#${DIR}/clenshaw-curtis.o: ${FUNCDIR}/clenshaw-curtis.cc
+#	g++ -c ${FUNCDIR}/clenshaw-curtis.cc ${LIBS} ${INC} -o ${DIR}/clenshaw-curtis.o 
+
+
+diffraction: ${DEPS} ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o  ${DIR}/clenshaw.o  ${DIR}/dcurtis.o  ${DIR}/dgauss.o ${FUNCDIR}/clenshaw-curtis.hh 
+	g++ ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o  ${DIR}/dgauss.o ${DIR}/clenshaw.o ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/diffraction ${INC} -std=c++17 -O1
+
 
 ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c ${UTILDIR}/f2.h
 	echo ${DIR}

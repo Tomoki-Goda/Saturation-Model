@@ -13,7 +13,7 @@ def main():
     plotcolor=['b','r','g']
     plotstyle=['--','-',':']
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],"i:o:ps:",["in","out","plot",'save'] )
+        opts, args = getopt.gnu_getopt(sys.argv[1:],"hi:o:ps:",["help","in","out","plot",'save'] )
     except getopt.GetoptError as err:
         print("Error reading option")
 
@@ -30,6 +30,9 @@ def main():
             indir=args
         elif opt in ['-s','--save']:
             savedir=arg
+        elif opt in ['-h','--help']:
+            print(' getopt.gnu_getopt(sys.argv[1:],"h:i:o:ps:",["help","in","out","plot","save"]' )
+            return(0)
 
 
 

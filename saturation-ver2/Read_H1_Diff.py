@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import sys, getopt , os
 
 def main():
-    plot_only=False
-    computeonly=False
+    plot=True
+    compute=False
     parallelkernel=4;
     indir=["."]
     savedir="."
@@ -24,23 +24,24 @@ def main():
             read_file=arg
         elif opt in ['-o','-out']:
             outdir=arg
-            if not(plot_only):
+            if compute:
                 indir=[outdir]
         elif opt in ['-p','-plot']:
-            plot_only=True
+            plot=True
+            compute=False
             #indir=arg.strip().split(':');
-            indir=args
         elif opt in ['-s','--save']:
             savedir=arg
         elif opt in ['-c','--compute']:
-            computeonly=True
+            compute=True
         elif opt in ['-j','--j']:
             parallelkernel=arg
         elif opt in ['-h','--help']:
             print(' getopt.gnu_getopt(sys.argv[1:],"h:i:o:ps:c",["help","in","out","plot","save","compute"]' )
             return(0)
 
-
+    if plot:
+        indir=args
 
     #read_file="./data/H1diff2006.txt"
     data=pd.read_csv(read_file,sep=" ",index_col=None)
@@ -68,6 +69,7 @@ def main():
     beta_set=sorted(list(set(data["beta"].values)))
     
     parallelargs=[]
+    parallelargs_All=[]
     args=[]
 
     print("Q2 ",Q2_set,"\n\n")
@@ -76,7 +78,7 @@ def main():
         data_Q2=data[data['Q2']==Q2]
         #beta_set=sorted(list(set(data_Q2["beta"].values)))
         print("beta ",i," ",  beta_set,"\n\n")
-        parallelargs=[]
+        #parallelargs=[]
         for j in range(len(beta_set)):
             beta=beta_set[j]
             data_beta=data_Q2[data_Q2['beta']==beta]
@@ -87,11 +89,11 @@ def main():
             #print(data_beta)
             xmax=max(xp_set)
             xmin=min(xp_set)
-            if not(plot_only):
+            if compute:
                 #os.system("{DIR}/diffraction -in {DIR}/result.txt -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out {DIR}/file-{q2_:}-{beta_:}.txt ".format(DIR=outdir,q2_=Q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
-                parallelargs.append([outdir+"/result.txt","{dir_}/file-{q2_:f}-{beta_:f}.txt".format(dir_=outdir,q2_=Q2,beta_=beta), Q2,beta,xmin,xmax])
+                parallelargs.append([outdir+"/result.txt","{dir_}/file-{q2_:}-{beta_:}.txt".format(dir_=outdir,q2_=Q2,beta_=beta),'{}'.format(Q2),'{}'.format(beta),'{}'.format(xmin),'{}'.format(xmax)])
 
-            if not(computeonly):
+            else:
                 for k in range(len(indir)):
                     fd3=[]
                     xp=[]
@@ -115,17 +117,22 @@ def main():
                 ax[i][j].set(xscale='log')
                 ax[i][j].tick_params(direction='in')
                 #plt.show()i
-        
+        #if compute:
+        #    parallelargs_All.append(parallelargs)
+    
+    if compute:
         parallelargs=np.transpose(parallelargs)
+        #paralellargs_All=np.transpose(parallelargs_All);
+         
         command="parallel  -j "+str(parallelkernel)+" --link "+outdir+"/diffraction "
         for i in parallelargs:
             command=command+"::: "
             for j in i:
-                command=command+str(j)+" "
-        print(command)
+                command=command+j+" "
+        #print(command)
         os.system(command)
 
-    if not(computeonly):
+    if plot:
         plt.savefig("{DIR}/plot-diff.png".format(DIR=savedir,beta_=beta,q2_=Q2))
     #plt.clf()
 

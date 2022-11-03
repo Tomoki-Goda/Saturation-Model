@@ -47,11 +47,14 @@ double dclenshaw(double(*func)(double*),double a,double b,double eps){
 	double increase;
 	smin=min;
 	smax=max;
+
+	int licz=0,licztot=0;
 	double f[N/2+1];
 	if(fabs(min-max)<1.0e-15){
 		return(0);
 	}		
 	while(1){
+		licztot++;
 		scale=(smax-smin)/2;
 		if(scale<2.0e-15){
 			printf("Clenshaw_Curtis::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] scale = %.5e\n",smin,smax,min,max,scale);
@@ -89,8 +92,10 @@ double dclenshaw(double(*func)(double*),double a,double b,double eps){
 		if(fabs(val16-val8)<eps*(1+fabs(val16)) ){
 			//total+=valfull;
 			total=Kahn(total,val16,&accum);
+			licz++;
 			
 			if(fabs(smax-max)<1.0e-15){
+				//printf("Efficiency %d/%d = %.3f\n",16*licz,16*licztot,((double)licz)/licztot);
 				return(sign*(total+accum) );
 			//bereak;
 			}
@@ -109,7 +114,7 @@ double dclenshaw(double(*func)(double*),double a,double b,double eps){
 //
 //
 //
-#define TEST 0
+#define TEST 0 
 #if TEST==1
 double func(double *X){
 	double x=*X;

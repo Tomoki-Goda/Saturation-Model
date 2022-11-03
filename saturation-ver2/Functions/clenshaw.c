@@ -44,6 +44,7 @@ double dclenshaw(double(*func)(double*),double a,double b,double eps){
 	double total=0;
 	double accum=0;
 	const int N=16;
+	double increase;
 	smin=min;
 	smax=max;
 	double f[N/2+1];
@@ -95,10 +96,11 @@ double dclenshaw(double(*func)(double*),double a,double b,double eps){
 			}
 			smin=smax;
 			//smax=max;
-			smax=((max-(smin+2*4*scale)<1.0e-10)?(smin+2*4*scale):(max));
+			increase=(4*scale);
+			smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 		}else{
 			//smax=mid;
-			smax=smin+(scale/4);
+			smax=smin+(scale/2);
 		}
 	}
 }

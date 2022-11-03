@@ -176,7 +176,7 @@ double phi2_integrand_kt(double *K){
 	diff_param.kt2=kt2;
 
 	//double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99, 1.0e-5,4);
-	double phi2=phi2u_integrator.integrate(&phi2_integrand_u,1.0e-5,0.98, 1.0e-5);
+	double phi2=phi2u_integrator.integrate(&phi2_integrand_u,1.0e-5,0.98, 1.0e-4);
 
 	double z=diff_param.z, Q2=diff_param.Q2;
 	double val=phi2*phi2*std::log((1-z)*Q2/(kt2));

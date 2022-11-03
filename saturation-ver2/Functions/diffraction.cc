@@ -307,6 +307,13 @@ double xFD_g(double beta,double xp,double Q2,double mf2){
 
 
 int main(int argc,char** argv){
+	/*char input_file_name[]=argv[1];
+	char output_file_name[]=argv[2];
+	double Q2=atof(argv[3]);
+	double beta=atof(argv[4]);
+	double xmin=atof(argv[5]),xmax=atof(argv[6]);
+	*/
+
 	read_options(argc,argv,&OPTIONS);
 	FILE* infile=fopen(OPTIONS.input_file_name,"r");
 	double param_arr[20],sigpar[10],sudpar[10];
@@ -342,6 +349,8 @@ int main(int argc,char** argv){
 	
 	xmin=(OPTIONS.xmin )/2;
 	xmax=(OPTIONS.xmax )*2;
+	//xmin=(xmin )/2;
+	//xmax=(xmax )*2;
 	std::cout<<"Q2= "<<Q2<<"\tbeta= "<<beta<<std::endl;
 	double y;
 

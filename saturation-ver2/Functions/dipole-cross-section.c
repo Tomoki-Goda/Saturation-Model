@@ -11,7 +11,7 @@
 
 extern double dgquad_(double (*)(double*), double*,double*,int*  );
 extern double dgauss_(double (*)(double*), double*,double*,double *  );
-
+extern double dclenshaw(double(*)(double*),double,double,double);
 
 ////////////////////////////////////////////////////////////
 ////////////////// common functions ////////////////////////
@@ -179,54 +179,12 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 ////////////////////////////////////////////////////////////////////////////////////////
 //derivatives
 ///////////////////////////////////////////////////////////////////////////////////////
-/*
-extern double dderiv_(double(*)(double*), double*, double*, double*, double*);
-double dderiv2_(double(*func )(double*), double* var , double* del, double*dfdx, double*err){
-	double vars[4];
-	double val[4];
-	double varmid=*var;
-	int fact=5;
-	double grad1,grad2 ;
-	double h1;
-	//for(int i=0;i<1;i++){
-		if(varmid<0.005){
-			h1=varmid/5;
-		}else{
-			h1=1.0e-3;
-		}
-		vars[0]=varmid-2*h1;
-		vars[1]=varmid-h1;
-		vars[2]=varmid+h1;
-		vars[3]=varmid+2*h1;
-	
-		val[0]=(*func)(vars);
-		val[1]=(*func)(vars+1);
-		val[2]=(*func)(vars+2);
-		val[3]=(*func)(vars+3);
-
-		grad1=((-val[3]+8*val[2]-8*val[1]+val[0])/(12*h1));
-		//grad1=((val[1]-val[0]))/(2*h1);
-	//	if(grad1<1.0e-12){
-	//		break;
-	//	}	
-	//	if(i>1&&(fabs((grad1-grad2)/grad2)<1.0e-8)){
-	//			break;
-	///	}
-	//	if(i==4){
-			//printf("reached max\t%.5e\t%.5e\t%.5e\t%.5e \n",*var,grad1,grad2,fabs((grad1-grad2)/grad2) );
-			//getchar();
-	//	}
-	//	grad2=grad1;
-	//	fact++;
-	//}
-	*dfdx=grad1;
-	return *dfdx;
-}
-*/
 struct parameters{
+	double rmax;
 	double x;
 	double Q2;
 	double *sigpar;
+	double *sudpar;
 } SIGPARAM;
 
 void set_sigmapar(double x,double Q2 ,double*sigpar){
@@ -254,25 +212,7 @@ double laplacian2(double (*func)(double*), double r,double step ){
 	double val=d2+d1/r;//(arr[2]-2*arr[1]+arr[0])/(step*step)+(arr[2]-arr[0])/(r*step);
 	return val;
 }
-/*	
-double dsigma(double *r){
-//	PARAM.x=x;
-//	PARAM.par=par;
-	double delta=10,dfdx,rerr;
-	dderiv2_(&sigma_for_lap, r,&delta,&dfdx,&rerr);
-	
-	return dfdx;
-}
 
-double d2sigma(double *r){
-//	PARAM.x=x;
-//	PARAM.par=par;
-	double delta=1,dfdx,rerr;
-	//dfdx=dsigma(r);
-	dderiv2_(&dsigma, r,&delta,&dfdx,&rerr);
-	return dfdx;
-}
-*/
 double Qs2(double r , double x, double *par){
 #if(MODEL==0||MODEL==2||MODEL==22)
 	double qs2=pow(par[2]/x,par[1]);
@@ -319,6 +259,42 @@ double laplacian_sigma(double r,double x,double q2, double *par,double *sudpar){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+double integrand_gbs(double *R){
+	double r=*R;
+	double val=r*log(SIGPARAM.rmax/r)*laplacian_sigma(r,SIGPARAM.x,SIGPARAM.Q2,SIGPARAM.sigpar,SIGPARAM.sudpar);
+	return val;
+}
+double integrand_gbs2(double *R){
+	double r=*R;
+	double val=r*laplacian_sigma(r,SIGPARAM.x,SIGPARAM.Q2,SIGPARAM.sigpar,SIGPARAM.sudpar);
+	return val;
+}
+
+double sigma_gbs(double r, double x, double Q2,double *sigpar,double* sudpar){
+	set_sigmapar(x,Q2,sigpar);
+	SIGPARAM.sudpar=sudpar;
+	SIGPARAM.rmax=r;
+
+	double rmin_2;
+	int signal=rmin2(Q2, sudpar,&rmin_2 );
+
+	double rmin=sqrt(rmin_2);
+	double val=0;
+
+	if(r-rmin<1.0e-15){
+		val=BASE_SIGMA(r,x,Q2,sigpar);
+		return(val);	
+	}
+	val=BASE_SIGMA(rmin,x,Q2,sigpar);
+	double min=R_MIN;
+	double eps=DGAUSS_PREC;
+	val+=dclenshaw(&integrand_gbs,rmin,r,eps);
+	val+=log(r/rmin)*dclenshaw(&integrand_gbs2,min,rmin,eps);
+	printf("%.5e\n",val);
+	return(val);
+}
+
+
 #if (MODEL==2)
 
 ////////////////////////////////// CERN INTEGRATION ROUTINE VERSION ////////////////////////////////////

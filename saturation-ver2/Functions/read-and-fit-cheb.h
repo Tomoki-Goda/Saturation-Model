@@ -165,6 +165,7 @@ void sample_integrand(const  double *psi_arr,  double  *samples, const double* p
 	for(int i=0; i<=(N_DATA*(NF-1)*N_CHEB); i++){
 		samples[i]=psi_arr[i]*sigma_arr[i];
 	}
+	//printf("Sampled\n");
 
 }
 
@@ -217,7 +218,7 @@ void generate_data_set(const double *par,const double *psi_arr,double *samples, 
 		}
 		csarray[data_no]=val*jac/((double) N_CHEB);//jacobian for ch.var. and 2/N normalization of curtis clenshaw quadrature.
 	}
-	
+	//printf("Generated\n");
 //////////////////////////////////////////////////////////////
 }
 

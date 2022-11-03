@@ -60,7 +60,7 @@ class impact{
 /////////////////////////////////////
 //////  stores global variables /////
 static struct impact diff_param;
-Clenshaw_Curtis integral(32);
+//Clenshaw_Curtis integral(32);
 ////////////////////////////////////
 //#define INTSTR 2  
 double integrate(double (*func)(double*),double min, double max, double rel, const int type ){
@@ -93,8 +93,8 @@ double integrate(double (*func)(double*),double min, double max, double rel, con
 		//double eps=rel;//1.0e-5;
 		val=dgauss_(func,&min,&max,&rel);
 //#endif
-	}else if (type==6){
-		val=integral.integrate(func,min,max,rel);
+//	}else if (type==6){
+//		val=integral.integrate(func,min,max,rel);
 	}else if (type==5){
 		val=dcurtis(func,min,max,rel);
 	}else if (type==4){
@@ -131,6 +131,8 @@ double phi_integrand(double *R){
 	return(val);
 }
 
+Clenshaw_Curtis phi_integrator(16);
+
 double phi(int index,double z){
 	diff_param.index=index;
 	diff_param.set_z(z);
@@ -138,7 +140,8 @@ double phi(int index,double z){
 	//double val=0,min=1.0e-5,max=0.99;
 	//double eps=1.0e-6;
 	//val=dgauss_(&phi_integrand,&min,&max,&eps);
-	double val=integrate(&phi_integrand,1.0e-5,0.99,1.0e-6,4);
+	//double val=integrate(&phi_integrand,1.0e-5,0.99,1.0e-6,4);
+	double val=phi_integrator.integrate(&phi_integrand,1.0e-5,0.99,1.0e-6);
 	return(val);
 }
 
@@ -146,7 +149,7 @@ double phi2_integrand_u(double *U){
 	double u=*U;//change of variable
 	double jac=pow(1-u,-2);
 	u=u/(1-u);
-
+	
 	double kt=std::sqrt(diff_param.kt2) , z=diff_param.z, xp=diff_param.xp, Q2=diff_param.Q2;
 	int index=2;
 	double x=xp;//Q2*(1/xp-1);
@@ -160,6 +163,7 @@ double phi2_integrand_u(double *U){
 	return(val);
 }
 
+Clenshaw_Curtis phi2u_integrator(16);
 double phi2_integrand_kt(double *K){
 	double kt2=pow(*K,2);
 	double jac=2**K;
@@ -171,7 +175,9 @@ double phi2_integrand_kt(double *K){
 	}
 	diff_param.kt2=kt2;
 
-	double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99, 1.0e-5,4);
+	//double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99, 1.0e-5,4);
+	double phi2=phi2u_integrator.integrate(&phi2_integrand_u,1.0e-5,0.98, 1.0e-5);
+
 	double z=diff_param.z, Q2=diff_param.Q2;
 	double val=phi2*phi2*std::log((1-z)*Q2/(kt2));
 	return(jac*val);
@@ -212,6 +218,7 @@ double FD_T_integrand(double *Z){
 	//}
 	return(jac*val);
 }	
+Clenshaw_Curtis phi2_integrator(16);
 double FD_g_integrand(double *Z){
 	double z=*Z;
 	if(z<0||z>1){
@@ -231,7 +238,8 @@ double FD_g_integrand(double *Z){
 		printf("%f !!!!!\n",min);
 		getchar();
 	}
-	val=integrate(&phi2_integrand_kt, min,max,1.0e-3,4);
+	//val=integrate(&phi2_integrand_kt, min,max,1.0e-3,4);
+	val=phi2_integrator.integrate(&phi2_integrand_kt, min,max,1.0e-3);
 	
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);
 	if(isinf(val)==1||isnan(val)==1){
@@ -241,6 +249,8 @@ double FD_g_integrand(double *Z){
 }
 
 ////////////////////////////////////////////////////////////////////
+
+Clenshaw_Curtis FD3_integrator(16);
 double xFD_LT(int pol){
 	//!!!!!!!!  Run diff_param.set_extern(beta,xp,Q2,mf2) before use !!!!!!!!!!!
 	const double hc22=pow(0.3893,2), BD=6.0, alpha_s=0.2;//Unknown hc2 inherited.
@@ -278,7 +288,7 @@ double xFD_LT(int pol){
 			printf("error:: choose polarizaion\n");
 		}
 	//std::cout<<"z integral ["<<min<<", "<<max<<"]"<<std::endl;
-	double res=integrate(funcptr,min,max,1.0e-2,4);
+	double res=FD3_integrator.integrate(funcptr,min,max,1.0e-2);
 	//res*=2;//see the comm. above.
 	std::cout<<"pol="<<(char)pol<<"\tIntegral= "<<res;
 
@@ -307,15 +317,18 @@ double xFD_g(double beta,double xp,double Q2,double mf2){
 
 
 int main(int argc,char** argv){
-	/*char input_file_name[]=argv[1];
-	char output_file_name[]=argv[2];
+	char input_file_name[250];
+	strcpy(input_file_name,argv[1]);
+	char output_file_name[250];
+	strcpy(output_file_name,argv[2]);
 	double Q2=atof(argv[3]);
 	double beta=atof(argv[4]);
 	double xmin=atof(argv[5]),xmax=atof(argv[6]);
-	*/
+	printf("%.3e %.3e %.3e %.3e\n",Q2,beta,xmin,xmax); 	
 
-	read_options(argc,argv,&OPTIONS);
-	FILE* infile=fopen(OPTIONS.input_file_name,"r");
+	//read_options(argc,argv,&OPTIONS);
+	//FILE* infile=fopen(OPTIONS.input_file_name,"r");
+	FILE* infile=fopen(input_file_name,"r");
 	double param_arr[20],sigpar[10],sudpar[10];
 	read_parameters(infile,param_arr);
 	parameter(param_arr,sigpar,sudpar);
@@ -324,17 +337,19 @@ int main(int argc,char** argv){
 
        	fclose(infile);
 	//FILE* controlfile=fopen(argv[argc-1],"r" );
-	double Q2,beta,xmin,xmax;
+	//double Q2,beta,xmin,xmax;
 	//fscanf(controlfile,"%lf\t%lf\t%lf%lf",&beta,&Q2,&xmin,&xmax );
 	//fclose(controlfile);
 	//Clenshaw_Curtis integral(16);
 
+	//phi2u_integrator.Print=1;
+	phi2u_integrator.DIV=4;
 #if ((MODEL==1)||(MODEL==3))
 	approx_xg(sigpar+1);
 #endif
 
-	beta=OPTIONS.beta;
-	Q2=OPTIONS.Q2;
+	//beta=OPTIONS.beta;
+	//Q2=OPTIONS.Q2;
 	double mf2=MASS_L2;
 	double xp;
 	double val;
@@ -343,14 +358,15 @@ int main(int argc,char** argv){
 	//char name[150];
 	//sprintf(name,"%s-%.4f-%.3f.txt",OPTIONS.output_file_name,beta,Q2);
 
-	file.open(OPTIONS.output_file_name,std::fstream::out);
-	printf("%s\n", OPTIONS.output_file_name);
+	//file.open(OPTIONS.output_file_name,std::fstream::out);
+	file.open(output_file_name,std::fstream::out);
+	printf("%s\n", output_file_name);
 	char type[3]={'t','l','g'};
 	
-	xmin=(OPTIONS.xmin )/2;
-	xmax=(OPTIONS.xmax )*2;
-	//xmin=(xmin )/2;
-	//xmax=(xmax )*2;
+	//xmin=(OPTIONS.xmin )/2;
+	//xmax=(OPTIONS.xmax )*2;
+	xmin=(xmin )/2;
+	xmax=(xmax )*2;
 	std::cout<<"Q2= "<<Q2<<"\tbeta= "<<beta<<std::endl;
 	double y;
 

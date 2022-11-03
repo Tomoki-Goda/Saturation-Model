@@ -10,7 +10,7 @@
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.h 
 
-LIBS=-lm -lmathlib -lkernlib -lpacklib  -Wno-unused-result
+LIBS=-lm -lmathlib -lkernlib -lpacklib  -Wno-unused-result -lquadmath
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions

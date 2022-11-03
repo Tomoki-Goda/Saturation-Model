@@ -6,6 +6,8 @@ import sys, getopt , os
 
 def main():
     plot_only=False
+    computeonly=False
+    parallelkernel=4;
     indir=["."]
     savedir="."
     outdir="."
@@ -13,7 +15,7 @@ def main():
     plotcolor=['b','r','g']
     plotstyle=['--','-',':']
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],"hi:o:ps:",["help","in","out","plot",'save'] )
+        opts, args = getopt.gnu_getopt(sys.argv[1:],"hi:o:ps:cj:",["help","in","out","plot",'save','compute','j'] )
     except getopt.GetoptError as err:
         print("Error reading option")
 
@@ -30,8 +32,12 @@ def main():
             indir=args
         elif opt in ['-s','--save']:
             savedir=arg
+        elif opt in ['-c','--compute']:
+            computeonly=True
+        elif opt in ['-j','--j']:
+            parallelkernel=arg
         elif opt in ['-h','--help']:
-            print(' getopt.gnu_getopt(sys.argv[1:],"h:i:o:ps:",["help","in","out","plot","save"]' )
+            print(' getopt.gnu_getopt(sys.argv[1:],"h:i:o:ps:c",["help","in","out","plot","save","compute"]' )
             return(0)
 
 
@@ -60,6 +66,9 @@ def main():
     fig.set_figheight(lengthQ2)
     fig.set_figwidth(1.2*lengthbeta)
     beta_set=sorted(list(set(data["beta"].values)))
+    
+    parallelargs=[]
+    args=[]
 
     print("Q2 ",Q2_set,"\n\n")
     for i in range(len(Q2_set)):
@@ -67,6 +76,7 @@ def main():
         data_Q2=data[data['Q2']==Q2]
         #beta_set=sorted(list(set(data_Q2["beta"].values)))
         print("beta ",i," ",  beta_set,"\n\n")
+        parallelargs=[]
         for j in range(len(beta_set)):
             beta=beta_set[j]
             data_beta=data_Q2[data_Q2['beta']==beta]
@@ -78,33 +88,45 @@ def main():
             xmax=max(xp_set)
             xmin=min(xp_set)
             if not(plot_only):
-                os.system("{DIR}/diffraction -in {DIR}/result.txt -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out {DIR}/file-{q2_:}-{beta_:}.txt ".format(DIR=outdir,q2_=Q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
-            
-            
-            for k in range(len(indir)):
-                fd3=[]
-                xp=[]
-                with open("{DIR}/file-{q2_:}-{beta_:}.txt".format(q2_=Q2,beta_=beta,DIR=indir[k])) as fi:
-                    for line in fi:
-                        plot_data=line.strip().split("\t")
-                        fd3.append(1.23*float(plot_data[1]))
-                        xp.append(float(plot_data[0]))
-                ax[i][j].plot(xp,fd3,c=plotcolor[k],ls=plotstyle[k])
-                #datapt=np.transpose(frame[['xp','xF']].values)
-                datapt=np.transpose(data_beta[['xp','xp*sigmaD(3)']].values)
-                error=data_beta['dtot'].values
-                error=error*datapt[1]/100
-                #error=frame[["stat","sys+","sys-"]].values
-                #errp=[np.sqrt(float(i[0])**2+float(i[1])**2 ) for i in error]
-                #errn=[np.sqrt(float(i[0])**2+float(i[2])**2) for i in error]
-                #plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=[errn,errp] , c='b')
-            ax[i][j].errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=error , c='black',marker="x",fmt='none')
-            ax[i][j].scatter([float(i) for i in datapt[0]],[float(i) for i in datapt[1]] ,c='black',s=2)
-                
-            ax[i][j].set(xscale='log')
-            ax[i][j].tick_params(direction='in')
-            #plt.show()
-    plt.savefig("{DIR}/plot-diff.png".format(DIR=savedir,beta_=beta,q2_=Q2))
+                #os.system("{DIR}/diffraction -in {DIR}/result.txt -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out {DIR}/file-{q2_:}-{beta_:}.txt ".format(DIR=outdir,q2_=Q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
+                parallelargs.append([outdir+"/result.txt","{dir_}/file-{q2_:f}-{beta_:f}.txt".format(dir_=outdir,q2_=Q2,beta_=beta), Q2,beta,xmin,xmax])
+
+            if not(computeonly):
+                for k in range(len(indir)):
+                    fd3=[]
+                    xp=[]
+                    with open("{DIR}/file-{q2_:}-{beta_:}.txt".format(q2_=Q2,beta_=beta,DIR=indir[k])) as fi:
+                        for line in fi:
+                            plot_data=line.strip().split("\t")
+                            fd3.append(1.23*float(plot_data[1]))
+                            xp.append(float(plot_data[0]))
+                    ax[i][j].plot(xp,fd3,c=plotcolor[k],ls=plotstyle[k])
+                    #datapt=np.transpose(frame[['xp','xF']].values)
+                    datapt=np.transpose(data_beta[['xp','xp*sigmaD(3)']].values)
+                    error=data_beta['dtot'].values
+                    error=error*datapt[1]/100
+                    #error=frame[["stat","sys+","sys-"]].values
+                    #errp=[np.sqrt(float(i[0])**2+float(i[1])**2 ) for i in error]
+                    #errn=[np.sqrt(float(i[0])**2+float(i[2])**2) for i in error]
+                    #plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=[errn,errp] , c='b')
+                ax[i][j].errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=error , c='black',marker="x",fmt='none')
+                ax[i][j].scatter([float(i) for i in datapt[0]],[float(i) for i in datapt[1]] ,c='black',s=2)
+                    
+                ax[i][j].set(xscale='log')
+                ax[i][j].tick_params(direction='in')
+                #plt.show()i
+        
+        parallelargs=np.transpose(parallelargs)
+        command="parallel  -j "+str(parallelkernel)+" --link "+outdir+"/diffraction "
+        for i in parallelargs:
+            command=command+"::: "
+            for j in i:
+                command=command+str(j)+" "
+        print(command)
+        os.system(command)
+
+    if not(computeonly):
+        plt.savefig("{DIR}/plot-diff.png".format(DIR=savedir,beta_=beta,q2_=Q2))
     #plt.clf()
 
 

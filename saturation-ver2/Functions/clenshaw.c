@@ -94,7 +94,8 @@ double dclenshaw(double(*func)(double*),double a,double b,double eps){
 			//bereak;
 			}
 			smin=smax;
-			smax=max;
+			//smax=max;
+			smax=((max-(smin+2*4*scale)<1.0e-10)?(smin+2*4*scale):(max));
 		}else{
 			//smax=mid;
 			smax=smin+(scale/4);

@@ -117,7 +117,7 @@ ${DIR}/clenshaw.o: ${FUNCDIR}/clenshaw.c
 
 
 diffraction: ${DEPS} ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o  ${DIR}/clenshaw.o  ${DIR}/dcurtis.o  ${DIR}/dgauss.o ${FUNCDIR}/clenshaw-curtis.hh 
-	g++ ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o  ${DIR}/dgauss.o ${DIR}/clenshaw.o ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/diffraction ${INC} -std=c++17 -O1
+	g++ ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o  ${DIR}/dgauss.o ${DIR}/clenshaw.o ${DIR}/dcurtis.o ${LIBS} -o ${DIR}/diffraction ${INC} -std=c++17 ${OPT}
 
 
 ${DIR}/read-and-fit.o: ${DEPS} ${FUNCDIR}/read-and-fit.c ${UTILDIR}/f2.h

@@ -17,14 +17,12 @@
 extern "C" double SIGMA(double ,double, double,double*,double*);
 extern "C" int parameter(double*, double*,double*);
 extern "C" int approx_xg(double*);
-extern "C" double dgquad_(double (*func)(double*),double*, double *, int*);
-extern "C" double dgauss_(double (*)(double*),double*,double*,double*);
-extern "C" int dadapt_(double (*)(double *), double*,double*,int*,double*,double*,double*,double*);
+//extern "C" double dgquad_(double (*func)(double*),double*, double *, int*);
+//extern "C" double dgauss_(double (*)(double*),double*,double*,double*);
+//extern "C" int dadapt_(double (*)(double *), double*,double*,int*,double*,double*,double*,double*);
 //extern "C" double dgauss20(double (*)(double*), double,double,double);
-extern "C" double dgauss40(double (*)(double*), double,double,double);
-
-extern "C" double dcurtis(double (*)(double*), double,double,double);
-
+//extern "C" double dgauss40(double (*)(double*), double,double,double);
+//extern "C" double dcurtis(double (*)(double*), double,double,double);
 extern "C" double dclenshaw(double (*)(double*), double,double,double);
 //class Clenshaw_Curtis;
 //extern double Clenshaw_Curtis::integrate(double(*)(double*), double,double,double);
@@ -62,51 +60,6 @@ class impact{
 static struct impact diff_param;
 //Clenshaw_Curtis integral(32);
 ////////////////////////////////////
-//#define INTSTR 2  
-double integrate(double (*func)(double*),double min, double max, double rel, const int type ){
-	/////////////quad//////////////
-	double val=0;
-//#if INTSTR==0
-	if(type==0){
-		int N=96;
-		val=dgquad_(func,&min,&max,&N);
-//#elif INTSTR==1
-	}else if(type==1){
-		int N=96;
-		int count=25;
-		double high=min,low=min,step=(max-min)/count;
-		val=0;
-		for (int i=0;i<count;i++){
-			high+=step;
-			val+=dgquad_(func,&low,&high,&N);
-			low=high;
-		}
-//#elif INTSTR==2
-	} else if(type==2){
-		//double rel=1.0e-5;
-	        double	abs=0;
-		int seg=1;
-		double err;
-		dadapt_(func, &min,&max,&seg,&rel,&abs,&val,&err);
-//#elif INTSTR==3
-	}else if(type==3){
-		//double eps=rel;//1.0e-5;
-		val=dgauss_(func,&min,&max,&rel);
-//#endif
-//	}else if (type==6){
-//		val=integral.integrate(func,min,max,rel);
-	}else if (type==5){
-		val=dcurtis(func,min,max,rel);
-	}else if (type==4){
-		val=dclenshaw(func,min,max,rel);
-	}else if (type==7){
-		val=dgauss40(func,min,max,rel);
-		//val=dgauss40(func,min,max,rel);
-	}else{
-		printf("Unknown integration\n");
-	}
-	return(val);	
-}
 
 double phi_integrand(double *R){
 	double r=*R;//change of variable
@@ -137,10 +90,6 @@ double phi(int index,double z){
 	diff_param.index=index;
 	diff_param.set_z(z);
 
-	//double val=0,min=1.0e-5,max=0.99;
-	//double eps=1.0e-6;
-	//val=dgauss_(&phi_integrand,&min,&max,&eps);
-	//double val=integrate(&phi_integrand,1.0e-5,0.99,1.0e-6,4);
 	double val=phi_integrator.integrate(&phi_integrand,1.0e-5,0.99,1.0e-6);
 	return(val);
 }
@@ -175,8 +124,7 @@ double phi2_integrand_kt(double *K){
 	}
 	diff_param.kt2=kt2;
 
-	//double phi2=integrate(&phi2_integrand_u,1.0e-5,0.99, 1.0e-5,4);
-	double phi2=phi2u_integrator.integrate(&phi2_integrand_u,1.0e-5,0.98, 1.0e-5);
+	double phi2=phi2u_integrator.integrate(&phi2_integrand_u,1.0e-5,0.98, 1.0e-4);
 
 	double z=diff_param.z, Q2=diff_param.Q2;
 	double val=phi2*phi2*std::log((1-z)*Q2/(kt2));
@@ -238,7 +186,6 @@ double FD_g_integrand(double *Z){
 		printf("%f !!!!!\n",min);
 		getchar();
 	}
-	//val=integrate(&phi2_integrand_kt, min,max,1.0e-3,4);
 	val=phi2_integrator.integrate(&phi2_integrand_kt, min,max,1.0e-3);
 	
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);

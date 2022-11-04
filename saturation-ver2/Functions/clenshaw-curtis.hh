@@ -132,7 +132,7 @@ class Clenshaw_Curtis{
 			smax=max;
 			int licz=0;
 			int totlicz=0;
-			double efficiency;
+			double efficiency,increase;
 			while(true){
 				totlicz++;
 
@@ -179,7 +179,8 @@ class Clenshaw_Curtis{
 					}
 					smin=smax;
 					//smax=max;
-					smax=( ( (max-(2*DIV*scale+smin))<1.0e-10)?(max):(2*DIV*scale+smin) );
+					increase=2*DIV*scale;//twice the current section size to start.
+					smax=( ( (max-(increase+smin))<increase/2)?(max):(increase+smin) );//but only if remaining section is not too small.(it is wasteful to compute small remnant of section at the end...
 				}else{
 					//smax=mid;
 					smax=smin+(scale/DIV);

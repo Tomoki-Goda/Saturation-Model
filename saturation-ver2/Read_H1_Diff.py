@@ -12,8 +12,8 @@ def main():
     savedir="."
     outdir="."
     readfile=""
-    plotcolor=['b','r','g']
-    plotstyle=['--','-',':']
+    plotcolor=['b','r','g','m']
+    plotstyle=['--','-',':','-.']
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],"hi:o:ps:cj:",["help","in","out","plot",'save','compute','j'] )
     except getopt.GetoptError as err:
@@ -97,21 +97,22 @@ def main():
                 for k in range(len(indir)):
                     fd3=[]
                     xp=[]
-                    with open("{DIR}/file-{q2_:}-{beta_:}.txt".format(q2_=Q2,beta_=beta,DIR=indir[k])) as fi:
-                        for line in fi:
-                            plot_data=line.strip().split("\t")
-                            fd3.append(1.23*float(plot_data[1]))
-                            xp.append(float(plot_data[0]))
-                    ax[i][j].plot(xp,fd3,c=plotcolor[k],ls=plotstyle[k])
-                    #datapt=np.transpose(frame[['xp','xF']].values)
-                    datapt=np.transpose(data_beta[['xp','xp*sigmaD(3)']].values)
-                    error=data_beta['dtot'].values
-                    error=error*datapt[1]/100
-                    #error=frame[["stat","sys+","sys-"]].values
-                    #errp=[np.sqrt(float(i[0])**2+float(i[1])**2 ) for i in error]
-                    #errn=[np.sqrt(float(i[0])**2+float(i[2])**2) for i in error]
-                    #plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=[errn,errp] , c='b')
-                ax[i][j].errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=error , c='black',marker="x",fmt='none')
+                    if(os.path.exists("{DIR}/file-{q2_:}-{beta_:}.txt".format(q2_=Q2,beta_=beta,DIR=indir[k])) ):
+                        with open("{DIR}/file-{q2_:}-{beta_:}.txt".format(q2_=Q2,beta_=beta,DIR=indir[k])) as fi:
+                            for line in fi:
+                                plot_data=line.strip().split("\t")
+                                fd3.append(1.23*float(plot_data[1]))
+                                xp.append(float(plot_data[0]))
+                        ax[i][j].plot(xp,fd3,c=plotcolor[k],ls=plotstyle[k])
+                        #datapt=np.transpose(frame[['xp','xF']].values)
+                        datapt=np.transpose(data_beta[['xp','xp*sigmaD(3)']].values)
+                        error=data_beta['dtot'].values
+                        error=error*datapt[1]/100
+                        #error=frame[["stat","sys+","sys-"]].values
+                        #errp=[np.sqrt(float(i[0])**2+float(i[1])**2 ) for i in error]
+                        #errn=[np.sqrt(float(i[0])**2+float(i[2])**2) for i in error]
+                        #plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=[errn,errp] , c='b')
+                    ax[i][j].errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=error , c='black',marker="x",fmt='none')
                 ax[i][j].scatter([float(i) for i in datapt[0]],[float(i) for i in datapt[1]] ,c='black',s=2)
                     
                 ax[i][j].set(xscale='log')

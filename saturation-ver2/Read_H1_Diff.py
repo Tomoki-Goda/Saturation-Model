@@ -15,12 +15,14 @@ def main():
     plotcolor=['b','r','g','m']
     plotstyle=['--','-',':','-.']
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],"hi:o:ps:cj:",["help","in","out","plot",'save','compute','j'] )
+        opts, args = getopt.gnu_getopt(sys.argv[1:],"d:hi:o:ps:cj:",['data',"help","in","out","plot",'save','compute','j'] )
     except getopt.GetoptError as err:
         print("Error reading option")
 
     for opt, arg in opts:
         if opt in ['-i','-in']:
+            rundir=arg
+        elif opt in ['-d','-data']:
             read_file=arg
         elif opt in ['-o','-out']:
             outdir=arg
@@ -59,13 +61,14 @@ def main():
     lengthbeta=len(list(set(data['beta'])))
 
     #plt.ion()
-    plt.margins(0)
-    fig,ax=plt.subplots(lengthQ2,lengthbeta, sharex=True,sharey=True,layout="constrained")
-    fig.get_layout_engine().set(wspace=0,hspace=0,w_pad=0,h_pad=0)
-    #fig.xscale('log')
-    print(lengthQ2, ",  " ,lengthbeta)
-    fig.set_figheight(lengthQ2)
-    fig.set_figwidth(1.2*lengthbeta)
+    if plot:
+        plt.margins(0)
+        fig,ax=plt.subplots(lengthQ2,lengthbeta, sharex=True,sharey=True,layout="constrained")
+        fig.get_layout_engine().set(wspace=0,hspace=0,w_pad=0,h_pad=0)
+        #fig.xscale('log')
+        print(lengthQ2, ",  " ,lengthbeta)
+        fig.set_figheight(lengthQ2)
+        fig.set_figwidth(1.2*lengthbeta)
     beta_set=sorted(list(set(data["beta"].values)))
     
     parallelargs=[]
@@ -91,7 +94,7 @@ def main():
             xmin=min(xp_set)
             if compute:
                 #os.system("{DIR}/diffraction -in {DIR}/result.txt -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out {DIR}/file-{q2_:}-{beta_:}.txt ".format(DIR=outdir,q2_=Q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
-                parallelargs.append([outdir+"/result.txt","{dir_}/file-{q2_:}-{beta_:}.txt".format(dir_=outdir,q2_=Q2,beta_=beta),'{}'.format(Q2),'{}'.format(beta),'{}'.format(xmin),'{}'.format(xmax)])
+                parallelargs.append([rundir+"/result.txt","{dir_}/file-{q2_:}-{beta_:}.txt".format(dir_=outdir,q2_=Q2,beta_=beta),'{}'.format(Q2),'{}'.format(beta),'{}'.format(xmin),'{}'.format(xmax)])
 
             else:
                 for k in range(len(indir)):
@@ -125,7 +128,7 @@ def main():
         parallelargs=np.transpose(parallelargs)
         #paralellargs_All=np.transpose(parallelargs_All);
          
-        command="parallel  -j "+str(parallelkernel)+" --link "+outdir+"/diffraction "
+        command="parallel  -j "+str(parallelkernel)+" --link "+rundir+"/diffraction "
         for i in parallelargs:
             command=command+"::: "
             for j in i:

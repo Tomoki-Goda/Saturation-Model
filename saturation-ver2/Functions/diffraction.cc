@@ -9,6 +9,10 @@
 #include"../Utilities/options.h"
 #include"./clenshaw-curtis.hh"
 
+
+#ifndef ADJOINT
+#define ADJOINT 1
+#endif
 //double      cyl_bessel_k( double v, double x );
 ////////////////////////////////////////////////////////////////////////////
 //Formulae can be found in J. R. Forshaw, et al. Nucl. Phys. A675, (2000) //
@@ -107,7 +111,16 @@ double phi2_integrand_u(double *U){
 	if(isnan(u/kt)==1){
 		printf("%f passed from integral func, makes u=%f\t kt2=%f\n ",*U,u,diff_param.kt2);
 	}
-	val*=SIGMA(u/kt,x,Q2,diff_param.sigpar,diff_param.sudpar);
+	double sigma=SIGMA(u/kt,x,Q2,diff_param.sigpar,diff_param.sudpar);
+#if ADJOINT==0
+	val*=sigma;
+#elif ADJOINT==1
+	//sigma/=( diff_param.sigpar[0]);
+	//val*=(1-pow(1-sigma, 9.0/4.0))*diff_param.sigpar[0];//(2*sigma-sigma*sigma)*( diff_param.sigpar[0]);
+//#elif ADJOINT==2
+	sigma/=( diff_param.sigpar[0]);
+	val*=(2.0*sigma-sigma*sigma/2.0)*( diff_param.sigpar[0]);
+#endif
 	val*=jac;
 	return(val);
 }
@@ -200,7 +213,7 @@ double FD_g_integrand(double *Z){
 Clenshaw_Curtis FD3_integrator(16);
 double xFD_LT(int pol){
 	//!!!!!!!!  Run diff_param.set_extern(beta,xp,Q2,mf2) before use !!!!!!!!!!!
-	const double hc22=pow(0.3893,2), BD=6.0, alpha_s=0.2;//Unknown hc2 inherited.
+	const double hc22=pow(0.3893,2), BD=6, alpha_s=0.2;//hc2, GeV to mb conversion.
 	double factor, min,max;
 	double (*funcptr)(double*);
 	switch(pol){
@@ -225,7 +238,11 @@ double xFD_LT(int pol){
 			min=((min>1.0e-10)?(min):(1.0e-10));
 			break;
 		case 'g':
+//#if ADJOINT==0
 			factor=81*diff_param.beta*alpha_s/(512*pow(PI,5)*hc22*BD);
+//#elif ADJOINT==1
+//			factor=diff_param.beta*alpha_s/(32*pow(PI,5)*hc22*BD);
+//#endif
 			funcptr=&FD_g_integrand;
 			max=1;
 			min=diff_param.beta;

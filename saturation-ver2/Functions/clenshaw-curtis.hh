@@ -126,7 +126,7 @@ class Clenshaw_Curtis{
 			double valfull,valhalf;
 			double arg1,arg2;
 			double total=0;
-			double accum=0;
+			double accum=0,accum2=0;
 
 			smin=min;
 			smax=max;
@@ -152,15 +152,20 @@ class Clenshaw_Curtis{
 				f[N/2]=(*func)(&mid);
 				
 				valfull=0;
+				accum2=0;
 				for(int i=0;i<=N/2;i++){
-					valfull+=f[i]*wfull[i];
+					valfull=Kahn(valfull,f[i]*wfull[i],&accum2);
 					//printf("%.3e\t",f[i]*w[i]);
 				}
+				valfull+=accum2;
 				//printf("\n");
 				valhalf=0;
+				accum2=0;
 				for(int i=0;i<=N/4;i++){
-					valhalf+=f[2*i]*whalf[i];
+					valhalf=Kahn(valhalf,f[2*i]*whalf[i],&accum2);
 				}
+				valhalf+=accum2;
+
 				valfull*=2*scale/N;
 				valhalf*=4*scale/N;
 				//printf("%.5e , %.5e in the domain [%.3e, %.3e] of [%.3e, %.3e] \n",valfull,valhalf,smin,smax,min,max);

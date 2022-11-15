@@ -43,6 +43,7 @@ double dclenshaw(double(*func)(double*),double a,double b,double eps){
 	double arg1,arg2;
 	double total=0;
 	double accum=0;
+	double accum2=0;
 	const int N=16;
 	double increase;
 	smin=min;
@@ -77,15 +78,20 @@ double dclenshaw(double(*func)(double*),double a,double b,double eps){
 			printf("%.3e encountered at %.3e \n",f[N/2],mid );
 		}
 		val16=0;
+		accum2=0;
 		for(int i=0;i<=N/2;i++){
-			val16+=f[i]*w16[i];
+			val16=Kahn(val16,f[i]*w16[i],&accum2);
 			//printf("%.3e\t",f[i]*w[i]);
 		}
+		val16+=accum2;
 		//printf("\n");
 		val8=0;
+		accum2=0;
 		for(int i=0;i<=N/4;i++){
-			val8+=f[2*i]*w8[i];
+			val8=Kahn(val8,f[2*i]*w8[i],&accum2);
 		}
+		val8+=accum2;
+
 		val16*=2*scale/N;
 		val8*=4*scale/N;
 		//printf("%.5e , %.5e in the domain [%.3e, %.3e] of [%.3e, %.3e] \n",valfull,valhalf,smin,smax,min,max);

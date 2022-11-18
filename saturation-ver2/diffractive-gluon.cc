@@ -123,15 +123,15 @@ double gluF(double k,double Qs2){
 double gluF_gbw(double k,double Qs2){
 	//double Qsa2=Qs2;
 	//double Qsa2=Qs2;
-	double val=(23.0/0.389)*(3.0)/(Qs2*pow(2*PI,2))*exp(-pow(k,2)/Qs2);
+	double val=(23.0/0.389)*(4.0/3.0)/(Qs2*pow(2*PI,2))*exp(-pow(k,2)/Qs2);
 	return(val);
 }
 double k1F_integrand(double*K, void* v_args){
 	double k1=*K;
 	double *args=(double *)v_args;
 	double Qs2=args[2],beta=args[0],k=args[1];
-	double val=gluF(k1,Qs2);
-	//double val=gluF_gbw(k1,Qs2);
+	//double val=gluF(k1,Qs2);
+	double val=gluF_gbw(k1,Qs2);
 
 	val*=pow(beta,2)+pow(1-beta,2)+pow(k1/k,2)*(1-beta)-(pow( (1-2*beta)*pow(k,2) - (1-beta)*pow(k1,2), 2) + 2*beta*(1-beta)*pow(k,4))/(pow(k,2)*pow( pow(pow(k,2)+(1-beta)*pow(k1,2) ,2)-4*pow((1-beta)* k*k1,2),0.5));
 	//std::cout<<val<<std::endl;

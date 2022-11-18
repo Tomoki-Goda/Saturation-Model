@@ -88,10 +88,10 @@ def main():
             if len(data_beta)==0:
                 continue
             #xp_set=sorted(list(set(data_beta["xp"].values)))
-            xp_set=sorted(list(set(data_beta["xp"].values)))
+            x_set=sorted(list(set(data_beta["x"].values)))
             #print(data_beta)
-            xmax=max(xp_set)
-            xmin=min(xp_set)
+            xmax=max(x_set)
+            xmin=min(x_set)
             if compute:
                 #os.system("{DIR}/diffraction -in {DIR}/result.txt -beta {beta_:} -Q2 {q2_:} -xmin {xmin_:} -xmax {xmax_:} -out {DIR}/file-{q2_:}-{beta_:}.txt ".format(DIR=outdir,q2_=Q2,beta_=beta,xmax_=xmax,xmin_=xmin ))
                 parallelargs.append([rundir+"/result.txt","{dir_}/file-{q2_:}-{beta_:}.txt".format(dir_=outdir,q2_=Q2,beta_=beta),'{}'.format(Q2),'{}'.format(beta),'{}'.format(xmin),'{}'.format(xmax)])
@@ -125,16 +125,26 @@ def main():
         #    parallelargs_All.append(parallelargs)
     
     if compute:
-        parallelargs=np.transpose(parallelargs)
         #paralellargs_All=np.transpose(parallelargs_All);
-         
-        command="parallel  -j "+str(parallelkernel)+" --link "+rundir+"/diffraction "
-        for i in parallelargs:
-            command=command+"::: "
-            for j in i:
-                command=command+j+" "
-        #print(command)
-        os.system(command)
+        if parallelkernel=="1":
+            for i in parallelargs:
+                command=rundir+"/diffraction "
+                for j in i:
+                    command=command+j+" "
+                print(command);
+                os.system(command)
+
+        else: 
+            parallelargs=np.transpose(parallelargs)
+            command="parallel  -j "+str(parallelkernel)+" --link "
+            command+=rundir+"/diffraction "
+
+            for i in parallelargs:
+                command=command+"::: "
+                for j in i:
+                    command=command+j+" "
+            #print(command)
+            os.system(command)
 
     if plot:
         plt.savefig("{DIR}/plot-diff.png".format(DIR=savedir,beta_=beta,q2_=Q2))

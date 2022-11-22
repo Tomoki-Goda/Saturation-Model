@@ -11,7 +11,7 @@
 
 
 #ifndef ADJOINT
-#define ADJOINT 1
+	#define ADJOINT 0
 #endif
 //double      cyl_bessel_k( double v, double x );
 ////////////////////////////////////////////////////////////////////////////
@@ -21,16 +21,24 @@
 extern "C" double SIGMA(double ,double, double,double*,double*);
 extern "C" int parameter(double*, double*,double*);
 extern "C" int approx_xg(double*);
-//extern "C" double dgquad_(double (*func)(double*),double*, double *, int*);
-//extern "C" double dgauss_(double (*)(double*),double*,double*,double*);
-//extern "C" int dadapt_(double (*)(double *), double*,double*,int*,double*,double*,double*,double*);
-//extern "C" double dgauss20(double (*)(double*), double,double,double);
-//extern "C" double dgauss40(double (*)(double*), double,double,double);
-//extern "C" double dcurtis(double (*)(double*), double,double,double);
 extern "C" double dclenshaw(double (*)(double*), double,double,double);
-//class Clenshaw_Curtis;
-//extern double Clenshaw_Curtis::integrate(double(*)(double*), double,double,double);
 
+double IIM(double r,double x, double Q2){
+	double lambda=0.2197;
+	double Qs=pow(1.632e-5/x,lambda/2 );
+	double alpha=0.85,beta=0.9;
+	double gamma=0.7376;
+	double kappa=9.9;
+
+	double val=0;
+	if(r*Qs<=2){
+		val=0.7*pow(r*Qs/2,2*gamma)*exp(-2*pow( log(r*Qs/2),2 )/(kappa*lambda*log(1/x)) );
+	}else{
+		val=1-exp(-4*alpha*pow( log(beta*r*Qs),2 ) );
+	}
+	return(val);
+
+}
 
 class impact{
 ///	private:
@@ -61,7 +69,7 @@ class impact{
 };
 /////////////////////////////////////
 //////  stores global variables /////
-static struct impact diff_param;
+static struct impact diff_param, diff_param_beta;
 //Clenshaw_Curtis integral(32);
 ////////////////////////////////////
 
@@ -74,11 +82,13 @@ double phi_integrand(double *R){
 	//std::cout<<"z= "<<diff_param.z<<"\t"<<"kr= "<<k<<" * "<<r<<"\t"<<"ep r= "<<ep<<" * "<<r<<std::endl;
 	double x=diff_param.xp;//Q2*(1/xp-1);
 	
+
 	double val=r*std::cyl_bessel_j(index,k*r)*std::cyl_bessel_k(index, ep*r);//	*(diff_param.func)(r,x,Q2,sigpar);
 	if(isnan(r)==1){
 		printf("%f passed from integral func, makes r=%f\n",*R,r);
 	}
-	val*=SIGMA(r,x,diff_param.Q2,diff_param.sigpar,diff_param.sudpar);
+	//val*=SIGMA(r,x,diff_param.Q2,diff_param.sigpar,diff_param.sudpar);
+	val*=diff_param.sigpar[0]*IIM(r,x,diff_param.Q2);
 	val*=jac;
 
 	if((isnan(val)+isinf(val))!=0){
@@ -94,7 +104,8 @@ double phi(int index,double z){
 	diff_param.index=index;
 	diff_param.set_z(z);
 
-	double val=phi_integrator.integrate(&phi_integrand,1.0e-5,0.99,1.0e-6);
+	//double val=phi_integrator.integrate(&phi_integrand,1.0e-5,0.99,1.0e-6);
+	double val=dclenshaw(&phi_integrand,1.0e-5,0.99,1.0e-6);
 	return(val);
 }
 
@@ -111,15 +122,14 @@ double phi2_integrand_u(double *U){
 	if(isnan(u/kt)==1){
 		printf("%f passed from integral func, makes u=%f\t kt2=%f\n ",*U,u,diff_param.kt2);
 	}
-	double sigma=SIGMA(u/kt,x,Q2,diff_param.sigpar,diff_param.sudpar);
+	//double sigma=SIGMA(u/kt,x,Q2,diff_param.sigpar,diff_param.sudpar);
+	double sigma=diff_param.sigpar[0]*IIM(u/kt,x,Q2);
 #if ADJOINT==0
-	val*=sigma;
+	val*=9.0/4.0*sigma;
 #elif ADJOINT==1
-	//sigma/=( diff_param.sigpar[0]);
-	//val*=(1-pow(1-sigma, 9.0/4.0))*diff_param.sigpar[0];//(2*sigma-sigma*sigma)*( diff_param.sigpar[0]);
-//#elif ADJOINT==2
 	sigma/=( diff_param.sigpar[0]);
-	val*=(2.0*sigma-sigma*sigma/2.0)*( diff_param.sigpar[0]);
+	//val*=(1-pow(1-sigma, 9.0/4.0))*diff_param.sigpar[0];
+	val*=(2*sigma-sigma*sigma)*( diff_param.sigpar[0]);
 #endif
 	val*=jac;
 	return(val);
@@ -137,10 +147,12 @@ double phi2_integrand_kt(double *K){
 	}
 	diff_param.kt2=kt2;
 
-	double phi2=phi2u_integrator.integrate(&phi2_integrand_u,1.0e-5,0.98, 1.0e-4);
+	//double phi2=phi2u_integrator.integrate(&phi2_integrand_u,1.0e-5,0.98, 1.0e-4);
+	double phi2=dclenshaw(&phi2_integrand_u,1.0e-5,0.99,1.0e-5);
 
 	double z=diff_param.z, Q2=diff_param.Q2;
-	double val=phi2*phi2*std::log((1-z)*Q2/(kt2));
+	double beta=diff_param.beta;
+	double val=phi2*phi2*std::log((1-z)*Q2/(kt2)/**(z-beta)/beta*/);
 	return(jac*val);
 }
 
@@ -188,9 +200,9 @@ double FD_g_integrand(double *Z){
 	//diff_param.index=index;
 	diff_param.set_z(z);
 	double beta=diff_param.beta;
-	int N=96;
-	double val,min=1.0e-6,max=(1-z)*diff_param.Q2;
+	double val,min=1.0e-7,max=(1-z)*diff_param.Q2;//*(z-beta)/beta;
 	max=sqrt(max);
+
 	if(min>max){
 		return(0);
 	}
@@ -199,8 +211,9 @@ double FD_g_integrand(double *Z){
 		printf("%f !!!!!\n",min);
 		getchar();
 	}
-	val=phi2_integrator.integrate(&phi2_integrand_kt, min,max,1.0e-3);
+	//val=phi2_integrator.integrate(&phi2_integrand_kt, min,max,1.0e-4);
 	
+	val=dclenshaw(&phi2_integrand_kt,min,max,1.0e-4);
 	val*=(pow(1-beta/z,2)+pow(beta/z,2) )/pow(1-z,3);
 	if(isinf(val)==1||isnan(val)==1){
 		printf("FD_g_intregrand:: z=%.3e val=%.3e\n",*Z,val);
@@ -208,14 +221,134 @@ double FD_g_integrand(double *Z){
 	return(val);
 }
 
-////////////////////////////////////////////////////////////////////
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Small beta
+///////////////////////////////////////////////////////////////////////////////////////////////
+Clenshaw_Curtis AIntegrator(16), AIntegrator2(16);
+struct A_param{
+	double xp;
+	double v,r;	
+}A_var;
+
+double S(double r,double xp){
+	//double 	val=1 - SIGMA(r,xp,diff_param_beta.Q2,diff_param_beta.sigpar,diff_param_beta.sudpar)/( diff_param_beta.sigpar[0] );
+	double 	val=1 - IIM(r,xp,diff_param_beta.Q2);
+	return(val);
+}
+double A_integrand(double u,double v, double r,double xp){
+	double val=0;
+	val+=u*u*pow( 
+			S( r/u ,xp )*S( (1.0/u - 1+2*v)*r,xp )-S(r,xp) 
+		,2);
+	val+=pow( 
+			S( r*u ,xp )*S( (1.0 - u+2*u*v)*r,xp )-S(r,xp) 
+		,2);
+	val/=( u*(1-u+2*u*v)*sqrt(v*(1-v)*(1+u*v)*(1-u+u*v)) );
+	val*=2;
+	return(val);
+}
+
+double AIntegrand1(double *U){
+	double val=A_integrand(*U,A_var.v,A_var.r, A_var.xp);
+	return(val);
+}
+double AIntegrand2(double *V){
+	A_var.v=*V;
+	//integrate over u;
+	double val=AIntegrator.integrate(&AIntegrand1,1.0e-8,1-1.0e-8,1.0e-3);
+	return(val);
+}
+double A(double r,double xp){
+	A_var.xp=xp;
+	A_var.r=r;
+	double val=AIntegrator2.integrate(&AIntegrand2,1.0e-8,1-1.0e-8,1.0e-2);
+	return(val);
+}
+
+
+Clenshaw_Curtis xF_Integrator1(16), xF_Integrator2(16);
+struct phi_param{
+	double r;
+}phi_T_param;
+
+double phi_T(double z, double r, double mf2){
+	double val=0;
+	double ep=diff_param_beta.ep;
+	val+=(z*z+(1-z)*(1-z))*ep*ep*pow(std::cyl_bessel_k(1,ep*r),2);
+	val+=mf2*pow(std::cyl_bessel_k(0,ep*r),2);
+	return(val);
+}
+double xF_beta_Integrand1(double *Z){
+	diff_param_beta.set_z(*Z);
+	double val=phi_T(*Z,phi_T_param.r,diff_param_beta.mf2);
+	//double val=xF_Integrator1.integrate(&xF_beta_Integrand1, 1.0e-8,100,1.0e-3);
+	return(val);
+}
+
+double xF_beta_Integrand2(double *R){
+	phi_T_param.r=*R;
+	double val=xF_Integrator1.integrate(&xF_beta_Integrand1, 1.0e-8,1-1.0e-8,1.0e-3);
+	val*=*R* A(*R,diff_param_beta.xp);
+	return(val);
+
+}
+//double xF_beta_Integrand2(double *R){
+//	double val=*R* A(*R,diff_param_beta.xp)*phi_T(diff_param_beta.z,*R,diff_param_beta.mf2);
+//	return(val);
+//}
+	
+
+double xF_beta(double xp,double Q2,double mf2){
+	getchar();
+	//diff_param.set_extern(0,xp,Q2,mf2);
+	double val=xF_Integrator2.integrate(&xF_beta_Integrand2, 1.0e-8,100,1.0e-2);
+	val*=Q2*3.0/(4.0*PI);
+
+	return(val);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////////////////////
+Clenshaw_Curtis xF_beta0_Integrator1(16), xF_beta0_Integrator2(16);
+double xF_beta0_Integrand1(double *R){
+	double r=*R;
+	double xp=diff_param.xp;
+	double k=sqrt(diff_param.kt2);
+	//double N=SIGMA(r,xp,diff_param.Q2,diff_param.sigpar,diff_param.sudpar)/( diff_param.sigpar[0] );
+	double N=IIM(r,xp,diff_param.Q2);
+	double val=std::cyl_bessel_j(2,r*k)*(2*N-N*N)/r;
+	return(val);
+}
+double xF_beta0_Integrand2(double *K){
+	double k=*K;
+	diff_param.kt2=k*k;
+	double Q2=diff_param.Q2;
+
+	double val=xF_beta0_Integrator1.integrate(&xF_beta0_Integrand1,1.0e-8,100,1.0e-3);
+	val=val*val;
+	val*=2*k*log(Q2/(k*k));
+	return(val);
+}
+double xF_beta0(double xp,double Q2,double mf2){
+	//diff_param.set_extern(0,xp,Q2,mf2);
+	double val=xF_beta0_Integrator2.integrate(&xF_beta0_Integrand2,1.0e-8,sqrt(Q2),1.0e-3);
+	return(val);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+//
 Clenshaw_Curtis FD3_integrator(16);
 double xFD_LT(int pol){
 	//!!!!!!!!  Run diff_param.set_extern(beta,xp,Q2,mf2) before use !!!!!!!!!!!
-	const double hc22=pow(0.3893,2), BD=6, alpha_s=0.2;//hc2, GeV to mb conversion.
-	double factor, min,max;
+	const double hc22=pow(0.3893,2), BD=5.591, alpha_s=0.25;//hc2, GeV to mb conversion.
+	double factor, min,max , beta_factor;
 	double (*funcptr)(double*);
+	getchar();
 	switch(pol){
 		case 't':
 			factor=2*3*pow(diff_param.Q2,2)/(hc22*128*pow(PI,4)*diff_param.beta*BD);
@@ -240,12 +373,18 @@ double xFD_LT(int pol){
 		case 'g':
 #if ADJOINT==0
 			factor=81*diff_param.beta*alpha_s/(512*pow(PI,5)*hc22*BD);
-#elif ADJOINT==1
+#elif ADJOINT==1	
+			//printf("beta_factor\n");
+			beta_factor=xF_beta(diff_param.xp,diff_param.Q2,diff_param.mf2)/ xF_beta0(diff_param.xp,diff_param.Q2,diff_param.mf2);
+			//beta_factor=1;
+			//printf("FACTOR\t %.3e\n",beta_factor);
+
 			factor=diff_param.beta*alpha_s/(32*pow(PI,5)*hc22*BD);
+			factor*=beta_factor;
 #endif
 			funcptr=&FD_g_integrand;
-			max=1;
-			min=diff_param.beta;
+			max=1-1.0e-8;
+			min=diff_param.beta+1.0e-8;
 			break;
 
 		default:
@@ -261,7 +400,7 @@ double xFD_LT(int pol){
 	std::cout<<"\tResult=  "<<res<<std::endl;
 	return(res);
 }
-
+/////////////////////////////////////////////////////////////////////////////////////////
 double xFD_T(double beta,double xp,double Q2,double mf2){
 	diff_param.set_extern(beta,xp,Q2,mf2);
 	double res=xFD_LT('t');
@@ -277,7 +416,9 @@ double xFD_g(double beta,double xp,double Q2,double mf2){
 	double res=xFD_LT('g');
 	return(res);
 }
-
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////////////////////
 
 
 int main(int argc,char** argv){
@@ -296,8 +437,12 @@ int main(int argc,char** argv){
 	double param_arr[20],sigpar[10],sudpar[10];
 	read_parameters(infile,param_arr);
 	parameter(param_arr,sigpar,sudpar);
+
+	sigpar[0]=27.36;
 	diff_param.sigpar=sigpar;
 	diff_param.sudpar=sudpar;
+	diff_param_beta.sigpar=sigpar;
+	diff_param_beta.sudpar=sudpar;
 
        	fclose(infile);
 	//FILE* controlfile=fopen(argv[argc-1],"r" );
@@ -314,7 +459,9 @@ int main(int argc,char** argv){
 
 	//beta=OPTIONS.beta;
 	//Q2=OPTIONS.Q2;
-	double mf2=MASS_L2;
+	//double mf2=MASS_L2;
+	double mf2=0.0196;
+	beta*=(1+4*mf2/Q2);
 	double xp;
 	double val;
 	std::fstream file;
@@ -326,7 +473,6 @@ int main(int argc,char** argv){
 	file.open(output_file_name,std::fstream::out);
 	printf("%s\n", output_file_name);
 	char type[3]={'t','l','g'};
-	
 	//xmin=(OPTIONS.xmin )/2;
 	//xmax=(OPTIONS.xmax )*2;
 	xmin=(xmin )/2;
@@ -335,9 +481,10 @@ int main(int argc,char** argv){
 	double y;
 
 	for(int i=0;i<5;i++){
-		xp=pow(10,log10(xmin)  + log10(xmax/xmin )*((double)i)/(5-1));
+		xp=pow(10,log10(xmin)  + log10(xmax/xmin )*((double)i)/(5-1))/beta;
 		printf("%.5e\t %.5e\t %.5e\n",xp,beta,Q2);
 		diff_param.set_extern(beta,xp,Q2,mf2);
+		diff_param_beta.set_extern(beta,xp,Q2,mf2);
 		val=0;
 		for(int j=0;j<3;j++){
 			if(type[j]=='l'){

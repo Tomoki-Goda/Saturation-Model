@@ -238,11 +238,11 @@ double xFD_LT(int pol){
 			min=((min>1.0e-10)?(min):(1.0e-10));
 			break;
 		case 'g':
-//#if ADJOINT==0
+#if ADJOINT==0
 			factor=81*diff_param.beta*alpha_s/(512*pow(PI,5)*hc22*BD);
-//#elif ADJOINT==1
-//			factor=diff_param.beta*alpha_s/(32*pow(PI,5)*hc22*BD);
-//#endif
+#elif ADJOINT==1
+			factor=diff_param.beta*alpha_s/(32*pow(PI,5)*hc22*BD);
+#endif
 			funcptr=&FD_g_integrand;
 			max=1;
 			min=diff_param.beta;

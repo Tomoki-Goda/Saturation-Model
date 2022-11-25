@@ -6,19 +6,19 @@
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
-
+#include"clenshaw.h"
 //#include"simpson-integral.h"
 
 
 extern double dbesk0_(double*);
 extern double dbesk1_(double*);
 
-extern double dgquad_(double (*)(const double*), double*,double*,int*  );
-extern double dgauss_(double (*)(const double*), double*,double*,double *  );
-extern double dclenshaw(double (*)(const double*), double,double,double  );
-extern void simpson1dA(double(*)(double ,double**),double**,double,double,int,double*,double*);
-extern double boole_integral(double(*)(double ,double**),double**,double,double,double, double,int,int, double*,double*);
-extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
+//extern double dgquad_(double (*)(const double*), double*,double*,int*  );
+//extern double dgauss_(double (*)(const double*), double*,double*,double *  );
+//extern double dclenshaw(double (*)(const double*), double,double,double  );
+//extern void simpson1dA(double(*)(double ,double**),double**,double,double,int,double*,double*);
+//extern double boole_integral(double(*)(double ,double**),double**,double,double,double, double,int,int, double*,double*);
+//extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
 
 int F_L=0;
  
@@ -27,7 +27,7 @@ static double Q2;
 static double R;
 static unsigned flavourtype;
 
-double psisq_f (const double *Z)  {
+double psisq_f (double *Z,void*)  {
 	double z=*Z;
 #else
 double psisq_f (double R, double z, double Q2, unsigned flavourtype/*, unsigned dataform */)  {
@@ -41,25 +41,25 @@ double psisq_f (double R, double z, double Q2, unsigned flavourtype/*, unsigned 
 
 	switch(flavourtype){
 		case 0:
-			charge_sum=5.0/6.0;
+			charge_sum=5.0/9.0;
 			mass2=MASS_L2;
 			break;
 		case 1:
-			charge_sum=1.0/6.0;
+			charge_sum=1.0/9.0;
 			mass2=MASS_S2;
 			break;
 		case 2:
-			charge_sum=2.0/3.0;
+			charge_sum=4.0/9.0;
 			mass2=MASS_C2;
 			break;
 		case 3:
-			charge_sum=1.0/6.0;
+			charge_sum=1.0/9.0;
 			mass2=MASS_B2;
 			break;
 		default:
 			printf("psisq_f::wrong input %d\n",flavourtype);
 			getchar();
-			charge_sum=5.0/6.0;
+			charge_sum=5.0/9.0;
 			mass2=MASS_L2;
 	}
 	double	value;
@@ -93,7 +93,8 @@ double psisq_f (double R, double z, double Q2, unsigned flavourtype/*, unsigned 
 	}
 	}
 	//Q2 comes from the factor to multiply F2 to get cross-section.
-	return (Q2 *  (charge_sum) * NORM *value);
+	//return (Q2 *  (charge_sum) * NORM *value);
+	return ( (3*charge_sum*value)/(2*PI*PI) );
 }
 
 
@@ -151,7 +152,8 @@ double psisq_z_int(double r,double q2,unsigned f){
 	//dadapt_(&psisq_f,&zmin,&zmax,&seg ,&NRel, &NAbs, &res, &error);
 	
 	/////////////////////////////////////////
-	res=dclenshaw(&psisq_f,zmin,zmax,DGAUSS_PREC);
+	double *dummy;
+	res=dclenshaw(&psisq_f,(void*)dummy,zmin,zmax,DGAUSS_PREC);
 	return(2.0* res);
 
 }

@@ -7,6 +7,9 @@ import sys, getopt , os
 def main():
     plot=True
     compute=False
+    label=False;
+    leg=[]
+
     parallelkernel=4;
     indir=["."]
     savedir="."
@@ -14,14 +17,24 @@ def main():
     readfile=""
     plotcolor=['b','r','g','m']
     plotstyle=['--','-',':','-.']
+    savename="plot-diff.png"
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],"d:hi:o:ps:cj:",['data',"help","in","out","plot",'save','compute','j'] )
+        opts, args = getopt.gnu_getopt(sys.argv[1:],"l:N:C:S:d:hi:o:ps:cj:",['label',"name",'color','style','data',"help","in","out","plot",'save','compute','j'] )
     except getopt.GetoptError as err:
         print("Error reading option")
 
     for opt, arg in opts:
         if opt in ['-i','-in']:
             rundir=arg
+        elif opt in ['-l', '-label']:
+            plotlabel=arg.split(":")
+            label=True
+        elif opt in ['-N', '-name']:
+            savename=arg
+        elif opt in ['-C','-color']:
+            plotcolor=arg.split(' ')
+        elif opt in ['-S','-style']:
+            plotstyle=arg.split(" ")
         elif opt in ['-d','-data']:
             read_file=arg
         elif opt in ['-o','-out']:
@@ -36,6 +49,7 @@ def main():
             savedir=arg
         elif opt in ['-c','--compute']:
             compute=True
+            plot=False
         elif opt in ['-j','--j']:
             parallelkernel=arg
         elif opt in ['-h','--help']:
@@ -49,7 +63,7 @@ def main():
     data=pd.read_csv(read_file,sep=" ",index_col=None)
     print(data)
     #print(sorted(list(set(data["Q2"].values))))
-    data= data[data['Q2']<=90]
+    data= data[(data['Q2']<=90)&(data['beta']<0.4)]
     if not('xp' in data):
         xp=data['x']/data['beta']
         data['xp']=xp
@@ -62,7 +76,7 @@ def main():
 
     #plt.ion()
     if plot:
-        plt.margins(0)
+        plt.margins(y=0,x=0)
         fig,ax=plt.subplots(lengthQ2,lengthbeta, sharex=True,sharey=True,layout="constrained")
         fig.get_layout_engine().set(wspace=0,hspace=0,w_pad=0,h_pad=0)
         #fig.xscale('log')
@@ -77,6 +91,8 @@ def main():
 
     print("Q2 ",Q2_set,"\n\n")
     for i in range(len(Q2_set)):
+        legend_entry=label
+
         Q2=Q2_set[i]
         data_Q2=data[data['Q2']==Q2]
         #beta_set=sorted(list(set(data_Q2["beta"].values)))
@@ -85,6 +101,11 @@ def main():
         for j in range(len(beta_set)):
             beta=beta_set[j]
             data_beta=data_Q2[data_Q2['beta']==beta]
+            if plot:
+                if j==0:
+                    ax[i][j].set_ylabel("$Q^2=$"+str(Q2_set[i]))
+                if i==0:
+                    ax[i][j].set_title("$\\beta$="+str(beta_set[j]))
             if len(data_beta)==0:
                 continue
             #xp_set=sorted(list(set(data_beta["xp"].values)))
@@ -106,7 +127,10 @@ def main():
                                 plot_data=line.strip().split("\t")
                                 fd3.append(1.23*float(plot_data[1]))
                                 xp.append(float(plot_data[0]))
-                        ax[i][j].plot(xp,fd3,c=plotcolor[k],ls=plotstyle[k])
+                        plot=(ax[i][j].plot(xp,fd3,c=plotcolor[k],ls=plotstyle[k]))
+                        if legend_entry:
+                            leg.append(plot)
+
                         #datapt=np.transpose(frame[['xp','xF']].values)
                         datapt=np.transpose(data_beta[['xp','xp*sigmaD(3)']].values)
                         error=data_beta['dtot'].values
@@ -116,6 +140,7 @@ def main():
                         #errn=[np.sqrt(float(i[0])**2+float(i[2])**2) for i in error]
                         #plt.errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=[errn,errp] , c='b')
                     ax[i][j].errorbar([float(i) for i in datapt[0]],[float(i) for i in datapt[1]],yerr=error , c='black',marker="x",fmt='none')
+                legend_entry=False
                 ax[i][j].scatter([float(i) for i in datapt[0]],[float(i) for i in datapt[1]] ,c='black',s=2)
                     
                 ax[i][j].set(xscale='log')
@@ -123,7 +148,6 @@ def main():
                 #plt.show()i
         #if compute:
         #    parallelargs_All.append(parallelargs)
-    
     if compute:
         #paralellargs_All=np.transpose(parallelargs_All);
         if parallelkernel=="1":
@@ -147,7 +171,13 @@ def main():
             os.system(command)
 
     if plot:
-        plt.savefig("{DIR}/plot-diff.png".format(DIR=savedir,beta_=beta,q2_=Q2))
+        if label:
+            leg=np.transpose(leg)
+            #ax[len(Q2_set)-1][0].legend(leg[0],plotlabel,loc='lower right',bbox_to_anchor=(0,-1,1,0),ncols=len(indir))
+            fig.legend(leg[0],plotlabel,loc='lower left',bbox_to_anchor=(0.15,0.02),ncols=1)
+        #print("{DIR}/plot-diff.png".format(DIR=savedir))
+        plt.savefig("{DIR}/{name}".format(DIR=savedir,name=savename))
+        #plt.show()
     #plt.clf()
 
 

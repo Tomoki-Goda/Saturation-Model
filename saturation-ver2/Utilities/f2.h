@@ -1,12 +1,12 @@
+#include"/home/tomoki/Numerics/clenshaw.h"
 
 
 
-
-extern void simpson1dA(double(*)(double, double**),double**,double,double,int,double*,double*); 
+//extern void simpson1dA(double(*)(double, double**),double**,double,double,int,double*,double*); 
 extern double dgauss_(double (*)(const double*), double*,double*,double *  );
 extern double dgquad_(double (*)(const double*),  const double*, const double*, const int*  );
 extern double dadapt_(double(* )(const double*),double*,double*,int*,double*,double* ,double*,double*);
-
+//extern double dclenshaw(double(* )(const double*),double,double,double);
 static int FIX_W=0;
 int PLOT_FLAVOUR=0;
 
@@ -36,16 +36,17 @@ double mod_x_W( double Q2,double W2,int fl){
 }
 
 ///////////////////////////////////////Version 1////////////////////////////////////////////////////////
-double f2_integrand(double R, double ** par){
+double f2_integrand(double *R, void* param){
+	double **par=(double**)param;
 	double xm;
 	double Q2= *(*(par)+1);
 	double *sigpar=*(par+1);
 	double *sudpar=*(par+2);
 	int fl=(int)(**( par+3)+0.1);
 	
-	double r=R/(1-R);
-	double jac=pow(1-R,-2);
-
+	double r=*R;
+	double jac=pow(1-r,-2);
+	r=r/(1-r);
 	double value=0.0;
 
 	//if(FIX_W==1){
@@ -69,18 +70,19 @@ double f2(double Q2, double**pars){
 		for(int i =0;i<(NF-1);i++){
 			pars[3][0]=i;
 			res=0;
-			simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,&res,&err);
+			//simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,&res,&err);
+			res=dclenshaw(&f2_integrand,(void*)pars,1.0e-5,0.97,DGAUSS_PREC);
 			val+=res;
 		}
 	}else if(PLOT_FLAVOUR==2){
 		pars[3][0]=2;
 		res=0;
-		simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,&res,&err);
+		res=dclenshaw(&f2_integrand,(void*)pars,1.0e-5,0.97,DGAUSS_PREC);
 		val+=res;
 	}else if(PLOT_FLAVOUR==3){
 		pars[3][0]=3;
 		res=0;
-		simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,&res,&err);
+		res=dclenshaw(&f2_integrand,(void*)pars,1.0e-5,0.97,DGAUSS_PREC);
 		val+=res;
 	}
 	
@@ -93,7 +95,7 @@ double f2(double Q2, double**pars){
 static double Q2, X, *SUDPAR, *SIGPAR;
 static int FL;
 
-double f2_integrand_2(const double* R){
+double f2_integrand_2(double* R,void*){
 	double xm;
 	
 
@@ -110,7 +112,7 @@ double f2_integrand_2(const double* R){
 }
 double f2_2(double x,double q2, double *sigpar ,  double *sudpar){
 	double res=0, err=0,val=0;
-	
+	void* dummy;
 	SUDPAR=sudpar;
 	SIGPAR=sigpar;
 	//double prec=
@@ -128,51 +130,53 @@ double f2_2(double x,double q2, double *sigpar ,  double *sudpar){
 	//double error=0;
 	
 	double N=DGAUSS_PREC;
-	int n=96;
-	double step=(rmax-rmin)/7;
-	double high,low;
+	//int n=96;
+	//double step=(rmax-rmin)/7;
+	//double high,low;
 	
 	if(PLOT_FLAVOUR==0){
 		for(int i =0;i<(NF-1);i++){
 			FL=i;
 			res=0;
-			low=rmin;
-			high=rmin;
+			//low=rmin;
+			//high=rmin;
 			//simpson1dA(&f2_integrand,pars,1.0e-5,30,250,&res,&err);
 			//dadapt_(&f2_integrand_2,&rmin,&rmax,&seg ,&NRel, &NAbs, &res, &error);
 			//res+=dgauss_(&f2_integrand_2,&rmin,&rmax,&N);
 			//res+=dgquad_(&f2_integrand_2,&rmin,&rmax,&n);
-			for(int i=0;i<7;i++){
-				high+=step;
-				//res+=dgauss_(&f2_integrand_2,&low,&high,&N);
-				res+=dgquad_(&f2_integrand_2,&low,&high,&n);
-				//printf(" %f %f %d\n",rmin,rmax,n);
-				low=high;
-			}
+//			for(int i=0;i<7;i++){
+//				high+=step;
+//				//res+=dgauss_(&f2_integrand_2,&low,&high,&N);
+//				res+=dgquad_(&f2_integrand_2,&low,&high,&n);
+//				//printf(" %f %f %d\n",rmin,rmax,n);
+//				low=high;
+//			}
+			res+=dclenshaw(&f2_integrand_2,dummy, rmin,rmax,DGAUSS_PREC);
 			//printf("%.5e %.5e\n",res,error);
 			val+=res;
 		}
 	}else {
 		FL=PLOT_FLAVOUR;
 		res=0;
-		low=rmin;
-		high=rmin;
+		//low=rmin;
+		//high=rmin;
 		//simpson1dA(&f2_integrand,pars,1.0e-5,30,250,&res,&err);
 		//dadapt_(&f2_integrand_2,&rmin,&rmax,&seg ,&NRel, &NAbs, &res, &error);
 		//res+=dgauss_(&f2_integrand_2,&rmin,&rmax,&N);
 		//res+=dgquad_(&f2_integrand_2,&rmin,&rmax,&n);
-		for(int i=0;i<7;i++){
-			high+=step;
-			//res+=dgauss_(&f2_integrand_2,&low,&high,&N);
-			res+=dgquad_(&f2_integrand_2,&low,&high,&n);
-			//printf(" %f %f %d\n",rmin,rmax,n);
-			low=high;
-		}
+		res+=dclenshaw(&f2_integrand_2,dummy , rmin,rmax,DGAUSS_PREC);
+//		for(int i=0;i<7;i++){
+//			high+=step;
+//			//res+=dgauss_(&f2_integrand_2,&low,&high,&N);
+//			res+=dgquad_(&f2_integrand_2,&low,&high,&n);
+//			//printf(" %f %f %d\n",rmin,rmax,n);
+//			low=high;
+//		}
 		//printf("%.5e %.5e\n",res,error);
 		val+=res;
 	}
 	//printf("%f \tx=%.5e q2=%.5e fl=%d\n",val,X,Q2,FL);
-	return val;
+	return( (q2/(2*PI)) *val ) ;
 }
 
 

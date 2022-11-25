@@ -2,7 +2,7 @@
 #define DGAUSS_H
 #include<math.h>
 #include<stdio.h>
-#include<stdlib.h>
+#include"./Kahn.h"
 
 static const double x10[]={
 0.148874338981631211,	
@@ -92,121 +92,112 @@ static const double w40[]={
 };
 
 
-static double Kahn(double a,double b,double *c){
-	//double c;
-	double	sum=a+b;
 
-	if(a>b){
-		*c=sum-a;
-		*c=*c-b;
-	}else{
-		*c=sum-b;
-		*c=*c-a;
-	}
-	return(sum);
-}
 
-double dgaussN(double (*func)(double*),double min, double max,double  eps,int N){
+double dgauss(double (*func)(double*,void*),void* param, double min, double max,double  eps){
 	double smin,smax; //section
 	double x; 
 	double total=0, val10=0, val20=0;
 	double scale, mid;
 	double prec=1.0e-14;
-	double carry=0, carry_total=0;
+	double accum[3]={0}, accum_total[3]={0};
 	double error=0;
-	double arg1,arg2;
+	double arg1,arg2,increase;
 
 	smax=max;
 	smin=min;
+	int licz=0,licztot=0;
+	//double f[N/2+1];
+	double f[11];
+	if(fabs(min-max)<1.0e-15){
+		return(0);
+	}		
 	while(1){
-		if((smin>smax)||(smin<min)||(smax>max) ){
-			printf("value error [%.3e, %3e] of [%.3e, %.3e]\n",smin,smax,min,max ); 
+		licztot++;
+		scale=(smax-smin)/2;
+		if(scale<2.0e-15){
+			printf("DGAUSS :: division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] scale = %.5e\n",smin,smax,min,max,scale);
+			getchar();
 		}
 
-		//printf("range=%.5e\t%.5e\n",smin,smax);
-		scale=(smax-smin)/2;
 		mid=(smax+smin)/2;
 
-		if(scale<prec ){
-			printf("DGAUSS :: Section size too small. %.3e between %.3e  %.3e\n",scale,smin,smax );
-			return(0);
-		}
-
-		if(N==20){
+//		if(N==20){
 			val10=0;
-			carry=0;
+			//accum=0;
+			Kahn_init(accum,3);
 			for(int i=0;i<5;i++){
 				x=scale*x10[i];
 				arg1=mid+x;
 				arg2=mid-x;
 
-				val10=Kahn(val10,w10[i]*( (*func)(&arg1)+(*func)(&arg2) ),&carry);
+				//val10=Kahn(val10,w10[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),&accum);
+				val10=Kahn(val10,w10[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),accum,3);
 
 				//val10+=w10[i]*( (*func)(mid+x)+(*func)(mid-x) ) ;
 			}
-			val10+=carry;
-			carry=0;
+			//val10+=accum;
+			val10=Kahn_total(val10,accum,3);
+			//accum=0;
 			//val10*=scale;
 			val20=0;
+			Kahn_init(accum,3);
 			for(int i=0;i<10;i++){
 				x=scale*x20[i];
 				arg1=mid+x;
 				arg2=mid-x;
-				val20=Kahn(val20,w20[i]*( (*func)(&arg1)+(*func)(&arg2) ),&carry);
+				//val20=Kahn(val20,w20[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),&accum);
+				val20=Kahn(val20,w20[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),accum,3);
 				//val20+=w20[i]*( (*func)(mid+x)+(*func)(mid-x) ) ;
 			}
-			val20+=carry;
-			//carry=0;
-		}else if(N==40){
+			//val20+=accum;
+			val20=Kahn_total(val20,accum,3);
+			//accum=0;
+/*		}else if(N==40){
 			val10=0;
-			carry=0;
+			accum=0;
 			for(int i=0;i<10;i++){
 				x=scale*x20[i];
 				arg1=mid+x;
 				arg2=mid-x;
-				val10=Kahn(val10,w20[i]*( (*func)(&arg1)+(*func)(&arg2) ),&carry);
+				val10=Kahn(val10,w20[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),&accum);
 				//val10+=w20[i]*( (*func)(mid+x)+(*func)(mid-x) ) ;
 			}
-			val10+=carry;
-			carry=0;
+			val10+=accum;
+			accum=0;
 			//val10*=scale;
 			val20=0;
 			for(int i=0;i<20;i++){
 				x=scale*x40[i];
 				arg1=mid+x;
 				arg2=mid-x;
-				val20=Kahn(val20,w40[i]*( (*func)(&arg1)+(*func)(&arg2) ),&carry);
+				val20=Kahn(val20,w40[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),&accum);
 				//val20+=w40[i]*( (*func)(mid+x)+(*func)(mid-x) ) ;
 			}
-			val20+=carry;
+			val20+=accum;
 		}
-
+*/
 		//val20*=scale;
-		//printf("[%.5e ,  %.5e] \t %.5e \t res=%.5e  +-  %.5e, accumlator= %.3e\n",smin,smax, scale ,scale*val20,scale*fabs(val10-val20),carry_total);
+		//printf("[%.5e ,  %.5e] \t %.5e \t res=%.5e  +-  %.5e, accumlator= %.3e\n",smin,smax, scale ,scale*val20,scale*fabs(val10-val20),accum_total);
 		val10*=scale;
 		val20*=scale;
-		
 		if(fabs(val20-val10)< eps*(1+fabs(val20) )){
-			total=Kahn(total,val20,&carry_total);
-			error+=fabs(val20-val10);
-
-			if(fabs(smax-max)<prec){
-				//if "end of sector"=="end of integration region", END.
-				//break;
-				
-				//printf("estimated error= %.5e\n", error);
-
-				return(total+carry_total);		
+			total=Kahn(total,val20,accum_total,3);
+			licz++;
+			
+			if(fabs(smax-max)<1.0e-15){
+				//printf("Efficiency %d/%d = %.3f\n",16*licz,16*licztot,((double)licz)/licztot);
+				return(Kahn_total(total,accum_total,3 ));
+			//bereak;
 			}else{
-				//move to next sector
 				smin=smax;
-				smax=max;
+				//smax=max;
+				increase=(4*scale);
+				smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 			}
-		}else{	
-			//Half the section
+		}else{
 			//smax=mid;
-			smax=smin+(scale/2);//quarter
-
+			smax=smin+(scale/2);
 		}
 	}
 }
@@ -214,25 +205,27 @@ double dgaussN(double (*func)(double*),double min, double max,double  eps,int N)
 
 
 //inline
- double dgauss20(double (*func)(double*),double min, double max,double  eps){
-	return(dgaussN(func,min,max,eps,20));	
-}
+ //double dgauss20(double (*func)(double*,void*), void* param, double min, double max,double  eps){
+//	return(dgaussN(func,min,max,eps,20));	
+//}
 //inline
-double dgauss40(double (*func)(double*),double min, double max,double  eps){
-	return(dgaussN(func,min,max,eps,20));
-}
+//double dgauss40(double (*func)(double*,void*),void* param,double min, double max,double  eps){
+//	return(dgaussN(func,min,max,eps,40));
+//}
 //////////////////////////////////////////////////////////
 //
 //
-/*double func(double x){
-		
+/*
+double func(double *X,void*){
+	double x=*X;		
 	return(x*x*exp(-x*x));
 }
 
 int main(){
-	double val=dgauss40(&func , 0,100,1.0e-10);
+	double* dummy;
+	double val=dgauss(&func ,(void*)dummy, 0,100,1.0e-10);
 	printf(" %.5e\n",val);
 	return(0);
-}
-*/
+}*/
+
 #endif

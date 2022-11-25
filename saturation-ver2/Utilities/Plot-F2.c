@@ -15,9 +15,10 @@
 #include"./plot.c"
 
 
+
 extern void approx_xg(const double *);
 extern int parameter(const double*,double *, double*);
-extern void simpson1dA(double(*)(double, double**),double**,double,double,int,double*,double*); 
+//extern void simpson1dA(double(*)(double, double**),double**,double,double,int,double*,double*); 
 extern double SIGMA(double , double ,double ,double *,double*);
 extern double psisq_z_int(double, double ,int);
 extern double mod_x(double,double, int);

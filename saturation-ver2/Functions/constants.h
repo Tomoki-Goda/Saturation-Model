@@ -19,3 +19,5 @@
 
 //#define NORM 1/(2*pow(PI,3))
 #define NORM 0.041414065//0.08282813//i don't know what this is but normalization of psi...
+//Looks like 2.56819/(2*Pi^3)
+// 2.5... is mb to GeV

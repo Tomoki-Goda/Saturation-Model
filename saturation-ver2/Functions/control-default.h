@@ -58,6 +58,10 @@
 	#define MU202 0 //0 to use default set in Parameter.h
 #endif
 
+#ifndef IIM // IIM model. not for fitting!! and overwrites all selections for dipole.
+	#define IIM 0
+#endif
+
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -193,34 +197,43 @@
 
 
 //dipole sigma 
-#if MODEL==0
-#define SIGMA(r,x,Q2,par, sudpar)  sigma_gbw(r,x,Q2,par)
-#elif MODEL==1
-#define SIGMA(r,x,Q2,par, sudpar)  sigma_bgk(r,x,Q2,par)
-#elif MODEL==2
-#define SIGMA(r,x,Q2,par, sudpar)  sigma_gbs(r,x,Q2,par)  
-#elif MODEL==22
-#define SIGMA sigma_s 
-#elif MODEL==3
-#define SIGMA sigma_s
-#endif
+#if IIM==1
+/////////////////////////////////////////////////////////
+//IIM model
+////////////////////////////////////////////////////////
+	#define SIGMA(r,x,Q2,par,sudpar) sigma_iim(r,x,Q2,par)
+	#define BASE_SIGMA sigma_iim 
+/////////////////////////////////////////////////////////
+#else
+	#if MODEL==0
+		#define SIGMA(r,x,Q2,par, sudpar)  sigma_gbw(r,x,Q2,par)
+	#elif MODEL==1
+		#define SIGMA(r,x,Q2,par, sudpar)  sigma_bgk(r,x,Q2,par)
+	#elif MODEL==2
+		#define SIGMA(r,x,Q2,par, sudpar)  sigma_gbs(r,x,Q2,par)  
+	#elif MODEL==22
+		#define SIGMA sigma_s 
+	#elif MODEL==3
+		#define SIGMA sigma_s
+	#endif
+
 
 //dipole sigma to be combined with sudakov
-#if SATURATION ==1
-	#if (MODEL==3||MODEL==1)
-		#define BASE_SIGMA sigma_bgk
-	#elif (MODEL==22||MODEL==2||MODEL==0)
-		#define BASE_SIGMA sigma_gbw
+	#if SATURATION ==1
+		#if (MODEL==3||MODEL==1)
+			#define BASE_SIGMA sigma_bgk
+		#elif (MODEL==22||MODEL==2||MODEL==0)
+			#define BASE_SIGMA sigma_gbw
+		#endif
+	#elif SATURATION==0
+		#if (MODEL==3||MODEL==1)
+			#define BASE_SIGMA sigma_bgk_ns
+		#elif (MODEL==22||MODEL==2||MODEL==0)
+			#define BASE_SIGMA sigma_gbw_ns
+		#endif
 	#endif
-#elif SATURATION==0
-	#if (MODEL==3||MODEL==1)
-		#define BASE_SIGMA sigma_bgk_ns
-	#elif (MODEL==22||MODEL==2||MODEL==0)
-		#define BASE_SIGMA sigma_gbw_ns
-	#endif
+
 #endif
-
-
 
 
 

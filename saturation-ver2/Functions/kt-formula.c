@@ -1,12 +1,6 @@
-//#include<iostream>
-//#include<fstream>
-//#include<cmath>
-//#include<minuit.h>
-//#include<getopts.h>
-//
-
 #include<stdio.h>
 #include<math.h>
+#include<time.h>
 #include"clenshaw.h"
 #include"./control.h"
 #include"./control-default.h"
@@ -14,7 +8,7 @@
 ///////////////////////////////////////////////
 // Formulae are found in M. A. Kimber Thesis
 ///////////////////////////////////////////////
-#define ALPHA_RUN 1 
+#define ALPHA_RUN  0
 
 static double alpha(double mu2){
 	double b0=(11.0*3.0-3.0*2.0)/12.0;
@@ -147,7 +141,7 @@ double F2_kt(double x,double Q2,double mf2,double *par){
 }
 
 
-/*
+
 int main(int argc, char** argv){
 	
 	double par[3]={23.3,3.04e-4,0.288};
@@ -165,12 +159,14 @@ int main(int argc, char** argv){
 	//params[0]=param;
 	//double kap_max=param[0]*(1-param[0])*(param[3]*((1-param[5])/param[5])-param[2])-param[4];
 	double k2;
-	for (int i =0; i<21;i++){
-		
-		Q2=pow(10, -2+5*((double)i)/20);
-		val=(2.0/3.0)*F2(x,Q2,0.0196, par) + (4.0/9.0)*F2(x,Q2,0.196,par) + (1/9.0)*F2(x,Q2,21.16,par);
+        clock_t time;
+        for (int i =0; i<21;i++){
+        	Q2=pow(10, -2+5*((double)i)/20);
+		time=clock();
+		val=(2.0/3.0)*F2_kt(x,Q2,0.0196, par) + (4.0/9.0)*F2_kt(x,Q2,0.196,par) + (1/9.0)*F2_kt(x,Q2,21.16,par);
+		time-=clock();
 		fprintf(file,"%.5e\t%.5e\n",Q2,val);
-		printf("%.5e\t%.5e\n",Q2,val);
+		printf("%.5e\t%.5e\t %f\n",Q2,val,-((double)time)/CLOCKS_PER_SEC);
 		//file<<Q2<<"\t"<<val<<std::endl;
 		//std::cout<<Q2<<"\t"<<val<<std::endl;
 		
@@ -188,4 +184,4 @@ int main(int argc, char** argv){
 	return 0;
 
 
-}*/
+}

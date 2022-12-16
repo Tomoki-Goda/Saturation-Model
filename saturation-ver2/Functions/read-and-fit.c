@@ -8,6 +8,7 @@
 #include<stdlib.h>
 #include<math.h>
 #include<time.h>
+#include<pthread.h>
 
 #include"control.h"
 #include"control-default.h"
@@ -25,14 +26,16 @@
 
 #include"../Utilities/f2.h"
 //#include"./kahnsum.h"
-
+#ifndef N_THREADS
+	#define  N_THREADS 6 
+#endif
 int N_SIMPS=N_SIMPS_R;
 int N_CHEB=N_CHEB_R;
 double CS_COMP[MAXN];
 ////////////////////////////////////////////////////////
 char datadir[]="/home/tomoki/Saturation-Model/saturation-ver2/data";
 ///////////////////////////////////////////////////////
-
+extern double F2_kt(double , double ,double ,const  double * );
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////  now integrate over r with Simpsons method    /////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -117,11 +120,102 @@ double compute_chisq(const double *par){
 	for(unsigned i=0;i<N_DATA;i++){
 		//chisq+=pow( ( cs[i]-CS_DATA[i] )/(ERR_DATA[i]),2);
 		//chisq+=pow( ( *(cs+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
-		chiarr[i]=pow( ( *(CS_COMP+i) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);
+		chiarr[i]=pow( ( *(CS_COMP+i)*(Q2_DATA[i]/(4*PI*PI) ) - *(CS_DATA+i) )/( *(ERR_DATA+i) ),2);//Factor for sigma->F2
 		
 	}
 	
-	chisq=k_group_sum(chiarr,N_DATA);
+	//chisq=k_group_sum(chiarr,N_DATA);
+	chisq=Kahn_list_sum(chiarr,N_DATA);
+	return(chisq );
+}
+//double cckt(const double *par,int i){i
+struct ccktstr{
+	const double * par;	
+	int i;
+	double *resptr;
+};
+void *cckt(void *arg){
+	struct ccktstr* argstr=(struct ccktstr*)arg;
+	int i=argstr->i;
+	const double *par=argstr->par;
+	double *resptr=argstr->resptr;
+	double val=0;
+	double chisq=0;
+	double x;
+	
+	x=X_DATA[i];
+	//x=mod_x(X_DATA[i], Q2_DATA[i]  ,0 );
+	val=(2.0/3.0)*F2_kt(x, Q2_DATA[i],MASS_L2, par );
+	//x=mod_x(X_DATA[i], Q2_DATA[i]  ,2 );
+	val+=(4.0/9.0)*F2_kt(x, Q2_DATA[i],MASS_C2, par);
+	//x=mod_x(X_DATA[i], Q2_DATA[i]  ,3 );
+	val+=(1.0/9.0)*F2_kt(x, Q2_DATA[i],MASS_B2, par );
+	chisq+=pow((CS_DATA[i]-val)/(ERR_DATA[i]),2) ;
+	
+	*resptr=chisq;
+	//return(chisq );
+}
+
+pthread_t threads[N_THREADS];
+
+double compute_chisq_kt_p(const double *par,int Np ){	
+	
+	struct ccktstr arg[Np];//={par,0};
+	for(int i =0;i<Np;i++){
+		arg[i].par=par;
+	}
+	//printf("first arg %.e\n",*(arg[0].par));
+
+	//pthread_t threads[Np];
+	int k=0;
+	double chi[N_DATA];
+
+	while(k<N_DATA ){
+		for(int j=0;j<Np;j++){
+			if(k+j==N_DATA){
+				break;
+			}
+			//printf("first arg %.e\n",*(arg[j].par));
+			arg[j].i=k+j;
+			arg[j].resptr=(chi+k+j);
+			pthread_create(&(threads[k+j]), NULL,cckt,(void*)(&arg[j]));
+			//pthread_join( threads[k+j], NULL);
+
+		}
+		for(int j=0;j<Np;j++){
+			if(k+j==N_DATA){
+				break;
+			}
+			pthread_join( threads[k+j], NULL);
+			//printf("chi %f\n",*(arg[j].resptr));
+		}
+		k+=Np;
+	}
+	
+	//pthread_exit(NULL);
+	//double chisq=k_group_sum(chi,N_DATA);
+	
+	//printf("done\n");
+	double chisq=Kahn_list_sum(chi,N_DATA);
+	//printf("chi %f\n",chisq);
+	return(chisq);
+}
+double compute_chisq_kt(const double *par){
+
+
+	double val=0;
+	double chisq=0;
+	double x;
+	for(int i=0;i<N_DATA;i++){
+		x=X_DATA[i];
+		//x=mod_x(X_DATA[i], Q2_DATA[i]  ,0 );
+		val=(2.0/3.0)*F2_kt(x, Q2_DATA[i],MASS_L2, par );
+		//x=mod_x(X_DATA[i], Q2_DATA[i]  ,2 );
+		val+=(4.0/9.0)*F2_kt(x, Q2_DATA[i],MASS_C2, par);
+		//x=mod_x(X_DATA[i], Q2_DATA[i]  ,3 );
+		val+=(1.0/9.0)*F2_kt(x, Q2_DATA[i],MASS_B2, par );
+		chisq+=pow((CS_DATA[i]-val)/(ERR_DATA[i]),2) ;
+	}
 	return(chisq );
 }
 
@@ -159,8 +253,6 @@ void grid_plot(FILE * file,  double * sigpar,  double* sudpar){
 			q2=Q2_DATA[i];
 			for(int j=0;j<5;j++){
 				x=(0.5+(3.5)*((double)j)/5)*X_DATA[i];			
-				res=f2_2(x,q2, sigpar , sudpar);
-				//printf("%.3e %.3e %.3e \n",res,x,q2);
 				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,res,Q2_DATA[i]);
 			}
 		}
@@ -170,10 +262,10 @@ void grid_plot(FILE * file,  double * sigpar,  double* sudpar){
 }
 
 void fcn(const int *npar, const double grad[], double*fcnval, const double *par,const unsigned *iflag,void (*dum)(void) ){
-	
+	//printf("start fcn\n");
 	/////////////////////////////////////////
 	//for detail see MINUIT documentatin.
-	char outline[200];//entry in the log file 
+	char outline[500];//entry in the log file 
 	clock_t time;
 	time=clock();
 	
@@ -188,16 +280,23 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 		sprintf(outline, "%.2e, ",*(par+i));
 		log_printf(log_file,outline);
 	}
-	
-	
-#if (MODEL==1||MODEL==3)
+#if KT==1
+	static double sigpar[10],sudpar[10];	
+	parameter(par,sigpar,sudpar);
+#if N_THREADS>1
+	*fcnval=compute_chisq_kt_p(sigpar,N_THREADS);
+#else 
+	*fcnval=compute_chisq_kt(sigpar);
+#endif
+#else
+	#if (MODEL==1||MODEL==3)
 	static double sigpar[10],sudpar[10];	
 	parameter(par,sigpar,sudpar);
 	approx_xg(sigpar+1);//generate chebyshev coefficients
-#endif
-	
+	#endif
 	*fcnval=compute_chisq(par);
-	if(*iflag==3){
+#endif
+/*	if(*iflag==3){
 #if ((MODEL!=1)&&(MODEL!=3))
 		static double sigpar[10],sudpar[10];	
 		parameter(par,sigpar,sudpar);
@@ -218,12 +317,13 @@ void fcn(const int *npar, const double grad[], double*fcnval, const double *par,
 		}
 		log_printf(log_file,outline);
 		printf("\n\n%s\n\n",outline);
-	}else{
+	}else{*/
 	time-=clock();
 	
 	sprintf(outline,"    %.3e (%.3f), in %.1e sec\n",*fcnval,*fcnval/(N_DATA-N_PAR), -((double)time)/CLOCKS_PER_SEC);
 	log_printf(log_file,outline);
-	}
+//	}
+	//printf("fcn end\n");
 //	}
 }
 

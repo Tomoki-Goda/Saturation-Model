@@ -1,7 +1,7 @@
 #include<math.h>
 #include<stdlib.h>
 #include<stdio.h>
-#include"./kahnsum.h"
+#include"./Kahn.h"
 #ifndef PI
 	#define PI 3.1415926535897932384626433832795
 #endif
@@ -271,7 +271,7 @@ double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *de
 #endif
 		ind_vec_increment(ind2,degree,dim);//increment the ind1; like in the way increasing (hr,min,sec) second by second. 
 	}
-	val=k_group_sum(arr,len);
+	val=Kahn_list_sum(arr,len);
 	static int licz=0;
 	if(isnan(val)!=0){
 		val=0;
@@ -356,7 +356,7 @@ double chebyshev(const unsigned *degree,unsigned dim,const double* coeff , doubl
 		arr[j]=val;	
 		ind_vec_increment(ind1,degree,dim);
 	}
-	res=k_group_sum(arr,len);
+	res=Kahn_list_sum(arr,len);
 	for(unsigned i=0;i<dim;i++){
 		res*=(2.0/degree[i]);	
 	}
@@ -423,7 +423,7 @@ double d_chebyshev(const unsigned *degree,unsigned dim,const double* coeff , dou
 		arr[j]=val;	
 		ind_vec_increment(ind1,degree,dim);
 	}
-	res=k_group_sum(arr,len);
+	res=Kahn_list_sum(arr,len);
 	for(unsigned i=0;i<dim;i++){
 		res*=(2.0/degree[i]);	
 	}

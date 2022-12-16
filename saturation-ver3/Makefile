@@ -24,15 +24,20 @@ GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-
 
 ########################################################################################################
 
-all: clean main critical dipole F2 FL F2-slope tmd-gluon tmd-gluon-x tmd-critical fcn export-data ww-gluon 
+#all: clean main critical dipole F2 FL F2-slope tmd-gluon tmd-gluon-x tmd-critical fcn export-data ww-gluon 
+all: clean main 
 grid: gluon-grid
 
 fit: clean main
 
 plot: critical dipole F2 FL F2-slope tmd-gluon tmd-gluon-x tmd-critical fcn export-data  ww-gluon gluon-grid
 
-main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${FUNCDIR}/clenshaw.h ${DIR}/kt-formula.o 
-	gcc ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main ${INC} ${OPT}
+#main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${FUNCDIR}/clenshaw.h ${DIR}/kt-formula.o 
+#	gcc ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main ${INC} ${OPT}
+
+main: ${DEPS} ${FUNCDIR}/main-2.cc ${DIR}/kt-formula.o 
+	g++ ${FUNCDIR}/main-2.cc  ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main -fopenmp -lMinuit2 ${INC} ${OPT}
+
 
 gluon-grid: ${DEPS} ${UTILDIR}/gluon-grid.c ${DIR}/dipole-cross-section.o  ${UTILDIR}/tmd-gluon-2.h ${FUNCDIR}/clenshaw.o 
 	gcc ${UTILDIR}/gluon-grid.c ${DIR}/dipole-cross-section.o ${LIBS} -o ${DIR}/gluon-grid   ${INC} ${OPT}
@@ -76,29 +81,14 @@ fcn: ${DEPS} ${FUNCDIR}/fcn.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.
 diffraction: ${DEPS} ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o ${FUNCDIR}/clenshaw.h ${FUNCDIR}/clenshaw-curtis.hh 
 	g++ ${FUNCDIR}/diffraction.cc ${DIR}/dipole-cross-section.o ${LIBS} -o ${DIR}/diffraction ${INC}  ${OPT}
 
-#ww-gluon-x: ${DEPS} ${UTILDIR}/ww-gluon-x.c ${UTILDIR}/ww-gluon.h ${DIR}/dipole-cross-section.o 
-#	gcc ${UTILDIR}/ww-gluon-x.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/ww-gluon-x   ${INC} ${OPT}
-
-#ww-critical: ${DEPS} ${UTILDIR}/ww-critical.c ${UTILDIR}/ww-gluon.h ${DIR}/dipole-cross-section.o 
-#	gcc ${UTILDIR}/ww-critical.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/ww-critical   ${INC} ${OPT}
-
-#geometric-scaling: ${DEPS} ${UTILDIR}/geometric-scaling.c  ${UTILDIR}/critical-line.h ${DIR}/dipole-cross-section.o 
-#	gcc ${UTILDIR}/geometric-scaling.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/geometric   ${INC} ${OPT}
-#geometric: ${DEPS} ${UTILDIR}/geometric-scaling.c  ${UTILDIR}/tmd-gluon.h ${DIR}/dipole-cross-section.o 
-#	gcc ${UTILDIR}/geometric-scaling.c ${DIR}/dipole-cross-section.o  ${LIBS} -o ${DIR}/geometric   ${INC} ${OPT}
-
-#heavy-F2: ${DEPS} ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/clenshaw.o  
-#	gcc ${UTILDIR}/Plot-heavy-F2.c ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/clenshaw.o ${LIBS} -o ${DIR}/heavy-F2 ${INC} ${OPT} 
-
 export-data: ${DEPS} ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${FUNCDIR}/clenshaw.h
 	gcc ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o  ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/export-data ${INC} ${OPT} 
 
-${DIR}/kt-formula.o: ${FUNCDIR}/kt-formula.c
-	gcc ${FUNCDIR}/kt-formula.c -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
+#${DIR}/kt-formula.o: ${FUNCDIR}/kt-formula.c
+#	gcc ${FUNCDIR}/kt-formula.c -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
 
-
-#${DIR}/clenshaw.o: ${FUNCDIR}/clenshaw.c
-#	gcc -c ${FUNCDIR}/clenshaw.c -o ${DIR}/clenshaw.o  ${INC} ${OPT}
+${DIR}/kt-formula.o: ${FUNCDIR}/kt-formula.cc
+	g++ ${FUNCDIR}/kt-formula.cc -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
 
 
 ${DIR}/read-and-fit.o: ${FUNCDIR}/read-and-fit.c ${FUNCDIR}/read-and-fit-cheb.h ${FUNCDIR}/read-and-fit.h  ${UTILDIR}/f2.h ${FUNCDIR}/Kahn.h 

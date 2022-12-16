@@ -8,10 +8,11 @@
 #include"./gluon-chebyshev.h"
 #include"./sudakov.h"
 //#include"./laplacian.h"
+#include"clenshaw.h"
 
-extern double dgquad_(double (*)(double*), double*,double*,int*  );
-extern double dgauss_(double (*)(double*), double*,double*,double *  );
-extern double dclenshaw(double(*)(double*),double,double,double);
+//extern double dgquad_(double (*)(double*), double*,double*,int*  );
+//extern double dgauss_(double (*)(double*), double*,double*,double *  );
+//extern double dclenshaw(double(*)(double*),double,double,double);
 
 ////////////////////////////////////////////////////////////
 ////////////////// common functions ////////////////////////
@@ -27,11 +28,11 @@ int parameter(const double *par,double* sigpar,double* sudpar){
 	//}
 	//printf("\n");
 #if (MODEL==0||MODEL==2||MODEL==22)
-	sigpar[0]=par[0];
+	sigpar[0]=2.56819*par[0];//mb to GeV
 	sigpar[1]=par[1];
 	sigpar[2]=par[2]*1.0e-4;
 #else
-	sigpar[0]=par[0];
+	sigpar[0]=2.56819*par[0];
 	sigpar[1]=par[1];
 	//sigpar[1]=pow(fabs(par[1])*1.0e-4,par[2]);
 	sigpar[2]=par[2];
@@ -163,8 +164,8 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 	double mu2;
 	int signal= compute_mu2(r, par+3 , &mu2, 1 );
 	if(signal!=0){
-		printf("sigma_bgk:: C %.3e mu02 %.3e\n",par[3],par[4]);
-		getchar();
+		printf("sigma_bgk:: C %.3e mu02 %.3e signal=%d\n",par[3],par[4],signal);
+		//getchar();
 		return 0;
 	} 
 	
@@ -174,7 +175,25 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 	
 	return(val) ;	
 }
+//////////////////////////////////////////////////////////////
+//////////////////// IIM ////////////////////////////////////
+/////////////////////////////////////////////////////////////
+double sigma_iim(double r, double x, double Q2, const double* par){
+	double lambda=0.2197;
+	double Qs=pow(1.632e-5/x,lambda/2 );
+	double alpha=0.860533,beta=0.709374;
+	double gamma=0.7376;
+	double kappa=9.9;
 
+	double val=0;
+	if(r*Qs<=2){
+		val=0.7*pow(r*Qs/2,2*gamma)*exp(-2*pow( log(r*Qs/2),2 )/(kappa*lambda*log(1/x)) );
+	}else{
+		val=1-exp(-4*alpha*pow( log(beta*r*Qs),2 ) );
+	}
+	return(val);
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //derivatives
@@ -228,6 +247,26 @@ double Qs2(double r , double x, double *par){
 double laplacian_sigma(double r,double x,double q2, double *par,double *sudpar){
 	SIGPARAM.x=x;
 	SIGPARAM.sigpar=par;
+#if IIM==1
+	double x0=1.632e-5, k=9.9, l=0.2197, gc=0.7376, N0=0.7, al=0.860533 ,be=0.709374;
+	double val=0;
+	double Qs=pow(x0/x, l/2);
+	double logqsr=0;
+	if(Qs*r<2){
+		logqsr=log(Qs*r/2);
+		val=pow(4,1-gc)*exp((2*pow(logqsr,2)) /(k*l*log(x)) ) *N0* pow(Qs*r,2*gc)* (4*pow(logqsr,2)+4*gc*k*l*logqsr*log(x)+k*l* log(x)*(1+pow(gc,2)*k*l*log(x)))/(pow(k*l*r*log(x),2)); 
+		//val+=(pow(4,1 - gc)*exp((2*pow(logqsr,2))/(k*l*log(x)))*N0*pow(Qs*r,2*gc)*(4*pow(logqsr,2) + 4*gc*k*l*logqsr*log(x) + k*l*log(x)*(1 + pow(gc,2)*k*l*log(x))))/
+   (pow(k,2)*pow(l,2)*pow(r,2)*pow(log(x),2));
+	}else{
+		val=-16*al*al*pow(be*Qs*r,-4*al)/pow(r,2);
+	}
+	//printf("lap %.3e Qs r =%.3e, logqsr=%.3e\n", val, Qs*r,logqsr );
+	val*=par[0];
+	if((isnan(val)+isinf(val)) !=0){
+		printf("r=%.3e x=%.3e Q2=%.3e value=%.3e, Qs=%.3e\n",r,x,q2, val, Qs);
+		getchar();
+	}
+#else
 	double val;
 	double bound=7.5e-3;
 	if(r<bound){
@@ -240,12 +279,18 @@ double laplacian_sigma(double r,double x,double q2, double *par,double *sudpar){
 	}else{
 		val=laplacian2(&sigma_for_lap,r,bound/10);
 	}
+
+	
+
+
 #if SUDAKOV>=1
 	double mu2;
 	int signal=compute_mu2(r,sudpar, &mu2,1);//compute mu2
 	if(q2>mu2){
 		val*=exp_sud(r,mu2,q2);
 	}
+#endif
+	//printf("lap sigma %.3e\n",val);
 #endif
 	return val;
 }
@@ -259,12 +304,12 @@ double laplacian_sigma(double r,double x,double q2, double *par,double *sudpar){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////             INTEGRATION            ///////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
-double integrand_gbs(double *R){
+double integrand_gbs(double *R ,void*){
 	double r=*R;
 	double val=r*log(SIGPARAM.rmax/r)*laplacian_sigma(r,SIGPARAM.x,SIGPARAM.Q2,SIGPARAM.sigpar,SIGPARAM.sudpar);
 	return val;
 }
-double integrand_gbs2(double *R){
+double integrand_gbs2(double *R,void*){
 	double r=*R;
 	double val=r*laplacian_sigma(r,SIGPARAM.x,SIGPARAM.Q2,SIGPARAM.sigpar,SIGPARAM.sudpar);
 	return val;
@@ -287,9 +332,10 @@ double sigma_gbs(double r, double x, double Q2,double *sigpar,double* sudpar){
 	}
 	val=BASE_SIGMA(rmin,x,Q2,sigpar);
 	double min=R_MIN;
+	double *dummy;
 	double eps=DGAUSS_PREC;
-	val+=dclenshaw(&integrand_gbs,rmin,r,eps);
-	val+=log(r/rmin)*dclenshaw(&integrand_gbs2,min,rmin,eps);
+	val+=dclenshaw(&integrand_gbs,(void*)dummy,rmin,r,eps);
+	val+=log(r/rmin)*dclenshaw(&integrand_gbs2,(void*)dummy,min,rmin,eps);
 	printf("%.5e\n",val);
 	return(val);
 }
@@ -344,9 +390,11 @@ double sigma_gbs(double r, double x, double Q2, const double * par){
 	double result=0;
 	double rmin=1.0e-5;
 	double N=DGAUSS_PREC;
+	double *dummy;
 	//int N=96;
 	//result=dgquad_(&integrand_gbs,&rmin,VAR,&N);
-	result=dgauss_(&integrand_gbs,&rmin,VAR,&N);
+	//result=dgauss_(&integrand_gbs,&rmin,VAR,&N);
+	result=dclenshaw(&integrand_gbs,(void*)dummy, rmin,*VAR,DGAUSS_PREC);
 	return(result);
 }
 

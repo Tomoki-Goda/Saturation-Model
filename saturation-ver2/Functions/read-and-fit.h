@@ -1,9 +1,9 @@
 //static double PSI[5][2*N_SIMPS_R+1][MAXN];//pre-evaluated sets of psi
 //static double SAMPLES[5][2*N_SIMPS_R+1][MAXN];//sampled points of integrand 
 #define MAXN 600
-#include"./kahnsum.h"
-
-//extern double k_group_sum(const double *arr,int len);
+//#include"./kahnsum.h"
+#include"./Kahn.h"
+//extern double Kahn_list_sum(const double *arr,int len);
 //extern double kahn_sum(const double *arr,int len);
 
 extern double SIGMA_PREC;
@@ -111,7 +111,7 @@ void sample_integrand(const  double *psi_arr,  double  *samples, const double* p
 #if (R_CHANGE_VAR==1)
 				term*=pow(1+r,2);
 #endif	
-				samples[data_no*((NF-1)*(2*N_SIMPS+1))+j*(NF-1)+fl ]=term;
+				samples[data_no*((NF-1)*(2*N_SIMPS+1))+j*(NF-1)+fl ]=2*PI*term;//azimuthal 2PI
 				//samples[fl][j][data_no]=term;
 			}
 		}
@@ -221,11 +221,11 @@ void simpson_kahn_sum(const double *samples, double * csarray){
 		}
 
 		res2=kahn_sum(summand,2*N_SIMPS+1);
-		res3=k_group_sum(summand,2*N_SIMPS+1);
+		res3=Kahn_list_sum(summand,2*N_SIMPS+1);
 
 
 		qsort(summand, 2*N_SIMPS+1,sizeof(*summand),&comp_fabs);
-		res4=k_group_sum(summand,2*N_SIMPS+1);
+		res4=Kahn_list_sum(summand,2*N_SIMPS+1);
 		val=res4;
 		res5=0;
 		for(int i=0;i<(2*N_SIMPS+1);i++){
@@ -234,7 +234,7 @@ void simpson_kahn_sum(const double *samples, double * csarray){
 
 		printf("results: %.6e  %.6e  %.6e  %.6e\t %.5e\n",res3-res1,res3-res2,res3-res4,res3-res5,res3);
 #endif*/
-		val=k_group_sum(summand,2*N_SIMPS+1);
+		val=Kahn_list_sum(summand,2*N_SIMPS+1);
 
 		*(csarray+data_no)=val*(r_step/3);
 	}		

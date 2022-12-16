@@ -120,7 +120,7 @@ int import_results(FILE * file,struct data *data_struct,struct data *error_struc
 
 void table_name(const char* key, char* name){
 	if(strcmp(key,"sigma_0")==0){
-		strcpy(name,"$\\sigma_0$");
+		strcpy(name,"$\\sigma_0$ [mb]");
 		
 	}else if(strcmp(key,"x_0")==0){
 		strcpy(name,"$x_0 (10^{-4})$");
@@ -138,16 +138,17 @@ void table_name(const char* key, char* name){
 		strcpy(name,"$C$");
 		
 	}else if(strcmp(key,"mu02")==0){
-		strcpy(name,"$\\mu_0^2$");
+		strcpy(name,"$\\mu_0^2 \\; [\\mathrm{GeV^2}]$");
 		
 	}else if(strcmp(key,"C2")==0){
 		strcpy(name,"$C_S$");
 		
 	}else if(strcmp(key,"mu022")==0){
-		strcpy(name,"$\\mu_{0S}^2$");
+		strcpy(name,"$\\mu_{0S}^2\\; [\\mathrm{GeV^2}]$");
 		
 	}else if(strcmp(key,"n_data")==0){
 		strcpy(name,"$N_{data}$");
+
 	}else if(strcmp(key,"chisq/dof")==0){
 		strcpy(name,"$\\chi^2/dof$");
 		
@@ -176,6 +177,14 @@ void interpret_dir(char* dir, char *mass, char * qup, char * model, char *sudako
 		
 		chptr=strtok(filenameptr[1],"-");
 		sscanf(chptr,"%4s%s",dum,mass);
+		if(strcmp(mass,"0.0")==0){
+			strcpy(mass,"0.0");
+		}else if(strcmp(mass,"0.0196")==0){
+			strcpy(mass,"0.14");	
+		}else{
+			printf("Unknown mass %s\n",mass);
+		}
+
 		chptr=strtok(NULL,"-");
 		sscanf(chptr,"%3s%s",dum,qup);
 		chptr=strtok(NULL,"-");
@@ -269,12 +278,14 @@ int main(int argc, char** argv){
 	}
 	//printf("out file open\n");
 	//fprintf(file,"\\begin{table}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|");
-	fprintf(file,"\\resizebox{\\textwidth}{!}{\\begin{tabular}{|");
+	//fprintf(file,"\\resizebox{\\textwidth}{!}{
+	fprintf(file,"\\begin{tabular}{|");
 	
+	fprintf(file,"c c ");
 	for(int i=0;i<varlen+1;i++){
 		fprintf(file,"c|");
 	}
-	fprintf(file,"}\n\\hline\n-");
+	fprintf(file,"}\n\\hline\n Model & $m_l\\;[\\mathrm{GeV}]$ & $Q_\\mathrm{up}^2 \\;[\\mathrm{GeV^2}]$");
 	
 	char parval[20];
 	double parameter_value;
@@ -294,7 +305,8 @@ int main(int argc, char** argv){
 	for(int i=0;i<dir_ind;i++){
 		
 		interpret_dir(argv[directories[i]], mass, qup,model, sudakov);
-		fprintf(file,"%s, $m_l=%s$, $Q_{up}=%s$ ",model,mass,qup);
+		//fprintf(file,"%s, $m_l=%s$ & $Q_\\mathrm{up}=%s$ ",model,mass,qup);
+		fprintf(file,"%s&%s &%s",model,mass,qup);
 		for(int j=0;j<varlen;j++){
 			//printf("%s ",pars[j]);
 			read_write_data(&(data_arr[i]),pars[j],parval,"r");
@@ -318,7 +330,7 @@ int main(int argc, char** argv){
 		}
 		fprintf(file,"\\\\ \\hline\n");
 	}
-	fprintf(file,"\\end{tabular} }\n");
+	fprintf(file,"\\end{tabular} \n");
 	//fprintf(file,"\\end{tabular} } \\end{table}\n");
 	fclose(file);	
 

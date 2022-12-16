@@ -9,12 +9,12 @@ BGKS=${DIR}/BGKS-Fix-S/Mass0.0-Qup650-Model3-Sud1
 SAVE=../Document/Plots
 PLOT=./Plotting
 
-#${PLOT}/visualize-dipole.py \
-#	-s ${SAVE}/dipole \
-#	${GBW} \
-#	${GBWS} \
-#	${BGK} \
-#	${BGKS}
+${PLOT}/visualize-dipole.py \
+	-s ${SAVE}/dipole \
+	${GBW} \
+	${GBWS} \
+	${BGK} \
+	${BGKS}
 
 #${PLOT}/visualize-slope.py \
 #	-s ${SAVE}/slope \

@@ -4,7 +4,8 @@
 
 
 #define MAXN 600
-#include"./kahnsum.h"
+//#include"./kahnsum.h"
+#include"./Kahn.h"
 /////////////////////kahn.h/////////////////////
 //extern double k_group_sum(const double *arr,int len);
 //extern double kahn_sum(const double *arr,int len);
@@ -189,7 +190,8 @@ double curtis_clenshaw_sum(const double *sample_arr){
 	//summand[N_CHEB/2]=val;
 	
 	
-	return k_group_sum(summand,N_CHEB/2);
+	//return k_group_sum(summand,N_CHEB/2);
+	return Kahn_list_sum(summand,N_CHEB/2);
 	 
 }
 
@@ -216,7 +218,7 @@ void generate_data_set(const double *par,const double *psi_arr,double *samples, 
 			shift=(data_no*(NF-1)*N_CHEB + fl*N_CHEB);
 			 val+=curtis_clenshaw_sum(samples+shift );
 		}
-		csarray[data_no]=val*jac/((double) N_CHEB);//jacobian for ch.var. and 2/N normalization of curtis clenshaw quadrature.
+		csarray[data_no]=2*PI*val*jac/((double) N_CHEB);//2*PI from azimuthal.  jacobian for ch.var. and 2/N normalization of curtis clenshaw quadrature.
 	}
 	//printf("Generated\n");
 //////////////////////////////////////////////////////////////

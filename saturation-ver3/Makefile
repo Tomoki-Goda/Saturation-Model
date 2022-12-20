@@ -35,8 +35,8 @@ plot: critical dipole F2 FL F2-slope tmd-gluon tmd-gluon-x tmd-critical fcn expo
 #main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${FUNCDIR}/clenshaw.h ${DIR}/kt-formula.o 
 #	gcc ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main ${INC} ${OPT}
 
-main: ${DEPS} ${FUNCDIR}/main-2.cc ${DIR}/kt-formula.o 
-	g++ ${FUNCDIR}/main-2.cc  ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main -fopenmp -lMinuit2 ${INC} ${OPT}
+main: ${DEPS} ${FUNCDIR}/main-2.cc ${DIR}/kt-formula-cuba.o 
+	g++ ${FUNCDIR}/main-2.cc  ${DIR}/kt-formula-cuba.o ${LIBS} -o ${DIR}/main -fopenmp -lMinuit2 -lcuba ${INC} ${OPT}
 
 
 gluon-grid: ${DEPS} ${UTILDIR}/gluon-grid.c ${DIR}/dipole-cross-section.o  ${UTILDIR}/tmd-gluon-2.h ${FUNCDIR}/clenshaw.o 
@@ -89,6 +89,9 @@ export-data: ${DEPS} ${UTILDIR}/export-data.c ${DIR}/read-and-fit.o ${DIR}/dipol
 
 ${DIR}/kt-formula.o: ${FUNCDIR}/kt-formula.cc
 	g++ ${FUNCDIR}/kt-formula.cc -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
+
+${DIR}/kt-formula-cuba.o: ${FUNCDIR}/cubaintegral.cc
+	g++ ${FUNCDIR}/cubaintegral.cc -o ${DIR}/kt-formula-cuba.o -c  ${INC} ${OPT} 
 
 
 ${DIR}/read-and-fit.o: ${FUNCDIR}/read-and-fit.c ${FUNCDIR}/read-and-fit-cheb.h ${FUNCDIR}/read-and-fit.h  ${UTILDIR}/f2.h ${FUNCDIR}/Kahn.h 

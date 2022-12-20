@@ -266,7 +266,9 @@ double F2_kt(const double x,const  double Q2,const  double mf2,const double* par
 	const int key =9;
 	
 	//char statefile[]="cuba.state";
-	char statefile[]="";
+	
+	char statefile[100]="";
+	//sprintf(statefile,"x%.3e-Q2%.3e.state",x,Q2);
  	double result;
  	
 	

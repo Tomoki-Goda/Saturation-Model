@@ -76,7 +76,7 @@ int main(int argc, char** argv){
 	printf("*****************************\n");
 	printf("*** Simplex: eps=%.1e  ***\n",INT_PREC);
 	printf("*****************************\n");
-	min=simplex(100,10);
+	min=simplex(100,1);
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		
 	ROOT::Minuit2::MnMachinePrecision prec;

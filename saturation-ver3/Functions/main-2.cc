@@ -13,6 +13,14 @@ double INT_PREC=DGAUSS_PREC;
 
 
 int main(int argc, char** argv){
+	std::chrono::system_clock walltime;
+	std::chrono::time_point start= walltime.now();
+	
+	std::cout<<std::scientific<<std::endl;
+	
+	printf("Czesc World!\nProgram Started.\n");
+	printf("Directory=%s\n",(char*)argv[1]);
+	
 
 	KtFCN theFCN("/home/tomoki/Saturation-Model/saturation-ver3/data/hera_tot.dat");
 	ROOT::Minuit2::MnUserParameters upar;
@@ -56,38 +64,65 @@ int main(int argc, char** argv){
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
 	
-	//ROOT::Minuit2::MnUserParameterState stat(upar);
-	//ROOT::Minuit2::MnStrategy strategy(0);
-	//std::cout<<"Parameters\n ";
-	//std::cout<<stat<<std::endl;
-	INT_PREC=1.0e-3;
-	
+	INT_PREC=1.0e-2;
+	printf("*****************************\n");
+	printf("*** Simplex: eps=%.1e  ***\n",INT_PREC);
+	printf("*****************************\n");
 	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);
 	ROOT::Minuit2::FunctionMinimum min=simplex(100,10);
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	
+	INT_PREC=1.0e-3;
+	printf("*****************************\n");
+	printf("*** Simplex: eps=%.1e  ***\n",INT_PREC);
+	printf("*****************************\n");
+	min=simplex(100,10);
+	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		
 	ROOT::Minuit2::MnMachinePrecision prec;
 	prec.SetPrecision(1.0e-5);
-	ROOT::Minuit2::MnMigrad migrad(theFCN, min.UserParameters() ,1);
-	//ROOT::Minuit2::MnMigrad migrad(theFCN, upar,1);
-	INT_PREC=1.0e-5;
+	ROOT::Minuit2::MnMigrad migrad(theFCN, min.UserParameters() ,0);
 	
-	//std::cout<<"min= "<<min<<std::endl;
+	INT_PREC=1.0e-4;
 	for(int i=0;i<(N_PAR-skip);i++ ){
 		migrad.RemoveLimits(i);
 	}
-	//ROOT::Minuit2::FunctionMinimum min=migrad();
-
-	//ROOT::Minuit2::FunctionMinimum 
-	min=migrad(1000,1);
+	printf("***************************\n");
+	printf("*** First: eps=%.1e  ***\n",INT_PREC);
+	printf("***************************\n");
+	for(int i=0;i<10;i++){
+		min=migrad(10,10);
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		std::cout<<std::scientific<<"fcn= "<<min.UserState().Fval()<<", edm= "<<min.UserState().Edm()<<std::endl;
+		
+		if(min.IsValid()){
+			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
+			break;
+		}
+	}
 	
-	//stat(upar);
+	INT_PREC=1.0e-5;
+	printf("***************************\n");
+	printf("*** Second: eps=%.1e  ***\n",INT_PREC);
+	printf("***************************\n");
+	ROOT::Minuit2::MnMigrad migrad2(theFCN, min.UserParameters() ,1);
+	
+	for(int i=0;i<20;i++){
+		min=migrad(50,1);
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		std::cout<<std::scientific<<"fcn= "<<min.UserState().Fval()<<", edm= "<<min.UserState().Edm()<<"  "<<min.IsValid()<<std::endl;
+		if(min.IsValid()){
+			printf("FINE: %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
+			break;
+		}
+	}
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	
 	std::cout<<"min= "<<min<<std::endl;
-	
-	//FILE* file=fopen(argv[1],"w");
 	std::fstream file;
+	std::chrono::duration time=walltime.now()-start;
+	
+	std::cout<<time.count()<<" seconds"<<std::endl;
+	
 	file.open(((std::string)argv[1])+"/result.txt",std::fstream::out);
 	file<<std::scientific;
 	file<<"Qup"<<"\t"<<Q2_MAX<<std::endl;

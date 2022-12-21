@@ -8,7 +8,7 @@
 
 
 ########################################################################################################
-DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.h 
+DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
 LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath
 

@@ -7,7 +7,8 @@
 #include"Minuit2/FCNBase.h"
 #include"Minuit2/MnMachinePrecision.h"
 
-#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
+//#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
+#include"./clenshaw-curtis.hh"
 #include<ctime>
 #include<chrono>
 

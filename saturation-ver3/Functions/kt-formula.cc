@@ -1,10 +1,13 @@
 #include<iostream>
 #include<cmath>
-#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
+//#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
 //#include"/home/tomoki/Numerics/clenshaw-sector.h"
-#include"/home/tomoki/Numerics/clenshaw.h"
-#include"/home/tomoki/Numerics/dgauss.h"
+//#include"/home/tomoki/Numerics/clenshaw.h"
+//#include"/home/tomoki/Numerics/dgauss.h"
 //#include"/home/tomoki/Numerics/chebyshev.hh"
+#include"./clenshaw.h"
+#include"./dgauss.h"
+#include"./clenshaw-curtis.hh"
 
 #include"./control.h"
 #include"./control-default.h"

@@ -69,7 +69,7 @@ int main(int argc, char** argv){
 	printf("*** Simplex: eps=%.1e  ***\n",INT_PREC);
 	printf("*****************************\n");
 	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);
-	ROOT::Minuit2::FunctionMinimum min=simplex(100,10);
+	ROOT::Minuit2::FunctionMinimum min=simplex(200,1);
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	
 	INT_PREC=1.0e-3;
@@ -81,17 +81,18 @@ int main(int argc, char** argv){
 		
 	ROOT::Minuit2::MnMachinePrecision prec;
 	prec.SetPrecision(1.0e-5);
-	ROOT::Minuit2::MnMigrad migrad(theFCN, min.UserParameters() ,0);
 	
-	INT_PREC=1.0e-4;
+	ROOT::Minuit2::MnMigrad migrad(theFCN, min.UserParameters() ,0);
 	for(int i=0;i<(N_PAR-skip);i++ ){
 		migrad.RemoveLimits(i);
 	}
+	
+	INT_PREC=1.0e-3;
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  ***\n",INT_PREC);
 	printf("***************************\n");
 	for(int i=0;i<10;i++){
-		min=migrad(10,10);
+		min=migrad(20,1);
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		std::cout<<std::scientific<<"fcn= "<<min.UserState().Fval()<<", edm= "<<min.UserState().Edm()<<std::endl;
 		
@@ -101,7 +102,8 @@ int main(int argc, char** argv){
 		}
 	}
 	
-	INT_PREC=1.0e-5;
+	
+	INT_PREC=1.0e-4;
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",INT_PREC);
 	printf("***************************\n");
@@ -116,10 +118,26 @@ int main(int argc, char** argv){
 			break;
 		}
 	}
+	INT_PREC=1.0e-5;
+	printf("***************************\n");
+	printf("*** Second: eps=%.1e  ***\n",INT_PREC);
+	printf("***************************\n");
+	//ROOT::Minuit2::MnMigrad migrad2(theFCN, min.UserParameters() ,1);
+	
+	for(int i=0;i<20;i++){
+		min=migrad(50,1);
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		std::cout<<std::scientific<<"fcn= "<<min.UserState().Fval()<<", edm= "<<min.UserState().Edm()<<"  "<<min.IsValid()<<std::endl;
+		if(min.IsValid()){
+			printf("FINE: %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
+			break;
+		}
+	}
+	
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	std::cout<<"min= "<<min<<std::endl;
 	std::fstream file;
-	std::chrono::duration time=walltime.now()-start;
+	std::chrono::duration<double> time=walltime.now()-start;
 	
 	std::cout<<time.count()<<" seconds"<<std::endl;
 	
@@ -133,6 +151,9 @@ int main(int argc, char** argv){
 	file<<"chisq"<<"\t"<<min.UserState().Fval()<<"\t"<<min.UserState().Edm()<<std::endl;
 	file<<"n_data\t"<<theFCN.MAX_N<<std::endl;
 	file<<"chisq/dof\t"<<min.Fval()/(theFCN.MAX_N-(N_PAR-skip) ) <<std::endl;
+	file<<"Flag\t"<<min.IsValid()<<std::endl;
+	file<<"eps\t"<<INT_PREC<<std::endl;
+	
 	file.close();
 	
 	

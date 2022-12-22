@@ -47,7 +47,7 @@ double   par_max[] 	= {50.00,  	20.00,	10.0, 		10.00,	1.00,		10,	1.00,		2.0,	2.0
 #endif
 #endif
 
-int parameter(std::vector<double> par,double* sigpar,double* sudpar){
+int parameter(std::vector<double> par,PREC* sigpar,PREC* sudpar){
 ///////////////////
 //Sigpar are as we all know it, parameters for dipole sigma.
 //sudpar are {C , r_max, g1, g2} but parameters may be given in terms of mu02 (as in BGK), and C and r_max may be that of BGK.
@@ -58,71 +58,71 @@ int parameter(std::vector<double> par,double* sigpar,double* sudpar){
 	//}
 	//printf("\n");
 #if (MODEL==0||MODEL==2||MODEL==22)
-	sigpar[0]=2.56819*par[0];//mb to GeV
-	sigpar[1]=par[1];
-	sigpar[2]=par[2]*1.0e-4;
+	sigpar[0]=2.56819*(PREC)(par[0]);//mb to GeV
+	sigpar[1]=(PREC)(par[1]);
+	sigpar[2]=(PREC)(par[2])*1.0e-4;
 #else
-	sigpar[0]=2.56819*par[0];
-	sigpar[1]=par[1];
-	//sigpar[1]=pow(fabs(par[1])*1.0e-4,par[2]);
-	sigpar[2]=par[2];
+	sigpar[0]=2.56819*(PREC)(par[0]);
+	sigpar[1]=(PREC)(par[1]);
+	//sigpar[1]=pow(fabs((PREC)par[1])*1.0e-4,par[2]);
+	sigpar[2]=(PREC)(par[2]);
 #endif
 
 	
 	
 	//printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
 #if(MODEL==1||MODEL==3)
-	sigpar[3]=par[3];
+	sigpar[3]=(PREC)(par[3]);
 	#if MU0==0
-		sigpar[4]=sigpar[3]/(par[4]*par[4]);
+		sigpar[4]=sigpar[3]/((PREC)(par[4])*(PREC)(par[4]));
 	#else
-		sigpar[4]=par[4];//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
+		sigpar[4]=(PREC)(par[4]);//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
 	#endif
 	//printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
-		sudpar[0]=par[3];
+		sudpar[0]=(PREC)(par[3]);
 	#if MU0==0
-		sudpar[1]=sudpar[0]/(par[4]*par[4]);
+		sudpar[1]=sudpar[0]/((PREC)(par[4])*(PREC)(par[4]));
 	#else
-		sudpar[1]=par[4];
+		sudpar[1]=(PREC)(par[4]);
 	#endif
 	//printf("\tSUDAKOV: %.2e %.2e ",sudpar[0],sudpar[1]);	
 #if (SUDAKOV==2)
-	sudpar[2]=par[5];
-	sudpar[3]=par[6];
+	sudpar[2]=(PREC)(par[5]);
+	sudpar[3]=(PREC)(par[6]);
 	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
 #endif
 
 ///////////////////////////////////////////////////////
 #elif (MODEL==3)
 	#if INDEPENDENT_C==1
-		sudpar[0]=par[5] ;
+		sudpar[0]=(PREC)(par[5]) ;
 	#else 
-		sudpar[0]=par[3];
+		sudpar[0]=(PREC)(par[3]);
 	#endif
 
 	#if MU0==0 //if rmax is fit parameter
 		#if INDEPENDENT_RMAX==1
-			sudpar[1]=sudpar[0]/(par[6]*par[6]);
+			sudpar[1]=sudpar[0]/((PREC)(par[6])*(PREC)(par[6]));
 		#else
-			sudpar[1]=sudpar[0]/(par[4]*par[4]);
+			sudpar[1]=sudpar[0]/((PREC)(par[4])*(PREC)(par[4]));
 		#endif
 
 	#else //if mu02 is the fit parameter
 		#if INDEPENDENT_RMAX==1
-			sudpar[1]=par[6];
+			sudpar[1]=(PREC)(par[6]);
 		#else
-			sudpar[1]=par[4];//mu02 is shared
+			sudpar[1]=(PREC)(par[4]);//mu02 is shared
 		#endif
 	#endif
 	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);
 
 //////////////////////////////////////////////////////
 #if (SUDAKOV==2)
-	sudpar[2]=par[7];
-	sudpar[3]=par[8];
+	sudpar[2]=(PREC)(par[7]);
+	sudpar[3]=(PREC)(par[8]);
 	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
 #endif
 #endif

@@ -10,22 +10,24 @@
 //#include"dipole-cross-section.h"
 
 #include"./mu2.h"
-
+#include"clenshaw.h"
 
 double SIGMA_PREC;
 //extern int N_DATA;
 
 
 //extern double sudakov(double ,double, double* );// in dipole-cross-section
-//extern double BASE_SIGMA(double, double, double, double*);
-extern double sigma_gbw(double, double, double, const double*);
-extern double sigma_bgk(double, double, double, const double*);
+extern double BASE_SIGMA(double, double, double,const  double*);
+//extern double SIGMA(double, double, double, double*);
+//extern double sigma_gbw(double, double, double, const double*);
+//extern double sigma_bgk(double, double, double, const double*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 extern double dgauss_(double(* )(double*),double*,double*,double*); 
 extern double dgquad_(double(* )(double*),double*,double*,int*);
 extern double dadapt_(double(* )(double*),double*,double*,int*,double*,double* ,double*,double*);
-
+extern double dcurtis(double(* )(double*),double,double,double);
+//extern double dclenshaw(double(* )(double*),double,double,double);
 static double VAR[3];
 //static double DUMMY_ARRAY[20];
 static const double *SIGPAR;//=DUMMY_ARRAY;
@@ -251,7 +253,7 @@ double ddsdrdr(double r ,const double * mu2_arr, double q2, const double *SUDPAR
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////     Integration     //////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
-double integrand( double * r_ptr){
+double integrand( double * r_ptr,void*){
 	
 	double val;
 	double r=*r_ptr;
@@ -288,8 +290,10 @@ double integrand( double * r_ptr){
 	}
 
 #if (SUDAKOV==1)	
-	if((mu2_arr[0]) > q2){
-		printf("integrand:: mu2=%.3e Q2=%.3e\n",mu2_arr[0], q2 );
+	if(mu2_arr[0]-q2>0 ){
+		if(fabs(q2-mu2_arr[0])>1.0e-5){
+			printf("integrand:: mu2=%.3e Q2=%.3e, 1-difference = %3.e\n",mu2_arr[0], q2,(q2-mu2_arr[0]) );
+		}
 		return(0.0);
 	}
 #endif
@@ -386,12 +390,13 @@ double integral_term(double r, double x, double q2,const  double * sigmapar,cons
 		//rmin=rmax;
 	//}
 	////////////////////////////////////
-	int seg=10;
-	double NRel=DGAUSS_PREC ;
-	double NAbs=0;//1.0e-10;
-	double error=0;
-	dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
-	
+	//int seg=10;
+	//double NRel=DGAUSS_PREC ;
+	//double NAbs=0;//1.0e-10;
+	//double error=0;
+	//dadapt_(&integrand,&rmin,VAR,&seg ,&NRel, &NAbs, &result, &error)	;
+	double* dummy;
+	result=dclenshaw(&integrand,dummy,rmin,*VAR,DGAUSS_PREC );	
 	
 ////////////////////////////////////////////////////////////////////////////////
 	if(isnan(result)!=0){

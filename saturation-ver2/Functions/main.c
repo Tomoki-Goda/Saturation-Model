@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
 	//int error_flag;
 	//MNCOMD(*fcn,"SET LIMITS",error_flag,0);
 	//MNCOMD(*fcn,"MINIMIZE 1000 1.0D00 " ,error_flag,0);
-	MNCOMD(*fcn,"CALLFCN 3",error_flag,0);	
+	//MNCOMD(*fcn,"CALLFCN 3",error_flag,0);	
 	time_measure-=clock();
 	
 	

@@ -1,10 +1,11 @@
 
-//extern double k_group_sum(const double *arr,int len);
+//extern double Kahn_list_sum(const double *arr,int len);
 //#include"./kahnsum.h"
 //#include"./critical-line.h"
 //#include"../Functions/sudakov.h"
-#include"../Functions/kahnsum.h"
+#include"../Functions/Kahn.h"
 //#include"./main.h"
+#include"clenshaw.h"
 extern double dbesj0_(double*);
 extern double dbesj1_(double*);
 extern double mod_x(double, double,int);
@@ -15,7 +16,6 @@ extern double laplacian_sigma(double ,double,double,double*,double *);
 extern int parameter(const double*,double*,double*);
 extern void approx_xg(const double *);
 
-extern double dgauss_(double (*)(double*),double*,double*,double*);
 
 static const int n=750;
 static double sample[2*750+1 +2]={0};
@@ -34,7 +34,7 @@ double *mu2;
 //static double lap_for_int(double*r){
 //	return(laplacian_sigma(PARAM.x, *r, PARAM.Q2,PARAM.sigpar));
 //}
-static double integrand_af(double* r ){
+static double integrand_af(double* r,void* ){
 	double r2=(*r)/(1-*r);
 	double jac=1.0/pow(1-*r,2);
 
@@ -44,8 +44,11 @@ static double integrand_af(double* r ){
  	//printf("%.5e\tr=%.5e\n",val,*r);
 	return val;
 }
+
+extern double dgauss_(double (*)(double*),double*,double*,double*);
 extern double dgquad_(double(*)(double *), double*, double*,int*);
 extern double dadapt_(double(*)(double *), double*, double*,int*,double*,double*,double*,double*);
+//extern double dclenshaw(double (*)(double *), double ,double, double);
 
 double af(double x,double k,double q2,double * sigpar,double *sudpar){
 	PARAM.x=x;
@@ -73,7 +76,31 @@ double af(double x,double k,double q2,double * sigpar,double *sudpar){
 	//	//val+=dgquad_(&integrand_af,&low,&high,&N);
 	//	low=high;
 	//}
-	val=dgauss_(&integrand_af,lim,lim+1,&eps);
+	//val=dgauss_(&integrand_af,lim,lim+1,&eps);
+	double* dummy;	
+#if IIM==1
+	val=0;
+	double Qs=pow(1.632e-5/x,0.2197/2);
+	double r_bound=2.0/Qs;
+	r_bound=r_bound/(1+r_bound);
+	printf("%.3e %.3e %.3e\n", lim[0],r_bound, lim[1]);
+	if(r_bound<lim[0]){
+		r_bound=lim[0];
+		printf("skip\n " );
+	}else{
+		val+=dclenshaw(&integrand_af,(void*)dummy,lim[0],r_bound-1.0e-3,eps);
+		printf("val1 %.3e\n" ,val);
+	}
+	if(r_bound>lim[1]){
+		r_bound=lim[1];
+		printf("skip\n " );
+	}else{
+		val+=dclenshaw(&integrand_af,(void*)dummy,r_bound+1.0e-3,lim[1],eps);
+		printf("val2 %.3e\n" ,val);
+	}
+#else
+	val=dclenshaw(&integrand_af,(void*)dummy,lim[0],lim[1],eps);
+#endif
 	//dadapt_(&integrand_af,lim,lim+1,&seg,&eps,&epsabs,&val,&err);
 	//double val=dgquad_(&integrand_af,lim,lim+1,&N);
 	printf("af= %.5e+-%.5e \tk^2=%.5e \n",val,err,k*k);
@@ -122,7 +149,7 @@ double simps_sum(double * sample, int len ,  double step){
 			}
 			summand[j]=term;
 	}
-	val=k_group_sum(summand,2*n+1);
+	val=Kahn_list_sum(summand,2*n+1);
 	val*=(step/3);
 	return val;
 }
@@ -188,4 +215,47 @@ double grad_k(double k,double step,double *sudpar,double q2){
 	return(val);
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+double saturation(double step,double* sudpar,double Q2){
+	double k_step=0.1;
+	double k_min=0.4;
+	double k=k_min;
+	double prev=1;
+	double val;
+	
+	for(int i=0;i<6;i++){
+		//printf("%.3e\t%.3e\n",k_min,k_step );
+		k=k_min;
+		
+		for(int j=0;j<100;j++){
+			val=grad_k(k,step,sudpar,Q2);
+			//printf("%d : %.3e, %.3e, %.3e, %.3e\n",j ,k,k_min, val, prev );
+			if(j!=0 ){
+				if(prev*val<0){
+					k_min=k-k_step;
+					//printf("%d : %.3e, %.3e, %.3e, %.3e\n",i ,k,k_min, val, prev );
+					break;
+				}
+			}
+			if(fabs(val)>fabs(prev)){
+				//printf("error\t%.3e\t%.3e\n",val,prev);
+			}
+			//printf("%f, %f, %f\n",k, val, prev );
+			prev=val;
+			k+=k_step;
+		}
+		if(fabs(prev)<1.0e-5){
+			break;
+		}
+		if(i!=5){
+			k_step*=0.05;
+		}
+		
+	}
+	//printf("\nk=%.3e, val= %.3e, prev= %.3e\n\n",k, val, prev );
+	
+	k=k - k_step*fabs(val/(prev-val) );//weighted mid point 	
+	return(k);
+}
 

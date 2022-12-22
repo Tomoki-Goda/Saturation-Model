@@ -15,7 +15,7 @@
 
 extern void approx_xg(const double *);
 extern int parameter(const double*,double *, double*);
-extern void simpson1dA(double(*)(double, double**),double**,double,double,int,double*,double*); 
+//extern void simpson1dA(double(*)(double, double**),double**,double,double,int,double*,double*); 
 extern double SIGMA(double , double ,double ,double *,double*);
 extern double psisq_z_int(double, double ,int);
 extern double mod_x(double,double, int);
@@ -31,9 +31,11 @@ double f2_slope(double Q2, double**pars){
 	double xdiff=(**pars)/10; //this is just a choice. choosing the value of 10x, note its \Delta log10(x) so very small.
 	double logx=log10(**pars);
 	double f2[2];
-	simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,f2,&err);//f2 is not over r bur r=R/(1-R)
+	//simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,f2,&err);//f2 is not over r bur r=R/(1-R)
+	f2[0]=dclenshaw(&f2_integrand,(void*)pars,1.0e-5,0.97,DGAUSS_PREC);
 	(*(*pars)) = pow(10.0, logx+xdiff);
-	simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,f2+1,&err);
+	//simpson1dA(&f2_integrand,pars,1.0e-5,0.97,500,f2+1,&err);
+	f2[1]=dclenshaw(&f2_integrand,(void*)pars,1.0e-5,0.97,DGAUSS_PREC);
 	//double slope = (log(f2[0]/ f2[1]) )/(log(10)*xdiff);
 	double slope = (log10(f2[0]/ f2[1]) )/(xdiff);
 	printf("%f\t%f\t%f\n",slope,*(f2),*(f2+1));

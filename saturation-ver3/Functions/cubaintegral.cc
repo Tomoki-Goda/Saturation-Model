@@ -171,7 +171,7 @@ class Integrand_kt{
 			val*=gluptr->aF(xz, kt2 );
 			
 #if ALPHA_RUN==1
-			val*=alpha(kappa_t_prime2+kt2+mf2+1)/0.2;
+			val*=gluptr->alpha(kappa_t_prime2+kt2+mf2+1)/0.2;
 			//printf("%.5le\n", val);
 #endif
 			return(Q2/(2*PI) *jac1*jac2*jac3* val/kt2 );	

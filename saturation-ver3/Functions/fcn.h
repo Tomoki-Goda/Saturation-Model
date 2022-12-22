@@ -73,6 +73,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			MAX_N=i;	
 			//file.close();	
 			fclose(file);	
+			printf("HERA data loaded\n");
 		
 		}
 		~KtFCN(){
@@ -108,6 +109,9 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				val=0;
 				x=X_DATA[i];
 				Q2=Q2_DATA[i];
+				if(Q2<1.0e-3){
+					printf("x=%.3e Q2=%.3e\n",x,Q2);
+				}
 				val=F2_kt(x,Q2,0,sigpar);//summation over flavour is done at the level of integrand.
 				
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
@@ -120,7 +124,11 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				printf("CHISQ = %.5e (%.2f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);			
 				std::cout<<interval.count()<<" seconds, ("<< -((double)time)/CLOCKS_PER_SEC<<" CPU seconds)"<<std::endl;
 			}
-#endif
+#endif	
+			if(std::isnan(chisq)+std::isinf(chisq)){
+				printf("theFCN:: %.3e encountered\n", chisq);
+				return(0);
+			}
 			return chisq;
 		}
 		

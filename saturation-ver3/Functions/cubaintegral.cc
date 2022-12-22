@@ -20,6 +20,10 @@ extern double INT_PREC;
 #endif
 
 inline double modx(const double x, const double Q2,const  double mf2){
+	if(std::isnan(x+Q2+mf2+mf2/Q2)+std::isinf(x+Q2+mf2+mf2/Q2)!=0){
+				printf("modx:: Q2=%.3e x=%.3e mf2=%.3e\n",Q2,x,mf2);
+				getchar();
+	}
 #if MODX==1
 	return( (x*(1+4*mf2/Q2)));
 #else 
@@ -198,6 +202,10 @@ class Sigma{
 
 	public:	
 		int set_kinem(const double a,const double b){
+			if(std::isnan(a+b)+std::isinf(a+b)!=0){
+				printf("Sigma:: Q2=%.3e x=%.3e\n",a,b);
+				getchar();
+			}
 			x=a;
 			Q2=b;
 			return 0;
@@ -226,6 +234,7 @@ class Sigma{
 			if(std::isnan(val)+std::isinf(val)!=0){
 				printf("sigma_gbw: %.3e encountered \n",val);
 				printf("sigma_0 %.3e  lambda %.3e x_0 %.3e\n",sigma_0,lambda,x_0);
+				printf("Q2 %.3e  x %.3e \n",Q2,x);
 				getchar();
 				return 0;
 			}else{
@@ -256,6 +265,10 @@ class Integrand_r{
 	private:
 		double x, Q2, mf2;
 		int set_kinem(double a,double b,double c){
+			if(std::isnan(a+b+c)+std::isinf(a+b+c)!=0){
+				printf("Integrand:: Q2=%.3e x=%.3e mf2=%.3e\n",a,b,c);
+				getchar();
+			}
 			x=a;
 			Q2=b;
 			mf2=c;

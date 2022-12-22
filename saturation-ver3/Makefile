@@ -10,14 +10,14 @@
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
-LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath
+LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -openmp
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
 
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR}
 
-OPT=-O3 -Wno-unused-result 
+OPT=-O3 -Wno-unused-result # -Wno-format 
 
 SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
 GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h
@@ -36,7 +36,7 @@ plot: critical dipole F2  F2-slope tmd-gluon tmd-gluon-x tmd-critical dipole-gri
 #	gcc ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main ${INC} ${OPT}
 
 main: ${DEPS} ${FUNCDIR}/main-2.cc ${DIR}/kt-formula-cuba.o 
-	g++ ${FUNCDIR}/main-2.cc  ${DIR}/kt-formula-cuba.o ${LIBS} -o ${DIR}/main -fopenmp -lMinuit2 -lcuba ${INC} ${OPT}
+	g++ ${FUNCDIR}/main-2.cc  ${DIR}/kt-formula-cuba.o ${LIBS} -o ${DIR}/main  ${INC} ${OPT}
 
 
 gluon-grid: ${DEPS} ${UTILDIR}/gluon-grid.c ${DIR}/dipole-cross-section.o  ${UTILDIR}/tmd-gluon-2.h ${FUNCDIR}/clenshaw.h 

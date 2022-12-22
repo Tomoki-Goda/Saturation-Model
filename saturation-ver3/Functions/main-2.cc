@@ -8,7 +8,7 @@
 #include"./constants.h"
 #include"./Parameters.hh"
 
-double INT_PREC=DGAUSS_PREC;
+PREC INT_PREC=DGAUSS_PREC;
 #include"./fcn.h"
 
 //KtFCN theFCN("/home/tomoki/Saturation-Model/saturation-ver3/data/hera_tot.dat");
@@ -105,7 +105,7 @@ int main(int argc, char** argv){
 	
 	INT_PREC=1.0e-2;
 	printf("*****************************\n");
-	printf("*** Simplex: eps=%.1e  ***\n",INT_PREC);
+	printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("*****************************\n");
 	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);
 	ROOT::Minuit2::FunctionMinimum min=simplex(200,1);
@@ -124,7 +124,7 @@ int main(int argc, char** argv){
 	
 	INT_PREC=1.0e-3;
 	printf("*****************************\n");
-	printf("*** Simplex: eps=%.1e  ***\n",INT_PREC);
+	printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("*****************************\n");
 	min=simplex(100,1);
 	
@@ -151,7 +151,7 @@ int main(int argc, char** argv){
 
 	INT_PREC=1.0e-3;
 	printf("***************************\n");
-	printf("*** First: eps=%.1e  ***\n",INT_PREC);
+	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
 	for(int i=0;i<10;i++){
 		min=migrad(20,1);
@@ -174,7 +174,7 @@ int main(int argc, char** argv){
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 	INT_PREC=1.0e-4;
 	printf("***************************\n");
-	printf("*** Second: eps=%.1e  ***\n",INT_PREC);
+	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
 	ROOT::Minuit2::MnMigrad migrad2(theFCN, min.UserParameters() ,1);
 	
@@ -214,7 +214,7 @@ int main(int argc, char** argv){
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	std::cout<<"min= "<<min<<std::endl;
 	std::fstream file;
-	std::chrono::duration<double> time=walltime.now()-start;
+	std::chrono::duration<PREC> time=walltime.now()-start;
 	
 	std::cout<<time.count()<<" seconds"<<std::endl;
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	

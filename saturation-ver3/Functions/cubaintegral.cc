@@ -70,7 +70,7 @@ class Gluon{
 			Q2=b;
 			return 0;
 		}
-	private:
+	public:
 		inline PREC alpha(const PREC mu2){
 			//const PREC b0=((11.0*3.0-3.0*2.0)/12.0);
 			//const PREC val=1.0/(b0 *log( ((mu2>2*LQCD2)?(mu2):(2*LQCD2))/LQCD2));

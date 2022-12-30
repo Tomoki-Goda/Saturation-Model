@@ -103,12 +103,12 @@ class Clenshaw_Curtis:public Clenshaw_Curtis_FIX{
 						}
 						return(total.total());
 					}
-					increase=2*(DIV*counter)*scale;//twice the current section size to start.
+					increase=2*(DIV)*scale;//twice the current section size to start.
 					smin=smax;
 					smax=( ( (max-(increase+smin))<increase/2)?(max):(increase+smin) );//but only if remaining section is not too small.(it is wasteful to compute small remnant of section at the end...
 					counter=0;
 				}else{  
-					smax=smin+(scale/(DIV*counter) );
+					smax=smin+(scale/(DIV) );
 				}
 				if((smax-smin)<1.0e-15){
 					std::cout<<name<<" ";

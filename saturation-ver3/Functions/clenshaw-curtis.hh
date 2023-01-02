@@ -51,7 +51,7 @@ class Clenshaw_Curtis:public Clenshaw_Curtis_FIX{
 				counter++;
 				totlicz++;
 				if(totlicz==50){
-					printf("Ran %d times.  Reconsider strategy \n",totlicz);
+					printf("Ran %d times.  Reconsider strategy. Eff= %d/%d=%.3e \n",totlicz,licz,totlicz,((double)licz)/totlicz);
 				}
 				scale=(smax-smin)/2;
 				
@@ -103,7 +103,8 @@ class Clenshaw_Curtis:public Clenshaw_Curtis_FIX{
 						}
 						return(total.total());
 					}
-					increase=2*(DIV)*scale;//twice the current section size to start.
+					increase=2*(pow(DIV,((counter+REV-1)/REV)))*scale;//DIV**a times the current section size to start.
+					//increase=2*DIV*scale;//DIV**a times the current section size to start.
 					smin=smax;
 					smax=( ( (max-(increase+smin))<increase/2)?(max):(increase+smin) );//but only if remaining section is not too small.(it is wasteful to compute small remnant of section at the end...
 					counter=0;
@@ -123,8 +124,10 @@ class Clenshaw_Curtis:public Clenshaw_Curtis_FIX{
 	//	return (integrate_cc(func, args, min, max, sect,  eps,1,));
 	//}
 public:
+	 
 	int ERROR=0;
 	int MAX_RECURSION=5;
+	int REV=2;//Determines how quickly the size of section grows (back). 
 	std::string name="";
 	
  	double	integrate(double(*func)(double*,void*),void* args,double min,double max, int sect,double eps,double epsabs){

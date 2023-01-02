@@ -54,7 +54,6 @@ int save_res(std::string name, const ROOT::Minuit2::FunctionMinimum *min,const K
 int main(int argc, char** argv){
 	std::chrono::system_clock walltime;
 	std::chrono::time_point start= walltime.now();
-	
 	std::cout<<std::scientific<<std::endl;
 	
 	printf("Czesc World!\nProgram Started.\n");

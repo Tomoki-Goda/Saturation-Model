@@ -1,0 +1,170 @@
+
+
+\section{Connection to the momentum space formula}
+Firstly, let us conider 
+\begin{align}
+&\left(\frac{1}{D_1}-\frac{1}{D_2}\right)^2&
+&\text{and}&
+&\left(\frac{\boldsymbol{\kappa}_t}{D_1}-\frac{\boldsymbol{\kappa}_t-\mathbf{k}_t}{D_2}\right)^2
+\end{align}
+of Eqs.~(\ref{eq:angle-unintegratedT})~and~(\ref{eq:angle-unintegratedL}).
+
+Using identities (demonstrated at the end of the section), 
+\begin{align}
+\begin{split}
+\left(\frac{1}{\kappa_t^2+N_i^2}-\frac{1}{(\boldsymbol{\kappa}_t-\mathbf{k}_t)^2+N_i^2} \right)&\\
+=-i &\left( 
+\int\frac{d^2\mathbf{r}}{2\pi}e^{i \boldsymbol{\kappa}_t\cdot\mathbf{r}}K_0(N_1 r)
+- \int\frac{d^2\mathbf{r}}{2\pi}e^{i (\boldsymbol{\kappa}_t-\mathbf{k}_t)\cdot\mathbf{r}}K_0(N_1 r)
+\right)
+\end{split}\\
+\begin{split}
+\left(\frac{\boldsymbol{\kappa}_t}{\kappa_t^2+N_i^2}-\frac{\boldsymbol{\kappa}_t-\mathbf{k}_t}{(\boldsymbol{\kappa}_t-\mathbf{k}_t)^2+N_i^2} \right)&\\
+=-i N_1& \left( 
+\int\frac{d^2\mathbf{r}}{2\pi}\left(\frac{\mathbf{r}}{r}\right)e^{i \boldsymbol{\kappa}_t\cdot\mathbf{r}}K_1(N_1 r)
+- \int\frac{d^2\mathbf{r}}{2\pi}\left(\frac{\mathbf{r}}{r}\right)e^{i (\boldsymbol{\kappa}_t-\mathbf{k}_t)\cdot\mathbf{r}}K_1(N_1 r)
+\right)
+\end{split}
+\end{align}
+And multipying by complex conjugate ({\color{red} Nowhere it is mentioned that it is complex conjuagte, but following Kowalski, it seems like so.})
+\begin{align}
+\begin{split}
+\left(\frac{1}{D_1}-\frac{1}{D_2}\right)^2&\\
+&=\int\frac{d^2\mathbf{r}}{2\pi}\int\frac{d^2\mathbf{r}'}{2\pi}
+e^{i \boldsymbol{\kappa}_t\cdot(\mathbf{r}-\mathbf{r}')}
+ \left(1 -e^{-i\mathbf{k}\cdot \mathbf{r}}
+\right)
+\left(1 -e^{i\mathbf{k}\cdot \mathbf{r}'}
+\right)
+K_0(N_1 r)K_0(N_1 r')
+\end{split}\\
+\begin{split}
+\left(\frac{\boldsymbol{\kappa}_t}{D_1}-\frac{\boldsymbol{\kappa}_t-\mathbf{k}_t}{D_2}\right)^2&\\
+=&\int\frac{d^2\mathbf{r}}{2\pi}\int\frac{d^2\mathbf{r}'}{2\pi}
+\left(\frac{\mathbf{r}\cdot\mathbf{r}'}{r r'}\right)
+e^{i \boldsymbol{\kappa}_t\cdot(\mathbf{r}-\mathbf{r}')}
+ \left(1 -e^{-i\mathbf{k}\cdot \mathbf{r}}
+\right)
+\left(1 -e^{i\mathbf{k}\cdot \mathbf{r}'}
+\right)
+K_1(N_1 r)K_1(N_1 r')
+\end{split}
+\end{align}
+Now,  if \underline{\color{blue} one assumed that $x/z$ and $\mu$ have no dependence on $\kappa_t$,} one can integrate over $\boldsymbol{\kappa}_t$ to yield a delta function $(2\pi)^2 \delta^2(\mathbf{r}-\mathbf{r}')$.\\
+Thus obtains,
+\begin{align}
+\int \frac{d^2\boldsymbol{\kappa}_t}{2\pi}\left(\frac{1}{D_1}-\frac{1}{D_2}\right)^2
+&=\int\frac{d^2\mathbf{r}}{2\pi}
+\left |1 -e^{i\mathbf{k}\cdot \mathbf{r}}
+\right|^2
+K_0^2(N_1 r)
+\\
+\int \frac{d^2\boldsymbol{\kappa}_t}{2\pi}\left(\frac{\boldsymbol{\kappa}_t}{D_1}-\frac{\boldsymbol{\kappa}_t-\mathbf{k}_t}{D_2}\right)^2&
+=\int\frac{d^2\mathbf{r}}{2\pi}
+\left|1 -e^{i\mathbf{k}\cdot \mathbf{r}}
+\right|^2
+K_1^2(N_1 r).
+\end{align}
+Inserting back to Eqs.~(\ref{eq:angle-unintegratedT})~and~(\ref{eq:angle-unintegratedL}) (angular part of $\mathbf{k}_t$ is brought back),
+\begin{align}
+\begin{split}
+F_{2T}(x,Q^2)=2\sum e^2_f\frac{Q^2}{4\pi^2}\int^1_0 d\beta\int\frac{d^2\mathbf{r}}{2\pi}
+{\color{blue}\int\frac{d^2 \mathbf{k}_t}{k_t^2} \alpha_s(\mu^2)\mathcal{F}(x/z,k^2_t,\mu^2)\left |1 -e^{i\mathbf{k}\cdot \mathbf{r}}
+\right|^2
+}
+&\Theta(1-x/z)\\
+\times
+\Big[
+\left[\beta^2+(1-\beta)^2\right]
+K_0^2(N_1 r)+&m_f^2
+K_1^2(N_1 r)
+\Big]
+\end{split}\\
+\begin{split}
+F_{2L}(x,Q^2)=2\sum e^2_f\frac{Q^2}{4\pi^2}\int^1_0 d\beta \int\frac{d^2\mathbf{r}}{2\pi}
+{\color{blue}\int\frac{d^2 \mathbf{k}_t}{k_t^2}
+\alpha_s(\mu^2)\mathcal{F}(x/z,k^2_t,\mu^2)\left|1 -e^{i\mathbf{k}\cdot \mathbf{r}}
+\right|^2
+}
+&\Theta(1-x/z)\\
+\times
+\Big[
+4Q^2\beta^2 (1-\beta)^2&
+K_1^2(N_1 r)
+\Big].
+\end{split}
+\end{align}
+Using the familiar equation
+\begin{equation}
+\sigma(x,r)=\frac{2\pi}{3}\int\frac{d^2\mathbf{k}}{k^2}\alpha\mathcal{F}(x,k^2)\left|1-e^{i \mathbf{k}\cdot\mathbf{r}}\right|,
+\end{equation}
+\underline{\color{blue}and again, assuming $z$ and $\mu$ are independent of $k_t$,}
+\begin{align}
+\begin{split}
+F_{2T}(x,Q^2)=6\sum e^2_f\frac{Q^2}{4\pi^2}\int^1_0 d\beta\int\frac{d^2\mathbf{r}}{(2\pi)^2}
+\sigma(x/z,r)
+&\Theta(1-x/z)\\
+\Big[
+\left[\beta^2+(1-\beta)^2\right]&
+K_0^2(N_1 r)
++m_f^2
+K_1^2(N_1 r)
+\Big]
+\end{split}\\
+\begin{split}
+F_{2L}(x,Q^2)=6\sum e^2_f\frac{Q^2}{4\pi^2}\int^1_0 d\beta \int\frac{d^2\mathbf{r}}{(2\pi)^2}
+\sigma(x/z,r)
+&\Theta(1-x/z)\\
+\Big[&
+4Q^2\beta^2 (1-\beta)^2
+K_1^2(N_1 r)
+\Big].
+\end{split}
+\end{align}
+{\color{red} Factor of $(2\pi)^2$ different from the GBW.} (and of course  $x\leftrightarrow x/z$.)
+
+\textbf{\color{blue}\underline{ One then identifies that GBW formula is obtained assuming $ 1/z=\left(1+4 m_f^2/Q^2\right)$.}}\\
+This corresponds to $k_t,\kappa'_2\sim0$ and $\beta\sim 1/2$. This assumption makes it necessary to have massive light quarks to replace non-zero $k_t$ and $\kappa'_2$.
+{\color{green} We didn't need to assume anything about $\beta$. can't we use for $x_\mathrm{mod}$ ?}\\
+
+{\Large Therfore, modified $x$ is unnecessary for $k_t$ formula !!}
+
+\subsection{The identities}
+For $i=1,2$.
+The identity can be demonstrated as follows.
+Starting from
+\begin{equation}
+i N_1^j\int\frac{dr d\theta}{2\pi} r\left( \frac{\mathbf{r}}{r}\right)^j e^{i r k \cos\theta}K_j(N_1 r),
+\end{equation}
+where $j=0,1$.
+One decompose in $\hat{\mathbf{k}}$ and $\hat{\mathbf{k}'}$, where $\hat{\mathbf{k}}\cdot \hat{\mathbf{k}'}=0$. 
+Then 
+\begin{equation}
+=i N_1^j\int\frac{dr d\theta}{2\pi}r \left(\frac{r\left( \hat{\mathbf{k}} \cos\theta+\hat{\mathbf{k}'}\sin\theta\right)}{r}\right)^j  e^{i r k \cos\theta}K_j(N_1 r).
+\end{equation}
+Since the integration over $\theta$ for the $\sin\theta$ term is 0,
+\begin{equation}
+=i N_1^j \hat{\mathbf{k}}^j\int\frac{dr d\theta}{2\pi}r \left(  \cos\theta \right)^j  e^{i  r k \cos\theta}K_j(N_1 r).
+\end{equation}
+Using, 
+\begin{equation}
+\int^\pi_{-\pi}\cos(j \theta)e^{\pm i z \cos(\theta)}=\pm 2\pi i J_j(z),
+\end{equation}
+and keepng in mind $j=0,1$ only,
+\begin{equation}
+\begin{split}
+=i N_1^j \hat{\mathbf{k}}^j\int\frac{dr d\theta}{2\pi} r  \left( \cos (j \theta)\right) e^{i rk \cos\theta}K_j(N_1 r)\\
+=- N_1^j \hat{\mathbf{k}}^j\int^\infty_0 dr r J_j(kr )K_j(N_1 r)
+\end{split}
+\end{equation}
+Lastly, using
+\begin{equation}
+\int^\infty_0 dr r J_j(r k) K_j( r N_1)=\left(\frac{|k|}{N_1}\right)^j\frac{1}{k^2+N_1^2},
+\end{equation}
+one arrives to the identity
+\begin{align}
+i N_1\int\frac{d^2\mathbf{r}}{2\pi} \left( \frac{\mathbf{r}}{r}\right) e^{i r k \cos\theta}K_1(N_1 r)&=-\mathbf{k} \frac{1}{k^2+N_1^2}\\
+i \int\frac{d^2\mathbf{r}}{2\pi}e^{i r k \cos\theta}K_1(N_1 r)&=- \frac{1}{k^2+N_1^2}
+\end{align}
+{\color{red} Somehow there is a sign difference from the Kowalski's paper. For now, trivial.}
+

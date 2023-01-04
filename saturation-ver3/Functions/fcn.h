@@ -16,7 +16,7 @@
 	#define RFORMULA 0
 #endif
 
-extern double F2_kt(const double,const double,const double, const double*);
+extern double F2_kt(const  PREC,const  PREC,const PREC, const PREC*);
 //extern double F2_r(const double,double,double,double*);
 class KtFCN : public ROOT::Minuit2::FCNBase {
 	
@@ -52,16 +52,25 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			FILE* file=fopen(data_file.c_str(),"r");
 			double wdata;
 			//while((!file.eof())&&(j<597)){
+			if(file==NULL){
+				printf("file not found.\n");
+			}
 			while((!feof(file))&&(j<597)){
-				fscanf(file,"%lE %lE %lE %lE %lE", (Q2_DATA+i),(X_DATA+i),&wdata,(CS_DATA+i),(ERR_DATA+i)); 
-				/////formula in I. Abt et al 2017////////
-				fac = pow(Q2_DATA[i],2)*(1-X_DATA[i])/ (4*pow(PI,2)*alpha*(Q2_DATA[i]+pow(2*X_DATA[i]*xmp0,2)));
-				fac*=units;	
-				CS_DATA[i] = fac*CS_DATA[i];
-				ERR_DATA[i] = fac*ERR_DATA[i];
+				fscanf(file,"%lf %lf %lf %lf %lf", (Q2_DATA+i),(X_DATA+i),&wdata,(CS_DATA+i),(ERR_DATA+i)); 
+				//printf("%le %le %le %le %le\n", *(Q2_DATA+i),*(X_DATA+i),wdata,*(CS_DATA+i),*(ERR_DATA+i)); 
+				
 			
 				if((X_DATA[i]<=X_MAX)&&( Q2_DATA[i]<=Q2_MAX)){
+					//printf("%le %le %le %le %le\n", *(Q2_DATA+i),*(X_DATA+i),wdata,*(CS_DATA+i),*(ERR_DATA+i)); 
+					/////formula in I. Abt et al 2017////////
+					fac = pow(Q2_DATA[i],2)*(1-X_DATA[i])/ (4*pow(PI,2)*alpha*(Q2_DATA[i]+pow(2*X_DATA[i]*xmp0,2)));
+					fac*=units;	
+					CS_DATA[i] = fac*CS_DATA[i];
+					ERR_DATA[i] = fac*ERR_DATA[i];
 					//fprintf(stdout, "%d: %lE %lE %lE %lE %lE\n",i+1,*(X_DATA+i), *(Y_DATA+i), *(Q2_DATA+i), *(CS_DATA+i), *(ERR_DATA+i));
+					
+					
+					//printf("%.3e %.3e %.3e %.3e %.3e\n", Q2_DATA[i],X_DATA[i],wdata,CS_DATA[i],ERR_DATA[i]); 
 					i++;
 				}
 				if(i==MAX_N){
@@ -73,6 +82,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			MAX_N=i;	
 			//file.close();	
 			fclose(file);	
+			printf("HERA data loaded\n");
 		
 		}
 		~KtFCN(){
@@ -82,7 +92,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			free(ERR_DATA);
 		}
 		
-		double operator()(const std::vector<double> & par)const{
+		double operator()(const std::vector<double>& par)const{
 			std::chrono::system_clock walltime;
 			std::chrono::time_point start= walltime.now();
 
@@ -102,12 +112,15 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			//getchar();
 			}
 #endif			
-			double sigpar[10],sudpar[10];
+			PREC sigpar[10],sudpar[10];
 			parameter(par,sigpar, sudpar);
 			for(int i=0;i<MAX_N;i++){
 				val=0;
 				x=X_DATA[i];
 				Q2=Q2_DATA[i];
+				if(Q2<1.0e-3){
+					printf("x=%.3e Q2=%.3e\n",x,Q2);
+				}
 				val=F2_kt(x,Q2,0,sigpar);//summation over flavour is done at the level of integrand.
 				
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
@@ -120,8 +133,12 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				printf("CHISQ = %.5e (%.2f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);			
 				std::cout<<interval.count()<<" seconds, ("<< -((double)time)/CLOCKS_PER_SEC<<" CPU seconds)"<<std::endl;
 			}
-#endif
-			return chisq;
+#endif	
+			if(std::isnan(chisq)+std::isinf(chisq)){
+				printf("theFCN:: %.3e encountered\n", chisq);
+				return(0);
+			}
+			return ((double)chisq);
 		}
 		
 

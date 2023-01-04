@@ -102,7 +102,10 @@ int main(int argc, char** argv){
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
 	
+	ROOT::Minuit2::MnMachinePrecision prec;
+	prec.SetPrecision(1.0e-8);
 	INT_PREC=1.0e-2;
+	prec.SetPrecision(INT_PREC);
 	printf("*****************************\n");
 	printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("*****************************\n");
@@ -122,6 +125,7 @@ int main(int argc, char** argv){
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 	
 	INT_PREC=1.0e-3;
+	prec.SetPrecision(INT_PREC);
 	printf("*****************************\n");
 	printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("*****************************\n");
@@ -138,8 +142,6 @@ int main(int argc, char** argv){
 		
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 
-	ROOT::Minuit2::MnMachinePrecision prec;
-	prec.SetPrecision(1.0e-8);
 
 	
 	ROOT::Minuit2::MnMigrad migrad(theFCN, min.UserParameters() ,0);
@@ -149,11 +151,12 @@ int main(int argc, char** argv){
 	
 
 	INT_PREC=1.0e-3;
+	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
 	for(int i=0;i<10;i++){
-		min=migrad(20,1);
+		min=migrad(20,10);
 		flag=check_min(&min,N_PAR-skip);
 		if( flag==0){
 			min_prev=min;
@@ -172,13 +175,14 @@ int main(int argc, char** argv){
 	
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 	INT_PREC=1.0e-4;
+	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
 	ROOT::Minuit2::MnMigrad migrad2(theFCN, min.UserParameters() ,1);
 	
 	for(int i=0;i<20;i++){
-		min=migrad2(50,1);
+		min=migrad2(50,10);
 		flag=check_min(&min,N_PAR-skip);
 		if( flag==0){
 			min_prev=min;
@@ -194,6 +198,7 @@ int main(int argc, char** argv){
 	}
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 	/*INT_PREC=1.0e-5;
+	prec.SetPrecision(INT_PREC);
 	save_res(((std::string)argv[1])+"/result.txt",min);	
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",INT_PREC);

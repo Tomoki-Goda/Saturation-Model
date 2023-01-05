@@ -174,7 +174,7 @@ int main(int argc, char** argv){
 	}
 	
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
-	INT_PREC=1.0e-4;
+	INT_PREC=1.0e-5;
 	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);

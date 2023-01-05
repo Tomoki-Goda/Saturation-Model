@@ -115,7 +115,7 @@ int main(int argc, char** argv){
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	INT_PREC=1.0e-2;
-	/*for(int i=0;i<2;++i){
+	for(int i=0;i<2;++i){
 		prec.SetPrecision(INT_PREC);
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
@@ -132,7 +132,7 @@ int main(int argc, char** argv){
 		std::cout<<i<<"  Parameters "<<min.UserState()<<std::endl;
 		
 		INT_PREC/=10;
-	}*/
+	}
 	
 	
 	INT_PREC=1.0e-3;

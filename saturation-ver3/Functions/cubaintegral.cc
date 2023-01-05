@@ -45,10 +45,19 @@ double change_var(PREC& var,PREC&  jac,const PREC &min, const PREC &max){//This 
 	return var;
 }
 double change_var2(PREC & var,PREC &  jac,const PREC &min, const PREC &max){//This version is regular at max->Inf
+	
 	PREC scale=(max-min);
-	PREC den=scale*(1-var)+var;
-	jac=pow(scale/den,2);
-	var=(min*(scale)*(1-var)+max*var)/den;	
+	const PREC c=(scale)/100;
+	PREC den=scale*(1-var)+c*var;
+	jac=pow(scale/den,2)*c;
+	var=(min*(scale)*(1-var)+max*var*c)/den;
+	return var;
+}
+double change_var3(PREC & var,PREC &  jac,const PREC &min, const PREC &max,const PREC &c){//This version is regular at max->Inf
+	//const PREC c=1;
+	PREC den=1-(1-c)*var;
+	jac=pow(den,-2)*(max-min)*c;
+	var=(max*c*var+min*(1-var))/den;
 	return var;
 }
 /*PREC change_var(PREC* __restrict var,PREC*  __restrict jac,const PREC min, const PREC max){
@@ -95,10 +104,10 @@ class Gluon{
 
 	public:
 		PREC aF(const PREC &x,const PREC &k2)const{
-			if(x_0<0||x_0>0.01){
+			if(x_0<1.0e-5||x_0>1.0e-3){
 				return 0;
 			}
-			if(lambda<0||lambda>2){
+			if(lambda<0.05||lambda>0.95){
 				return 0;
 			}
 			PREC Qs2=pow(x_0/x,lambda);
@@ -192,14 +201,14 @@ class Integrand_kt{
 			PREC kt2=x1, kappa_t_prime2=x2, beta=x3;
 			PREC jac1=1,jac2=1,jac3=1;
 			
-			change_var2(kappa_t_prime2, jac2,1.0e-15,kprimemax);
+			change_var3(kappa_t_prime2, jac2,1.0e-15,kprimemax, 1.0e-2);
 			change_var(beta, jac3,betamin,betamax);
 			
 			PREC ktmax=kt2_max(kappa_t_prime2,  beta);
 			if(1.0e-15>=ktmax){
 				return 0;
 			}
-			change_var2(kt2, jac1,1.0e-15,ktmax);
+			change_var3(kt2, jac1,1.0e-15,ktmax,1.0e-2);
 			/*if((std::isnan(jac1*jac2*jac3*kappa_t_prime2*beta*kt2 )
 			+std::isinf(jac1*jac2*jac3*kappa_t_prime2*beta*kt2))!=0){
 				printf("integrand:: %f encountered",jac1*jac2*jac3*kappa_t_prime2*beta*kt2);
@@ -218,42 +227,42 @@ class Integrand_kt{
 			return(jac1*jac2*jac3*val);
 		}
 		PREC  integrand01(const PREC &x1,const  PREC &x2,const PREC &x3)const{
-			PREC kt2=1-x1*x1, kappa_t_prime2=x2, beta=x3;
+			PREC kt2=1-x1, kappa_t_prime2=x2, beta=x3;
 			PREC jac1=1,jac2=1,jac3=1;
-			change_var2(kappa_t_prime2, jac2,1.0e-15,kprimemax);
+			change_var3(kappa_t_prime2, jac2,1.0e-15,kprimemax,5.0e-2);
 			change_var(beta, jac3,betamin,betamax);
 			PREC ktmax=kt2_max(kappa_t_prime2,  beta);
 			if(1.0e-15>=kappa_t_prime2||(ktmax<kappa_t_prime2)){
 				return 0;
 			}
-			change_var2(kt2, jac1,1.0e-15,kappa_t_prime2);
+			change_var3(kt2, jac1,1.0e-15,kappa_t_prime2,1.0e-2);
 			if(kt2<0||kt2>ktmax){
 				printf("wrong %.3e -> %.3e <ktmax=%.3e\n",x1, kt2,ktmax );
 			}
 			
 			PREC val;
 			val=integrand2( beta,kappa_t_prime2, kt2);
-			return(2*x1*jac1*jac2*jac3*val);
+			return(jac1*jac2*jac3*val);
 		}
 		PREC integrand02(const PREC &x1,const  PREC &x2,const PREC &x3)const{
-			PREC kt2=x1*x1, kappa_t_prime2=x2, beta=x3;
+			PREC kt2=x1, kappa_t_prime2=x2, beta=x3;
 			PREC jac1=1,jac2=1,jac3=1;
 			
-			change_var2(kappa_t_prime2, jac2,1.0e-15,kprimemax);
+			change_var3(kappa_t_prime2, jac2,1.0e-15,kprimemax,5.0e-2);
 			change_var(beta, jac3,betamin,betamax);
 			
 			PREC ktmax=kt2_max(kappa_t_prime2,  beta);
 			if(kappa_t_prime2>=ktmax||kappa_t_prime2>ktmax){
 				return 0;
 			}
-			change_var2(kt2, jac1,kappa_t_prime2,ktmax);
+			change_var3(kt2, jac1,kappa_t_prime2,ktmax,1.0e-2);
 			if(kt2<0||kt2>ktmax){
 				printf("wrong %.3e -> %.3e <ktmax=%.3e\n",x1, kt2,ktmax );
 			}
 			
 			PREC val;
 			val=integrand2( beta,kappa_t_prime2, kt2);
-			return(2*x1*jac1*jac2*jac3*val);
+			return(jac1*jac2*jac3*val);
 		}
 		PREC operator()(const PREC &x1,const  PREC &x2,const PREC &x3)const{
 			return(integrand01(x1,x2,x3)+integrand02(x1,x2,x3));
@@ -404,9 +413,9 @@ int F2_integrand_A1(const int * __restrict ndim, const PREC* __restrict  intv,co
 int F2_integrand_A(const int  *ndim,const  PREC *intv,const int  *ncomp,PREC * f, void * __restrict p){
  //	int operator()(const int  *ndim,const  PREC *intv,const int  *ncomp,PREC * f, void * __restrict p) const {
 		Integrand_kt* integrand=(Integrand_kt*)p;
-		const PREC& beta=intv[0];
-		const PREC& kappa_t_prime2=intv[1];
-		const PREC& kt2=intv[2];
+		const PREC beta=intv[0];
+		const PREC kappa_t_prime2=intv[1];
+		const PREC kt2=intv[2];
 		PREC val=0;
 		val+= (2.0/3.0)*integrand[0]( kt2, kappa_t_prime2, beta);
 		val+= (4.0/9.0)*integrand[1]( kt2, kappa_t_prime2, beta);
@@ -535,24 +544,25 @@ class Integrand_r{
 		return(result);	
 	}
 	public:
-	PREC integrand_r(PREC z,PREC r)const{
+	//PREC integrand_r(PREC z,PREC r)const{
+	PREC operator()(PREC z,PREC r)const{
 		PREC val=(Q2)/(2*PI*r) *sigma(r)* psisq_f (z, r);
 		return(val);//r^2 comes from photon wave function. just extracted... 2 pi r is angular integration 
 	}
 };
 
 int F2_integrand_B(const int *__restrict ndim, const PREC *__restrict intv,const int *__restrict ncomp,PREC*__restrict  f, void* __restrict p){
-	Integrand_r *param=(Integrand_r*)p;
+	Integrand_r *integrand=(Integrand_r*)p;
 	PREC z=intv[0];
 	PREC r=intv[1];
 	
 	PREC jac=0;
-	change_var(r,jac,R_MIN,R_MAX);
+	change_var3(r,jac,R_MIN,R_MAX,0.1);
 	PREC res=0;
 	
-	res+=(2.0/3.0)*param[0].integrand_r(z,r);
-	res+=(4.0/9.0)*param[1].integrand_r(z,r);
-	res+=(1.0/9.0)*param[2].integrand_r(z,r);
+	res+=(2.0/3.0)*integrand[0](z,r);
+	res+=(4.0/9.0)*integrand[1](z,r);
+	res+=(1.0/9.0)*integrand[2](z,r);
 
 	*f=jac*res;
 	return(0);
@@ -609,7 +619,7 @@ double F2_kt(const PREC x,const  PREC Q2,const  PREC mf2,const PREC (& par)[]){
 	const int key =11;
 #endif
 	
-	const long long int mineval=pow(15,ndim), maxeval=1/pow(INT_PREC/10,2);//use llChure if larger than ~1.0e+9
+	const long long int mineval=pow(10,ndim), maxeval=1/pow(INT_PREC/10,2);//use llChure if larger than ~1.0e+9
 	const long long int nstart=1.0e+2,nincrease=1.0e+2;
 	long long int neval=0;
 	//const int mineval=pow(10,ndim), maxeval=1/pow(INT_PREC/10,2);//use llChure if larger than ~1.0e+9

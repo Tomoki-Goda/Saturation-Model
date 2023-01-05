@@ -4,6 +4,7 @@
 #include"Minuit2/MnMigrad.h"
 #include"Minuit2/MnSimplex.h"
 #include"Minuit2/MnHesse.h"
+#include"Minuit2/MnEigen.h"
 #include"Minuit2/FCNBase.h"
 #include"Minuit2/MnMachinePrecision.h"
 
@@ -138,3 +139,21 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		
 
 };
+
+ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str){
+		ROOT::Minuit2::MnStrategy strat(str);
+		ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat);	
+		ROOT::Minuit2::FunctionMinimum min=migrad2(50,10);
+		ROOT::Minuit2::MnEigen eigen;
+
+		std::cout <<"Eigen values: " ;
+		for (double val: eigen(min.UserCovariance())){
+   			std::cout << val << ' ';
+   		}
+   		std::cout<<"\n"<<std::endl;
+   		stat=min.UserState();
+		return min;		
+}
+	
+	
+

@@ -104,11 +104,12 @@ int main(int argc, char** argv){
 	
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=1.0e-3;
+	INT_PREC=1.0e-4;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
-	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);	
-	ROOT::Minuit2::FunctionMinimum min=simplex(5,1);//Just initialization /check.
+	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);
+	std::cout<<"TEST RUN 10, eps = "<<INT_PREC<<std::endl;	
+	ROOT::Minuit2::FunctionMinimum min=simplex(10,1);//Just initialization /check.
 	ROOT::Minuit2::FunctionMinimum min_prev=min;
 	ROOT::Minuit2::MnEigen eigen;
 	//min_prev=min;
@@ -174,7 +175,7 @@ int main(int argc, char** argv){
 	
 	
 	
-	INT_PREC=1.0e-5;
+	INT_PREC=1.0e-4;
 	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);

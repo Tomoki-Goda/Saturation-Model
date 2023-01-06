@@ -94,7 +94,7 @@ class Gluon{
 	
 	public:
 		explicit Gluon(std::string &type,const PREC (&par)[]){
-				printf("gluon created\n");
+				//printf("gluon created\n");
 				key=type;	
 				set_par(par);	
 		}
@@ -248,7 +248,7 @@ class Integrand_kt{
 		PREC  integrand01(const PREC x1,const  PREC x2,const PREC x3)const{
 			PREC kt2=1-x1*x1, kappa_t_prime2=x2, beta=x3;
 			PREC jac1=1,jac2=1,jac3=1;
-			change_var(kappa_t_prime2, jac2,0,kprimemax,(1+kprimemax) );
+			change_var(kappa_t_prime2, jac2,0,kprimemax,(1+kprimemax/Q2) );
 			change_var(beta, jac3,betamin,betamax,1);
 			PREC ktmax=kt2_max(kappa_t_prime2,  beta);
 			if(0>=kappa_t_prime2||(ktmax<kappa_t_prime2)){
@@ -264,14 +264,14 @@ class Integrand_kt{
 			PREC kt2=x1*x1, kappa_t_prime2=x2, beta=x3;
 			PREC jac1=1,jac2=1,jac3=1;
 			
-			change_var(kappa_t_prime2, jac2,0,kprimemax,(1+kprimemax)  );
+			change_var(kappa_t_prime2, jac2,0,kprimemax,(1+kprimemax/Q2)  );
 			change_var(beta, jac3,betamin,betamax,1);
 			
 			PREC ktmax=kt2_max(kappa_t_prime2,  beta);
 			if(kappa_t_prime2>=ktmax){
 				return 0;
 			}
-			change_var(kt2, jac1,kappa_t_prime2,ktmax,(1+ktmax-kappa_t_prime2) );
+			change_var(kt2, jac1,kappa_t_prime2,ktmax,(1+(ktmax-kappa_t_prime2)/Q2) );
 			//change_var(kt2, jac1,kappa_t_prime2,ktmax,0.01 );
 			PREC val;
 			val=integrand2( beta,kappa_t_prime2, kt2);
@@ -325,7 +325,16 @@ class Integrand_kt{
 #endif
 			return(val);
 		}
-			
+		
+		int F2_integrand_A(const int  *ndim,const  PREC *intv,const int  *ncomp,PREC * f, void * __restrict p){
+			Integrand_kt* integrand=(Integrand_kt*)p;
+			const PREC beta=intv[0];
+			const PREC kappa_t_prime2=intv[1];
+			const PREC kt2=intv[2];	
+			//PREC val=0;
+			*f=(*this)( kt2, kappa_t_prime2, beta);
+			return 0;
+		}
 
 };
 
@@ -461,8 +470,13 @@ class Integrand_r{
 	public:
 	//PREC integrand_r(PREC z,PREC r)const{
 	PREC operator()(PREC z,PREC r)const{
-		PREC val=(Q2)/(2*PI*r) *sigma(r)* psisq_f (z, r);
-		return(val);//r^2 comes from photon wave function. just extracted... 2 pi r is angular integration 
+		PREC jacr=0;
+		change_var(r,jacr,R_MIN,R_MAX, 1+Q2);
+		PREC jacz=0;
+		change_var(z,jacz,0,0.5,10);
+		PREC val=sigma(r)* psisq_f (z, r)/r;
+		
+		return(jacr*jacz*2*val);//r^2 comes from photon wave function. just extracted... 2 pi r is angular integration 
 	}
 };
 
@@ -471,15 +485,14 @@ int F2_integrand_B(const int *__restrict ndim, const PREC *__restrict intv,const
 	PREC z=intv[0];
 	PREC r=intv[1];
 	
-	PREC jac=0;
-	change_var(r,jac,R_MIN,R_MAX,0.1);
+	
 	PREC res=0;
 	
 	res+=(2.0/3.0)*integrand[0](z,r);
 	res+=(4.0/9.0)*integrand[1](z,r);
 	res+=(1.0/9.0)*integrand[2](z,r);
 
-	*f=jac*res;
+	*f=res;
 	return(0);
 }
 

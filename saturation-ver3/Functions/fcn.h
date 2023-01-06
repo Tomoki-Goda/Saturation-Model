@@ -151,7 +151,7 @@ ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT
    			std::cout << val << ' ';
    		}
    		std::cout<<"\n"<<std::endl;
-   		std::cout<<i<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
+   		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
    		stat=min.UserState();
 		return min;		
 }

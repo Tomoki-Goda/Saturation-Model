@@ -15,9 +15,9 @@ LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -openmp
 UTILDIR=./Utilities
 FUNCDIR=./Functions
 
-INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR}
+INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR} -I ~/Tools/root/include
 
-OPT=-O3 -Wno-unused-result # -Wno-format 
+OPT=-O3 -Wno-unused-result #-g # -Wno-format 
 
 PARNI= #${DIR}/avh_parni.o ${DIR}/avh_moncar.o ${DIR}/parni-integral.o
 

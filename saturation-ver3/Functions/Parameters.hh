@@ -2,7 +2,7 @@
 #if ((MODEL==0)||( MODEL==2 )||( MODEL==22 )) 
 #if MU0==1
 std::string par_name[8]	= {"sigma_0",	"lambda",	"x_0",		"C2", 	"mu202",	"g1",	"g2"};
-double par_start[8]	= {	23.0,	0.29,		3.0,		1.26,	2.0,		0.5,	0.5};
+double par_start[8]	= {3.35403e+01,	3.24450e-01,	1.29768e+00,		1.26,	2.0,		0.5,	0.5};
 double par_error[8]	= {	1.0,	0.05,		0.01,		0.01,	0.1,		0.1,	0.1 };
 
 double   par_min[8]	= {	0.0,	0.00,		0.0,		0.1,	1.0 ,		0.0,	0.0};

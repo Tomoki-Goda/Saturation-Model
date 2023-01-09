@@ -15,9 +15,9 @@ LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -openmp
 UTILDIR=./Utilities
 FUNCDIR=./Functions
 
-INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR}
+INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR} -I ~/Tools/root/include
 
-OPT=-O3 -Wno-unused-result # -Wno-format 
+OPT=-O3 -Wno-unused-result #-g # -Wno-format 
 
 PARNI= #${DIR}/avh_parni.o ${DIR}/avh_moncar.o ${DIR}/parni-integral.o
 
@@ -101,9 +101,11 @@ ${DIR}/avh_moncar.o: ${PARNIDIR}/examples/avh_moncar.f
 ${DIR}/parni-integral.o: ${PARNIDIR}/examples/parni-integral.f
 	gfortran -c ${PARNIDIR}/examples/parni-integral.f -o ${DIR}/parni-integral.o
 
-${DIR}/kt-formula-cuba.o: ${FUNCDIR}/cubaintegral.cc
-	g++ ${FUNCDIR}/cubaintegral.cc -o ${DIR}/kt-formula-cuba.o -c  ${INC} ${OPT} 
+#${DIR}/kt-formula-cuba.o: ${FUNCDIR}/cubaintegral.cc
+#	g++ ${FUNCDIR}/cubaintegral.cc -o ${DIR}/kt-formula-cuba.o -c  ${INC} ${OPT} 
 
+${DIR}/kt-formula-cuba.o: ${FUNCDIR}/kt-formula-2.cc
+	g++ ${FUNCDIR}/kt-formula-2.cc -o ${DIR}/kt-formula-cuba.o -c  ${INC} ${OPT} 
 
 ${DIR}/read-and-fit.o: ${FUNCDIR}/read-and-fit.c ${FUNCDIR}/read-and-fit-cheb.h ${FUNCDIR}/read-and-fit.h  ${UTILDIR}/f2.h ${FUNCDIR}/Kahn.h 
 	gcc -c ${FUNCDIR}/read-and-fit.c -o ${DIR}/read-and-fit.o  ${INC} ${OPT}  

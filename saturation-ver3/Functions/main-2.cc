@@ -104,7 +104,7 @@ int main(int argc, char** argv){
 	
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=1.0e-4;
+	INT_PREC=1.0e-3;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);
@@ -115,7 +115,7 @@ int main(int argc, char** argv){
 	//min_prev=min;
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	INT_PREC=1.0e-2;
+	INT_PREC=5.0e-3;
 	for(int i=0;i<2;++i){
 		prec.SetPrecision(INT_PREC);
 		printf("*****************************\n");
@@ -132,12 +132,12 @@ int main(int argc, char** argv){
 		//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 		std::cout<<i<<"  Parameters "<<min.UserState()<<std::endl;
 		
-		INT_PREC/=10;
+		INT_PREC/=5;
 	}
 	
 	
 	INT_PREC=1.0e-3;
-	prec.SetPrecision(INT_PREC);
+	prec.SetPrecision(INT_PREC/2);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
@@ -176,7 +176,7 @@ int main(int argc, char** argv){
 	
 	
 	INT_PREC=1.0e-4;
-	prec.SetPrecision(INT_PREC);
+	prec.SetPrecision(INT_PREC/2);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");

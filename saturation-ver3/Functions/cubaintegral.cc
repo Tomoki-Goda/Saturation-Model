@@ -248,7 +248,7 @@ class Integrand_kt{
 		PREC  integrand01(const PREC x1,const  PREC x2,const PREC x3)const{
 			PREC kt2=1-x1*x1, kappa_t_prime2=x2, beta=x3;
 			PREC jac1=1,jac2=1,jac3=1;
-			change_var(kappa_t_prime2, jac2,0,kprimemax,(1+kprimemax/Q2) );
+			change_var(kappa_t_prime2, jac2,0,kprimemax,(1+kprimemax/pow(Q2,0.25)) );
 			change_var(beta, jac3,betamin,betamax,1);
 			PREC ktmax=kt2_max(kappa_t_prime2,  beta);
 			if(0>=kappa_t_prime2||(ktmax<kappa_t_prime2)){
@@ -264,14 +264,14 @@ class Integrand_kt{
 			PREC kt2=x1*x1, kappa_t_prime2=x2, beta=x3;
 			PREC jac1=1,jac2=1,jac3=1;
 			
-			change_var(kappa_t_prime2, jac2,0,kprimemax,(1+kprimemax/Q2)  );
+			change_var(kappa_t_prime2, jac2,0,kprimemax,(1+kprimemax/pow(Q2,0.25))  );
 			change_var(beta, jac3,betamin,betamax,1);
 			
 			PREC ktmax=kt2_max(kappa_t_prime2,  beta);
 			if(kappa_t_prime2>=ktmax){
 				return 0;
 			}
-			change_var(kt2, jac1,kappa_t_prime2,ktmax,(1+(ktmax-kappa_t_prime2)/Q2) );
+			change_var(kt2, jac1,kappa_t_prime2,ktmax,(1+(ktmax-kappa_t_prime2)) );
 			//change_var(kt2, jac1,kappa_t_prime2,ktmax,0.01 );
 			PREC val;
 			val=integrand2( beta,kappa_t_prime2, kt2);

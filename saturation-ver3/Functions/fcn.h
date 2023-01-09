@@ -118,10 +118,11 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				//x=X_DATA[i];
 				//Q2=Q2_DATA[i];
 				val=F2_kt(X_DATA[i],Q2_DATA[i],0,sigpar);//summation over flavour is done at the level of integrand.
-				
+				//printf("%.3e %.3e %.3e\n",val,CS_DATA[i],ERR_DATA[i]);	
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
 			}
-
+			//printf("done\n");
+			//getchar();
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();
 #if PRINT_PROGRESS!=0
@@ -143,14 +144,14 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str){
 		ROOT::Minuit2::MnStrategy strat(str);
 		ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat);	
-		ROOT::Minuit2::FunctionMinimum min=migrad2(50,10);
-		ROOT::Minuit2::MnEigen eigen;
+		ROOT::Minuit2::FunctionMinimum min=migrad2(25,10);
+		//ROOT::Minuit2::MnEigen eigen;
 
 		std::cout <<"Eigen values: " ;
-		for (double val: eigen(min.UserCovariance())){
-   			std::cout << val << ' ';
-   		}
-   		std::cout<<"\n"<<std::endl;
+		//for (double val: eigen(min.UserCovariance())){
+   		//	std::cout << val << ' ';
+   		//}
+   		//std::cout<<"\n"<<std::endl;
    		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
    		stat=min.UserState();
 		return min;		

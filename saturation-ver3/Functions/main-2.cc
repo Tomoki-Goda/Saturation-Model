@@ -111,11 +111,11 @@ int main(int argc, char** argv){
 	std::cout<<"TEST RUN 10, eps = "<<INT_PREC<<std::endl;	
 	ROOT::Minuit2::FunctionMinimum min=simplex(10,1);//Just initialization /check.
 	ROOT::Minuit2::FunctionMinimum min_prev=min;
-	ROOT::Minuit2::MnEigen eigen;
+	//ROOT::Minuit2::MnEigen eigen;
 	//min_prev=min;
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	INT_PREC=1.0e-2;
+	INT_PREC=1.0e-3;
 	for(int i=0;i<2;++i){
 		prec.SetPrecision(INT_PREC);
 		printf("*****************************\n");
@@ -132,31 +132,32 @@ int main(int argc, char** argv){
 		//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 		std::cout<<i<<"  Parameters "<<min.UserState()<<std::endl;
 		
-		INT_PREC/=10;
+		INT_PREC/=2;
 	}
 	
 	
-	INT_PREC=1.0e-3;
+	INT_PREC=5.0e-4;
 	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
 	ROOT::Minuit2::MnHesse hesse;
-	
-	//ROOT::Minuit2::MnMigrad migrad1(theFCN, stat.Parameters(),0);
-	//for(int i=0;i<(N_PAR-skip);i++ ){
-	//	migrad.RemoveLimits(i);
-	//}
 	ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,min.UserParameters());
+	for(int i=0;i<(N_PAR-skip);i++ ){
+		stat.RemoveLimits(i);
+	}
+	ROOT::Minuit2::MnUserParameterState statprev=stat;
+	
 	std::cout<<"Hesse "<<stat<<std::endl;
-	std::cout <<"Eigen values: " ;
-	for (double i: eigen(stat.Covariance())){
-   		std::cout << i << ' ';
-   	}
-   	std::cout << std::endl;
-   	ROOT::Minuit2::MnUserParameterState statprev=stat;
+	//std::cout <<"Eigen values: " ;
+	//for (double i: eigen(stat.Covariance())){
+   	//	std::cout << i << ' ';
+   	//}
+   	//std::cout << std::endl;
+   	
+   	
 	for(int i=0;i<10;i++){
-		min=migrad(theFCN, stat, 0);
+		min=migrad(theFCN, stat, 0);//defined in fcn.h
 		flag=check_min(&min,N_PAR-skip);
 		if( flag==0){
 			statprev=stat;
@@ -175,20 +176,25 @@ int main(int argc, char** argv){
 	
 	
 	
+	
 	INT_PREC=1.0e-4;
-	prec.SetPrecision(INT_PREC);
+	prec.SetPrecision(5*INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
 	stat=hesse(theFCN,min.UserParameters());
-	ROOT::Minuit2::MnMigrad migrad2(theFCN, stat.Parameters() ,1);
+	//ROOT::Minuit2::MnMigrad migrad2(theFCN, stat.Parameters() ,1);
 	statprev=stat;
 	for(int i=0;i<10;i++){
 		min=migrad(theFCN, stat, 1);
+		
 		flag=check_min(&min,N_PAR-skip);
+		
 		if( flag==0){
+			printf("ok\n");
 			statprev=stat;
-		}else{
+		}else{ 
+			printf("Invalid output\n");
 			stat=hesse(theFCN,statprev);
 		}
 		

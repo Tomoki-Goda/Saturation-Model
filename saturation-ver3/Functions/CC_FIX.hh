@@ -22,10 +22,14 @@ class Clenshaw_Curtis_FIX{
 	protected:
 		
 		int N=128;
-		__float128 x[128/2+1];
-		__float128 wfull[128/2+1];
-		__float128 xhalf[128/4+1];
-		__float128 whalf[128/4+1];
+		__float128 *__restrict__ x;//=(__float128*)malloc((N/2+1)*sizeof(__float128) );
+		__float128 *__restrict__ wfull;
+		__float128 *__restrict__ xhalf;
+		__float128 *__restrict__ whalf;
+		//__float128 x[128/2+1];
+		//__float128 wfull[128/2+1];
+		//__float128 xhalf[128/4+1];
+		//__float128 whalf[128/4+1];
 	//int N;
 	//__float128 *x;
 	//__float128 *wfull;
@@ -44,21 +48,21 @@ class Clenshaw_Curtis_FIX{
 			printf("max 128\n");
 			N=128;
 		}
-		prepare(N,x,wfull);
-		prepare(N/2,xhalf,whalf);
 		
 		//
-		//x=(__float128*)malloc((n/2+1)*sizeof(__float128) );
-		//wfull=(__float128*)malloc((n/2+1)*sizeof(__float128) );
-		//xhalf=(__float128*)malloc((n/2+1)*sizeof(__float128) );
-		//whalf=(__float128*)malloc((n/2+1)*sizeof(__float128) );
+		x=(__float128*)malloc((n/2+1)*sizeof(__float128) );
+		wfull=(__float128*)malloc((n/2+1)*sizeof(__float128) );
+		xhalf=(__float128*)malloc((n/4+1)*sizeof(__float128) );
+		whalf=(__float128*)malloc((n/4+1)*sizeof(__float128) );
+		prepare(N,x,wfull);
+		prepare(N/2,xhalf,whalf);
 	}
 	~Clenshaw_Curtis_FIX(){
 		
-	//free(x);
-	//free(wfull);
-	//free(xhalf);
-	//free(whalf);	
+	free(x);
+	free(wfull);
+	free(xhalf);
+	free(whalf);	
 	}
 	private:
 		__float128 quad_Kahn(__float128 a,__float128 b,__float128 *c)const{
@@ -75,7 +79,7 @@ class Clenshaw_Curtis_FIX{
 			return(sum);
 		}
 
-		int prepare(int N,__float128* x,__float128* w)const{
+		int prepare(int N,__float128* __restrict__ x,__float128* __restrict__ w)const{
 
 			x[0]=1;
 			x[1]=cosq(PI/N);
@@ -84,18 +88,19 @@ class Clenshaw_Curtis_FIX{
 			}
 			x[N/2]=0;
 			
-			char str[200];
+			//char str[200];
 			//for(int i=0;i<N/2+1;i++){
 			//	quadmath_snprintf(str,sizeof(str),"%.30Qe",x[i]);
 			//}
 			//fprintf(file,"\n");
-			__float128 c[N/2+1];
+			__float128 *__restrict__ c=(__float128*)malloc((N/2+1)*sizeof(__float128));
 			c[0]=1;
 			c[N/2]=1.0/(1-N*N);
 			for(int i=1;i<N/2;i++){
 				c[i]=2.0/(1-4*i*i);
 			}
-			__float128 t[N/2+1];
+			//__float128 t[N/2+1];
+			__float128 *__restrict__ t=(__float128*)malloc((N/2+1)*sizeof(__float128));
 			__float128 accum=0;
 			t[0]=1;
 			for(int i=0;i<N/2+1;i++){
@@ -116,6 +121,8 @@ class Clenshaw_Curtis_FIX{
 			//	quadmath_snprintf(str,sizeof(str),"%.30Qe",w[i]);
 			//}
 			//free(str);
+			free(c);
+			free(t);
 			//fprintf(file,"\n");
 			return 0;
 		}
@@ -123,10 +130,12 @@ class Clenshaw_Curtis_FIX{
 
 	protected:
 				
-		double integral16(double(*func)(double*,void*),void* args,double smin,double smax, double *res, double*half )const{
-			
-			
-			double  *f=(double*)malloc((N/2+1)*sizeof(double));
+		double integral16(
+				double(*func)(double*,void*),
+				void* __restrict__ args,double smin,double smax,
+			       	double * __restrict__ res, double* __restrict__ half )const{
+			double* __restrict__ f=(double*)malloc((N/2+1)*sizeof(double));
+			//double ( __restrict__ f)[N/2+1];
 			double arg1=0,arg2=0,scale=0,mid=0;
 			double valfull=0,valhalf=0;
 			Kahn total_sect(3);			

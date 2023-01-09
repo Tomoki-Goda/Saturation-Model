@@ -183,7 +183,7 @@ static double dgauss(double (*func)(double*,void*),void* param, double min, doub
 		counter++;
 		licztot++;
 		scale=(smax-smin)/2;
-		dgauss40(func,param,smin,smax,&val20,&val10);
+		dgauss20(func,param,smin,smax,&val20,&val10);
 		if(counter==MAX_RECURSION){
 			printf("dgauss::MAX_RECURSION\n");
 		}
@@ -209,6 +209,7 @@ static double dgauss(double (*func)(double*,void*),void* param, double min, doub
 		}
 		if(scale<2.0e-15){
 			printf("DGAUSS :: division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] scale = %.5e\n",smin,smax,min,max,scale);
+			printf("curent total=%.3e, val20=%.3e  licz/licztot=%d/%d\n",Kahn_total(total,accum_total,3 ),val20,licz,licztot);
 			getchar();
 		}
 

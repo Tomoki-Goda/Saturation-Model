@@ -54,7 +54,6 @@ int save_res(std::string name, const ROOT::Minuit2::FunctionMinimum *min,const K
 int main(int argc, char** argv){
 	std::chrono::system_clock walltime;
 	std::chrono::time_point start= walltime.now();
-	
 	std::cout<<std::scientific<<std::endl;
 	
 	printf("Czesc World!\nProgram Started.\n");
@@ -103,114 +102,104 @@ int main(int argc, char** argv){
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
 	
-	INT_PREC=1.0e-2;
-	printf("*****************************\n");
-	printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
-	printf("*****************************\n");
-	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);
-	ROOT::Minuit2::FunctionMinimum min=simplex(200,1);
-	ROOT::Minuit2::FunctionMinimum min_prev=min;
-
-	int flag=check_min(&min,N_PAR-skip);
-	if( flag==0){
-		min_prev=min;
-	}else{
-		min=min_prev;
-	}
-	std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
-	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	
-	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
-	
-	INT_PREC=1.0e-3;
-	printf("*****************************\n");
-	printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
-	printf("*****************************\n");
-	min=simplex(100,1);
-	
-	flag=check_min(&min,N_PAR-skip);
-	if( flag==0){
-		min_prev=min;
-	}else{
-		min=min_prev;
-	}
-	std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
-	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		
-	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
-
 	ROOT::Minuit2::MnMachinePrecision prec;
-	prec.SetPrecision(1.0e-8);
-
-	
-	ROOT::Minuit2::MnMigrad migrad(theFCN, min.UserParameters() ,0);
-	for(int i=0;i<(N_PAR-skip);i++ ){
-		migrad.RemoveLimits(i);
-	}
-	
-
-	INT_PREC=1.0e-3;
-	printf("***************************\n");
-	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
-	printf("***************************\n");
-	for(int i=0;i<10;i++){
-		min=migrad(20,1);
+	//prec.SetPrecision(1.0e-8);
+	INT_PREC=1.0e-4;
+	//prec.SetPrecision(INT_PREC);
+	int flag=0;
+	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);
+	std::cout<<"TEST RUN 10, eps = "<<INT_PREC<<std::endl;	
+	ROOT::Minuit2::FunctionMinimum min=simplex(10,1);//Just initialization /check.
+	ROOT::Minuit2::FunctionMinimum min_prev=min;
+	ROOT::Minuit2::MnEigen eigen;
+	//min_prev=min;
+	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
+	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+	INT_PREC=1.0e-2;
+	for(int i=0;i<2;++i){
+		prec.SetPrecision(INT_PREC);
+		printf("*****************************\n");
+		printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
+		printf("*****************************\n");
+		min=simplex(200,1);
 		flag=check_min(&min,N_PAR-skip);
-		if( flag==0){
+		if(flag==0){
 			min_prev=min;
+			save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 		}else{
 			min=min_prev;
 		}
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		std::cout<<std::scientific<<"fcn= "<<min.UserState().Fval()<<", edm= "<<min.UserState().Edm()<<std::endl;
+		//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
+		std::cout<<i<<"  Parameters "<<min.UserState()<<std::endl;
 		
+		INT_PREC/=10;
+	}
+	
+	
+	INT_PREC=1.0e-3;
+	prec.SetPrecision(INT_PREC);
+	printf("***************************\n");
+	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
+	printf("***************************\n");
+	ROOT::Minuit2::MnHesse hesse;
+	
+	//ROOT::Minuit2::MnMigrad migrad1(theFCN, stat.Parameters(),0);
+	//for(int i=0;i<(N_PAR-skip);i++ ){
+	//	migrad.RemoveLimits(i);
+	//}
+	ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,min.UserParameters());
+	std::cout<<"Hesse "<<stat<<std::endl;
+	std::cout <<"Eigen values: " ;
+	for (double i: eigen(stat.Covariance())){
+   		std::cout << i << ' ';
+   	}
+   	std::cout << std::endl;
+   	ROOT::Minuit2::MnUserParameterState statprev=stat;
+	for(int i=0;i<10;i++){
+		min=migrad(theFCN, stat, 0);
+		flag=check_min(&min,N_PAR-skip);
+		if( flag==0){
+			statprev=stat;
+		}else{
+			stat=hesse(theFCN,statprev);
+		}
 		
 		if(min.IsValid()){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
+		}else{
 		}
 	}
 	
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
+	
+	
+	
 	INT_PREC=1.0e-4;
+	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
-	ROOT::Minuit2::MnMigrad migrad2(theFCN, min.UserParameters() ,1);
-	
-	for(int i=0;i<20;i++){
-		min=migrad2(50,1);
+	stat=hesse(theFCN,min.UserParameters());
+	ROOT::Minuit2::MnMigrad migrad2(theFCN, stat.Parameters() ,1);
+	statprev=stat;
+	for(int i=0;i<10;i++){
+		min=migrad(theFCN, stat, 1);
 		flag=check_min(&min,N_PAR-skip);
 		if( flag==0){
-			min_prev=min;
+			statprev=stat;
 		}else{
-			min=min_prev;
+			stat=hesse(theFCN,statprev);
 		}
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		std::cout<<std::scientific<<"fcn= "<<min.UserState().Fval()<<", edm= "<<min.UserState().Edm()<<"  "<<min.IsValid()<<std::endl;
+		
 		if(min.IsValid()){
-			printf("FINE: %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
+			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
+		}else{
 		}
 	}
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
-	/*INT_PREC=1.0e-5;
-	save_res(((std::string)argv[1])+"/result.txt",min);	
-	printf("***************************\n");
-	printf("*** Second: eps=%.1e  ***\n",INT_PREC);
-	printf("***************************\n");
-	//ROOT::Minuit2::MnMigrad migrad2(theFCN, min.UserParameters() ,1);
 	
-	for(int i=0;i<20;i++){
-		min=migrad(50,1);
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		std::cout<<std::scientific<<"fcn= "<<min.UserState().Fval()<<", edm= "<<min.UserState().Edm()<<"  "<<min.IsValid()<<std::endl;
-		if(min.IsValid()){
-			printf("FINE: %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
-			break;
-		}
-	}
-	*/
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	std::cout<<"min= "<<min<<std::endl;
 	std::fstream file;
@@ -224,3 +213,8 @@ int main(int argc, char** argv){
 	return 0;
 	
 }
+
+	
+	
+	
+	

@@ -1,0 +1,227 @@
+\documentclass[12pt]{article}
+
+%\usepackage[T1]{fontenc}
+%\usepackage{merriweather}
+%\usepackage{librebaskerville}
+\usepackage{xcolor}
+\usepackage[]{geometry}
+
+\geometry{left=2cm,right=2cm,top=2.5cm,bottom=2cm}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[]{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{decorations}
+ \usetikzlibrary{snakes}
+\begin{document}
+\pagestyle{fancy}
+\fancyhead[L]{\today}
+\fancyhead[R]{Tomoki Goda}
+%{\centering\huge On GBW model and $k_t$-factorization.}\hrule\vspace{2cm}
+
+\section{Formula. etc}
+\begin{figure}[t]
+\centering
+\resizebox{0.5\textwidth}{!}{
+\begin{tikzpicture}
+\draw[snake=coil,segment aspect=0,segment length=0.1in](-0.875in , 0.5in)--(-0.5in,0.in);
+\draw[snake=coil,segment aspect=0,segment length=0.1in](0.875in ,0.5in)--(0.5in,0.in);
+\draw(-0.5in , 0in)--(0.5in,0in)--(0.5in , -0.5in)--(-0.5in,-0.5in)--cycle ;
+\draw(-0.5in , -0.25in)node[left,scale=0.02in]{$x$, $\kappa$};
+\draw(-0.5in , -0.75in)node[left,scale=0.02in]{$x/z$, $k$};
+\draw[ snake=coil,segment aspect=1.5,segment length=0.1in](0.5in , -1in)--(0.5in,-0.5in);
+\draw[snake=coil,segment aspect=1.5,segment length=0.1in](-0.5in , -1in)--(-0.5in,-0.5in);
+\end{tikzpicture}
+}
+\caption{\footnotesize Kinematic variables of gluon contribution to $\mathcal{F}$.  The momentum fraction of gluon is $x/z$ as it has to contribute via the quark box.
+}
+\label{fig:gluon-kinem}
+\end{figure}
+For protom momentum $p$ and photon momentum $q$,  define $q'\equiv q+x p$. 
+Then the Sudakov decomposition of $k$ and $\kappa$ (Fig.~\ref{fig:gluon-kinem}) are
+$\kappa=\alpha p-\beta q'+\kappa_t$, and $k=a p- bq'+k_t$.
+
+Eq.~(3.9) of Kimber's thesis reads
+\begin{multline}
+F_2(x,Q^2)=\sum_f f_f^2 \frac{Q^2}{2\pi}\int\frac{dk^2_t}{k_t^2}\int^1_0d\beta\int d{\kappa'}_t\alpha_s \mathcal{F}(x/z,k_t^2)\Theta(1-x/z)\\
+\left[\left(\beta^2+(1-\beta)^2\right)\left(\frac{I_1}{2\pi}-\frac{I_2}{2\pi}\right)
++\left(m_f^2+4Q^2\beta^2(1-\beta)^2\right)\left(\frac{I_3}{2\pi}-\frac{I_4}{2\pi}\right)\right],
+\label{eq:angle-integrated}
+\end{multline}
+where ${\boldsymbol{\kappa}'}_t\equiv{\boldsymbol{\kappa}_t}-(1-\beta)\mathbf{k}_t$, 
+\begin{equation}
+\begin{split}
+\frac{I_1}{2\pi}&=\frac{N_1N_2+N_3^2}{\left( N^2_1+2N_1N_2+N_3^2\right)^{3/2}}\\
+\frac{I_2}{2\pi}&=\frac{N_3-(1-2\beta)N_1}{(N_1+N_4)\sqrt{ N^2_1+2N_1N_2+N_3^2}}\\
+\frac{I_3}{2\pi}&=\frac{N_1+N_2}{\left( N^2_1+2N_1N_2+N_3^2\right)^{3/2}}\\
+\frac{I_2}{2\pi}&=\frac{(1-\beta)}{(N_1+N_4)\sqrt{ N^2_1+2N_1N_2+N_3^2}}
+\end{split}
+\end{equation}
+for
+\begin{equation}
+\begin{split}
+N_1&\equiv\beta(1-\beta)Q^2+m_f^2\\
+N_2&\equiv{\kappa'}_t^2+(1-\beta)^2k_t^2\\
+N_3&\equiv{\kappa'}_t^2-(1-\beta)^2k_t^2\\
+N_4&\equiv{\kappa'}_t^2+\beta(1-\beta)k_t^2
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\frac{1}{z}=1+\frac{{\kappa'}^2_t+m_f^2}{\beta(1-\beta)Q^2}+\frac{k^2_t}{Q^2}.
+\end{equation}
+
+
+The other formulae( %Eqs.~(3.6)~and~(3.7) of Kimber's thesis with addition of scale $\mu$ as in 
+Eqs.~(3.11)~and~(3.12) of Kimber's thesis ) are,
+\begin{align}
+\begin{split}
+F_{2T}(x,Q^2)=\sum e^2_f\frac{Q^2}{4\pi}\int\frac{d k_t^2}{k_t^2}&\int^1_0 d\beta\int d \kappa_t ^2 \frac{d\phi}{2\pi}\alpha_s(\mu^2)\mathcal{F}(x/z,k^2_t,\mu^2)\Theta(1-x/z)\\
+&\left[
+\left[\beta^2+(1-\beta)^2\right]
+\left(\frac{\boldsymbol{\kappa}_t}{D_1}-\frac{\boldsymbol{\kappa}_t-\mathbf{k}_t}{D_2}\right)^2
++m_f^2\left(\frac{1}{D_1}-\frac{1}{D_2}\right)^2
+\right]\label{eq:angle-unintegratedT}
+\end{split}\\
+\begin{split}
+F_{2L}(x,Q^2)=\sum e^2_f\frac{Q^2}{4\pi}\int\frac{d k_t^2}{k_t^2}&\int^1_0 d\beta\int d \kappa_t ^2 \frac{d\phi}{2\pi}\alpha_s(\mu^2)\mathcal{F}(x/z,k^2_t,\mu^2)\Theta(1-x/z)\\
+&\left[
+4Q^2\beta^2 (1-\beta)^2\left(\frac{1}{D_1}-\frac{1}{D_2}\right)^2
+\right],\label{eq:angle-unintegratedL}
+\end{split}
+\end{align}
+where
+\begin{equation}
+\begin{split}
+D_1&=\kappa_t^2+\beta(1-\beta)Q^2+m_f^2\\
+D_2&=(\boldsymbol{\kappa}_t-\mathbf{k}_t)^2+\beta(1-\beta)Q^2+m_f^2.
+\end{split}
+\end{equation}
+%In this case, one has additional integral of $\phi$
+Except for the coupling, this is $\phi$,  the angular part of $\kappa_t$, unintegrated version of Eq.~(\ref{eq:angle-integrated}) .
+The scale for $\alpha_s$ is suggested to be 
+\begin{equation}
+\mu^2=k^2_t+\kappa^2+m_f^2.
+\label{eq:scale}
+\end{equation}
+Note, the integration limits of $k_t$ and $\kappa_t$ are removed as GBW gluon is not perturbative.
+
+
+\section{Discussion}
+\subsection{Theta function, integration limits and modified $x$}
+The theta function restricts
+\begin{equation}
+1-x\left(1+\frac{{\kappa'}_t^2+m^2}{\beta(1-\beta)Q^2}+\frac{k_t^2}{Q^2}\right)>0.
+\end{equation}
+Consequently, the limit $Q^2\rightarrow0$ vanishes.
+It seems, it may no longer be necessary to use massive light quarks and modified $x$.
+
+Additionally, it restricts respectively,
+\begin{align}
+&\frac{1-x}{x}Q^2-4m^2>k^2,\\
+&\frac{1}{4} \frac{1-x}{x}Q^2-m^2>{\kappa'}_t^2,\\
+&\frac{1-\sqrt{1-\frac{4m^2}{\frac{1-x}{x} Q^2  }}}{2}<\beta< \frac{1+\sqrt{1-\frac{4m^2}{\frac{1-x}{x} Q^2  }}}{2},
+\end{align}
+consequently
+\begin{align}
+1>&\frac{4m^2}{\frac{1-x}{x} Q^2 }&& \rightarrow& x&<\frac{1}{1+\frac{4m^2}{Q^2}}.
+\end{align}
+That is, 
+\begin{equation}
+x_{m}<1.
+\end{equation}
+Now, considering that $x_m$ was $x$ of GBW gluon $\mathcal{F}(x,k^2)$, $x/z<1$ and the treatment of GBW with $x_m$ seem to correspond to each other.
+
+\subsection{Which formula(e) to be used.}
+Eq.~(\ref{eq:angle-integrated}) is relatively straight forward to implement, and \underline{\textbf{currently used}}. \\
+Eqs.~(\ref{eq:angle-unintegratedT})~(\ref{eq:angle-unintegratedL}) are more difficut due to the additional angular integral. However, it is necessary should one intend to use the running coupling with argument suggested in Kimber's formula (Eq.~(\ref{eq:scale})).
+\subsection{Preliminary data}
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{./preliminary.png}
+\includegraphics[width=0.5\textwidth]{./preliminary-dipole.png}
+\caption{\footnotesize Preliminary result for \underline{\textbf{selected}} combinations of \{fixed $\alpha_s$ (``fix"), running $\alpha_s$ (``run")\}  $\otimes$ \{ modified $x$ (``mod"), Bjorken $x$ (``Bjor")\}  $\otimes$ \{$\sigma_\mathrm{dipole}$ formula (``r"), $\mathcal{F}$ formula (``")\}.
+By running, it does not mean using Eqs.~(\ref{eq:angle-unintegratedT})~(\ref{eq:angle-unintegratedL}), but simply multiplying GBW $\mathcal{F}$ by $\frac{ \alpha(\mu^2) }{0.2}$, where $\alpha(\mu^2)=\frac{1}{b_0 \log\left(\frac{\mu^2}{\Lambda_\mathrm{QCD} }\right)}$ and $\mu^2=\max( k^2_t+{\kappa'}_t^2+m_f^2,2\Lambda_\mathrm{QCD})$. (!!NOTE!!, it is ${\kappa'}_t$ being used here, not $\kappa_t$ as in the Kimber's formula ! (cf. Eq.~(\ref{eq:scale})).\\
+Left:$ \alpha_s\mathrm{F}$, Right: $\sigma/\sigma_0$. (note, it is not $\alpha_s(\mu^2)$ for running case when plotted.) $Q^2=100\mathrm{GeV^2}$, $x=10^{-4}$.
+}
+\end{figure}
+
+\begin{itemize}
+\item all comparable $\chi^2 $. 
+\begin{itemize}
+\item $\alpha, x_m\;\sim5.4$, 
+\item $\alpha, x_B\;\sim4.4$,
+\item $\alpha, x_m, r\;\sim4.4$, 
+\item $\alpha(\mu), x_B\;\sim4.0$
+\end{itemize}
+$\rightarrow$ modification of $x$ is worsening.
+Later shown, theta function should deal with the photo production. There may not be necessity any more.\\
+\item most noteble difference is $\sigma_0$
+\begin{itemize}
+\item $\alpha, x_m\;\sim32$, 
+\item $\alpha, x_B\;\sim33$,
+\item $\alpha, x_m, r\;\sim19$, 
+\item $\alpha(\mu), x_B\;\sim44$
+\end{itemize}
+$\rightarrow$ Generally the $k_t$ versions have much higher $\sigma_0$.
+Note, Massive light quarks case has higher $\sigma_0$. Probably due  to the suppression by $x(1+4m^2/Q^2)$.
+
+\section{Concluding Remarks}
+\begin{itemize}
+\item modified $x$ deteriorates the fit while there is no longer apparent necessity.
+\item Even with incorrect(?) incorporation of $\alpha_s(\mu)$, it has positive effect on the fit. 
+\item biggest difference in the fit paramaeters is the normalization $\sigma_0$. 
+\end{itemize}
+\end{itemize}
+
+\section{Code, technicality}
+The fitting program has been rewritten completely in order to accommodate C++  Minuit2 and OOP. \\
+The repository is \\
+\textit{ git@github.com:Tomoki-Goda/Saturation-Model.git }\\
+At the early stage of development the integrations were done with private implementations of Gauss-Legendre quadrature, Curtis-Clenshaw quadrature, or CERNLIB subroutines(mostly DGAUSS). 
+These functions (mostly the Clensaw-Curtis function is used for speed and flexibility) are not very tolerant for step by the theta function. Besides, the Clenshaw method has to take end points of the integration region, making it unsuitable for cases where integrand is numerically ill defined at the end points.
+Cuba package has been implemented. Cuhre works similar to previous versions in terms of performance (except for possiblly better handling of failure). Vegas and Suave takes too long (possibly not optimized). 
+
+\section{Changes of variables}
+For $x=[0,1]$ and $y=[a,b]$, one can use following changes of variables:
+\begin{align}
+y&=b x+a(1-x), \\
+y&=a\left(\frac{b}{a}\right)^x,\\
+y&=\frac{a(b-a)(1-x)+x b}{(b-a)(1-x)+x}.
+\end{align}
+Note, only the third one can be used for $a=0, b=\infty$, where $y=\frac{x}{1-x}$.
+
+Then using this, 
+\begin{equation}
+\int^u_l dy f(y)=\int^1_0 \left(\frac{dy}{dx}\right) dx f(y(x;l,u)).
+\end{equation}
+For a multidimensional case, one may have
+\begin{equation}
+\begin{split}
+\int^{u_1}_{l_1} dy_1\int^{u_2}_{l_2} dy_2 f(y_1,y_2)& \Theta(\dots)\\
+=\int^1_0\int^1_0& \left(\frac{\partial y_1}{\partial x_1}\right) \left(\frac{\partial y_2}{\partial x_2}\right)dx_1 dx_2 f\left(y_1(x_1; l ,u ),y_2(x_2; l_2(x_1) ,u_2(x_1 ) )\right).
+\end{split}
+\end{equation}
+\section{Peak}
+Ignoring the theta function, and if we take limits $m_f^2\rightarrow0,\;\beta\rightarrow0$, 
+the donominators of $I_i$, $N_1^2+2N_1N_2+N_3^2\rightarrow {\kappa'}_t^2-k_t^2$.
+that is, when $\beta$ is small , one has a ridge at ${\kappa'}_t^2=k_t^2$ (We never actually hit the singular point as thetha function restrict lower limit of $\beta$. ).
+
+When there is a integrable peak at $x\sim0$ of $[0,1]$, one may use $x\rightarrow {x'}^2$. 
+consider when integrating 
+\begin{equation}
+\frac{1}{\sqrt{(x_1-x_2)^2}+\epsilon},
+\end{equation}
+for small $\epsilon$.
+ then one use
+\begin{align}
+x_1 &\rightarrow (1-{x'}_1) x_2& x_2 &\rightarrow (1-{x'}_2) x_1
+\end{align}
+then
+\begin{align}
+x_2&\frac{1}{ ({x'}_1 x_2)+\epsilon}& x_1&\frac{1}{({x'}_2 x_1)+\epsilon}
+\end{align}
+
+\input{r-formula}
+\end{document}

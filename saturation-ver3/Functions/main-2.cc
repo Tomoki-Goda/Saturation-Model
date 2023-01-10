@@ -104,7 +104,7 @@ int main(int argc, char** argv){
 	
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=1.0e-3;
+	INT_PREC=1.0e-4;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);

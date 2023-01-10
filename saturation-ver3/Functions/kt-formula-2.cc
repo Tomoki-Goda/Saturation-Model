@@ -152,7 +152,7 @@ class Integrand_kt{
 				return 0;
 			}
 			change_var(beta,jac3,betamin,betamax,1);
-			change_var(kappa2,jac2,0,kappamax,1+kappamax/pow(Q2,0.25));
+			change_var(kappa2,jac2,0,kappamax,1+kappamax/pow(Q2,0.5));
 
 			k2min=kappa2+(1-x)/x*beta*Q2-(mf2+kappa2)/(1-beta);
 			if(k2min<0){
@@ -164,7 +164,7 @@ class Integrand_kt{
 				return 0;
 			}
 
-			change_var(k2,jac1,0,k2max,1+k2max/pow(Q2,0.25));
+			change_var(k2,jac1,0,k2max,1+k2max/pow(Q2,0.5));
 			//cosphimin=(kappa2+mf2+(1-beta)*(k2-(1-x)/x*Q2*beta))/(2*(1-beta)*sqrt(kappa2*k2));
 			if(cosphimin<-1){
 				cosphimin=-1;
@@ -172,7 +172,7 @@ class Integrand_kt{
 			if(cosphimin>1){
 				return 0;
 			}
-			change_var(phi,jac4,0,acos(cosphimin),1);
+			change_var(phi,jac4,0,acos(cosphimin),2);
 			jac4*=2;
 			
 			double val=integrand(kappa2,k2,beta,phi);

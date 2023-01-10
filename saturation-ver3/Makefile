@@ -104,8 +104,8 @@ ${DIR}/parni-integral.o: ${PARNIDIR}/examples/parni-integral.f
 #${DIR}/kt-formula-cuba.o: ${FUNCDIR}/cubaintegral.cc
 #	g++ ${FUNCDIR}/cubaintegral.cc -o ${DIR}/kt-formula-cuba.o -c  ${INC} ${OPT} 
 
-${DIR}/kt-formula-cuba.o: ${FUNCDIR}/kt-formula-2.cc
-	g++ ${FUNCDIR}/kt-formula-2.cc -o ${DIR}/kt-formula-cuba.o -c  ${INC} ${OPT} 
+${DIR}/kt-formula-cuba.o: ${FUNCDIR}/kt-formula-3.cc
+	g++ ${FUNCDIR}/kt-formula-3.cc -o ${DIR}/kt-formula-cuba.o -c  ${INC} ${OPT} 
 
 ${DIR}/read-and-fit.o: ${FUNCDIR}/read-and-fit.c ${FUNCDIR}/read-and-fit-cheb.h ${FUNCDIR}/read-and-fit.h  ${UTILDIR}/f2.h ${FUNCDIR}/Kahn.h 
 	gcc -c ${FUNCDIR}/read-and-fit.c -o ${DIR}/read-and-fit.o  ${INC} ${OPT}  

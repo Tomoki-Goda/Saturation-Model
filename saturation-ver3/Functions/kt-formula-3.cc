@@ -112,8 +112,8 @@ class Gluon{
 			if(std::isnan(val)==1){
 				return(0);
 			}
-#if RUN==1
-			val*=alpha(mu2);
+#if ALPHA_RUN==1
+			val*=alpha(mu2)/0.25;
 #endif
 			return (sigma_0*val) ;
 		}
@@ -147,27 +147,22 @@ class Integrand_kt{
 		double operator()(const double x1, const double x2, const double x3, const double x4){
 			double k2=x1,kappa2=x2,beta=x3,phi=x4;
 			double jac1,jac2,jac3,jac4;
-			double k2max,k2min,cosphimin;
+			double k2max;
 			if(betamin>=betamax){
 				return 0;
 			}
 			change_var(beta,jac3,betamin,betamax,1);
-			change_var(kappa2,jac2,0,kappamax,1+kappamax/pow(Q2,0.5));
+			change_var(kappa2,jac2,0,kappamax,1+kappamax/pow(Q2,0.25));
 
 			change_var(phi,jac4,0,PI,2);
 			jac4*=2;
 
-			k2min=kappa2*pow(cos(phi),2)+(1-x)/x*beta*Q2-(mf2+kappa2)/(1-beta);
-			if(k2min<0){
-				return 0;
-			}
-			k2max=pow(sqrt(kappa2)*cos(phi)+sqrt(k2min),2);
-			k2min=(k2min>kappa2)?(0):(pow(sqrt(kappa2)*cos(phi)-sqrt(k2min),2));
-			if(k2max<0){
+			k2max=(1-x)/x*Q2-(kappa2+mf2)/(beta*(1-beta));
+			if(k2max<=0.0){
 				return 0;
 			}
 
-			change_var(k2,jac1,k2min,k2max,1+k2max/pow(Q2,0.5));
+			change_var(k2,jac1,0,k2max,1+k2max/pow(Q2,0.25));
 			//cosphimin=(kappa2+mf2+(1-beta)*(k2-(1-x)/x*Q2*beta))/(2*(1-beta)*sqrt(kappa2*k2));
 			//if(cosphimin<-1){
 			//	cosphimin=-1;
@@ -176,15 +171,15 @@ class Integrand_kt{
 			//	return 0;
 			//}
 			
-			double val=integrand(kappa2,k2,beta,phi);
+			double val=integrand(kappa2,k2,beta,phi)+integrand(kappa2,k2,1-beta,phi+PI);
 			val*=jac1*jac2*jac3*jac4;
 
 			if(std::isnan(val)||std::isinf(val)){
-				printf("%.3e %.3e %.3e %.3e\n",x1,x2,x3,x4 );
-				printf("%.3e %.3e %.3e %.3e\n",kappa2,k2,beta,phi );
+				printf("x1= %.3e x2= %.3e x3= %.3e x4= %.3e\n",x1,x2,x3,x4 );
+				printf("kappa2=%.3e k2=%.3e beta=%.3e phi=%.3e\n",kappa2,k2,beta,phi );
 				printf(" %.3e <beta<  %.3e\n",betamin,betamax );
-				printf("%.3e <k2< %.3e\n",k2min,k2max);
-				printf("%.3e <cos[phi]\n",cosphimin );
+				printf("%.3e <k2< %.3e\n",0.0,k2max);
+				//printf("%.3e <cos[phi]\n",cosphimin );
 				printf("%.3e <kappa2\n",kappamax );
 				getchar();
 			}
@@ -196,17 +191,29 @@ class Integrand_kt{
 		double betamin=0,betamax=0,kappamax=0;
 		Gluon* gluptr=NULL;
 
-		inline int D(const double kappa2,const double k2,const double beta,const double phi, double &D1,double &D2)const{
-			D1=kappa2+beta*(1-beta)*Q2+mf2;
-			D2=D1+k2-2*sqrt(kappa2*k2)*cos(phi);
+		int Ang(const double kappa2,const double k2,const double beta,const double phi, double &A1,double &A2)const{
+			const double A=beta*(1-beta)*Q2+mf2;
+			const double aA=kappa2+pow(1-beta,2)*k2+A;
+			const double b=2*(1-beta)*sqrt(kappa2*k2);
+			const double cA=kappa2+pow(beta,2)*k2+A;
+			const double d=2*(beta)*sqrt(kappa2*k2);
+			const double e=kappa2-beta*(1-beta)*k2;
+			const double f=(1-2*beta)*sqrt(kappa2*k2);
+			
+			const double den=aA+b*cos(phi);
+			A1=pow(den,-2)-2*b/((aA*d+cA*b)*(den));
+			//A1*=2;
+			A2=-A*pow(den,-2)+pow(den,-1)*(1-2*(b*e-aA*f)/(aA*d+cA*b));
+			//A2*=2;
+			///printf("%.3e %.3e\n",A1,A2);
 			return 0;
 		}
 
 		double integrand(double kappa2,double k2,double beta,double phi) const {
-			double D1,D2;
-			D(kappa2,k2,beta,phi,D1,D2);
+			double A1,A2;
+			Ang(kappa2,k2,beta,phi,A1,A2);
 			double xz=0;
-			xz=x*(beta*D1+(1-beta)*D2)/(Q2*beta*(1-beta));
+			xz=x*(1+(kappa2+mf2)/(beta*(1-beta)*Q2)+k2/Q2);
 			//xz=x*(1+(kappa2+mf2)/((1-beta)*Q2)+(kappa2+k2-2*sqrt(kappa2*k2)*cos(phi)+mf2)/(beta*Q2));
 			if(xz>1){
 				if(fabs(1-xz)>1.0e-10){
@@ -216,13 +223,10 @@ class Integrand_kt{
 				return 0;
 			}
 			double val=0;
-			val+=(kappa2*pow(fabs(1.0/D1-1.0/D2),2));
-			val+=k2*pow(1.0/D2,2);
-			val+=2*sqrt(k2*kappa2)*cos(phi)*(-pow(D2,-2)+1.0/(D1*D2));
-			val*=(beta*beta+(1-beta)*(1-beta));
-
-			val+=(mf2+4*Q2*pow(beta*(1-beta),2))*pow(fabs(1.0/D1-1.0/D2),2);
-			double mu2=k2+kappa2+mf2;
+			val+=(pow(beta,2)+pow(1-beta,2))*A2;
+			val+=(mf2+4*Q2*pow(beta*(1-beta),2))*A1;
+			//val*=2;//for using beta<-> 1-beta symmetry
+			double mu2=k2*(1+pow(1-beta,2))+kappa2+mf2+2*(1-beta)*sqrt(kappa2*k2)*cos(phi);
 			val*=(*gluptr)(xz,k2,mu2);
 			return(val/k2);
 		}

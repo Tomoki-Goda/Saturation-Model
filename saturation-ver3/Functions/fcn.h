@@ -118,7 +118,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				//x=X_DATA[i];
 				//Q2=Q2_DATA[i];
 				val=F2_kt(X_DATA[i],Q2_DATA[i],0,sigpar);//summation over flavour is done at the level of integrand.
-				//printf("%.3e %.3e %.3e\n",val,CS_DATA[i],ERR_DATA[i]);	
+				//printf("%.3e %.3e %.3e %.3e\n",val,CS_DATA[i],fabs(val-CS_DATA[i]),ERR_DATA[i]);	
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
 				
 			}

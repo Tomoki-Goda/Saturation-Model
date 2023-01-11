@@ -283,13 +283,13 @@ double laplacian_sigma(double r,double x,double q2, double *par,double *sudpar){
 	
 
 
-#if SUDAKOV>=1
+/*#if SUDAKOV>=1
 	double mu2;
 	int signal=compute_mu2(r,sudpar, &mu2,1);//compute mu2
 	if(q2>mu2){
 		val*=exp_sud(r,mu2,q2);
 	}
-#endif
+#endif*/
 	//printf("lap sigma %.3e\n",val);
 #endif
 	return val;

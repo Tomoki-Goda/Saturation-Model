@@ -36,6 +36,7 @@ static int plus(double *a,double *b){
 	c=c-small;
 	*a=sum;
 	*b=c;
+	return 0;
 }
 static int extract_exp(double x){
 	int y;
@@ -61,7 +62,7 @@ static int accum_sort(double *accum,int len){
 	}
 	return 0;
 }
-static double Kahn(double a,double b,double *accum,int N){
+static double Kahn_Sum(double a,double b,double *accum,int N){
 	double accum_tmp=b;
 	double sum=a;
 	plus(&sum,&accum_tmp);
@@ -90,7 +91,7 @@ static double Kahn_list_sum(double* list, int len){
 	double accum[3]={0};
 	double sum=0;
 	for(int i=0;i<len;i++){
-		sum=Kahn(sum,list[i],accum,3);
+		sum=Kahn_Sum(sum,list[i],accum,3);
 	}
 	sum=Kahn_total(sum,accum,3);
 	return sum;

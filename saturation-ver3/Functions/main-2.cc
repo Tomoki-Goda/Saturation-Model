@@ -45,6 +45,7 @@ int save_res(std::string name, const ROOT::Minuit2::FunctionMinimum *min,const K
 	file<<"n_data\t"<<theFCN->MAX_N<<std::endl;
 	file<<"chisq/dof\t"<<min->Fval()/(theFCN->MAX_N-(ndata) ) <<std::endl;
 	file<<"Flag\t"<<min->IsValid()<<std::endl;
+	file<<"Cov\t"<<min->UserState().CovarianceStatus()<<std::endl;
 	file<<"eps\t"<<INT_PREC<<std::endl;
 	
 	file.close();
@@ -52,6 +53,12 @@ int save_res(std::string name, const ROOT::Minuit2::FunctionMinimum *min,const K
 }
 
 int main(int argc, char** argv){
+	
+#if SCATTER==1
+	std::fstream scatterfile; 
+	scatterfile.open("home/tomoki/Saturation-Model/saturation-ver3/scatter.txt",std::fstream::out);
+	scatterfile.close();
+#endif
 	std::chrono::system_clock walltime;
 	std::chrono::time_point start= walltime.now();
 	std::cout<<std::scientific<<std::endl;
@@ -104,20 +111,20 @@ int main(int argc, char** argv){
 	
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=1.0e-3;
+	INT_PREC=1.0e-4;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	ROOT::Minuit2::MnSimplex simplex(theFCN,upar,0);
-	std::cout<<"TEST RUN 10, eps = "<<INT_PREC<<std::endl;	
-	ROOT::Minuit2::FunctionMinimum min=simplex(10,1);//Just initialization /check.
+	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<std::endl;	
+	ROOT::Minuit2::FunctionMinimum min=simplex(5,1);//Just initialization /check.
 	ROOT::Minuit2::FunctionMinimum min_prev=min;
 	//ROOT::Minuit2::MnEigen eigen;
 	//min_prev=min;
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	INT_PREC=4.0e-3;
-	for(int i=0;i<2;++i){
-		prec.SetPrecision(INT_PREC);
+	INT_PREC=1.0e-3;
+	/*for(int i=0;i<2;++i){
+		prec.SetPrecision(INT_PREC*2);
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
 		printf("*****************************\n");
@@ -134,10 +141,10 @@ int main(int argc, char** argv){
 		
 		INT_PREC/=2;
 	}
+	*/
 	
-	
-	INT_PREC=1.0e-3;
-	prec.SetPrecision(INT_PREC);
+	INT_PREC=5.0e-4;
+	prec.SetPrecision(INT_PREC*2);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
@@ -148,45 +155,42 @@ int main(int argc, char** argv){
 	}
 	ROOT::Minuit2::MnUserParameterState statprev=stat;
 	
-	std::cout<<"Hesse "<<stat<<std::endl;
-	//std::cout <<"Eigen values: " ;
-	//for (double i: eigen(stat.Covariance())){
-   	//	std::cout << i << ' ';
-   	//}
-   	//std::cout << std::endl;
-   	
-   	
+	std::cout<<"Hesse "<<stat<<std::endl;   	
+   	double goal=10;
 	for(int i=0;i<10;i++){
-		min=migrad(theFCN, stat, 0,10);//defined in fcn.h
+		min=migrad(theFCN, stat, 0,goal);//defined in fcn.h
 		flag=check_min(&min,N_PAR-skip);
 		if( flag==0){
 			statprev=stat;
 		}else{
 			stat=hesse(theFCN,statprev);
 		}
+		printf("EDM/FVal %.3e/%.3e = %.3e\n",min.UserState().Edm(),min.UserState().Fval(),((min.UserState().Edm())/(min.UserState().Fval())) );
+		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
+		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
 		
-		if(min.IsValid()&&(min.HasValidCovariance())){
+		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}else{
+			stat=hesse(theFCN,min.UserState());
+			std::cout<<"Hesse "<<stat<<std::endl;  
 		}
 	}
 	
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
-	
-	
-	
-	
+
 	INT_PREC=1.0e-4;
-	prec.SetPrecision(5*INT_PREC);
+	prec.SetPrecision(4*INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);
 	printf("***************************\n");
 	stat=hesse(theFCN,min.UserParameters());
 	//ROOT::Minuit2::MnMigrad migrad2(theFCN, stat.Parameters() ,1);
 	statprev=stat;
+	goal=5;
 	for(int i=0;i<10;i++){
-		min=migrad(theFCN, stat, 1,5);
+		min=migrad(theFCN, stat, 1,goal);
 		
 		flag=check_min(&min,N_PAR-skip);
 		
@@ -197,11 +201,16 @@ int main(int argc, char** argv){
 			printf("Invalid output\n");
 			stat=hesse(theFCN,statprev);
 		}
-		
-		if(min.IsValid()&&(min.HasValidCovariance()) ){
+		printf("EDM/FVal %.3e/%.3e = %.3e\n",min.UserState().Edm(),min.UserState().Fval(),((min.UserState().Edm())/(min.UserState().Fval())) );
+		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
+		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
+		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}else{
+			stat=hesse(theFCN,min.UserState());
+			std::cout<<"Hesse "<<stat<<std::endl; 
+
 		}
 	}
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	

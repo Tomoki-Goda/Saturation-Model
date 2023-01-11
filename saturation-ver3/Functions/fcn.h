@@ -120,15 +120,20 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				val=F2_kt(X_DATA[i],Q2_DATA[i],0,sigpar);//summation over flavour is done at the level of integrand.
 				//printf("%.3e %.3e %.3e %.3e\n",val,CS_DATA[i],fabs(val-CS_DATA[i]),ERR_DATA[i]);	
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
+#if SCATTER==1
+			printf("done\n");
+			//exit(0);
+			getchar();
+#endif
 				
 			}
-			//printf("done\n");
-			//getchar();
+
+
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();
 #if PRINT_PROGRESS!=0
 			if((licznik/PRINT_PROGRESS)*PRINT_PROGRESS==licznik){
-				printf("CHISQ = %.5e (%.2f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);			
+				printf("CHISQ = %.5e (%.3f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);			
 				std::cout<<interval.count()<<" seconds, ("<< -((double)time)/CLOCKS_PER_SEC<<" CPU seconds)"<<std::endl;
 			}
 #endif	
@@ -143,10 +148,10 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 
 };
 
-ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const int  goal){
+ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
 		ROOT::Minuit2::MnStrategy strat(str);
 		ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat);	
-		ROOT::Minuit2::FunctionMinimum min=migrad2(20,goal);
+		ROOT::Minuit2::FunctionMinimum min=migrad2(25,goal);
 		//std::cout <<"Eigen values: " ;
 		//ROOT::Minuit2::MnEigen eigen;
 		//for (double val: eigen(min.UserCovariance())){

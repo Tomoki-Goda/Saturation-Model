@@ -65,18 +65,6 @@ double af(double x,double k,double q2,double * sigpar,double *sudpar){
 	//lim[1]=R_MAX;
 	lim[0]=R_MIN/(1+R_MIN);
 	lim[1]=((double)R_MAX)/(1+R_MAX);
-	//printf("k= %.5e integ lim = %.5e %.5e\n" ,k, lim[0],lim[1]);
-	//double step=(lim[1]-lim[0])/15, high=lim[0],low=lim[0];
-	//double val=0;
-	//int N=96;
-	//double low,high,step=(lim[1]-lim[0])/15;
-	//for(int i =0;i<15;i++){
-	//	high=low+step;
-	//	val+=dgauss_(&integrand_af,&low,&high, &eps);
-	//	//val+=dgquad_(&integrand_af,&low,&high,&N);
-	//	low=high;
-	//}
-	//val=dgauss_(&integrand_af,lim,lim+1,&eps);
 	double* dummy;	
 #if IIM==1
 	val=0;

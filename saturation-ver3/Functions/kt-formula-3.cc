@@ -113,7 +113,7 @@ class Gluon{
 				return(0);
 			}
 #if ALPHA_RUN==1
-			val*=alpha(mu2)/0.25;
+			val*=alpha(mu2)/0.15;
 #endif
 			return (sigma_0*val) ;
 		}
@@ -154,27 +154,39 @@ class Integrand_kt{
 			change_var(beta,jac3,betamin,betamax,1);
 			change_var(kappa2,jac2,0,kappamax,1+kappamax/pow(Q2,0.25));
 
-			change_var(phi,jac4,0,PI,2);
+			change_var(phi,jac4,0,PI,1);
 			jac4*=2;
 
 			k2max=(1-x)/x*Q2-(kappa2+mf2)/(beta*(1-beta));
 			if(k2max<=0.0){
 				return 0;
 			}
-
+			double val=0;//,valtot=0;
 			change_var(k2,jac1,0,k2max,1+k2max/pow(Q2,0.25));
-			//cosphimin=(kappa2+mf2+(1-beta)*(k2-(1-x)/x*Q2*beta))/(2*(1-beta)*sqrt(kappa2*k2));
-			//if(cosphimin<-1){
-			//	cosphimin=-1;
-			//}
-			//if(cosphimin>1){
-			//	return 0;
-			//}
-			
-			double val=integrand(kappa2,k2,beta,phi)+integrand(kappa2,k2,1-beta,phi+PI);
+			val=integrand(kappa2,k2,beta,phi)+integrand(kappa2,k2,1-beta,phi+PI);
 			val*=jac1*jac2*jac3*jac4;
 
-			if(std::isnan(val)||std::isinf(val)){
+/*			if(kappa2<k2max){
+				k2=1-x1*x1;
+				change_var(k2,jac1,0,kappa2,1+kappa2/pow(Q2,0.25));
+				val=integrand(kappa2,k2,beta,phi)+integrand(kappa2,k2,1-beta,phi+PI);
+				val*=jac1*jac2*jac3*jac4;
+				valtot+=2*x1*val;
+			}else{
+				change_var(k2,jac1,0,k2max,1+k2max/pow(Q2,0.25));
+				val=integrand(kappa2,k2,beta,phi)+integrand(kappa2,k2,1-beta,phi+PI);
+				val*=jac1*jac2*jac3*jac4;
+			}
+			if(kappa2<k2max){
+			
+				k2=x1*x1;
+				change_var(k2,jac1,kappa2,k2max,1+(k2max-kappa2));
+				val=integrand(kappa2,k2,beta,phi)+integrand(kappa2,k2,1-beta,phi+PI);
+				val*=jac1*jac2*jac3*jac4;
+				valtot+=2*x1*val;
+			}
+*/
+			if(k2>k2max||std::isnan(val)||std::isinf(val)){
 				printf("x1= %.3e x2= %.3e x3= %.3e x4= %.3e\n",x1,x2,x3,x4 );
 				printf("kappa2=%.3e k2=%.3e beta=%.3e phi=%.3e\n",kappa2,k2,beta,phi );
 				printf(" %.3e <beta<  %.3e\n",betamin,betamax );
@@ -218,6 +230,7 @@ class Integrand_kt{
 			if(xz>1){
 				if(fabs(1-xz)>1.0e-10){
 					printf("Theta: x/z=%.3e kappa2=%.3e k2=%.3e beta=%.3e phi=%.3e Q2=%.3e x=%.3e mf2=%.3e\n",xz,kappa2,k2,beta,phi,Q2,x,mf2);
+					printf("%.3e\n",xz-1);
 					getchar();
 				}
 				return 0;

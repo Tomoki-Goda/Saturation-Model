@@ -115,7 +115,7 @@ int main(int argc, char** argv){
 	//min_prev=min;
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	INT_PREC=1.0e-3;
+	INT_PREC=4.0e-3;
 	for(int i=0;i<2;++i){
 		prec.SetPrecision(INT_PREC);
 		printf("*****************************\n");
@@ -136,7 +136,7 @@ int main(int argc, char** argv){
 	}
 	
 	
-	INT_PREC=5.0e-4;
+	INT_PREC=1.0e-3;
 	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
@@ -157,7 +157,7 @@ int main(int argc, char** argv){
    	
    	
 	for(int i=0;i<10;i++){
-		min=migrad(theFCN, stat, 0);//defined in fcn.h
+		min=migrad(theFCN, stat, 0,10);//defined in fcn.h
 		flag=check_min(&min,N_PAR-skip);
 		if( flag==0){
 			statprev=stat;
@@ -165,7 +165,7 @@ int main(int argc, char** argv){
 			stat=hesse(theFCN,statprev);
 		}
 		
-		if(min.IsValid()){
+		if(min.IsValid()&&(min.HasValidCovariance())){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}else{
@@ -186,7 +186,7 @@ int main(int argc, char** argv){
 	//ROOT::Minuit2::MnMigrad migrad2(theFCN, stat.Parameters() ,1);
 	statprev=stat;
 	for(int i=0;i<10;i++){
-		min=migrad(theFCN, stat, 1);
+		min=migrad(theFCN, stat, 1,5);
 		
 		flag=check_min(&min,N_PAR-skip);
 		
@@ -198,7 +198,7 @@ int main(int argc, char** argv){
 			stat=hesse(theFCN,statprev);
 		}
 		
-		if(min.IsValid()){
+		if(min.IsValid()&&(min.HasValidCovariance()) ){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}else{

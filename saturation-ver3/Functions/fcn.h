@@ -143,10 +143,10 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 
 };
 
-ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str){
+ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const int  goal){
 		ROOT::Minuit2::MnStrategy strat(str);
 		ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat);	
-		ROOT::Minuit2::FunctionMinimum min=migrad2(20,10);
+		ROOT::Minuit2::FunctionMinimum min=migrad2(20,goal);
 		//std::cout <<"Eigen values: " ;
 		//ROOT::Minuit2::MnEigen eigen;
 		//for (double val: eigen(min.UserCovariance())){

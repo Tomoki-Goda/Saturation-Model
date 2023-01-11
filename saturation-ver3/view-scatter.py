@@ -5,12 +5,13 @@ import numpy as np
 import pandas as pd
 
 
-df=pd.read_table("./gbwscatter.txt",delimiter="\t")
+df=pd.read_table("./scatter.txt",delimiter="\t")
 df.columns=['kappa2','kt2','beta','Q2','x','mf2','val']
 print(df)
 
 fig,ax=plt.subplots(1,3,layout="constrained")
-
+fig.set_figheight(5)
+fig.set_figwidth(15)
 ax[0].scatter(df['kappa2'],df['kt2'],s=0.1)
 ax[0].set(yscale="log", xscale="log")
 

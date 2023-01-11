@@ -345,7 +345,8 @@ class Integrand_kt{
 				return 0;
 			}
 			change_var(beta,jac3,betamin,betamax,1);
-			change_var(kappa2,jac2,0,kappamax,1+kappamax/pow(Q2,0.25));
+			//change_var(kappa2,jac2,0,kappamax,1+kappamax/pow(Q2,0.25));
+			change_var(kappa2,jac2,0,kappamax,1+kappamax/pow(1+Q2,0.5));
 
 			k2max=(1-x)/x*Q2-(kappa2+mf2)/(beta*(1-beta));
 			if(k2max<=0.0){
@@ -353,32 +354,34 @@ class Integrand_kt{
 			}
 
 			double val=0;
-
-			change_var(k2,jac1,0,k2max,1+k2max/pow(Q2,0.25));
+/*
+			//change_var(k2,jac1,0,k2max,1+k2max/pow(Q2,0.25));
+			change_var(k2,jac1,0,k2max,1+k2max/pow(1+Q2,0.5));
 			val=integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
 			val*=jac1*jac2*jac3;
 			return val;
-/*
+*/
 			if(kappa2<k2max){
 				k2=1-x1*x1;
-				change_var(k2,jac1,0,kappa2,1+kappa2/pow(Q2,0.25));
+				change_var(k2,jac1,0,kappa2,1+kappa2/pow(1+Q2,0.5));
 				val+=jac1*integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
 				
 				k2=x1*x1;
-				//change_var(k2,jac1,kappa2,k2max,1+k2max/pow(kappa2*Q2,0.25));
+				//change_var(k2,jac1,kappa2,k2max,1+k2max/pow(kappa2*(1+Q2),0.5));
+				//change_var(k2,jac1,kappa2,k2max,1+kappamax/pow(1+Q2,0.5));
 				change_var(k2,jac1,kappa2,k2max,1+k2max-kappa2);
 				val+=jac1 *integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
 				
 				val*=2*x1*jac2*jac3;
 			}else{
-				change_var(k2,jac1,0,k2max,1+k2max/pow(Q2,0.25));
+				change_var(k2,jac1,0,k2max,1+k2max/pow(1+Q2,0.5));
 				val=integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
 				val*=jac1*jac2*jac3;
 			}
 
 
 			return val;
-*/
+
 		}
 		
 #if SCATTER==1

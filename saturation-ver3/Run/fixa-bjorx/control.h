@@ -11,3 +11,4 @@
 #define PRINT_PROGRESS 1
 #define ALPHA_RUN 0
 #define MODX 0
+#define SCATTER 1

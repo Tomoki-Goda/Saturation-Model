@@ -121,7 +121,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				//printf("%.3e %.3e %.3e %.3e\n",val,CS_DATA[i],fabs(val-CS_DATA[i]),ERR_DATA[i]);	
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
 #if SCATTER==1
-			printf("done\n");
+			printf("done %.3e\n",chisq/(i+1));
 			//exit(0);
 			getchar();
 #endif

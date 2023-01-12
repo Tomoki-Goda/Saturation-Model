@@ -29,7 +29,7 @@ grid: gluon-grid
 
 fit: clean main
 
-plot: critical dipole F2 FL F2-slope tmd-gluon tmd-gluon-x tmd-critical fcn export-data  ww-gluon gluon-grid
+plot: dipole F2 FL F2-slope tmd-gluon tmd-gluon-x tmd-critical fcn export-data  ww-gluon gluon-grid
 
 main: ${DEPS} ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${FUNCDIR}/clenshaw.h 
 	gcc ${FUNCDIR}/main.c ${DIR}/read-and-fit.o ${DIR}/dipole-cross-section.o ${DIR}/photon-wave-function.o ${LIBS} -o ${DIR}/main ${INC} ${OPT}
@@ -40,8 +40,8 @@ gluon-grid: ${DEPS} ${UTILDIR}/gluon-grid.c ${DIR}/dipole-cross-section.o  ${UTI
 dipole-grid: ${DEPS} ${UTILDIR}/dipole-grid.c ${DIR}/dipole-cross-section.o ${FUNCDIR}/clenshaw.h
 	gcc ${UTILDIR}/dipole-grid.c ${DIR}/dipole-cross-section.o ${LIBS} -o ${DIR}/dipole-grid  ${INC} ${OPT}
 
-critical : ${DEPS} ${UTILDIR}/critical-line.c ${UTILDIR}/critical-line.h ${DIR}/dipole-cross-section.o ${FUNCDIR}/clenshaw.h
-	gcc ${UTILDIR}/critical-line.c ${DIR}/dipole-cross-section.o ${LIBS} -o ${DIR}/critical   ${INC} ${OPT}
+#critical : ${DEPS} ${UTILDIR}/critical-line.c ${UTILDIR}/critical-line.h ${DIR}/dipole-cross-section.o ${FUNCDIR}/clenshaw.h
+#	gcc ${UTILDIR}/critical-line.c ${DIR}/dipole-cross-section.o ${LIBS} -o ${DIR}/critical   ${INC} ${OPT}
 
 dipole: ${DEPS} ${UTILDIR}/Plot-DP.c ${DIR}/dipole-cross-section.o ${FUNCDIR}/clenshaw.h
 	gcc ${UTILDIR}/Plot-DP.c ${DIR}/dipole-cross-section.o ${LIBS} -o ${DIR}/dipole  ${INC} ${OPT}

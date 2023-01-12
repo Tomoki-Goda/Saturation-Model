@@ -37,12 +37,13 @@ def main():
     fig1,ax1=plt.subplots(1,2,constrained_layout=True, sharey=True,sharex=True )
     fig1.get_layout_engine().set(wspace=1/10)
     leg=[]
-    q2= ['5','50','500']
+    #q2= ['5','50','500']
+    q2= ['0']
     name=['GBW',"BGK"]
     for l in range(2): 
         ax1[l].text(1.0e-7,0,name[l],fontsize=25);
         for j in ['1']:
-            with open(args[0+2*l]+'/gluon-x-500-'+j+'.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/gluon-x-0-'+j+'.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:

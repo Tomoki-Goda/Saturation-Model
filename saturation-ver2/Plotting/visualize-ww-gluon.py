@@ -42,7 +42,7 @@ def main():
     for l in range(2):
         ax1[l].text(5,0.2,name[l],fontsize=25)
         for j in ['4']:
-            with open(args[0+2*l]+'/ww-gluon-500-'+j+'.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/ww-gluon-0-'+j+'.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:
@@ -50,7 +50,8 @@ def main():
                     dpi.append(float(data[1]))
                     ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            for k in ['5','50','500']:            
+            #for k in ['5','50','500']:            
+            for k in ['0']:            
                 with open(args[1+2*l]+'/ww-gluon-{0}-'.format(k)+j+'.txt',"r") as fi:
                     dpi=[]
                     ri=[]
@@ -62,7 +63,7 @@ def main():
                     #ax1[l].text(ri[pos],pow(10*dpi[pos],3),'$Q^2={0}\\mathrm{{GeV^2}}$'.format(k))
                     #ax1[l].text(ri[0],dpi[0],'$Q^2={0}\\mathrm{{GeV^2}}$'.format(k))
                 leg.append(ax1[l].plot(ri,dpi ,c='red',ls="-"))
-        ax1[l].set( xscale= 'log' ,   yscale='log',ylim=[1.0e-3,3] )
+        ax1[l].set( xscale= 'log' ,   yscale='log',ylim=[2.50e-3,7.5] )
         ax1[l].grid('true')
         ax1[l].set_xlabel("$k_t^2\\;[\\mathrm{GeV^2}]$",rotation="horizontal",loc='right')
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])

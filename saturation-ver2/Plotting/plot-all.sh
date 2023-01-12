@@ -6,7 +6,8 @@ GBW=${DIR}/GBW/Mass0.0-Qup650-Model0-Sud0
 GBWS=${DIR}/GBWS-Fix-S/Mass0.0-Qup650-Model22-Sud1
 BGK=${DIR}/BGK/Mass0.0-Qup650-Model1-Sud0
 BGKS=${DIR}/BGKS-Fix-S/Mass0.0-Qup650-Model3-Sud1
-SAVE=../Document/Plots
+#SAVE=../Document/Plots
+SAVE=../Document/Plots2
 PLOT=./Plotting
 
 ${PLOT}/visualize-dipole.py \
@@ -58,12 +59,12 @@ ${PLOT}/visualize-ww-gluon.py \
 	${BGK} \
 	${BGKS}
 
-#${PLOT}/visualize-critical.py \
-#	-s ${SAVE}/critical \
-#	${GBW} \
-#	${GBWS} \
-#	${BGK} \
-#	${BGKS}
+${PLOT}/visualize-critical.py \
+	-s ${SAVE}/critical \
+	${GBW} \
+	${GBWS} \
+	${BGK} \
+	${BGKS}
 #./visualize-ww-critical.py \
 #	-s ${SAVE}/ww-critical-GBW \
 #	${GBW} \

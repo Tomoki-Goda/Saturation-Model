@@ -41,7 +41,7 @@ def main():
     for l in range(2):
         ax1[l].text(1.0e-2,0.25,name[l],fontsize=25);
         for j in ['4']:
-            with open(args[0+2*l]+'/gluon-500-'+j+'.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/gluon-0-'+j+'.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:
@@ -49,7 +49,8 @@ def main():
                     dpi.append(float(data[1]))
                     ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            q2=['5','50','500']
+            #q2=['5','50','500']
+            q2=['0']
             #sty=['-','_.',':']
             for k in range(len(q2)):
                 #print(k)

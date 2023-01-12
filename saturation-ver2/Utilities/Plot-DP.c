@@ -31,7 +31,8 @@ double generate_points(double r, double** par){
 	double val = 0;
 	double x;
 	for(int i =0; i<1/*( NF-1)*/;i++){
-		x=mod_x(**par, *((*par)+1),i);
+	//	x=mod_x(**par, *((*par)+1),i);
+		x=**par;
 		//val+=SIGMA(r,x,*(*(par)+1),*(par+1),*(par+2)) / ( *(*(par+1)) ) ; //0.1973 for GeV<-> fm
 		val+=BASE_SIGMA(r,x,*(*(par)+1),*(par+1)) / ( *(*(par+1)) ) ; //0.1973 for GeV<-> fm
 	}

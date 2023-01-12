@@ -41,7 +41,7 @@ def main():
     for l in range(2): 
         ax1[l].text(1,1.0e-5,name[l],fontsize=25)
         for j in ['2', '4', '6']:
-            with open(args[0+2*l]+'/dipole-100-'+j+'.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/dipole-0-'+j+'.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:
@@ -51,7 +51,7 @@ def main():
                 
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
             #ax1[l].text(ri[0]/1.3,5*dpi[0],"x=$10^{-"+j+"}$")
-            with open(args[1+2*l]+'/dipole-100-'+j+'.txt',"r") as fi:
+            with open(args[1+2*l]+'/dipole-0-'+j+'.txt',"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:

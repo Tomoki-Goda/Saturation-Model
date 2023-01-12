@@ -169,7 +169,7 @@ double sigma_bgk(double r, double x, double q2, const double * par){
 		return 0;
 	} 
 	
-	double expo = 0.389379*(pow( r* PI,2) * xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
+	double expo = /*0.389379*/(pow( r* PI,2) * xg_chebyshev(x,mu2))/ (3* sigma_0); //prefactor, origin unknown...
 	
 	double val=sigma_0*(1-exp(-expo));
 	
@@ -238,7 +238,7 @@ double Qs2(double r , double x, double *par){
 #else
 	double mu2;
 	int signal= compute_mu2(r, par+3 , &mu2, 1 );
-	double qs2 =4* 0.389379*(pow(  PI,2) * xg_chebyshev(x,mu2))/ (3* par[0]); //prefactor, origin unknown...
+	double qs2 =4*(pow(  PI,2) * xg_chebyshev(x,mu2))/ (3* par[0]); 
 #endif
 	return qs2;
 }

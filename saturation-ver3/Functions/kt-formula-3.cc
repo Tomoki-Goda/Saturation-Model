@@ -1,6 +1,6 @@
 #include<iostream>
 #include<fstream>
-#define TEST 1 
+#define TEST 0
 
 #include<cuba.h>
 #include<cmath>

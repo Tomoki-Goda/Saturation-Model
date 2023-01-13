@@ -9,7 +9,7 @@
 #include"Minuit2/MnMachinePrecision.h"
 
 //#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
-#include"./clenshaw-curtis.hh"
+//#include"./clenshaw-curtis.hh"
 #include<ctime>
 #include<chrono>
 
@@ -147,21 +147,25 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		
 
 };
-
+/*
 ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
 		ROOT::Minuit2::MnStrategy strat(str);
 		ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat);	
 		ROOT::Minuit2::FunctionMinimum min=migrad2(50,goal);
-		//std::cout <<"Eigen values: " ;
-		//ROOT::Minuit2::MnEigen eigen;
-		//for (double val: eigen(min.UserCovariance())){
-   		//	std::cout << val << ' ';
-   		//}
-   		//std::cout<<"\n"<<std::endl;
+		
    		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
    		stat=min.UserState();
 		return min;		
 }
-	
+ROOT::Minuit2::FunctionMinimum simplex(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
+		ROOT::Minuit2::MnStrategy strat(str);
+		ROOT::Minuit2::MnSimplex simplex2(theFCN,stat,strat);	
+		ROOT::Minuit2::FunctionMinimum min=simplex2(50,goal);
+		
+   		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
+   		stat=min.UserState();
+		return min;		
+}
+	*/
 	
 

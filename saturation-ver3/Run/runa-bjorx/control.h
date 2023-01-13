@@ -11,3 +11,4 @@
 #define PRINT_PROGRESS 1
 #define ALPHA_RUN 1
 #define MODX 0
+#define MU02 1

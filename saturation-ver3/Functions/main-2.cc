@@ -173,7 +173,9 @@ int main(int argc, char** argv){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}else{
-			stat=hesse(theFCN,min.UserState());
+			min=simplex(50,1);
+			stat=min.UserState();
+			//stat=hesse(theFCN,min.UserState());
 			std::cout<<"Hesse "<<stat<<std::endl;  
 		}
 	}
@@ -207,8 +209,9 @@ int main(int argc, char** argv){
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
-		}else{
-			stat=hesse(theFCN,min.UserState());
+		}else{	min=simplex(50,1);
+			stat=min.UserState();
+			//stat=hesse(theFCN,min.UserState());
 			std::cout<<"Hesse "<<stat<<std::endl; 
 
 		}

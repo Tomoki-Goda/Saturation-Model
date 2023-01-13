@@ -104,7 +104,7 @@ class Gluon{
 		}
 	public:
 		inline double alpha(const double mu2)const{
-			return 4.0/(9.0 *std::log( (mu2>1.0)?(mu2/LQCD2):(1.0/LQCD2) ));
+			return 4.0/(9.0 *std::log( (mu2>0.5)?(mu2/LQCD2):(0.5/LQCD2) ));
 		}
 
 	public:
@@ -363,7 +363,7 @@ class Integrand_kt{
 */
 			if(kappa2<k2max){
 				k2=1-x1*x1;
-				change_var(k2,jac1,0,kappa2,1+kappa2/pow(1+Q2,0.5));
+				change_var(k2,jac1,0,kappa2,1+kappa2/pow(1+Q2,0.25));
 				val+=jac1*integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
 				
 				k2=x1*x1;
@@ -374,7 +374,7 @@ class Integrand_kt{
 				
 				val*=2*x1*jac2*jac3;
 			}else{
-				change_var(k2,jac1,0,k2max,1+k2max/pow(1+Q2,0.5));
+				change_var(k2,jac1,0,k2max,1+k2max/pow(1+Q2,0.25));
 				val=integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
 				val*=jac1*jac2*jac3;
 			}

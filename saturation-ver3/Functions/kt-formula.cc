@@ -77,7 +77,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Gluon{
-	double sigma_0=0,lambda=0,x_0=0;
+	double sigma_0=0,lambda=0,x_0=0,mu02=MU02;
 	double Q2=0;
 	
 	
@@ -95,6 +95,9 @@ class Gluon{
 				sigma_0 =(double)par[0];
 				lambda	=(double)par[1];
 				x_0	=(double)par[2];
+#if MU02==0
+				mu02=(double)par[3];
+#endif
 			}else{
 				std::cout<<"unknown model: "<<key<<std::endl;
 			}
@@ -108,9 +111,10 @@ class Gluon{
 		}
 	public:
 		inline double alpha(const double mu2)const{
-			const double mu02=MU02;
+			//const double mu02=MU02;
 			//return 4.0/(9.0 *std::log( (mu2>mu0)?(mu2/LQCD2):(mu0/LQCD2) ));
-			return 4.0/(9.0 *std::log( (mu2+mu02)/LQCD2) );
+			
+			return 4.0/(9.0 *std::log( std::max(mu2,mu02)/LQCD2) );
 		}
 
 	public:
@@ -120,6 +124,9 @@ class Gluon{
 			}
 			if(lambda<0.05||lambda>0.95){
 				return 0;
+			}
+			if(mu02<2*LQCD2){
+				return(0);
 			}
 			double Qs2=pow(x_0/x,lambda);
 			double val=3.0/(4*PI*PI)*k2/Qs2*exp(-k2/Qs2);

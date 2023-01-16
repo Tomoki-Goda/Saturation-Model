@@ -45,10 +45,6 @@ typedef double PREC;
 	#define R_MAX 30
 #endif
 
-#ifndef MU0
-//if 1 mu02 is the fit parameter if 0 r_max is.
-	#define MU0 1 
-#endif
 
 //////////////////IRREGULAR CONTROL//////////////////////
 #ifndef  SATURATION
@@ -118,11 +114,6 @@ typedef double PREC;
 	#define NONLINEAR 0 
 #endif
 
-#ifndef STRATEGY
-// Strategy for MIGRAD. read MINUIT documentation.
-	#define STRATEGY 1
-#endif
-
 #ifndef FEJER
 	#define FEJER 0
 #endif
@@ -164,9 +155,19 @@ typedef double PREC;
 //////////////////////////////////////////////////////////////////
 //N_PAR is number of fit parameters
 #if MODEL ==0 
+#if MU02==0
+	#define N_PAR 4
+#else 
 	#define N_PAR 3
+#endif
+
 #elif MODEL==1
+#if MU02==0
+	#define N_PAR 6
+#else 
 	#define N_PAR 5
+#endif
+
 #elif (MODEL==2||MODEL==22)
 	#if SUDAKOV==0
 		#define N_PAR 3

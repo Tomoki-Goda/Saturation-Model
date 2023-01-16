@@ -101,7 +101,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			double x,Q2;
 			double val;
 			double chisq=0;
-			const int len=sizeof(par)/sizeof(par[0]);
+			const int len=par.size();
+			//printf("%d parameters\n",len);
 			//double param[len];
 #if PRINT_PROGRESS!=0
 			if((licznik/PRINT_PROGRESS)*PRINT_PROGRESS==licznik){			

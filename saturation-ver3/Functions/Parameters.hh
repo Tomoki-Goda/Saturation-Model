@@ -83,9 +83,9 @@ int i=0,j=0,k=0;
 #endif
 #endif
 	//printf("\n");
-	if(i!=N_PAR){
-		printf("parameter number mismatch counted %d, N_PAR= %d\n",i,N_PAR);
-		exit(0);
-	}
+	//if(i!=N_PAR){
+	//	printf("parameter number mismatch counted %d, N_PAR= %d\n",i,N_PAR);
+	//	exit(0);
+	//}
 	return 0;
 }

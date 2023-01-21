@@ -4,11 +4,12 @@
 
 #include<cuba.h>
 #include<cmath>
+#include <vector>
 #include"./control.h"
 #include"./control-default.h"
 #include"./constants.h"
-
-//#include"./clenshaw.h"
+#include"./interpolation2.hh"
+#include"./clenshaw.h"
 //#include"./dgauss.h"
 //#include"./clenshaw-curtis.hh"
 extern PREC INT_PREC;
@@ -70,75 +71,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 //double change_var(double & var,double &  jac,const double min, const double max){
 //	return(change_var(var,jac,min,  max,1));
 //}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//               Gluon
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Gluon{
-	double sigma_0=0,lambda=0,x_0=0,mu02=MU02;
-	double Q2=0;
-	
-	
-	public:
-	
-		std::string key;
-		explicit Gluon(std::string &type,const double (&par)[]){
-				//printf("gluon created\n");
-				key=type;	
-				set_par(par);	
-		}
-		void set_par(const double(&par)[]){
-			if(key=="gbw"){
-				//printf("parameters set\n");
-				sigma_0 =(double)par[0];
-				lambda	=(double)par[1];
-				x_0	=(double)par[2];
-#if MU02==0
-				mu02=(double)par[3];
-#endif
-			}else{
-				std::cout<<"unknown model: "<<key<<std::endl;
-			}
-
-		}
-		~Gluon(){}
-		int set_kinem(const double &b){
-			//x=a;
-			Q2=b;
-			return 0;
-		}
-	public:
-		inline double alpha(const double mu2)const{
-			//const double mu02=MU02;
-			//return 4.0/(9.0 *std::log( (mu2>mu0)?(mu2/LQCD2):(mu0/LQCD2) ));
-			
-			return 4.0/(9.0 *std::log( std::max(mu2,mu02)/LQCD2) );
-		}
-
-	public:
-		double operator()(const double x,const double k2,const double mu2)const{
-			if(x_0<1.0e-5||x_0>1.0e-3){
-				return 0;
-			}
-			if(lambda<0.05||lambda>0.95){
-				return 0;
-			}
-			if(mu02<2*LQCD2){
-				return(0);
-			}
-			double Qs2=pow(x_0/x,lambda);
-			double val=3.0/(4*PI*PI)*k2/Qs2*exp(-k2/Qs2);
-			if(std::isnan(val)==1){
-				return(0);
-			}
-#if ALPHA_RUN==1
-			val*=alpha(mu2)/0.2;//alpha at mu=1
-#endif
-			return (sigma_0*val) ;
-		}
-};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //         Angular integral
@@ -322,6 +255,8 @@ class Integrand_kt{
 			betamin=sqrt(1-4*(mf2/((1-x)/x*Q2) )) ;
 			betamax=(1+betamin)/2;
 			betamin=(1-betamin)/2;
+			
+			
 			return 0;
 		}
 		
@@ -733,8 +668,8 @@ double F2_kt(const PREC x,const  PREC Q2,const  PREC mf2,const PREC (& par)[]){
  	 	printf("%.3le encountered \n",(double)result);
  	 	return 0;
  	 }
- 	// printf("end F2\n");
- 	 return ((double)(result));
+ 	 printf("end F2 %.3e\n",result);
+ 	 return (result);
 }
 
 

@@ -15,7 +15,7 @@ static const double w16[]={6.274509803921572703711007079619e-02, 2.9894962269764
 static const double w8[]={1.269841269841270256502063773496e-01, 5.848745968640726177649829569567e-01, 1.117460317460317429023630586917e+00, 1.446871434881959070257763581104e+00, 1.574603174603174567114383108901e+00};
 
 
-static double dclenshaw(double(*func)(double*,void* par),void* par , const double a, const double b,const double eps){
+template<typename TYPE,typename args_type>static double dclenshaw(const TYPE &func,const args_type par , const double a, const double b, const double eps){
 	int MAX_RECURSION=15;
 //double dclenshaw(double(*func)(double*),double a,double b,double eps){
 	double sign, max,min;
@@ -52,42 +52,31 @@ static double dclenshaw(double(*func)(double*,void* par),void* par , const doubl
 		counter++;
 		licztot++;
 		scale=(smax-smin)/2;
-		//if(scale<2.0e-15){
-		//	printf("dclenshaw::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] scale = %.5e\n",smin,smax,min,max,scale);
-		//	getchar();
-		//}
 		mid=(smax+smin)/2;
 
 		for(int i=0;i<N/2;i++){
 			arg1=mid+scale*x16[i];
 			arg2=mid-scale*x16[i];
-			f[i]=(*func)(&arg1,par)+(*func)(&arg2,par);
+			f[i]=func(&arg1,par)+func(&arg2,par);
 			if((isnan(f[i])+isinf(f[i]))!=0){
 				printf("%.3e encountered at %.3e or %.3e\n",f[i],arg1,arg2 );
 			}
 		}
 		f[0]/=2;
-		f[N/2]=(*func)(&mid,par);
+		f[N/2]=func(&mid,par);
 
 		if((isnan(f[N/2])+isinf(f[N/2]))!=0){
 			printf("%.3e encountered at %.3e \n",f[N/2],mid );
 		}
 		valfull=0;
-		//accum2=0;
 		Kahn_init(accum2,3);
 		for(int i=0;i<=N/2;i++){
-			//valfull=dclensaw_Kahn(valfull,f[i]*w16[i],&accum2);
 			valfull=Kahn_Sum(valfull,f[i]*w16[i],accum2,3);
-			//printf("%.3e\t",f[i]*w[i]);
 		}
-		//valfull+=accum2;
 		valfull=Kahn_total(valfull,accum2,3);
-		//printf("\n");
 		valhalf=0;
-		//accum2=0;
 		Kahn_init(accum2,3);
 		for(int i=0;i<=N/4;i++){
-			//valhalf=dclensaw_Kahn(valhalf,f[2*i]*w8[i],&accum2);
 			valhalf=Kahn_Sum(valhalf,f[2*i]*w8[i],accum2,3);
 		}
 		//valhalf+=accum2;
@@ -95,7 +84,6 @@ static double dclenshaw(double(*func)(double*,void* par),void* par , const doubl
 
 		valfull*=2*scale/N;
 		valhalf*=4*scale/N;
-		//printf("%.5e , %.5e in the domain [%.3e, %.3e] of [%.3e, %.3e] \n",valfull,valhalf,smin,smax,min,max);
 		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<eps )|| (counter==MAX_RECURSION)){//Need improvement
 			if(counter==MAX_RECURSION){
 				printf("MAX_RECURSION:: evaluated %d times. Increase MAX_RECURSION\n",MAX_RECURSION );
@@ -103,39 +91,27 @@ static double dclenshaw(double(*func)(double*,void* par),void* par , const doubl
 				printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
 				for(int i=0;i<N/2;i++){
 					arg2=mid-scale*x16[i];
-					printf("%.3e\n",(*func)(&arg2,par));
+					printf("%.3e\n",func(&arg2,par));
 				}
 				arg2=mid;
-				printf("%.3e\n",(*func)(&arg2,par));
+				printf("%.3e\n",func(&arg2,par));
 				for(int i=0;i<N/2;i++){
 					arg2=mid+scale*x16[N/2-i-1];
-					printf("%.3e\n",(*func)(&arg2,par));
+					printf("%.3e\n",func(&arg2,par));
 				}
 				printf("\n");
 			}
-			//if(fabs(valfull-valhalf)<eps*(eps+fabs(valfull)) ){//originally 1 but now 1.0e-3 no reason but to go further in the absolute accuracy
-			//if(( fabs(valfull-valhalf)>eps*(fabs(valfull)) ) && (fabs(2*valfull*(max-min)/scale)>eps) ){
-				//printf("%.5e , %.5e in the domain [%.3e, %.3e] of [%.3e, %.3e] \n",valfull,valhalf,smin,smax,min,max);
-				//printf("%.5e %.5e\n ",fabs(valfull-valhalf),eps*(eps+fabs(valfull)) );
-			//	printf("Abs: %.5e %.5e \tRel: %.5e %.5e\n ",abs(2*valfull*(max-min)/scale),eps,fabs(valfull-valhalf),eps*(fabs(valfull)));
-			//}
-		
-			//total+=valfull;
-			//total=dclensaw_Kahn(total,valfull,&accum);
+			
 			total=Kahn_Sum(total,valfull,accum,3);
 			licz++;
 			counter=0;
 			if(fabs(smax-max)<1.0e-15){
-				//printf("Efficiency %d/%d = %.3f\n",16*licz,16*licztot,((double)licz)/licztot);
 				return(sign*Kahn_total(total,accum,3) );
-			//bereak;
 			}
 			smin=smax;
-			//smax=max;
 			increase=(4*scale);
 			smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 		}else{
-			//smax=mid;
 			smax=smin+(scale/2);
 		}
 		if((smax-smin)<1.0e-15){
@@ -147,24 +123,5 @@ static double dclenshaw(double(*func)(double*,void* par),void* par , const doubl
 	}
 }
 
-//////////////////////////////////////////////////////////
-//
-//
-//
-/*
-#define TEST 1
-#if TEST==1
-double func(double *X,void*){
-	double x=*X;
-		
-	return(x*x*exp(-x*x));
-}
 
-int main(){
-	double * a=0;
-	double val=dclenshaw(&func , (void*)a, 0,100,1.0e-15);
-	printf(" %.5e\n",val);
-	return(0);
-}
-#endif*/
 #endif

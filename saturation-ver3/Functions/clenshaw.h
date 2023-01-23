@@ -17,7 +17,7 @@ static const double w8[]={1.269841269841270256502063773496e-01, 5.84874596864072
 
 template<typename TYPE,typename args_type>static double dclenshaw(const TYPE &func,const args_type par , const double a, const double b, const double eps){
 	int MAX_RECURSION=15;
-//double dclenshaw(double(*func)(double*),double a,double b,double eps){
+//double dclenshaw(double(&func)(const double*, const void*),const void* args,const double a,const double b,const double eps){
 	double sign, max,min;
 
 	if((1-(a-b))==1){
@@ -57,13 +57,13 @@ template<typename TYPE,typename args_type>static double dclenshaw(const TYPE &fu
 		for(int i=0;i<N/2;i++){
 			arg1=mid+scale*x16[i];
 			arg2=mid-scale*x16[i];
-			f[i]=func(&arg1,par)+func(&arg2,par);
+			f[i]=func(arg1,par)+func(arg2,par);
 			if((isnan(f[i])+isinf(f[i]))!=0){
 				printf("%.3e encountered at %.3e or %.3e\n",f[i],arg1,arg2 );
 			}
 		}
 		f[0]/=2;
-		f[N/2]=func(&mid,par);
+		f[N/2]=func(mid,par);
 
 		if((isnan(f[N/2])+isinf(f[N/2]))!=0){
 			printf("%.3e encountered at %.3e \n",f[N/2],mid );

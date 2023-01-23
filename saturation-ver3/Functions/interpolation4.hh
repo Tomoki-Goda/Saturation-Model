@@ -9,6 +9,142 @@ extern double change_var(double & var,double &  jac,const double min, const doub
 extern double INT_PREC;
 
 //template <typename functype> 
+class Sigma{
+		static double* sigpar;
+		
+	public:
+		static void init(const double (&par)[]){
+			sigpar=par;
+		}
+		explicit Sigma(void){//{(const double (&par)[]){
+			//sigma_init(par);
+		}
+		~Sigma(){
+		}
+		static double operator(const double r,const double x)const{//,const double Q2,const double*sigpar)const {
+			double sigma_0=sigpar[0];
+			double lambda=sigpar[1];
+			double x_0=sigpar[2];
+			if(x_0<1.0e-5||x_0>1.0e-3){
+				return 0;
+			}
+			if(lambda<0.05||lambda>0.95){
+				return 0;
+			}
+			
+			return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
+		}
+}
+
+class Gluon_Integrand{
+	protected:
+		double Q2,kt2;
+		Sigma sigma;
+		int x_npts,y_npts;
+		gsl_interp_accel *  x_accel_ptr,*  y_accel_ptr;
+		gsl_spline2d *  spline_ptr;
+		double *x_array,*y_array,*f_array;
+		
+		void init(int npts1,int npts2 ){
+			x_npts=npts1;
+			y_npts=npts2;
+			x_array=(double*)malloc(x_npts*sizeof(double));
+			y_array=(double*)malloc(y_npts*sizeof(double));
+			f_array=(double*)malloc(x_npts*y_npts*sizeof(double));
+			//func=funcptr;
+		}
+		void free_approx(){
+			gsl_spline2d_free (spline_ptr);
+			gsl_interp_accel_free (x_accel_ptr);
+			gsl_interp_accel_free (y_accel_ptr);
+			free(x_array);
+			free(y_array);
+			free(f_array);
+		}
+		
+		int generate_array(){
+			double x,y;
+			for (int j = 0; j < y_npts; j++){
+				y=pow(10,-10+10*((double)j)/(y_npts-1));
+				y_array[j] = y;
+			}	
+			for (int i = 0; i < x_npts; i++){
+				x=pow(10,-10+12*((double)i)/(x_npts-1));
+				x_array[i] = x;
+			}
+			return 0;
+		}
+		
+		
+	public:
+		Gluon_Integrand(int npts1,int npts2){
+			init(npts1,npts2);
+			//sigma.init(par);
+		}
+		set_kinem(const double kt2,const double Q2, const double (&par)[]){
+			this.kt2=a;
+			this.Q2=b;
+			sigma.init(par);
+		}
+		
+		~Gluon_Integrand(){
+			free_approx();
+		}
+		
+		int approximate(){
+			generate_array();
+			
+			for (int j = 0; j < y_npts; j++){
+				for (int i = 0; i < x_npts; i++){
+					f_array[j*x_npts+i] = sigma(x_array[i],y_array[j]);
+				}
+			}
+			x_accel_ptr = gsl_interp_accel_alloc ();
+			y_accel_ptr = gsl_interp_accel_alloc ();
+			spline_ptr = gsl_spline2d_alloc (gsl_interp2d_bicubic, x_npts,y_npts); // cubic spline
+			gsl_spline2d_init (spline_ptr, x_array, y_array, f_array, x_npts, y_npts);
+			return(0);
+		}
+		double operator()(const double x,const double y)const{	
+			double val = gsl_spline2d_eval_deriv_xx(spline_ptr, x, y, x_accel_ptr,y_accel_ptr);
+			val+=gsl_spline2d_eval_deriv_x(spline_ptr, x, y, x_accel_ptr,y_accel_ptr)/x;
+			return(r*std::cyl_bessel_j(0,r*sqrt(kt2))*val);
+		}
+};
+class aF{
+	public:
+		Gluon_Integrand* integrand;
+	
+		aF(const Gluon_Integrand & integrand){
+			this.integrand=&integrand;
+		}
+		~aF(){
+		}
+		
+		double operator()(const double x,const double k2,const double mu2)const{
+			if(mu02<2*LQCD2){
+				return(0);
+			}
+			std::vector<double> par={k2,x};
+			double val=3.0/(4*PI*PI)*dclenshaw< Laplacian_Sigma ,std::vector<double>& >(dpptr,par,R_MIN,R_MAX,INT_PREC);
+			
+			if(std::isnan(val)==1){
+				return(0);
+			}
+#if ALPHA_RUN==1
+			val*=alpha(mu2)/0.2;//alpha at mu=1
+#endif
+			return (val) ;
+		}
+		
+		}
+	
+	
+
+};
+		
+
+
 class Interpolate2d{
 	protected:
 		int x_npts,y_npts;
@@ -85,66 +221,6 @@ class Interpolate2d{
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Laplacian_Sigma:public Interpolate2d{
-		const double * sigpar;
-
-		double func(const double r,const double x)const{//,const double Q2,const double*sigpar)const {
-			double sigma_0=sigpar[0];
-			double lambda=sigpar[1];
-			double x_0=sigpar[2];
-			if(x_0<1.0e-5||x_0>1.0e-3){
-				return 0;
-			}
-			if(lambda<0.05||lambda>0.95){
-				return 0;
-			}
-			
-			return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
-		}
-		int generate_array(){
-			double x,y;
-			for (int j = 0; j < y_npts; j++){
-				y=pow(10,-10+10*((double)j)/(y_npts-1));
-				y_array[j] = y;
-			}	
-			for (int i = 0; i < x_npts; i++){
-				//x=((double)i)/(x_npts-1);
-				x=pow(10,-10+10*((double)i)/(x_npts-1));
-				x_array[i] = x;
-			}
-			return 0;
-		}
-		double approx_f(const double x,const double y)const{	
-			double val = gsl_spline2d_eval_deriv_xx(spline_ptr, x, y, x_accel_ptr,y_accel_ptr);
-			val += gsl_spline2d_eval_deriv_x(spline_ptr, x, y, x_accel_ptr,y_accel_ptr)/x;
-			return(val);
-		}
-	
-	public:
-		Laplacian_Sigma(int n_x,int n_y);
-		//}
-		~Laplacian_Sigma(){//:Interpolate2d(){
-		}
-		void approx_sigma(){
-			approximate();
-			
-		}
-		void set_par(const double * par){
-			sigpar=par;
-		}
-		
-		double operator()(const double *R,const std::vector<double>& par)const{
-			const double r=*R;
-			//const double *par=((const double*)K);
-			
-			double val=approx_f(r,par[1])*r*2*PI*std::cyl_bessel_j(0,r*sqrt(par[0]));
-			//printf("af= %.3e\n",val);
-			return( val );
-		}
-	
-};
-Laplacian_Sigma::Laplacian_Sigma(int n_x,int n_y): Interpolate2d(n_x,n_y){
-}
 class Gluon{
 	private:
 		Laplacian_Sigma dpptr(30,30);

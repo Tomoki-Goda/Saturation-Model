@@ -19,9 +19,9 @@ INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR}
 
 OPT=-O3 -Wno-unused-result #-g # -Wno-format 
 
-SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
-GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h
-PARNIDIR=/home/tomoki/Tools/Parni
+#SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
+#GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h
+#PARNIDIR=/home/tomoki/Tools/Parni
 
 ########################################################################################################
 all: clean main 
@@ -29,14 +29,23 @@ grid: gluon-grid
 
 fit: clean main
 
-main: ${DEPS} ${FUNCDIR}/main.cc ${DIR}/kt-formula.o ${PARNI}
-	g++ ${FUNCDIR}/main.cc  ${DIR}/kt-formula.o ${PARNI} ${LIBS} -o ${DIR}/main  ${INC} ${OPT}
+main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
+	g++ ${FUNCDIR}/main.cc ${LIBS} -o ${DIR}/main  ${INC} ${OPT}
 
-${DIR}/kt-formula.o: ${FUNCDIR}/kt-formula.cc
-	g++ ${FUNCDIR}/kt-formula.cc -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
+#main: ${DEPS} ${FUNCDIR}/main.cc ${DIR}/kt-formula.o 
+#	g++ ${FUNCDIR}/main.cc  ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main  ${INC} ${OPT}
 
+#${DIR}/kt-formula.o: ${FUNCDIR}/kt-formula.cc
+#	g++ ${FUNCDIR}/kt-formula.cc -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
 
-		
+plot: dipole gluon
+
+gluon: ${DEPS} ${UTILDIR}/tmd-gluon.c ${UTILDIR}/tmd-gluon-2.h
+	g++ ${UTILDIR}/tmd-gluon.c -o ${DIR}/gluon ${OPT} ${INC} ${LIBS}
+
+dipole: ${DEPS} ${UTILDIR}/Plot-DP.c 
+	g++ ${UTILDIR}/Plot-DP.c -o ${DIR}/dipole ${OPT} ${INC} ${LIBS}
+
 clean: 
 	rm -f ${DIR}/*.o
 	rm -f ${DIR}/main

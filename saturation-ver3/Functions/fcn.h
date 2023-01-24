@@ -10,6 +10,7 @@
 
 //#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
 //#include"./clenshaw-curtis.hh"
+#include"./kt-formula.hh"
 #include<ctime>
 #include<chrono>
 
@@ -17,7 +18,7 @@
 	#define RFORMULA 0
 #endif
 
-extern double F2_kt(const  PREC,const  PREC,const PREC, const PREC(&)[]);
+//extern double F2_kt(const  PREC,const  PREC,const PREC, const PREC(&)[]);
 //extern double F2_r(const double,double,double,double*);
 class KtFCN : public ROOT::Minuit2::FCNBase {
 	
@@ -36,7 +37,6 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			ERR_DATA=(double*)realloc(ERR_DATA,MAX_N*sizeof(double));
 		}
 		double Up() const {return 1;}
-		
 	public:
 		unsigned MAX_N=0;
 		explicit KtFCN(std::string data_file ){
@@ -93,6 +93,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		
 		double operator()(const std::vector<double>& par)const{
 			std::chrono::system_clock walltime;
+			F2_kt F2;	
 			std::chrono::time_point start= walltime.now();
 
 			clock_t time=clock();
@@ -118,8 +119,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				val=0;
 				//x=X_DATA[i];
 				//Q2=Q2_DATA[i];
-				val=F2_kt(X_DATA[i],Q2_DATA[i],0,sigpar);//summation over flavour is done at the level of integrand.
-				//printf("%.3e %.3e %.3e %.3e\n",val,CS_DATA[i],fabs(val-CS_DATA[i]),ERR_DATA[i]);	
+				val=F2(X_DATA[i],Q2_DATA[i],0,sigpar);//summation over flavour is done at the level of integrand.
+				//printf("%d: %.2e %.2e %.2e %.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],fabs(val-CS_DATA[i]),ERR_DATA[i],X_DATA[i],Q2_DATA[i]);	
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
 #if SCATTER==1
 			printf("done %.3e\n",chisq/(i+1));

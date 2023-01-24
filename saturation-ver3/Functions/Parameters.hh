@@ -12,7 +12,7 @@ std::string  par_name[]	= {"sigma_0",	"A_g",	"lambda_g",	"mu102",	"C1", 	"mu02",
 double par_start[]  	= {22.40,	1.0,	0.1,		4.0,		0.38, 	2.0,		1.26,	2.0,		0.1, 	0.1};  
 double par_error[]  	= { 1.00,  	0.10,	0.05, 		1.0,		1.0,	0.1,		0.1,	0.1,		0.01,	0.01};
 double   par_min[] 	= { 0.00,  	0.00,	-10.0,		1.0,		0.01, 	1.0,		0.5,	1.0,		0.0,	0.0};
-double   par_max[] 	= {50.00,  	20.00,	10.0, 		10.0		10.0,	10.0,		10,	10.0,		2.0,	2.0};
+double   par_max[] 	= {50.00,  	20.00,	10.0, 		10.0,		10.0,	10.0,		10,	10.0,		2.0,	2.0};
 #endif
 
 int parameter(const std::vector<double>& par,PREC(& sigpar)[],PREC(& sudpar)[]){

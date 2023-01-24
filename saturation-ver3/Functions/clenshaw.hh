@@ -1,5 +1,5 @@
-#ifndef DCLENSHAW_H
-#define DCLENSHAW_H
+#ifndef DCLENSHAW_HH
+#define DCLENSHAW_HH
 #include<math.h>
 #include<stdio.h>
 #include"./Kahn.h"
@@ -10,12 +10,35 @@
 #endif
 
 
-static const double x16[]={1.000000000000000000000000000000e+00, 9.807852804032304506194118511447e-01, 9.238795325112867619863336960547e-01, 8.314696123025452498358628945367e-01, 7.071067811865475460497457679922e-01, 5.555702330196022565633495419049e-01, 3.826834323650898141569391948192e-01, 1.950903220161283203970903689557e-01, 0.000000000000000000000000000000e+00};	
-static const double w16[]={6.274509803921572703711007079619e-02, 2.989496226976449054167638106882e-01, 6.038586523452146797285979221456e-01, 8.712444206551274286632311850505e-01, 1.111651746945864560764091023555e+00, 1.305381314253626384086121496437e+00, 1.451790273891946807960151513108e+00, 1.540110916903405124741484817321e+00, 1.571281006575124188778813660861e+00 };	
-static const double w8[]={1.269841269841270256502063773496e-01, 5.848745968640726177649829569567e-01, 1.117460317460317429023630586917e+00, 1.446871434881959070257763581104e+00, 1.574603174603174567114383108901e+00};
+static const double x16[]={
+	1.000000000000000000000000000000e+00,
+       	9.807852804032304506194118511447e-01,
+       	9.238795325112867619863336960547e-01,
+       	8.314696123025452498358628945367e-01,
+       	7.071067811865475460497457679922e-01,
+       	5.555702330196022565633495419049e-01,
+       	3.826834323650898141569391948192e-01,
+       	1.950903220161283203970903689557e-01,
+       	0.000000000000000000000000000000e+00};	
+static const double w16[]={
+	6.274509803921572703711007079619e-02,
+       	2.989496226976449054167638106882e-01,
+       	6.038586523452146797285979221456e-01,
+       	8.712444206551274286632311850505e-01,
+       	1.111651746945864560764091023555e+00,
+       	1.305381314253626384086121496437e+00,
+       	1.451790273891946807960151513108e+00,
+       	1.540110916903405124741484817321e+00,
+       	1.571281006575124188778813660861e+00 };	
+static const double w8[]={
+	1.269841269841270256502063773496e-01,
+       	5.848745968640726177649829569567e-01,
+       	1.117460317460317429023630586917e+00,
+       	1.446871434881959070257763581104e+00,
+       	1.574603174603174567114383108901e+00};
 
 
-template<typename TYPE,typename args_type>static double dclenshaw(const TYPE &func,const args_type par , const double a, const double b, const double eps){
+template<typename TYPE,typename args_type>static double dclenshaw(TYPE &func, args_type par , const double a, const double b, const double eps, const double Aeps){
 	int MAX_RECURSION=15;
 //double dclenshaw(double(&func)(const double*, const void*),const void* args,const double a,const double b,const double eps){
 	double sign, max,min;
@@ -84,20 +107,20 @@ template<typename TYPE,typename args_type>static double dclenshaw(const TYPE &fu
 
 		valfull*=2*scale/N;
 		valhalf*=4*scale/N;
-		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<eps )|| (counter==MAX_RECURSION)){//Need improvement
+		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<Aeps )|| (counter==MAX_RECURSION)){//Need improvement
 			if(counter==MAX_RECURSION){
 				printf("MAX_RECURSION:: evaluated %d times. Increase MAX_RECURSION\n",MAX_RECURSION );
 				printf("[%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);
 				printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
 				for(int i=0;i<N/2;i++){
 					arg2=mid-scale*x16[i];
-					printf("%.3e\n",func(&arg2,par));
+					printf("%.3e\n",func(arg2,par));
 				}
 				arg2=mid;
-				printf("%.3e\n",func(&arg2,par));
+				printf("%.3e\n",func(arg2,par));
 				for(int i=0;i<N/2;i++){
 					arg2=mid+scale*x16[N/2-i-1];
-					printf("%.3e\n",func(&arg2,par));
+					printf("%.3e\n",func(arg2,par));
 				}
 				printf("\n");
 			}

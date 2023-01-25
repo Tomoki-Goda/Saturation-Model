@@ -151,7 +151,8 @@ class Laplacian_Sigma{
 
 class Dipole_Gluon{
 	Laplacian_Sigma integrand;
-	CCIntegral cc=CCprepare(64,"dipole");
+	CCIntegral cc=CCprepare(32,"dipole",10);
+	
 	public: 
 		//void init(Laplacian_Sigma* integrand ){
 		void init(const int n,const double(&par)[] ){

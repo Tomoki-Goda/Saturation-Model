@@ -16,7 +16,8 @@ extern "C" doublecomplex wgamma_(const doublecomplex*);
 extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
 extern "C" double dgammf_(const double*);
 class Collinear_Gluon{
-	CCIntegral cc=CCprepare(64,"gluon");
+	CCIntegral cc=CCprepare(32,"gluon",10);
+	
 	private:
 		const double       beta = 6.6;
 		const double        n_0 = 0.5;       /* Maximal singluraity of integrand */

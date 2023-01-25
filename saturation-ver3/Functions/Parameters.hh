@@ -8,11 +8,16 @@ double   par_min[]	= {	0.0,	0.00,		0.0,		1.0,		0.1,	1.0 ,		0.0,	0.0};
 double   par_max[] 	= {	80.0,	1.00,		100.0,		10,		10.0,	10.0,		2.0,	2.0};
 //#endif
 #elif (MODEL==1)||(MODEL==3)
-std::string  par_name[]	= {"sigma_0",	"A_g",	"lambda_g",	"mu102",	"C1", 	"mu02",		"C2",	"mu202",	"g1",	"g2"};
-double par_start[]  	= {22.40,	1.0,	0.1,		4.0,		0.38, 	2.0,		1.26,	2.0,		0.1, 	0.1};  
-double par_error[]  	= { 1.00,  	0.10,	0.05, 		1.0,		1.0,	0.1,		0.1,	0.1,		0.01,	0.01};
-double   par_min[] 	= { 0.00,  	0.00,	-10.0,		1.0,		0.01, 	1.0,		0.5,	1.0,		0.0,	0.0};
-double   par_max[] 	= {50.00,  	20.00,	10.0, 		10.0,		10.0,	10.0,		10,	10.0,		2.0,	2.0};
+std::string  par_name[]	= {
+"sigma_0",	"A_g",	"lambda_g",	"mu102",	"C1", 	"mu02",		"C2",	"mu202",	"g1",	"g2"};
+double par_start[]  	= {
+30.0,		1.0,	0.1,		4.0,		0.38, 	2.0,		1.26,	2.0,		0.1, 	0.1};  
+double par_error[]  	= {
+ 5.00,  	0.10,	0.2, 		1.0,		1.0,	0.1,		0.1,	0.1,		0.01,	0.01};
+double   par_min[] 	= {
+ 0.00,  	0.00,	-5.0,		1.0,		0.01, 	1.0,		0.5,	1.0,		0.0,	0.0};
+double   par_max[] 	= {
+50.00,		20.00,	5.0, 		10.0,		10.0,	10.0,		10,	10.0,		2.0,	2.0};
 #endif
 
 int parameter(const std::vector<double>& par,PREC(& sigpar)[],PREC(& sudpar)[]){

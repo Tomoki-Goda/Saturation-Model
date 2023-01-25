@@ -423,6 +423,10 @@ int F2_integrand_A(const int  *ndim,const  PREC *intv,const int  *ncomp,PREC * f
 		val+= (4.0/9.0)*integrand[1]( kt2, kappa_t_prime2, beta,phi);
 		val+= (1.0/9.0)*integrand[2]( kt2, kappa_t_prime2, beta,phi);
 		*f=val/(4*PI);
+		if(std::isnan(val)+std::isinf(val)!=0){
+			printf("integrand %.3e encountered beta:%.3e kappa2 %.3e kt2: %.3e phi: %.3e \n",val,beta,kappa_t_prime2,kt2,phi);
+			*f=0;
+		}
 		return 0;
 }
 #else
@@ -436,6 +440,10 @@ int F2_integrand_A(const int  *ndim,const  PREC *intv,const int  *ncomp,PREC * f
 		val+= (4.0/9.0)*integrand[1]( kt2, kappa_t_prime2, beta);
 		val+= (1.0/9.0)*integrand[2]( kt2, kappa_t_prime2, beta);
 		*f=val;
+		if(std::isnan(val)+std::isinf(val)!=0){
+			printf("integrand %.3e encountered beta:%.3e kappa2 %.3e kt2: %.3e \n",val,beta,kappa_t_prime2,kt2);
+			*f=0;
+		}
 		return 0;
 }
 #endif

@@ -1,134 +1,105 @@
 #ifndef DCLENSHAW_HH
-#define DCLENSHAW_HH
+#define DCLENSHAW_HH 1
 #include<math.h>
 #include<stdio.h>
+#include<string>
 #include"./Kahn.h"
 //#include<stdlib.h>
 
 #ifndef PI
 #define PI 3.141592653589793238462643383279502884197
 #endif
-
-
-static const double x16[]={
-	1.000000000000000000000000000000e+00,
-       	9.807852804032304506194118511447e-01,
-       	9.238795325112867619863336960547e-01,
-       	8.314696123025452498358628945367e-01,
-       	7.071067811865475460497457679922e-01,
-       	5.555702330196022565633495419049e-01,
-       	3.826834323650898141569391948192e-01,
-       	1.950903220161283203970903689557e-01,
-       	0.000000000000000000000000000000e+00};	
-static const double w16[]={
-	6.274509803921572703711007079619e-02,
-       	2.989496226976449054167638106882e-01,
-       	6.038586523452146797285979221456e-01,
-       	8.712444206551274286632311850505e-01,
-       	1.111651746945864560764091023555e+00,
-       	1.305381314253626384086121496437e+00,
-       	1.451790273891946807960151513108e+00,
-       	1.540110916903405124741484817321e+00,
-       	1.571281006575124188778813660861e+00 };	
-static const double w8[]={
-	1.269841269841270256502063773496e-01,
-       	5.848745968640726177649829569567e-01,
-       	1.117460317460317429023630586917e+00,
-       	1.446871434881959070257763581104e+00,
-       	1.574603174603174567114383108901e+00};
-
-
-template<typename TYPE,typename args_type>static double dclenshaw(TYPE &func, args_type par , const double a, const double b, const double eps, const double Aeps){
-	int MAX_RECURSION=15;
+typedef  struct{int N=128; double wfull[65], whalf[33], x[65]; std::string tag="unnamed";} CCIntegral;
+template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegral &data,TYPE &func, args_type par , const double a, const double b, const double eps, const double Aeps){
+	const double (&x16)[]=data.x;
+	const double (&w16)[]=data.wfull;
+	const double (&w8)[]=data.whalf;
+	const int N=data.N;
+	int MAX_RECURSION=7;
 //double dclenshaw(double(&func)(const double*, const void*),const void* args,const double a,const double b,const double eps){
 	double sign, max,min;
 
-	if((1-(a-b))==1){
-		return(0);
+	if(b>a){
+		min=a;
+		max=b;
+		sign=1;
 	}else if(a>b){
 		max=a;
 		min=b;
 		sign=-1;
 	}else{
-		min=a;
-		max=b;
-		sign=1;
+		return(0);
 	}
 	double smin,smax;
 	double scale,mid;
 	double valfull,valhalf;
-	double arg1,arg2;
+	double arg;
 	double total=0;
 	double accum[3]={0};
 	double accum2[3]={0};
-	const int N=16;
+	//const int N=16;
 	double increase;
 	smin=min;
+	//smax=max/data.div;
 	smax=max;
-
 	int licz=0,licztot=0 , counter=0;
 	double f[N/2+1];
-	if(fabs(min-max)<1.0e-15){
+	if(fabs(min-max)<0.0){
 		return(0);
 	}		
 	while(1){
-		counter++;
-		licztot++;
+		++counter;
+		++licztot;
 		scale=(smax-smin)/2;
 		mid=(smax+smin)/2;
 
 		for(int i=0;i<N/2;i++){
-			arg1=mid+scale*x16[i];
-			arg2=mid-scale*x16[i];
-			f[i]=func(arg1,par)+func(arg2,par);
-			if((isnan(f[i])+isinf(f[i]))!=0){
-				printf("%.3e encountered at %.3e or %.3e\n",f[i],arg1,arg2 );
-			}
+			arg=scale*x16[i];
+			f[i]=func(mid+arg,par)+func(mid-arg,par);
 		}
-		f[0]/=2;
+		
 		f[N/2]=func(mid,par);
-
-		if((isnan(f[N/2])+isinf(f[N/2]))!=0){
-			printf("%.3e encountered at %.3e \n",f[N/2],mid );
-		}
 		valfull=0;
 		Kahn_init(accum2,3);
+		
 		for(int i=0;i<=N/2;i++){
-			valfull=Kahn_Sum(valfull,f[i]*w16[i],accum2,3);
+			valfull=Kahn_Sum(valfull,f[i]*w16[i],accum2,3);			
 		}
+		
 		valfull=Kahn_total(valfull,accum2,3);
 		valhalf=0;
 		Kahn_init(accum2,3);
 		for(int i=0;i<=N/4;i++){
 			valhalf=Kahn_Sum(valhalf,f[2*i]*w8[i],accum2,3);
 		}
-		//valhalf+=accum2;
 		valhalf=Kahn_total(valhalf,accum2,3);
 
 		valfull*=2*scale/N;
 		valhalf*=4*scale/N;
+#if DCLENSHAW_HH==1		
+		if(not(std::isfinite(valfull)&&std::isfinite(valhalf))){
+			printf("3 Clenshaw_Curtis:: in \"%s\" %.3e  %.3e encountered\n",(data.tag).c_str(),valfull,valhalf);
+			goto Error;
+		}
+#endif
+		
+		
 		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<Aeps )|| (counter==MAX_RECURSION)){//Need improvement
 			if(counter==MAX_RECURSION){
-				printf("MAX_RECURSION:: evaluated %d times. Increase MAX_RECURSION\n",MAX_RECURSION );
+				printf("Clenshaw_Curtis::MAX_RECURSION:: in \"%s\", evaluated %d times. Increase MAX_RECURSION\n",(data.tag).c_str(), MAX_RECURSION );
 				printf("[%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);
 				printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
-				for(int i=0;i<N/2;i++){
-					arg2=mid-scale*x16[i];
-					printf("%.3e\n",func(arg2,par));
-				}
-				arg2=mid;
-				printf("%.3e\n",func(arg2,par));
-				for(int i=0;i<N/2;i++){
-					arg2=mid+scale*x16[N/2-i-1];
-					printf("%.3e\n",func(arg2,par));
-				}
-				printf("\n");
+				//getchar();
+				goto Error;
 			}
 			
 			total=Kahn_Sum(total,valfull,accum,3);
-			licz++;
+			++licz;
+			//data.div+=pow(4,counter);
+			
 			counter=0;
-			if(fabs(smax-max)<1.0e-15){
+			if(fabs(smax-max)==0.0){
+				//data.div/=licz;
 				return(sign*Kahn_total(total,accum,3) );
 			}
 			smin=smax;
@@ -137,14 +108,105 @@ template<typename TYPE,typename args_type>static double dclenshaw(TYPE &func, ar
 		}else{
 			smax=smin+(scale/2);
 		}
-		if((smax-smin)<1.0e-15){
-			printf("Abs: %.5e %.5e \tRel: %.5e %.5e\n ",fabs(2*valfull*(max-min)/scale),eps,fabs(valfull-valhalf),eps*(fabs(valfull)));
-			printf("Clenshaw_Curtis::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);						
+		if(((max-min)-(smax-smin))==(max-min)){
+			printf("Clenshaw_Curtis:: in \"%s\", division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",(data.tag).c_str(), smin,smax,min,max, licz,licztot);						
 			printf("valfull= %.3e , valhalf= %.3e \n",valfull,valhalf);
 			//getchar();
+			goto Error;
 		}
+		
 	}
+	
+	Error:
+		for(int i=0;i<N/2;i++){
+			arg=mid-scale*x16[i];
+			printf("f(%.3e) = %.3e\n",arg,func(arg,par));
+		}
+		arg=mid;
+		printf("f(%.3e) = %.3e\n",arg,func(arg,par));
+		for(int i=0;i<N/2;i++){
+			arg=mid+scale*x16[N/2-i-1];
+			printf("f(%.3e) = %.3e\n",arg, func(arg,par));
+		}
+		printf("\n");
+		getchar();
+		return 0;
+	
 }
+
+
+
+CCIntegral CCprepare(const int N){
+	CCIntegral data;
+	
+	if((N/4)*4!=N || N>128){
+		printf("N=%d has to be multiple of 4, <= 128\n",N );
+	}
+	data.N=N;
+	data.x[0]=1;
+	data.x[1]=cos(PI/N);
+	for(int i =2;i<N/2;i++){
+		data.x[i]=cos(i*PI/N);
+	}
+	data.x[N/2]=0;
+	
+	double *__restrict__ c=(double*)malloc((N/2+1)*sizeof(double));
+	c[0]=1;
+	c[N/2]=1.0/(1-N*N);
+	for(int i=1;i<N/2;i++){
+		c[i]=2.0/(1-4*i*i);
+	}
+	double *__restrict__ t=(double*)malloc((N/2+1)*sizeof(double));
+	double accum[3]={0};
+	t[0]=1;
+	for(int i=0;i<N/2+1;i++){
+		Kahn_init(accum,3);
+		t[1]=cos(2*i*PI/N);
+		data.wfull[i]=c[0]+c[1]*t[1];
+		for(int j=2;j<N/2+1;j++){
+			t[j]=cos(i*j*2*PI/N);
+			data.wfull[i]=Kahn_Sum(data.wfull[i],t[j]*c[j],accum,3);
+		}
+		data.wfull[i]=Kahn_total(data.wfull[i],accum,3);
+		if(i==0){
+		data.wfull[i]/=2;
+		}
+		//printf("%.10e\t",data.wfull[i]);
+	}//printf("\n");
+	c[0]=1;
+	c[N/4]=1.0/(1-N*N/4);
+	for(int i=1;i<N/4;i++){
+		c[i]=2.0/(1-4*i*i);
+	}
+	t[0]=1;
+	for(int i=0;i<N/4+1;i++){
+		Kahn_init(accum,3);
+		t[1]=cos(4*i*PI/N);
+		data.whalf[i]=c[0]+c[1]*t[1];
+		for(int j=2;j<N/4+1;j++){
+			t[j]=cos(i*j*4*PI/N);
+			data.whalf[i]=Kahn_Sum(data.whalf[i],t[j]*c[j],accum,3);
+		}
+		data.whalf[i]=Kahn_total(data.whalf[i],accum,3);
+		
+		//data.whalf[i]+=accum;
+		if(i==0){
+		data.whalf[i]/=2;
+		}
+		//printf("%.10e\t",data.whalf[i]);
+	}//printf("\n");
+	
+	free(c);
+	free(t);
+	//getchar();
+	return data;
+}
+CCIntegral CCprepare(const int N,const std::string &tag){
+	CCIntegral data=CCprepare(N);
+	data.tag=tag;
+	return data;
+}
+
 
 
 #endif

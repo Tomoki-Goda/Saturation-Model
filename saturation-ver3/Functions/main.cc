@@ -120,13 +120,13 @@ int main(int argc, char** argv){
 	
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=1.0e-3;
+	INT_PREC=5.0e-3;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
 	ROOT::Minuit2::MnSimplex simplex1(theFCN,upar,0);
-	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<std::endl;	
-	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
+	std::cout<<"TEST RUN 25, eps = "<<INT_PREC<<std::endl;	
+	ROOT::Minuit2::FunctionMinimum min=simplex1(25,1);//Just initialization /check.
 	ROOT::Minuit2::FunctionMinimum min_prev=min;
 	//ROOT::Minuit2::MnEigen eigen;
 	//min_prev=min;

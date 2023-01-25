@@ -7,6 +7,7 @@
 #include <gsl/gsl_interp2d.h>
 #include <gsl/gsl_spline2d.h>
 #include"clenshaw.hh"
+#include"gauss.hh"
 #include"./gluons.hh"
 extern double INT_PREC;
 
@@ -68,7 +69,14 @@ class Sigma{
 			if(mu2<1){
 				return(0);
 			}
-			return( sigma_0*(1-exp(-pow(r*PI,2)*alpha(mu2)*xg(x,mu2 )/(3*sigma_0) ) )); 	
+			double val=sigma_0*(1-exp(-pow(r*PI,2)*alpha(mu2)*xg(x,mu2 )/(3*sigma_0) ) );
+			
+			if(!std::isfinite(val)){
+				printf("%.3e = sigma(%.3e, %.3e;%.3e, %.3e,%.3e, %.3e, %.3e)\n",val,r,x,sigma_0,sigpar[1],sigpar[2],C,mu02);
+				printf("%.3e\n",xg(x,mu2));
+				getchar();
+			} 
+			return val;	
 		}
 #endif		
 };
@@ -90,6 +98,8 @@ class Laplacian_Sigma{
 			free(sigma_array);
 		}
 		
+		
+	public:	
 		int approximate(const double x){
 			double r;
 			for (int j = 0; j < r_npts; j++){
@@ -101,7 +111,6 @@ class Laplacian_Sigma{
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 			return(0);
 		}
-	public:	
 		Laplacian_Sigma(){
 		}
 		~Laplacian_Sigma(){
@@ -115,28 +124,34 @@ class Laplacian_Sigma{
 			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
 			sigma.init(par);
 		}
-		double operator()(const double r, const std::vector<double> &par){
-			static double x_prev=0;
+		double operator()(const double r, const std::vector<double> &par)const {
 			const double x=par[0],kt2=par[1];
-			//std::cout<<std::scientific<<x<<"  "<<kt2<<std::endl;
-			//static double x_prev=0;
-			if (x_prev!=x){
-				//printf("approx x_prev= %.3e-> x= %.3e\n",x_prev,x);
-				x_prev=x;
-				approximate(x);
-			}	
 			double val = 0;
-			//val+=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
-			val+=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
-			val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+			double val1,val2;
+			val1=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
+			if(not(std::isfinite(val1))){
+				printf("1: val=%.3e for r= %.3e\n ",val1,r);
+			}
+			val2=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+			if(not(std::isfinite(val2))){
+				printf("2: val=%.3e for r= %.3e\n",val2,r);
+			}
+			
+			val=val1+val2;
 			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
-			//printf("%.3e\n", val);
+			if(not(std::isfinite(val))){
+				printf("3: val=%.3e for r= %.3e\nparameter: ",val,r);
+				for(int i=0;i<par.size();i++){
+					printf(" %.3e\t",par[i]);
+				}printf("\n");
+			}
 			return(val);
 		}
 };
 
 class Dipole_Gluon{
 	Laplacian_Sigma integrand;
+	CCIntegral cc=CCprepare(64,"dipole");
 	public: 
 		//void init(Laplacian_Sigma* integrand ){
 		void init(const int n,const double(&par)[] ){
@@ -145,10 +160,15 @@ class Dipole_Gluon{
 		double operator()(const double x,const double kt2,const double mu2){
 			//this->x=x;
 			//this->kt2=kt2;
+			static double x_prev=0;
+			if (x_prev!=x){
+				x_prev=x;
+				integrand.approximate(x);
+			}
 			const std::vector<double> par={x,kt2};
-			double val=3.0/(8*PI*PI)*dclenshaw< Laplacian_Sigma , const std::vector<double>& >(integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
-			//double val=integrand(kt2,par);
-			//double val=3.0/(4*PI*PI)*dclenshaw< double , const std::vector<double>& >(this->integrand,par,R_MIN,R_MAX,INT_PREC);
+			double val=3.0/(8*PI*PI)*dclenshaw< const Laplacian_Sigma , const std::vector<double>& >(cc,integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
+			//double val=3.0/(8*PI*PI)*dclenshaw< const Laplacian_Sigma , const std::vector<double>& >(integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
+			//double val=3.0/(8*PI*PI)*dgauss< const Laplacian_Sigma , const std::vector<double>& >(integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
 			return val;
 		}
 };

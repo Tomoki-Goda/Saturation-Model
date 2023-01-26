@@ -512,7 +512,7 @@ class F2_kt{
 			if(newpar==1|| kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
 				//printf("%.3e -> %.3e Q2= %.3e, x= %.3e\n", kt2max,Q2*(1-x)/x ,Q2,x);
 				//kt2max=10*Q2*(1-x)/x;
-				gluon.init(100,150,par);
+				gluon.init(150,150,par);
 				gluon.set_max(kt2max);
 				newpar=0;
 			}

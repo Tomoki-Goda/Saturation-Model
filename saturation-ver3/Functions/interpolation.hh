@@ -10,7 +10,9 @@
 #include"gauss.hh"
 #include"./gluons.hh"
 extern double INT_PREC;
-
+#ifndef LAPLACIAN
+#define LAPLACIAN 0
+#endif
 
 class Sigma{
 		const double* sigpar;
@@ -38,8 +40,15 @@ class Sigma{
 			if(lambda<0.05||lambda>0.95){
 				return 0;
 			}
+			double qs2=pow(x_0/x,lambda); 
+#if LAPLACIAN==0
+			double val=sigma_0*(1-exp( - pow(r , 2)*qs2/4));
+#elif LAPLACIAN==1
+			double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
+#endif
+			return val;
 			
-			return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
+			//return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
 		}
 #elif MODEL==1
 	private:
@@ -69,7 +78,12 @@ class Sigma{
 			if(mu2<1){
 				return(0);
 			}
-			double val=sigma_0*(1-exp(-pow(r*PI,2)*alpha(mu2)*xg(x,mu2 )/(3*sigma_0) ) );
+			double qs2=4*PI*PI*alpha(mu2)*xg(x,mu2)/(3*sigma_0); 
+#if LAPLACIAN==0
+			double val=sigma_0*(1-exp(-pow(r,2)*qs2/4) );
+#elif LAPLACIAN==1
+			double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
+#endif
 			
 			if(!std::isfinite(val)){
 				printf("%.3e = sigma(%.3e, %.3e;%.3e, %.3e,%.3e, %.3e, %.3e)\n",val,r,x,sigma_0,sigpar[1],sigpar[2],C,mu02);
@@ -127,17 +141,16 @@ class Laplacian_Sigma{
 		double operator()(const double r, const std::vector<double> &par)const {
 			const double x=par[0],kt2=par[1];
 			double val = 0;
-			double val1,val2;
-			val1=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
-			if(not(std::isfinite(val1))){
-				printf("1: val=%.3e for r= %.3e\n ",val1,r);
-			}
-			val2=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
-			if(not(std::isfinite(val2))){
-				printf("2: val=%.3e for r= %.3e\n",val2,r);
+#if LAPLACIAN==0
+			val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
+			val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+#elif LAPLACIAN==1
+			val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+#endif
+			if(not(std::isfinite(val))){
+				printf("2: val=%.3e for r= %.3e\n",val,r);
 			}
 			
-			val=val1+val2;
 			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
 			if(not(std::isfinite(val))){
 				printf("3: val=%.3e for r= %.3e\nparameter: ",val,r);
@@ -239,7 +252,7 @@ class Approx_aF{
 			x_accel_ptr = gsl_interp_accel_alloc ();
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
-			aF.init(200,par);
+			aF.init( N_CHEB_R ,par);
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;

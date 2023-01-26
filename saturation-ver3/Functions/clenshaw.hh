@@ -135,12 +135,18 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 }
 
 
+inline int t_pos(int i,int j, int n){
+	return(n/4-abs(n/2-i*j+((i*j)/n)*n));
+}
+inline int sign(int i){
+	return( (i==0)?(1): (i/abs(i)));
+}
 
 CCIntegral CCprepare(const int N){
 	CCIntegral data;
 	
-	if((N/4)*4!=N || N>128){
-		printf("N=%d has to be multiple of 4, <= 128\n",N );
+	if((N/8)*8!=N || N>128){
+		printf("N=%d has to be multiple of 8, <= 128\n",N );
 	}
 	data.N=N;
 	data.x[0]=1;
@@ -150,38 +156,36 @@ CCIntegral CCprepare(const int N){
 	}
 	data.x[N/2]=0;
 	
-	double *__restrict__ c=(double*)malloc((N/2+1)*sizeof(double));
+	double *__restrict__ c=(double*)calloc((N/2+1),sizeof(double));
 	c[0]=1;
 	c[N/2]=1.0/(1-N*N);
 	for(int i=1;i<N/2;i++){
 		c[i]=2.0/(1-4*i*i);
 	}
-	double *__restrict__ t=(double*)malloc((N/2+1)*(N/2+1)*sizeof(double));
+	double *__restrict__ t=(double*)calloc((N/4+1),sizeof(double));
 	double accum[3]={0};
-	for(int i=0;i<N/2+1;i++){
-		for(int j=0;j<N/2+1;j++){
-			if(( (i*j)/N)*N==i*j){
-				t[i*(N/2+1)+j]=1;
-			}else if(( (2*i*j)/N)*N==2*i*j){
-				t[i*(N/2+1)+j]=-1;
-			}else if(( (4*i*j)/N)*N==4*i*j){
-				t[i*(N/2+1)+j]=0;
-			}else{
-				t[i*(N/2+1)+j]=cos(2*i*j*PI/N);
-			}
-			//t[i*(N/2+1)+j]=((i*j==0)?(1):(cos(2*i*j*PI/N)) );
+	for(int j=0;j<N/4+1;j++){
+		if(j==0){
+			t[j]=0;
+		}else if(j==N/4){
+			t[j]=-1;
+		}else{
+			t[j]=-sin(2*j*PI/N);
 		}
-	}
-	
+		printf("%.3e\t",t[j]);
+		//t[i*(N/2+1)+j]=((i*j==0)?(1):(cos(2*i*j*PI/N)) );
+	}printf("\n");
+	int pos;
+	//double *__restrict arr=(double*)calloc(N/4+1,sizeof(double));
+
 	for(int i=0;i<N/2+1;i++){
 		Kahn_init(accum,3);
-		//t[1]=cos(2*i*PI/N);
-		data.wfull[i]=c[0]+c[1]*t[i*(N/2+1)+1];
-		
-		for(int j=2;j<N/2+1;j++){
+		for(int j=0;j<N/2+1;j++){
+			pos=t_pos(i,j,N);
 			//t[j]=cos(i*j*2*PI/N);
-			data.wfull[i]=Kahn_Sum(data.wfull[i],t[i*(N/2+1)+j]*c[j],accum,3);
-		}
+			data.wfull[i]=Kahn_Sum(data.wfull[i], sign(pos) * t[abs(pos)] *c[j],accum,3);
+		//	printf("%.2e\t",t[abs(pos)]);
+		}//printf("\n");
 		data.wfull[i]=Kahn_total(data.wfull[i],accum,3);
 		if(i==0){
 			data.wfull[i]/=2;
@@ -192,11 +196,10 @@ CCIntegral CCprepare(const int N){
 	//t[0]=1;
 	for(int i=0;i<N/4+1;i++){
 		Kahn_init(accum,3);
-		//t[1]=cos(4*i*PI/N);
-		data.whalf[i]=c[0]+c[1]*t[i*(N/2+1)+2];
-		for(int j=2;j<N/4+1;j++){
+		for(int j=0;j<N/4+1;j++){
 			//t[j]=cos(i*j*4*PI/N);
-			data.whalf[i]=Kahn_Sum(data.whalf[i],t[i*(N/2+1)+2*j]*c[j],accum,3);
+			pos=t_pos(i,j,N/2);
+			data.whalf[i]=Kahn_Sum(data.whalf[i],sign(pos)*t[2*abs(pos)]*c[j],accum,3);
 		}
 		data.whalf[i]=Kahn_total(data.whalf[i],accum,3);
 		

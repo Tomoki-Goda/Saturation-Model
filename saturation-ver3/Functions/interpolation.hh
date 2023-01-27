@@ -8,92 +8,12 @@
 #include <gsl/gsl_spline2d.h>
 #include"clenshaw.hh"
 #include"gauss.hh"
-#include"./gluons.hh"
+//#include"./gluons.hh"
 extern double INT_PREC;
 #ifndef LAPLACIAN
 #define LAPLACIAN 0
 #endif
 
-class Sigma{
-		const double* sigpar;
-		double x=0;
-	public:
-		void init(const double (&par)[]){
-			sigpar=par;
-		}
-		explicit Sigma(void){
-		}
-		~Sigma(){
-		}
-		double operator()(const double r,const double x){//,const double Q2,const double*sigpar)const {
-		 	this->x=x;
-		 	return((*this)(r));
-		 }
-#if MODEL==0
-		double operator()(const double r)const{
-			double sigma_0=sigpar[0];
-			double lambda=sigpar[1];
-			double x_0=sigpar[2];
-			if(x_0<1.0e-5||x_0>1.0e-3){
-				return 0;
-			}
-			if(lambda<0.05||lambda>0.95){
-				return 0;
-			}
-			double qs2=pow(x_0/x,lambda); 
-#if LAPLACIAN==0
-			double val=sigma_0*(1-exp( - pow(r , 2)*qs2/4));
-#elif LAPLACIAN==1
-			double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
-#endif
-			return val;
-			
-			//return( sigma_0*(1-exp( - pow(r * Q0, 2) * pow(x_0/x, lambda)/4)) );	
-		}
-#elif MODEL==1
-	private:
-		Collinear_Gluon xg;
-		
-		inline double alpha(double mu2 ){
-			static double b0= ((double)(33 -2*NF))/(12*PI);
-			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
-	
-		}
-		//inline PREC alpha(const PREC mu2)const{
-		//	return 4.0/(9.0 *log( ((mu2>2*LQCD2)?(mu2):(2.0*LQCD2))/LQCD2));
-		//}
-		double operator()(const double r){
-			double sigma_0=sigpar[0];
-			
-			//double A_g=sigpar[1];
-			//double lambda_g=sigpar[2];
-			if(sigpar[1]<0){
-				return 0;
-			}
-			xg.set_xg_parameter(sigpar[1],sigpar[2]);
-			double C=sigpar[3];
-			double mu02=sigpar[4];
-		
-			double mu2=C/(r*r)+mu02;
-			if(mu2<1){
-				return(0);
-			}
-			double qs2=4*PI*PI*alpha(mu2)*xg(x,mu2)/(3*sigma_0); 
-#if LAPLACIAN==0
-			double val=sigma_0*(1-exp(-pow(r,2)*qs2/4) );
-#elif LAPLACIAN==1
-			double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
-#endif
-			
-			if(!std::isfinite(val)){
-				printf("%.3e = sigma(%.3e, %.3e;%.3e, %.3e,%.3e, %.3e, %.3e)\n",val,r,x,sigma_0,sigpar[1],sigpar[2],C,mu02);
-				printf("%.3e\n",xg(x,mu2));
-				getchar();
-			} 
-			return val;	
-		}
-#endif		
-};
 //FOR APPROXIMATION AND DERIVATIVES		
 //class Laplacian_Sigma:public Sigma{
 class Laplacian_Sigma{
@@ -113,7 +33,10 @@ class Laplacian_Sigma{
 		}
 		
 		
-	public:	
+	public:
+		inline int set_kinem(double x){
+			return(approximate(x));
+		}	
 		int approximate(const double x){
 			double r;
 			for (int j = 0; j < r_npts; j++){
@@ -138,6 +61,9 @@ class Laplacian_Sigma{
 			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
 			sigma.init(par);
 		}
+		inline double operator()(double r)const{
+			return(gsl_spline_eval(spline_ptr, r,r_accel_ptr));
+		}
 		double operator()(const double r, const std::vector<double> &par)const {
 			const double x=par[0],kt2=par[1];
 			double val = 0;
@@ -146,7 +72,7 @@ class Laplacian_Sigma{
 			val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
 #elif LAPLACIAN==1
 			val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
-#endif
+#endif//LAPLACIAN
 			if(not(std::isfinite(val))){
 				printf("2: val=%.3e for r= %.3e\n",val,r);
 			}
@@ -168,7 +94,7 @@ class Dipole_Gluon{
 	
 	public: 
 		//void init(Laplacian_Sigma* integrand ){
-		void init(const int n,const double(&par)[] ){
+		inline void init(const int n,const double(&par)[] ){
 			integrand.init(n,par);	
 		}
 		double operator()(const double x,const double kt2,const double mu2){

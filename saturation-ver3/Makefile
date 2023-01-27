@@ -38,7 +38,9 @@ main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h
 #${DIR}/kt-formula.o: ${FUNCDIR}/kt-formula.cc
 #	g++ ${FUNCDIR}/kt-formula.cc -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
 
-plot: dipole gluon
+plot: ${FUNCDIR}/plot-things.cc
+	g++ ${FUNCDIR}/plot-things.cc -o ${DIR}/plot ${OPT} ${INC} ${LIBS}
+#plot: dipole gluon
 
 gluon: ${DEPS} ${UTILDIR}/tmd-gluon.c ${UTILDIR}/tmd-gluon-2.h
 	g++ ${UTILDIR}/tmd-gluon.c -o ${DIR}/gluon ${OPT} ${INC} ${LIBS}

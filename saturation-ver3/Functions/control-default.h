@@ -200,7 +200,8 @@ typedef double PREC;
 #endif
 
 
-//dipole sigma 
+//dipole sigma
+ /*
 #if IIM==1
 /////////////////////////////////////////////////////////
 //IIM model
@@ -238,7 +239,7 @@ typedef double PREC;
 	#endif
 
 #endif
-
+*/
 
 
 

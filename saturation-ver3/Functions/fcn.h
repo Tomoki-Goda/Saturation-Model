@@ -93,7 +93,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		
 		double operator()(const std::vector<double>& par)const{
 			std::chrono::system_clock walltime;
-			F2_kt F2;	
+				
 			std::chrono::time_point start= walltime.now();
 
 			clock_t time=clock();
@@ -115,12 +115,13 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 #endif			
 			PREC sigpar[10],sudpar[10];
 			parameter(par,sigpar, sudpar);//Format
+			F2_kt F2(sigpar);
 			for(int i=0;i<MAX_N;++i){
 				val=0;
 				//x=X_DATA[i];
 				//Q2=Q2_DATA[i];
-				val=F2(X_DATA[i],Q2_DATA[i],0,sigpar);//summation over flavour is done at the level of integrand.
-				//printf("%d: %.2e %.2e %.2e %.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],fabs(val-CS_DATA[i]),ERR_DATA[i],X_DATA[i],Q2_DATA[i]);	
+				val=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
+				//printf("%d: val=%.2e error= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],pow(fabs(val-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);	
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
 #if SCATTER==1
 			printf("done %.3e\n",chisq/(i+1));

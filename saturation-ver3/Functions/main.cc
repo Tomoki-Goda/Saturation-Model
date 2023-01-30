@@ -9,6 +9,7 @@
 #include"./Parameters.hh"
 
 PREC INT_PREC=DGAUSS_PREC;
+int N_APPROX=N_CHEB_R;
 #include"./fcn.h"
 
 //KtFCN theFCN("/home/tomoki/Saturation-Model/saturation-ver3/data/hera_tot.dat");
@@ -120,12 +121,13 @@ int main(int argc, char** argv){
 	
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=5.0e-3;
+	INT_PREC=1.0e-3;
+	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
 	ROOT::Minuit2::MnSimplex simplex1(theFCN,upar,0);
-	std::cout<<"TEST RUN 25, eps = "<<INT_PREC<<std::endl;	
+	std::cout<<"TEST RUN 25, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
 	ROOT::Minuit2::FunctionMinimum min=simplex1(25,1);//Just initialization /check.
 	ROOT::Minuit2::FunctionMinimum min_prev=min;
 	//ROOT::Minuit2::MnEigen eigen;
@@ -136,19 +138,22 @@ int main(int argc, char** argv){
 	//ROOT::Minuit2::MnSimplex simplex2(theFCN,upar,0);
 	
 	for(int i=0;i<2;++i){
+
 		prec.SetPrecision(INT_PREC*2);
 		printf("*****************************\n");
-		printf("*** Simplex: eps=%.1e  ***\n",(double)INT_PREC);
+		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 		printf("*****************************\n");
 		min=simplex1(100,1);
 		INT_PREC/=2;
+		//N_APPROX*=2;
 	}
 	
 	
 	INT_PREC=5.0e-4;
+	N_APPROX=N_CHEB_R;
 	prec.SetPrecision(INT_PREC*2);
 	printf("***************************\n");
-	printf("*** First: eps=%.1e  ***\n",(double)INT_PREC);
+	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
 	ROOT::Minuit2::MnHesse hesse;
 	ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,min.UserParameters());
@@ -179,7 +184,7 @@ int main(int argc, char** argv){
 	INT_PREC=1.0e-4;
 	prec.SetPrecision(4*INT_PREC);
 	printf("***************************\n");
-	printf("*** Second: eps=%.1e  ***\n",(double)INT_PREC);
+	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
 	stat=hesse(theFCN,min.UserParameters());
 	std::cout<<"Hesse "<<stat<<std::endl;   	

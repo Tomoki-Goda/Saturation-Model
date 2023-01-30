@@ -6,7 +6,7 @@
 #include<cmath>
 #include <vector>
 #include <string>
-#include"./control.h"
+#include"control.h"
 #include"./control-default.h"
 #include"./constants.h"
 #include"Parameters.hh"

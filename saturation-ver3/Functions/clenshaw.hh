@@ -9,7 +9,7 @@
 #ifndef PI
 #define PI 3.141592653589793238462643383279502884197
 #endif
-typedef  struct{int N=128; double wfull[65], whalf[33], x[65]; std::string tag="unnamed"; int max_rec=7;} CCIntegral;
+typedef  struct{int N=128; double wfull[65]={0}, whalf[33]={0}, x[65]={0}; std::string tag="unnamed"; int max_rec=7;} CCIntegral;
 template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegral &data,TYPE &func, args_type par , const double a, const double b, const double eps, const double Aeps){
 	const double (&x16)[]=data.x;
 	const double (&w16)[]=data.wfull;
@@ -172,14 +172,15 @@ CCIntegral CCprepare(const int N){
 		}else{
 			t[j]=-sin(2*j*PI/N);
 		}
-		printf("%.3e\t",t[j]);
+		//printf("%.3e\t",t[j]);
 		//t[i*(N/2+1)+j]=((i*j==0)?(1):(cos(2*i*j*PI/N)) );
-	}printf("\n");
+	}//printf("\n");
 	int pos;
 	//double *__restrict arr=(double*)calloc(N/4+1,sizeof(double));
 
 	for(int i=0;i<N/2+1;i++){
 		Kahn_init(accum,3);
+		data.wfull[i]=0;
 		for(int j=0;j<N/2+1;j++){
 			pos=t_pos(i,j,N);
 			//t[j]=cos(i*j*2*PI/N);
@@ -196,6 +197,7 @@ CCIntegral CCprepare(const int N){
 	//t[0]=1;
 	for(int i=0;i<N/4+1;i++){
 		Kahn_init(accum,3);
+		data.whalf[i]=0;
 		for(int j=0;j<N/4+1;j++){
 			//t[j]=cos(i*j*4*PI/N);
 			pos=t_pos(i,j,N/2);

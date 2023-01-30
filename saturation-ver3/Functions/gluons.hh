@@ -16,15 +16,15 @@ extern "C" doublecomplex wgamma_(const doublecomplex*);
 extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
 extern "C" double dgammf_(const double*);
 class Collinear_Gluon{
-	CCIntegral cc=CCprepare(32,"gluon",10);
+	CCIntegral cc;//=CCprepare(64,"gluon",10);
 	
 	private:
 		const double       beta = 6.6;
 		const double        n_0 = 0.5;       /* Maximal singluraity of integrand */
 
-		double A_g, lambda_g;
+		//double A_g, lambda_g;
 
-		doublecomplex gammatilde(doublecomplex n)const{
+		doublecomplex gammatilde(const doublecomplex n)const{
 			doublecomplex n1,n2,n3,l1,l2,t1,t2,t3,cx,value;
 			double m1,m2,rl;
 			int k=0;
@@ -50,6 +50,13 @@ class Collinear_Gluon{
 		}
 
 	public:
+		explicit Collinear_Gluon(){
+			cc=CCprepare(128,"gluon",10);
+			//printf("gluon\n");
+		}
+		~Collinear_Gluon(){
+			//printf("gluon end\n");
+		}
 		double operator()(const double y,const double*par )const{
 		//doublecomplex xgpdf_integrand(double y, double Y, double t) {
 			doublecomplex n0,n1,n2,g1,g2,gt,ex,l;
@@ -57,11 +64,11 @@ class Collinear_Gluon{
 			double m;
 
 			double Yg=par[0], tg=par[1];
-			
+			double lambda_g=par[2];
 
 			n0 = Complex(n_0,y);
-			n1 = Complex(-(this->lambda_g)+n_0,y);
-			n2 = Complex(-(this->lambda_g)+beta+n_0,y);
+			n1 = Complex(-lambda_g+n_0,y);
+			n2 = Complex(-lambda_g+beta+n_0,y);
 
 			g1 = wgamma_(&n1);
 			g2 = wgamma_(&n2);
@@ -75,42 +82,45 @@ class Collinear_Gluon{
 
 			val = ((1.0/m)*l*ex).r;
 			
-			/*if(not(std::isfinite(val))){
+			if(not(std::isfinite(val))){
 		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e   \n",n0.r,n1.r,n2.r, g1.r,g2.r,gt.r,ex.r,l.r);
 		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e  %.3e  \n%.3e\n",n0.i,n1.i,n2.i, g1.i,g2.i,gt.i,ex.i,l.i,m,val);
-		    		getchar();
-		    	}*/
+		    		//getchar();
+		    		return 0;
+		    	}
 		    	
 			return val;
 		}
 
-		void set_xg_parameter(double ag,double lg){
-			A_g=ag;
-			lambda_g=lg;
-		}
+		//void set_xg_parameter(double ag,double lg){
+		//	A_g=ag;
+		//	lambda_g=lg;
+		//}
 
 		/*******************************************************************************
 		* Gluons pdf  function
 		*******************************************************************************/
-		double operator()(const double x, const double QQ)const {
+		double operator()(const double x, const double QQ,const double A_g,const double l_g)const {
+			//return(A_g*pow(x,-l_g));
 			static int flag=0;
 			double normalization;
-		double value;
+			double value;
 			const double bprim = 33.0/6.0-NF/3.0;
 			double par[] = {
 				log(1/x),
-				(1/bprim)*log(log(QQ/LQCD2)/log(Q0/LQCD2))
+				(1/bprim)*log(log(QQ/LQCD2)/log(Q0/LQCD2)),
+				l_g
 			};
 		    	normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
 			//value=dclenshaw<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15);
 			//value=dgauss<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15); 
-			value=dclenshaw<const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-11,1.0e-15);  
+			value=dclenshaw<const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-10,1.0e-18);  
 			
 			value=normalization*value;
 			if(!std::isfinite(value)||value<0){
 				if(flag==0){
 					std::cout<<std::scientific<<"gluon error:: "<<value<<" for x="<<x<<" Q2= "<<QQ<<std::endl;
-					std::cout<<A_g<<"  "<<lambda_g<<std::endl;
+					std::cout<<A_g<<"  "<<l_g<<std::endl;
 					flag=1;
 				}
 				return 0;

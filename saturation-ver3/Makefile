@@ -30,7 +30,10 @@ grid: gluon-grid
 fit: clean main
 
 main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
-	g++ ${FUNCDIR}/main.cc ${LIBS} -o ${DIR}/main  ${INC} ${OPT}
+	g++ ${FUNCDIR}/main.cc ${LIBS} simps.o -o ${DIR}/main  ${INC} ${OPT}
+
+result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
+	g++ ${FUNCDIR}/format-result.cc ${LIBS} -o ${DIR}/result  ${INC} ${OPT}
 
 #main: ${DEPS} ${FUNCDIR}/main.cc ${DIR}/kt-formula.o 
 #	g++ ${FUNCDIR}/main.cc  ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main  ${INC} ${OPT}

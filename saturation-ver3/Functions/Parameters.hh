@@ -11,7 +11,7 @@ double   par_max[] 	= {	80.0,	1.00,		100.0,		10,		10.0,	10.0,		2.0,	2.0};
 std::string  par_name[]	= {
 "sigma_0",	"A_g",	"lambda_g",	"mu102",	"C1", 	"mu02",		"C2",	"mu202",	"g1",	"g2"};
 double par_start[]  	= {
-30.0,		1.0,	0.1,		4.0,		0.05, 	2.0,		1.26,	2.0,		0.1, 	0.1};  
+23.0,		1.1,	0.083,		4.0,		0.32, 	2.0,		1.26,	2.0,		0.1, 	0.1};  
 double par_error[]  	= {
  5.00,  	0.10,	0.2, 		1.0,		1.0,	0.1,		0.1,	0.1,		0.01,	0.01};
 double   par_min[] 	= {
@@ -20,7 +20,7 @@ double   par_max[] 	= {
 50.00,		20.00,	5.0, 		10.0,		10.0,	10.0,		10,	10.0,		2.0,	2.0};
 #endif
 
-int parameter(const std::vector<double>& par,PREC(& sigpar)[],PREC(& sudpar)[]){
+int parameter(const std::vector<double>& par,double (& sigpar)[],double (& sudpar)[]){
 ///////////////////
 //Sigpar are as we all know it, parameters for dipole sigma.
 //sudpar are {C , r_max, g1, g2} but parameters may be given in terms of mu02 (as in BGK), and C and r_max may be that of BGK.
@@ -32,15 +32,15 @@ int parameter(const std::vector<double>& par,PREC(& sigpar)[],PREC(& sudpar)[]){
 	//printf("\n");
 int i=0,j=0,k=0;
 #if (MODEL==0||MODEL==2||MODEL==22)
-	sigpar[j++]=2.56819*(PREC)(par[i++]);//mb to GeV
-	sigpar[j++]=(PREC)(par[i++]);
-	sigpar[j++]=(PREC)(par[i++])*1.0e-4;
+	sigpar[j++]=2.56819*(par[i++]);//mb to GeV
+	sigpar[j++]=(par[i++]);
+	sigpar[j++]=(par[i++])*1.0e-4;
 
 #else
-	sigpar[j++]=2.56819*(PREC)(par[i++]);
-	sigpar[j++]=(PREC)(par[i++]);
-	//sigpar[1]=pow(fabs((PREC)par[1])*1.0e-4,par[2]);
-	sigpar[j++]=(PREC)(par[i++]);
+	sigpar[j++]=2.56819*(par[i++]);
+	sigpar[j++]=(par[i++]);
+	//sigpar[1]=pow(fabs(par[1])*1.0e-4,par[2]);
+	sigpar[j++]=(par[i++]);
 #endif
 
 #if MU02==0
@@ -50,40 +50,40 @@ int i=0,j=0,k=0;
 #endif
 	//printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
 #if(MODEL==1||MODEL==3)
-	sigpar[j++]=(PREC)(par[i++]);
-	sigpar[j++]=(PREC)(par[i++]);//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
+	sigpar[j++]=(par[i++]);
+	sigpar[j++]=(par[i++]);//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
 	//printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
-	sudpar[k++]=(PREC)(par[i++]);
-	sudpar[k++]=(PREC)(par[i++]);
+	sudpar[k++]=(par[i++]);
+	sudpar[k++]=(par[i++]);
 	//printf("\tSUDAKOV: %.2e %.2e ",sudpar[0],sudpar[1]);	
 	#if (SUDAKOV==2)
-		sudpar[k++]=(PREC)(par[i++]);
-		sudpar[k++]=(PREC)(par[i++]);
+		sudpar[k++]=(par[i++]);
+		sudpar[k++]=(par[i++]);
 		//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
 	#endif
 
 ///////////////////////////////////////////////////////
 #elif (MODEL==3)
 	#if INDEPENDENT_C==1
-		sudpar[k++]=(PREC)(par[i++]) ;
+		sudpar[k++]=(par[i++]) ;
 	#else 
-		sudpar[k++]=(PREC)(par[(i++)-2]);
+		sudpar[k++]=(par[(i++)-2]);
 	#endif
 
 	#if INDEPENDENT_RMAX==1
-		sudpar[k++]=(PREC)(par[i++]);
+		sudpar[k++]=(par[i++]);
 	#else
-		sudpar[k++]=(PREC)(par[(i++)-2]);//mu02 is shared
+		sudpar[k++]=(par[(i++)-2]);//mu02 is shared
 	#endif
 	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);
 
 //////////////////////////////////////////////////////
 #if (SUDAKOV==2)
-	sudpar[k++]=(PREC)(par[i++]);
-	sudpar[k++]=(PREC)(par[i++]);
+	sudpar[k++]=(par[i++]);
+	sudpar[k++]=(par[i++]);
 	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
 #endif
 #endif

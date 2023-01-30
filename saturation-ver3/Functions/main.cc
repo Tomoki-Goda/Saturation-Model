@@ -7,6 +7,7 @@
 #include"./control-default.h"
 #include"./constants.h"
 #include"./Parameters.hh"
+#include"cfortran.h"
 
 PREC INT_PREC=DGAUSS_PREC;
 int N_APPROX=N_CHEB_R;

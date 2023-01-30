@@ -77,7 +77,7 @@ class Laplacian_Sigma{
 			const double x=par[0],kt2=par[1];
 			double val = 0;
 
-#if (LAPLACIAN==1)
+#if (LAPLACIAN==1||R_FORMULA==1)
 			val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
 #elif LAPLACIAN==0
 			val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);

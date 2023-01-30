@@ -11,6 +11,7 @@
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
 LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas
+# -lgfortran
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
@@ -30,10 +31,13 @@ grid: gluon-grid
 fit: clean main
 
 main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
-	g++ ${FUNCDIR}/main.cc ${LIBS} simps.o -o ${DIR}/main  ${INC} ${OPT}
+	g++ ${FUNCDIR}/main.cc -o ${DIR}/main  ${INC} ${OPT} ${LIBS} 
 
 result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
 	g++ ${FUNCDIR}/format-result.cc ${LIBS} -o ${DIR}/result  ${INC} ${OPT}
+
+#gluons.o: ${FUNCDIR}/gluons.f ${FUNCDIR}/clenshaw.f
+#	gfortran gluons.f -c -o ${FUNCDIR}/gluons.o
 
 #main: ${DEPS} ${FUNCDIR}/main.cc ${DIR}/kt-formula.o 
 #	g++ ${FUNCDIR}/main.cc  ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main  ${INC} ${OPT}
@@ -53,5 +57,6 @@ dipole: ${DEPS} ${UTILDIR}/Plot-DP.c
 
 clean: 
 	rm -f ${DIR}/*.o
+	rm -f ${FUNCDIR}/*.o
 	rm -f ${DIR}/main
 	 		

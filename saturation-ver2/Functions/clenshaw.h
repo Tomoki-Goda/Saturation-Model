@@ -2,7 +2,7 @@
 #define DCLENSHAW_H
 #include<math.h>
 #include<stdio.h>
-#include"./Kahn.h"
+#include"/home/tomoki/Numerics/Kahn.h"
 //#include<stdlib.h>
 
 #ifndef PI
@@ -15,7 +15,8 @@ static const double w16[]={6.274509803921572703711007079619e-02, 2.9894962269764
 static const double w8[]={1.269841269841270256502063773496e-01, 5.848745968640726177649829569567e-01, 1.117460317460317429023630586917e+00, 1.446871434881959070257763581104e+00, 1.574603174603174567114383108901e+00};
 
 
-static double dclenshaw(double(*func)(double*,void* par),void* par , double a,double b,double eps){
+static double dclenshaw(double(*func)(double*,void* par),void* par , const double a, const double b,const double eps){
+	int MAX_RECURSION=15;
 //double dclenshaw(double(*func)(double*),double a,double b,double eps){
 	double sign, max,min;
 
@@ -32,7 +33,7 @@ static double dclenshaw(double(*func)(double*,void* par),void* par , double a,do
 	}
 	double smin,smax;
 	double scale,mid;
-	double val16,val8;
+	double valfull,valhalf;
 	double arg1,arg2;
 	double total=0;
 	double accum[3]={0};
@@ -42,18 +43,19 @@ static double dclenshaw(double(*func)(double*,void* par),void* par , double a,do
 	smin=min;
 	smax=max;
 
-	int licz=0,licztot=0;
+	int licz=0,licztot=0 , counter=0;
 	double f[N/2+1];
 	if(fabs(min-max)<1.0e-15){
 		return(0);
 	}		
 	while(1){
+		counter++;
 		licztot++;
 		scale=(smax-smin)/2;
-		if(scale<2.0e-15){
-			printf("Clenshaw_Curtis::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] scale = %.5e\n",smin,smax,min,max,scale);
-			getchar();
-		}
+		//if(scale<2.0e-15){
+		//	printf("dclenshaw::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] scale = %.5e\n",smin,smax,min,max,scale);
+		//	getchar();
+		//}
 		mid=(smax+smin)/2;
 
 		for(int i=0;i<N/2;i++){
@@ -70,36 +72,59 @@ static double dclenshaw(double(*func)(double*,void* par),void* par , double a,do
 		if((isnan(f[N/2])+isinf(f[N/2]))!=0){
 			printf("%.3e encountered at %.3e \n",f[N/2],mid );
 		}
-		val16=0;
+		valfull=0;
 		//accum2=0;
 		Kahn_init(accum2,3);
 		for(int i=0;i<=N/2;i++){
-			//val16=dclensaw_Kahn(val16,f[i]*w16[i],&accum2);
-			val16=Kahn(val16,f[i]*w16[i],accum2,3);
+			//valfull=dclensaw_Kahn(valfull,f[i]*w16[i],&accum2);
+			valfull=Kahn_Sum(valfull,f[i]*w16[i],accum2,3);
 			//printf("%.3e\t",f[i]*w[i]);
 		}
-		//val16+=accum2;
-		val16=Kahn_total(val16,accum2,3);
+		//valfull+=accum2;
+		valfull=Kahn_total(valfull,accum2,3);
 		//printf("\n");
-		val8=0;
+		valhalf=0;
 		//accum2=0;
 		Kahn_init(accum2,3);
 		for(int i=0;i<=N/4;i++){
-			//val8=dclensaw_Kahn(val8,f[2*i]*w8[i],&accum2);
-			val8=Kahn(val8,f[2*i]*w8[i],accum2,3);
+			//valhalf=dclensaw_Kahn(valhalf,f[2*i]*w8[i],&accum2);
+			valhalf=Kahn_Sum(valhalf,f[2*i]*w8[i],accum2,3);
 		}
-		//val8+=accum2;
-		val8=Kahn_total(val8,accum2,3);
+		//valhalf+=accum2;
+		valhalf=Kahn_total(valhalf,accum2,3);
 
-		val16*=2*scale/N;
-		val8*=4*scale/N;
-		//printf("%.5e , %.5e in the domain [%.3e, %.3e] of [%.3e, %.3e] \n",val16,val8,smin,smax,min,max);
-		if(fabs(val16-val8)<eps*(1+fabs(val16)) ){
+		valfull*=2*scale/N;
+		valhalf*=4*scale/N;
+		//printf("%.5e , %.5e in the domain [%.3e, %.3e] of [%.3e, %.3e] \n",valfull,valhalf,smin,smax,min,max);
+		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<eps )|| (counter==MAX_RECURSION)){//Need improvement
+			if(counter==MAX_RECURSION){
+				printf("MAX_RECURSION:: evaluated %d times. Increase MAX_RECURSION\n",MAX_RECURSION );
+				printf("[%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);
+				printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
+				for(int i=0;i<N/2;i++){
+					arg2=mid-scale*x16[i];
+					printf("%.3e\n",(*func)(&arg2,par));
+				}
+				arg2=mid;
+				printf("%.3e\n",(*func)(&arg2,par));
+				for(int i=0;i<N/2;i++){
+					arg2=mid+scale*x16[N/2-i-1];
+					printf("%.3e\n",(*func)(&arg2,par));
+				}
+				printf("\n");
+			}
+			//if(fabs(valfull-valhalf)<eps*(eps+fabs(valfull)) ){//originally 1 but now 1.0e-3 no reason but to go further in the absolute accuracy
+			//if(( fabs(valfull-valhalf)>eps*(fabs(valfull)) ) && (fabs(2*valfull*(max-min)/scale)>eps) ){
+				//printf("%.5e , %.5e in the domain [%.3e, %.3e] of [%.3e, %.3e] \n",valfull,valhalf,smin,smax,min,max);
+				//printf("%.5e %.5e\n ",fabs(valfull-valhalf),eps*(eps+fabs(valfull)) );
+			//	printf("Abs: %.5e %.5e \tRel: %.5e %.5e\n ",abs(2*valfull*(max-min)/scale),eps,fabs(valfull-valhalf),eps*(fabs(valfull)));
+			//}
+		
 			//total+=valfull;
-			//total=dclensaw_Kahn(total,val16,&accum);
-			total=Kahn(total,val16,accum,3);
+			//total=dclensaw_Kahn(total,valfull,&accum);
+			total=Kahn_Sum(total,valfull,accum,3);
 			licz++;
-			
+			counter=0;
 			if(fabs(smax-max)<1.0e-15){
 				//printf("Efficiency %d/%d = %.3f\n",16*licz,16*licztot,((double)licz)/licztot);
 				return(sign*Kahn_total(total,accum,3) );
@@ -112,6 +137,12 @@ static double dclenshaw(double(*func)(double*,void* par),void* par , double a,do
 		}else{
 			//smax=mid;
 			smax=smin+(scale/2);
+		}
+		if((smax-smin)<1.0e-15){
+			printf("Abs: %.5e %.5e \tRel: %.5e %.5e\n ",fabs(2*valfull*(max-min)/scale),eps,fabs(valfull-valhalf),eps*(fabs(valfull)));
+			printf("Clenshaw_Curtis::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);						
+			printf("valfull= %.3e , valhalf= %.3e \n",valfull,valhalf);
+			//getchar();
 		}
 	}
 }

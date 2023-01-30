@@ -41,7 +41,7 @@ def main():
     for l in range(2):
         ax1[l].text(1.0e-2,0.25,name[l],fontsize=25);
         for j in ['4']:
-            with open(args[0+2*l]+'/gluon-500-'+j+'.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/gluon-0-'+j+'.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:
@@ -49,7 +49,8 @@ def main():
                     dpi.append(float(data[1]))
                     ri.append(float(data[0]))
             leg.append( ax1[l].plot(ri,dpi ,c='blue',ls="--"))
-            q2=['5','50','500']
+            #q2=['5','50','500']
+            q2=['0']
             #sty=['-','_.',':']
             for k in range(len(q2)):
                 #print(k)
@@ -70,7 +71,7 @@ def main():
 #    ax1[0].legend([leg[0][0],leg[1][0],leg[2][0]],['Without Sudakov','With Sudakov $Q^2=100\\;\\mathrm{GeV}^2$','With Sudakov $Q^2=650\\;\\mathrm{GeV}^2$'])
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     #ax1.set(title="",  ylabel="$\\alpha_s f(x k^2)$",    xlabel="$k^2$",  xscale= 'log' ,   yscale='linear' )
-    ax1[0].set_ylabel('$\\alpha_s \\mathcal{F}(x, k_t^2,Q^2)$',rotation="vertical",loc='top')
+    ax1[0].set_ylabel('$\\alpha_s \\mathcal{F}(x, k_t^2)$',rotation="vertical",loc='top')
     #fig1.canvas.draw()
     #fig1.set_layout_engine(None)
     fig1.set_figheight(4)

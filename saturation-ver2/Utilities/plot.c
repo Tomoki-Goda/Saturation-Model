@@ -1,14 +1,15 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
+//#include<stdio.h>
+//#include<stdlib.h>
+//#include<math.h>
 //#include<time.h>
-#include<string.h>
+//#include<string.h>
 
 //#include"control.h"
 //#include"../control-default.h"
 //#include"../constants.h"
 
 int read_options(int argc, char ** argv, double* param,double* x,double* Q2,char* outfile ){
+
 	char parfilename[100]="";
 	char name[20]="";
 	float par;

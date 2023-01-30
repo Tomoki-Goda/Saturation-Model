@@ -90,80 +90,60 @@ static const double w40[]={
 0.010498284531152813615,
 0.004521277098533191258,
 };
-
-static double dgauss40(double (*func)(double*,void*),void* param, double smin, double smax,double*val40,double*val20){
+template<typename TYPE,typename args_type>static double dgauss40(TYPE &func, args_type param , const double smin, const double smax,double& val40,double& val20){
 	double accum[3]={0};
 	double x; 
-	double arg1,arg2;
 	double scale=(smax-smin)/2;
-		
 	double mid=(smax+smin)/2;
 
-	*val20=0;
+	val20=0;
 	Kahn_init(accum,3);
 	for(int i=0;i<10;i++){
 		x=scale*x20[i];
-		arg1=mid+x;
-		arg2=mid-x;
-		*val20=Kahn_Sum(*val20,w20[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),accum,3);
+		val20=Kahn_Sum(val20,w20[i]*( func(mid-x,param)+func(mid+x,param) ),accum,3);
 	}
-	*val20=Kahn_total(*val20,accum,3);
-	*val40=0;
+	val20=Kahn_total(val20,accum,3);
+	val40=0;
 	Kahn_init(accum,3);
 	for(int i=0;i<20;i++){
 		x=scale*x40[i];
-		arg1=mid+x;
-		arg2=mid-x;
-		*val40=Kahn_Sum(*val40,w40[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),accum,3);
+		val40=Kahn_Sum(val40,w40[i]*( func(mid-x,param)+func(mid+x,param) ),accum,3);
 	}
-	//val20+=accum;
-	*val40=Kahn_total(*val40,accum,3);
-
-	//printf("[%.5e ,  %.5e] \t %.5e \t res=%.5e  +-  %.5e, accumlator= %.3e\n",smin,smax, scale ,scale*val20,scale*fabs(val10-val20),accum_total);
-	*val20*=scale;
-	*val40*=scale;
-	return(*val40);
+	val40=Kahn_total(val40,accum,3);
+	val20*=scale;
+	val40*=scale;
+	return(val40);
 }
 
 
-static double dgauss20(double (*func)(double*,void*),void* param, double smin, double smax,double*val20,double*val10){
+template<typename TYPE,typename args_type>static double dgauss20(TYPE &func, args_type param , const double smin, const double smax,double& val20,double& val10){
 	double accum[3]={0};
 	double x; 
-	double arg1,arg2;
 	double scale=(smax-smin)/2;
-		
 	double mid=(smax+smin)/2;
-
-	*val10=0;
+	val10=0;
 	Kahn_init(accum,3);
 	for(int i=0;i<5;i++){
 		x=scale*x10[i];
-		arg1=mid+x;
-		arg2=mid-x;
-		*val10=Kahn_Sum(*val10,w10[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),accum,3);
+		val10=Kahn_Sum(val10,w10[i]*( func(mid-x,param)+func(mid+x,param) ),accum,3);
 	}
-	*val10=Kahn_total(*val10,accum,3);
-	*val20=0;
+	val10=Kahn_total(val10,accum,3);
+	val20=0;
 	Kahn_init(accum,3);
 	for(int i=0;i<10;i++){
 		x=scale*x20[i];
-		arg1=mid+x;
-		arg2=mid-x;
-		*val20=Kahn_Sum(*val20,w20[i]*( (*func)(&arg1,param)+(*func)(&arg2,param) ),accum,3);
+		val20=Kahn_Sum(val20,w20[i]*(func(mid-x,param)+func(mid+x,param) ),accum,3);
 	}
-	//val20+=accum;
-	*val20=Kahn_total(*val20,accum,3);
-
-	//printf("[%.5e ,  %.5e] \t %.5e \t res=%.5e  +-  %.5e, accumlator= %.3e\n",smin,smax, scale ,scale*val20,scale*fabs(val10-val20),accum_total);
-	*val10*=scale;
-	*val20*=scale;
-	return(*val20);
+	val20=Kahn_total(val20,accum,3);
+	val10*=scale;
+	val20*=scale;
+	return(val20);
 }
 
-static double dgauss(double (*func)(double*,void*),void* param, double min, double max,double  eps,double  epsabs){
+template<typename TYPE,typename args_type>static double dgauss(TYPE &func, args_type param , const double min, const double max, const double eps, const double epsabs){
 	double smin,smax; //section
 	int counter=0;
-	int MAX_RECURSION=5;
+	int MAX_RECURSION=7;
 	double total=0, val10=0, val20=0;
 	double scale;
 	double prec=1.0e-14;
@@ -183,37 +163,69 @@ static double dgauss(double (*func)(double*,void*),void* param, double min, doub
 		counter++;
 		licztot++;
 		scale=(smax-smin)/2;
-		dgauss20(func,param,smin,smax,&val20,&val10);
-		if(counter==MAX_RECURSION){
-			printf("dgauss::MAX_RECURSION\n");
+		dgauss40(func,param,smin,smax,val20,val10);
+		if(!std::isfinite(val20*val10)){
+			goto Error;
 		}
 		
-		if(fabs(val20-val10)< eps*(fabs(val20) ) || fabs(val20-val10)< epsabs){
+		
+		if(fabs(val20-val10)< eps*(fabs(val20) ) || fabs(val20-val10)< epsabs||counter==MAX_RECURSION){
+			if(counter==MAX_RECURSION){
+				printf("dgauss::MAX_RECURSION\n");
+				printf("[%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);
+				printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",val20,val10,val20-val10);
+				goto Error;
+			}
 			total=Kahn_Sum(total,val20,accum_total,3);
 			licz++;
 			counter=0;
 			
 			if(smax==max){
-				//printf("Efficiency %d/%d = %.3f\n",16*licz,16*licztot,((double)licz)/licztot);
 				return(Kahn_total(total,accum_total,3 ));
-			//bereak;
 			}else{
 				smin=smax;
-				//smax=max;
 				increase=(4*scale);
 				smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 			}
 		}else{
-			//smax=mid;
-			smax=smin+(scale/2);
+			smax=smin+(scale/4);
 		}
-		if(scale<2.0e-15){
-			printf("DGAUSS :: division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] scale = %.5e\n",smin,smax,min,max,scale);
-			printf("curent total=%.3e, val20=%.3e  licz/licztot=%d/%d\n",Kahn_total(total,accum_total,3 ),val20,licz,licztot);
-			getchar();
+		if(((max-min)-(smax-smin))==(max-min)){
+			printf("DGAUSS::division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);						
+			printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",val20,val10,val20-val10);
+			//getchar();
+			goto Error;
 		}
+		
 
 	}
+	Error:	
+		double x;
+		const int N=20;
+		const double (&x1)[]=x40,(&x2)[]=x20;
+		for(int i=0;i<N;i++){
+			x=(max+min)/2-scale*x1[i];
+			printf("%.3e\n",func(x,param));
+		}
+		x=(max+min)/2;
+		printf("%.3e\n",func(x,param));
+		for(int i=0;i<N;i++){
+			x=(max+min)/2+scale*x1[N-i-1];
+			printf("%.3e\n",func(x,param));
+		}
+		printf("\n");
+		for(int i=0;i<N/2;i++){
+			x=(max+min)/2-scale*x2[i];
+			printf("%.3e\n",func(x,param));
+		}
+		x=(max+min)/2;
+		printf("%.3e\n",func(x,param));
+		for(int i=0;i<N/2;i++){
+			x=(max+min)/2+scale*x2[N/2-i-1];
+			printf("%.3e\n",func(x,param));
+		}
+		printf("\n");
+		return 0;
 }
 
 

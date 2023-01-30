@@ -35,7 +35,7 @@ double CS_COMP[MAXN];
 ////////////////////////////////////////////////////////
 char datadir[]="/home/tomoki/Saturation-Model/saturation-ver2/data";
 ///////////////////////////////////////////////////////
-extern double F2_kt(double , double ,double ,const  double * );
+//extern double F2_kt(double , double ,double ,const  double * );
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////  now integrate over r with Simpsons method    /////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ double compute_chisq(const double *par){
 	return(chisq );
 }
 //double cckt(const double *par,int i){i
-struct ccktstr{
+/*struct ccktstr{
 	const double * par;	
 	int i;
 	double *resptr;
@@ -154,10 +154,10 @@ void *cckt(void *arg){
 	
 	*resptr=chisq;
 	//return(chisq );
-}
+	}*/
 
-pthread_t threads[N_THREADS];
-
+//pthread_t threads[N_THREADS];
+/*
 double compute_chisq_kt_p(const double *par,int Np ){	
 	
 	struct ccktstr arg[Np];//={par,0};
@@ -218,7 +218,7 @@ double compute_chisq_kt(const double *par){
 	}
 	return(chisq );
 }
-
+*/
 void export_data(FILE * file,  double * sigpar,  double* sudpar){
 //for plotting x dep f2 plot. slightly out of place but neccessary to acccess data.
 	double res=0;

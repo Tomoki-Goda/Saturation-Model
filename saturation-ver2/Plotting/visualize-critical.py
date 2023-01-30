@@ -45,7 +45,7 @@ def main():
     name=['GBW','BGK']
     for l in range(2):
         ax1[l].text(1.0e-6,0.4,name[l],fontsize=25)
-        with open(args[0+2*l]+'/'+types[j]+'critical-50.txt' ,"r") as fi:
+        with open(args[0+2*l]+'/'+types[j]+'critical-0.txt' ,"r") as fi:
             dpi=[]
             ri=[]
             for i in fi:
@@ -57,7 +57,7 @@ def main():
         ax1[l].grid('true')
         
         
-        with open(args[1+2*l]+'/'+types[j]+'critical-50.txt' ,"r") as fi:
+        with open(args[1+2*l]+'/'+types[j]+'critical-0.txt' ,"r") as fi:
             dpi=[]
             ri=[]
             for i in fi:

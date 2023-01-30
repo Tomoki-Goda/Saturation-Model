@@ -9,7 +9,8 @@
 #include"Minuit2/MnMachinePrecision.h"
 
 //#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
-#include"./clenshaw-curtis.hh"
+//#include"./clenshaw-curtis.hh"
+#include"./kt-formula.hh"
 #include<ctime>
 #include<chrono>
 
@@ -17,7 +18,7 @@
 	#define RFORMULA 0
 #endif
 
-extern double F2_kt(const  PREC,const  PREC,const PREC, const PREC(&)[]);
+//extern double F2_kt(const  PREC,const  PREC,const PREC, const PREC(&)[]);
 //extern double F2_r(const double,double,double,double*);
 class KtFCN : public ROOT::Minuit2::FCNBase {
 	
@@ -36,7 +37,6 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			ERR_DATA=(double*)realloc(ERR_DATA,MAX_N*sizeof(double));
 		}
 		double Up() const {return 1;}
-		
 	public:
 		unsigned MAX_N=0;
 		explicit KtFCN(std::string data_file ){
@@ -93,6 +93,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		
 		double operator()(const std::vector<double>& par)const{
 			std::chrono::system_clock walltime;
+				
 			std::chrono::time_point start= walltime.now();
 
 			clock_t time=clock();
@@ -101,7 +102,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			double x,Q2;
 			double val;
 			double chisq=0;
-			const int len=sizeof(par)/sizeof(par[0]);
+			const int len=par.size();
+			//printf("%d parameters\n",len);
 			//double param[len];
 #if PRINT_PROGRESS!=0
 			if((licznik/PRINT_PROGRESS)*PRINT_PROGRESS==licznik){			
@@ -113,22 +115,28 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 #endif			
 			PREC sigpar[10],sudpar[10];
 			parameter(par,sigpar, sudpar);//Format
+			F2_kt F2(sigpar);
 			for(int i=0;i<MAX_N;++i){
 				val=0;
 				//x=X_DATA[i];
 				//Q2=Q2_DATA[i];
-				val=F2_kt(X_DATA[i],Q2_DATA[i],0,sigpar);//summation over flavour is done at the level of integrand.
-				//printf("%.3e %.3e %.3e\n",val,CS_DATA[i],ERR_DATA[i]);	
+				val=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
+				//printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],pow(fabs(val-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);	
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
+#if SCATTER==1
+			printf("done %.3e\n",chisq/(i+1));
+			//exit(0);
+			getchar();
+#endif
 				
 			}
-			//printf("done\n");
-			//getchar();
+
+
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();
 #if PRINT_PROGRESS!=0
 			if((licznik/PRINT_PROGRESS)*PRINT_PROGRESS==licznik){
-				printf("CHISQ = %.5e (%.2f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);			
+				printf("CHISQ = %.5e (%.3f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);			
 				std::cout<<interval.count()<<" seconds, ("<< -((double)time)/CLOCKS_PER_SEC<<" CPU seconds)"<<std::endl;
 			}
 #endif	
@@ -142,21 +150,25 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		
 
 };
-
-ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str){
+/*
+ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
 		ROOT::Minuit2::MnStrategy strat(str);
 		ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat);	
-		ROOT::Minuit2::FunctionMinimum min=migrad2(20,10);
-		//std::cout <<"Eigen values: " ;
-		//ROOT::Minuit2::MnEigen eigen;
-		//for (double val: eigen(min.UserCovariance())){
-   		//	std::cout << val << ' ';
-   		//}
-   		//std::cout<<"\n"<<std::endl;
+		ROOT::Minuit2::FunctionMinimum min=migrad2(50,goal);
+		
    		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
    		stat=min.UserState();
 		return min;		
 }
-	
+ROOT::Minuit2::FunctionMinimum simplex(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
+		ROOT::Minuit2::MnStrategy strat(str);
+		ROOT::Minuit2::MnSimplex simplex2(theFCN,stat,strat);	
+		ROOT::Minuit2::FunctionMinimum min=simplex2(50,goal);
+		
+   		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
+   		stat=min.UserState();
+		return min;		
+}
+	*/
 	
 

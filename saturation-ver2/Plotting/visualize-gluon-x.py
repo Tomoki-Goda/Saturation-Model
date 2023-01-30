@@ -37,12 +37,13 @@ def main():
     fig1,ax1=plt.subplots(1,2,constrained_layout=True, sharey=True,sharex=True )
     fig1.get_layout_engine().set(wspace=1/10)
     leg=[]
-    q2= ['5','50','500']
+    #q2= ['5','50','500']
+    q2= ['0']
     name=['GBW',"BGK"]
     for l in range(2): 
         ax1[l].text(1.0e-7,0,name[l],fontsize=25);
         for j in ['1']:
-            with open(args[0+2*l]+'/gluon-x-500-'+j+'.txt' ,"r") as fi:
+            with open(args[0+2*l]+'/gluon-x-0-'+j+'.txt' ,"r") as fi:
                 dpi=[]
                 ri=[]
                 for i in fi:
@@ -67,7 +68,7 @@ def main():
     #ax1.legend([leg[0][0],leg[1][0],leg[2][0]],['Without Sudakov','With Sudakov $Q^2=100\\;\\mathrm{GeV}^2$','With Sudakov $Q^2=650\\;\\mathrm{GeV}^2$'])
     ax1[0].legend([leg[0][0],leg[1][0]],['Without Sudakov','With Sudakov'])
     #ax1.set(title="",  ylabel="$\\alpha_s f(x k^2)$",    xlabel="$k^2$",  xscale= 'log' ,   yscale='linear' )
-    ax1[0].set_ylabel('$\\alpha_s \\mathcal{F}(x, k_t^2,Q^2)$',rotation="vertical",loc='top')
+    ax1[0].set_ylabel('$\\alpha_s \\mathcal{F}(x, k_t^2)$',rotation="vertical",loc='top')
     fig1.set_figheight(4)
     fig1.set_figwidth(10.5)
     #fig1.subplots_adjust(bottom=0.1, right=0.95, top=0.95, left=0.1)

@@ -19,13 +19,15 @@ double   par_max[8] 	= {	80.0,	1.00,		100.0,		10.0,	1.0,		2.0,	2.0};
 #elif (MODEL==1)
 #if MU0==1
 char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"mu02"	};
-double par_start[8]  	= {22.40,	1.35,	0.1,		0.38, 	2.0		}; 
+//double par_start[8]  	= {22.40,	1.35,	0.1,		0.38, 	2.0		}; 
+double par_start[]  	= {23.3,	1.18,	0.0832,		0.329, 	1.87 };	 
 double par_error[8]  	= { 1.00,  	0.10,	0.05, 		0.1, 	0.1		};
 double   par_min[8] 	= { 0.00,  	0.00,	-10.0,		0.1, 	1.0		};
 double   par_max[8] 	= {50.00,  	20.00,	10.0, 		10.00,	10.00		};
 #else
 char * par_name[8]	= {"sigma_0",	"A_g",	"lambda_g",	"C", 	"r_max"	};
-double par_start[8]  	= {22.40,	1.35,	0.1,		0.38, 	0.4		}; 
+//double par_start[8]  	= {22.40,	1.35,	0.1,		0.38, 	2.0		}; 
+double par_start[]  	= {23.3,	1.18,	0.0832,		0.329, 	1.87 };	 
 double par_error[8]  	= { 1.00,  	0.10,	0.05, 		0.1, 	0.01		};
 double   par_min[8] 	= { 0.00,  	0.00,	-10.0,		0.1, 	0.1		};
 double   par_max[8] 	= {50.00,  	20.00,	10.0, 		10.00,	1.00		};

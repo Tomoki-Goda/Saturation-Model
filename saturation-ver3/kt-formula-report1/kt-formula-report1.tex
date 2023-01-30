@@ -107,6 +107,38 @@ The scale for $\alpha_s$ is suggested to be
 \label{eq:scale}
 \end{equation}
 Note, the integration limits of $k_t$ and $\kappa_t$ are removed as GBW gluon is not perturbative.
+\section{BGK}
+In order to use the GBK dipole, one needs to evaluate
+\begin{equation}
+\begin{split}
+	\alpha \mathcal{F}(x,k_t)&=\frac{3}{4\pi}\int \frac{d^2r}{(2\pi)^2}e^{-i\mathbf{r}\cdot\mathbf{k_t}}\nabla^2_r\sigma(x,r)\\
+&=\frac{3}{8\pi^2}\int dr r J_0(r k_t) \nabla^2_r\sigma(x,r).
+\end{split}
+\end{equation}
+While $\nabla^2_r\sigma(x,r)$ is relatively smooth function, $J_0(z)$ is oscillatory function imposing difficulty in integration. Thus one may approximate  $\nabla^2_r\sigma(x,r)$.
+\subsection{Alternatively...}
+$\nabla^2_r\sigma(x,r)$
+ of GBW is 
+\begin{equation}
+\sigma_0 Q_s^2 \left(1-\frac{Q_s^2}{4}r^2\right)e^{-\frac{Q_s^2}{4}r^2}.
+\end{equation}
+and since
+\begin{equation}
+	\frac{3}{4\pi} \nabla^2_r\sigma(x,r)=\int d^2ke^{-i\mathbf{r}\cdot\mathbf{k_t}}\alpha \mathcal{F}(x,k_t),
+\end{equation}
+small-$r$ limit is
+\begin{equation}
+\begin{split}
+	\lim_{r\rightarrow0}\frac{3}{4\pi} \nabla^2_r\sigma(x,r)&=\pi \int^{1/r}_0 dk^2\alpha \mathcal{F}(x,k_t)\\
+&=\pi \alpha xg(x,1/r).
+\end{split}
+\end{equation}
+For this, we obtain 
+\begin{equation}
+Q_s^2=\frac{4\pi^2 \alpha x g(x,1/r)}{3\sigma_0},
+\end{equation}
+which is almost BGK. 
+
 
 
 \section{Discussion}
@@ -224,4 +256,14 @@ x_2&\frac{1}{ ({x'}_1 x_2)+\epsilon}& x_1&\frac{1}{({x'}_2 x_1)+\epsilon}
 \end{align}
 
 \input{r-formula}
+
+\section{Log rise...}
+\begin{equation}
+\alpha \mathcal{F} =\frac{3}{8\pi^2}\int^\infty_0dr r J_0(r k)\nabla^2_r \sigma
+\end{equation}
+in small $k$ limit,
+\begin{equation}
+\lim_{k\rightarrow0 } \alpha \mathcal{F} =\frac{3}{8\pi^2}\int^\infty_0dr r \nabla^2_r \sigma
+\end{equation}
+
 \end{document}

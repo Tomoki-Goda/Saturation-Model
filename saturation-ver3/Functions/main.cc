@@ -136,6 +136,7 @@ int main(int argc, char** argv){
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	INT_PREC=1.0e-3;
+	N_APPROX=N_CHEB_R/5;
 	//ROOT::Minuit2::MnSimplex simplex2(theFCN,upar,0);
 	
 	for(int i=0;i<2;++i){
@@ -151,7 +152,7 @@ int main(int argc, char** argv){
 	
 	
 	INT_PREC=5.0e-4;
-	N_APPROX=N_CHEB_R;
+	N_APPROX=N_CHEB_R/2;
 	prec.SetPrecision(INT_PREC*2);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
@@ -183,6 +184,7 @@ int main(int argc, char** argv){
 	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 
 	INT_PREC=1.0e-4;
+	N_APPROX=N_CHEB_R;
 	prec.SetPrecision(4*INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);

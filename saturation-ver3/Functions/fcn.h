@@ -55,6 +55,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			//while((!file.eof())&&(j<597)){
 			if(file==NULL){
 				printf("file not found.\n");
+				exit(1);
 			}
 			while((!feof(file))&&(j<597)){
 				fscanf(file,"%lf %lf %lf %lf %lf", (Q2_DATA+i),(X_DATA+i),&wdata,(CS_DATA+i),(ERR_DATA+i)); 

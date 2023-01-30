@@ -565,7 +565,7 @@ class F2_kt{
 			};
 			const int key =11;
 			const int ndim=3;
-			static double kt2max=1.0e+5;
+			const double kt2max=1.0e+5;
 			//printf(" %.3e \n",Q2*(1-x)/x);	
 #endif//R_FORMULA	
 			//const double*__restricted par;
@@ -587,10 +587,10 @@ class F2_kt{
 #endif
 #else//R_FORMULA
 #if GLUON_APPROX==1
-			if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-				gluon.init(N_APPROX+50,N_APPROX+50,par);
-				gluon.set_max(kt2max);
-			}
+			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
+			gluon.init(N_APPROX+50,N_APPROX+50,par);
+			gluon.set_max(kt2max);
+			//}
 #else
 			gluon.init(par);
 #endif//GLUON_APPROX==1			

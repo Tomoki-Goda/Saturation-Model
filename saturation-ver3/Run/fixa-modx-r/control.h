@@ -12,3 +12,4 @@
 #define ALPHA_RUN 0
 #define MODX 1 
 #define R_FORMULA 1
+#define GLUON_APPROX 1

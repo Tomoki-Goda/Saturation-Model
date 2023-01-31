@@ -24,7 +24,7 @@ class Laplacian_Sigma{
 		gsl_interp_accel *  r_accel_ptr;
 		gsl_spline *  spline_ptr;
 		double *r_array,*sigma_array;
-		
+		char mode='l';//l or s
 		
 		void free_approx(){
 			gsl_spline_free (spline_ptr);
@@ -62,7 +62,8 @@ class Laplacian_Sigma{
 			//printf("sigma approx end\n");
 			free_approx();
 		}
-		void init(const int npts1,const double (&par)[] ){
+		void init(const int npts1,const double (&par)[] ,char mode){
+			this->mode=mode;
 			r_npts=npts1;
 			r_array=(double*)calloc(r_npts,sizeof(double));
 			sigma_array=(double*)calloc(r_npts,sizeof(double));
@@ -77,12 +78,24 @@ class Laplacian_Sigma{
 			const double x=par[0],kt2=par[1];
 			double val = 0;
 
-#if (LAPLACIAN==1||R_FORMULA==1)
-			val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
-#elif LAPLACIAN==0
-			val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
-			val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
-#endif//LAPLACIAN R_FORMULA
+//#if (LAPLACIAN==1||R_FORMULA==1)
+			switch(mode){
+				case 'l':
+					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
+					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+					break;
+				case 's':
+					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+					break;
+				default:
+					printf("unknown option in laplacian sigma\n");
+			}
+		
+		//	val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+//#elif LAPLACIAN==0
+		//	val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
+		//	val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+//#endif//LAPLACIAN R_FORMULA
 			if(not(std::isfinite(val))){
 				printf("2: val=%.3e for r= %.3e\n",val,r);
 			}
@@ -105,7 +118,11 @@ class Dipole_Gluon{
 	public: 
 		//void init(Laplacian_Sigma* integrand ){
 		inline void init(const int n,const double(&par)[] ){
-			integrand.init(n,par);	
+#if LAPLACIAN==0
+			integrand.init(n,par,'l');	
+#elif LAPLACIAN==1
+			integrand.init(n,par,'s');
+#endif	
 		}
 		double operator()(const double x,const double kt2,const double mu2){
 			//this->x=x;

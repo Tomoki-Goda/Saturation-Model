@@ -6,20 +6,22 @@
 #include<stdlib.h>
 
 typedef struct{
-	char input_file_name[100];
-	char output_file_name[100];
+	std::string input_file_name;
+	std::string output_file_name;
+	std::string path;
+	std::string data_file_name;
 	double Q2;
 	double x;
 	double k;
 	int fl;
 	double W;
-	char data_file_name[100];
 	double xmax,xmin,beta;
 } options;
 
 options read_options(int argc, char** argv  ){
 	int c, indexptr;
-	options data;
+	options data={"result.txt","out.txt","","",0,0,0,0,0,0,0,0};
+
 	struct option long_options[]={
 		{"Q2",required_argument,0,'q'},
 		{"k",required_argument,0,'k'},
@@ -31,7 +33,8 @@ options read_options(int argc, char** argv  ){
 		{"data",required_argument,0,'d'},
 		{"xmax",required_argument,0,'M'},
 		{"xmin",required_argument,0,'m'},
-		{"beta",required_argument,0,'b'}
+		{"beta",required_argument,0,'b'},
+		{"path",required_argument,0,'p'}
 
 	};
 	char shortopts[]="q:k:x:f:i:o:w:d:M:m:b:";
@@ -54,16 +57,22 @@ options read_options(int argc, char** argv  ){
 				data.fl=atoi(optarg);
 				break;
 			case 'i':
-				strcpy(data.input_file_name,optarg);
+				//strcpy(data.input_file_name,optarg);
+				data.input_file_name=optarg;
 				break;
 			case 'o':
-				strcpy(data.output_file_name,optarg);
+				//strcpy(data.output_file_name,optarg);
+				data.output_file_name=optarg;
 				break;
 			case 'w':
 				data.W=atof(optarg);
 				break;
 			case 'd':
-				strcpy(data.data_file_name,optarg);
+				//strcpy(data.data_file_name,optarg);
+				data.data_file_name=optarg;
+				break;
+			case 'p':
+				data.path=optarg;
 				break;
 			case 'M':
 				data.xmax=atof(optarg);

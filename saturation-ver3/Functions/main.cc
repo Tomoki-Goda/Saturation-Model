@@ -122,8 +122,8 @@ int main(int argc, char** argv){
 	
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=1.0e-3;
-	N_APPROX=N_CHEB_R;
+	INT_PREC=5.0e-3;
+	N_APPROX=N_CHEB_R/5;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
@@ -136,7 +136,7 @@ int main(int argc, char** argv){
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	INT_PREC=1.0e-3;
-	N_APPROX=N_CHEB_R/5;
+	N_APPROX=N_CHEB_R/4;
 	//ROOT::Minuit2::MnSimplex simplex2(theFCN,upar,0);
 	
 	for(int i=0;i<2;++i){

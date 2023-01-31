@@ -568,6 +568,9 @@ class F2_kt{
 			const double kt2max=1.0e+5;
 			//printf(" %.3e \n",Q2*(1-x)/x);	
 #endif//R_FORMULA	
+      ////////////////////////////////////////////
+      ///   Position space
+      ///////////////////////////////////////////
 			//const double*__restricted par;
 	public: 
 		explicit F2_kt(const  double  (& par)[] ){
@@ -586,6 +589,9 @@ class F2_kt{
 			
 #endif
 #else//R_FORMULA
+      ////////////////////////////////////////////
+      ///   Momentum space
+      ///////////////////////////////////////////
 #if GLUON_APPROX==1
 			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
 			gluon.init(N_APPROX+50,N_APPROX+50,par);
@@ -596,6 +602,7 @@ class F2_kt{
 #endif//GLUON_APPROX==1			
 #endif//R_FORMULA
 		}
+
 		~F2_kt(){
 			//printf(" F2 end \n");
 			//getchar();

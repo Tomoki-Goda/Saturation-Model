@@ -81,10 +81,16 @@ class Collinear_Gluon{
 			m = Cabs(g2)*Cabs(g2);
 
 			val = ((1.0/m)*l*ex).r;
-			
+			int flag=0;
 			if(not(std::isfinite(val))){
-		    	//	printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e   \n",n0.r,n1.r,n2.r, g1.r,g2.r,gt.r,ex.r,l.r);
-		    	//	printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e  %.3e  \n%.3e\n",n0.i,n1.i,n2.i, g1.i,g2.i,gt.i,ex.i,l.i,m,val);
+				if(flag=1){
+					printf("\033[1A\033[2K\r");
+					printf("\033[1A\033[2K\r");
+				}else{
+					flag=1;
+				}
+		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e   \n",n0.r,n1.r,n2.r, g1.r,g2.r,gt.r,ex.r,l.r);
+		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e  %.3e  \n%.3e\n",n0.i,n1.i,n2.i, g1.i,g2.i,gt.i,ex.i,l.i,m,val);
 		    		//getchar();
 		    		return 0;
 		    	}

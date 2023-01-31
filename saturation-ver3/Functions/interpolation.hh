@@ -23,8 +23,9 @@ class Laplacian_Sigma{
 		int r_npts;
 		gsl_interp_accel *  r_accel_ptr;
 		gsl_spline *  spline_ptr;
-		double *r_array,*sigma_array;
 		char mode='l';//l or s
+		double *r_array=NULL,*sigma_array=NULL;
+		
 		
 		void free_approx(){
 			gsl_spline_free (spline_ptr);
@@ -64,6 +65,10 @@ class Laplacian_Sigma{
 		}
 		void init(const int npts1,const double (&par)[] ,char mode){
 			this->mode=mode;
+			if(sigma_array!=NULL){
+				printf("refresh\n");
+				free_approx();
+			}
 			r_npts=npts1;
 			r_array=(double*)calloc(r_npts,sizeof(double));
 			sigma_array=(double*)calloc(r_npts,sizeof(double));
@@ -113,7 +118,7 @@ class Laplacian_Sigma{
 
 class Dipole_Gluon{
 	Laplacian_Sigma integrand;
-	CCIntegral cc=CCprepare(32,"dipole",10);
+	CCIntegral cc=CCprepare(64,"dipole",10);
 	
 	public: 
 		//void init(Laplacian_Sigma* integrand ){

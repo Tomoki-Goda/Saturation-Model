@@ -609,15 +609,19 @@ class F2_kt{
 		}
 		
 		double operator()(const double  x,const  double  Q2,const  double  mf2){
-			static int count;
+			static unsigned int count;
 	//		std::string type="gbw";
-			
+			printf("Start F2\t");
 			//getchar();
 			integrands[0].set_kinem(x,Q2,MASS_L2);
+			printf("L+S");
 			integrands[1].set_kinem(x,Q2,MASS_C2);
+			printf("+C");
 			integrands[2].set_kinem(x,Q2,MASS_B2);
+			printf("+B\n");
 			//getchar();
 			
+			printf("%d: Cuhre x=%.2e Q2=%.2e\n",count++, x,Q2);
 			const long long int mineval=pow(15,ndim), maxeval=1/pow(INT_PREC /10,2);//use llChure if larger than ~1.0e+9
 			const long long int nstart=1.0e+2,nincrease=1.0e+2;
 			long long int neval=0;
@@ -633,7 +637,6 @@ class F2_kt{
 			//int spin=0;
 			char statefile[100]="";
 			double  result=0;
-			//printf("%d: Cuhre x=%.2e Q2=%.2e mf2=%.2e\n",count++, x,Q2,mf2);
 			llCuhre(ndim, 1,
 			//llTest(ndim, 1,
 #if R_FORMULA==1
@@ -645,7 +648,7 @@ class F2_kt{
 				(void*)integrands,
 				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,statefile,NULL, &nregions, &neval,  &fail, integral, error, prob
 			);
-			//printf("Cuhre-End\n");
+			printf("\033[2A\033[2K\r");
 			//cubawait(&spin);
 
 			result=Q2/(2*PI) *integral[0];

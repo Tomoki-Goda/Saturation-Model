@@ -65,7 +65,7 @@ int main(int argc, char** argv){
 	std::chrono::time_point start= walltime.now();
 	std::cout<<std::scientific<<std::endl;
 	
-	printf("Czesc World!\nProgram Started.\n");
+	printf("\033[2J\033[HProgram Started.\n");
 	printf("Directory=%s\n",(char*)argv[1]);
 	
 

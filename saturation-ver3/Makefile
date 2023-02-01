@@ -10,8 +10,7 @@
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
-LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas
-# -lgfortran
+LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas -lgfortran
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
@@ -30,14 +29,14 @@ grid: gluon-grid
 
 fit: clean main
 
-main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
-	g++ ${FUNCDIR}/main.cc -o ${DIR}/main  ${INC} ${OPT} ${LIBS} 
+main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h ${FUNCDIR}/gluons.o 
+	g++ ${FUNCDIR}/main.cc -o ${DIR}/main  ${FUNCDIR}/gluons.o ${INC} ${OPT} ${LIBS} 
 
 result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
 	g++ ${FUNCDIR}/format-result.cc ${LIBS} -o ${DIR}/result  ${INC} ${OPT}
 
-#gluons.o: ${FUNCDIR}/gluons.f ${FUNCDIR}/clenshaw.f
-#	gfortran gluons.f -c -o ${FUNCDIR}/gluons.o
+gluons.o: ${FUNCDIR}/gluons.f ${FUNCDIR}/clenshaw.f
+	gfortran ${FUNCDIR}/gluons.f -c -o ${FUNCDIR}/gluons.o
 
 #main: ${DEPS} ${FUNCDIR}/main.cc ${DIR}/kt-formula.o 
 #	g++ ${FUNCDIR}/main.cc  ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main  ${INC} ${OPT}
@@ -45,8 +44,9 @@ result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/
 #${DIR}/kt-formula.o: ${FUNCDIR}/kt-formula.cc
 #	g++ ${FUNCDIR}/kt-formula.cc -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
 
-plot: ${FUNCDIR}/plot-things.cc
-	g++ ${FUNCDIR}/plot-things.cc -o ${DIR}/plot ${OPT} ${INC} ${LIBS}
+plot: ${FUNCDIR}/plot-things.cc ${FUNCDIR}/gluons.o
+	g++ ${FUNCDIR}/plot-things.cc -o ${DIR}/plot  ${FUNCDIR}/gluons.o ${OPT} ${INC} ${LIBS}
+	g++ ${FUNCDIR}/plot-grid.cc -o ${DIR}/grid  ${FUNCDIR}/gluons.o ${OPT} ${INC} ${LIBS}
 #plot: dipole gluon
 
 gluon: ${DEPS} ${UTILDIR}/tmd-gluon.c ${UTILDIR}/tmd-gluon-2.h

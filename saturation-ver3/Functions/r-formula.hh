@@ -8,7 +8,7 @@ inline double  modx(const double  x, const double  Q2, const  double  mf2){
 #endif
 }
 extern double change_var(double & var,double &  jac,const double min, const double max,const double c);
-//extern "C" double xgpdf_(const double* x, const double* QQ,const double* A_g, const double* lambda_g );
+extern "C" double xgpdf_(const double* x, const double* QQ,const double* A_g, const double* lambda_g );
 //extern "C" double xgpdf(double x, double QQ);
 //extern "C" void set_xg_parameter(double ag,double lg);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

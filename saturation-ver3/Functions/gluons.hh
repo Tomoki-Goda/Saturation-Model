@@ -51,7 +51,7 @@ class Collinear_Gluon{
 
 	public:
 		explicit Collinear_Gluon(){
-			cc=CCprepare(128,"gluon",10);
+			cc=CCprepare(128,"gluon",50);
 			//printf("gluon\n");
 		}
 		~Collinear_Gluon(){
@@ -86,11 +86,12 @@ class Collinear_Gluon{
 				if(flag=1){
 					printf("\033[1A\033[2K\r");
 					printf("\033[1A\033[2K\r");
+					printf("\033[1A\033[2K\r");
 				}else{
 					flag=1;
 				}
 		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e   \n",n0.r,n1.r,n2.r, g1.r,g2.r,gt.r,ex.r,l.r);
-		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e  %.3e  \n%.3e\n",n0.i,n1.i,n2.i, g1.i,g2.i,gt.i,ex.i,l.i,m,val);
+		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e  %.3e \nval=%.3e\n",n0.i,n1.i,n2.i, g1.i,g2.i,gt.i,ex.i,l.i,m,val);
 		    		//getchar();
 		    		return 0;
 		    	}
@@ -120,7 +121,7 @@ class Collinear_Gluon{
 		    	normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
 			//value=dclenshaw<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15);
 			//value=dgauss<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15); 
-			value=dclenshaw<const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-10,1.0e-18);  
+			value=dclenshaw<const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-15,1.0e-20);  
 			
 			value=normalization*value;
 			if(!std::isfinite(value)||value<0){

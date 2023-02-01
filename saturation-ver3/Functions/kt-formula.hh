@@ -583,9 +583,9 @@ class F2_kt{
 			sigma[2].init(par);
 #elif GLUON_APPROX==1
 			
-			sigma[0].init(N_APPROX,par,'s');
-			sigma[1].init(N_APPROX,par,'s');
-			sigma[2].init(N_APPROX,par,'s');
+			sigma[0].init(N_APPROX+25,par,'s');
+			sigma[1].init(N_APPROX+25,par,'s');
+			sigma[2].init(N_APPROX+25,par,'s');
 			
 #endif
 #else//R_FORMULA

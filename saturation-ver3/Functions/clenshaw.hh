@@ -9,12 +9,44 @@
 #ifndef PI
 #define PI 3.141592653589793238462643383279502884197
 #endif
-typedef  struct{int N=128; double wfull[65]={0}, whalf[33]={0}, x[65]={0}; std::string tag="unnamed"; int max_rec=7;} CCIntegral;
-template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegral &data,TYPE &func, args_type par , const double a, const double b, const double eps, const double Aeps){
+typedef  struct{int N=128; double wfull[65]={0}, whalf[33]={0}, x[65]={0}; std::string tag="unnamed"; int max_rec=7; int InitDiv=1;} CCIntegral;
+
+template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf){
 	const double (&x16)[]=data.x;
 	const double (&w16)[]=data.wfull;
 	const double (&w8)[]=data.whalf;
 	const int N=data.N;
+	double f[N/2+1];
+	double accum2[2]={0};
+	double arg;
+	double scale=(smax-smin)/2;
+	double mid=(smax+smin)/2;
+	for(int i=0;i<N/2;i++){
+		arg=scale*x16[i];
+		f[i]=func(mid+arg,par)+func(mid-arg,par);
+	}
+	
+	f[N/2]=func(mid,par);
+	valfull=0;
+	Kahn_init(accum2,2);
+	
+	for(int i=0;i<=N/2;i++){
+		valfull=Kahn_Sum(valfull,f[i]*w16[i],accum2,2);			
+	}
+	
+	valfull=Kahn_total(valfull,accum2,2);
+	valhalf=0;
+	Kahn_init(accum2,2);
+	for(int i=0;i<=N/4;i++){
+		valhalf=Kahn_Sum(valhalf,f[2*i]*w8[i],accum2,2);
+	}
+	valhalf=Kahn_total(valhalf,accum2,2);
+	valfull*=2*scale/N;
+	valhalf*=4*scale/N;
+	return 0;
+}
+
+template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegral &data,TYPE &func, args_type par , const double a, const double b, const double eps, const double Aeps){
 	int MAX_RECURSION=data.max_rec;
 //double dclenshaw(double(&func)(const double*, const void*),const void* args,const double a,const double b,const double eps){
 	double sign, max,min;
@@ -31,83 +63,62 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		return(0);
 	}
 	double smin,smax;
-	double scale,mid;
 	double valfull,valhalf;
+	double scale;
 	double arg;
-	double total=0;
-	double accum[3]={0};
-	double accum2[3]={0};
+	double total=0,total2=0;
+	double accum[2]={0},accum2[2]={0};
 	//const int N=16;
 	double increase;
 	smin=min;
 	//smax=max/data.div;
-	smax=max;//data.init_div;
+	smax=max/data.InitDiv;//data.init_div;
 	int licz=0,licztot=0 , counter=0;
-	double f[N/2+1];
 	if(fabs(min-max)<0.0){
 		return(0);
 	}		
 	while(1){
+		if(((max-min)-(smax-smin))==(max-min)||counter==MAX_RECURSION){
+			printf("Clenshaw_Curtis:: in \"%s\", evaluated %d times.\n",(data.tag).c_str(),counter );
+			printf("sector size = %.3e\n [%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smax-smin,smin,smax,min,max, licz,licztot);
+			printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
+			//getchar();
+			goto Error;
+		}
 		++counter;
 		++licztot;
 		scale=(smax-smin)/2;
-		mid=(smax+smin)/2;
-
-		for(int i=0;i<N/2;i++){
-			arg=scale*x16[i];
-			f[i]=func(mid+arg,par)+func(mid-arg,par);
-		}
-		
-		f[N/2]=func(mid,par);
-		valfull=0;
-		Kahn_init(accum2,3);
-		
-		for(int i=0;i<=N/2;i++){
-			valfull=Kahn_Sum(valfull,f[i]*w16[i],accum2,3);			
-		}
-		
-		valfull=Kahn_total(valfull,accum2,3);
-		valhalf=0;
-		Kahn_init(accum2,3);
-		for(int i=0;i<=N/4;i++){
-			valhalf=Kahn_Sum(valhalf,f[2*i]*w8[i],accum2,3);
-		}
-		valhalf=Kahn_total(valhalf,accum2,3);
-
-		valfull*=2*scale/N;
-		valhalf*=4*scale/N;
+		fixed_cc<TYPE,args_type>(data,func,par,smin,smax,valfull,valhalf);
 #if DCLENSHAW_HH==1		
 		if(not(std::isfinite(valfull)&&std::isfinite(valhalf))){
 			printf("Clenshaw_Curtis:: in \"%s\" %.3e  %.3e encountered\n",(data.tag).c_str(),valfull,valhalf);
 			goto Error;
 		}
 #endif
+		//printf("[%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);
+		//printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
 		
-		
-		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<Aeps )|| (counter==MAX_RECURSION)){//Need improvement
-			if(counter==MAX_RECURSION){
-				printf("Clenshaw_Curtis::MAX_RECURSION:: in \"%s\", evaluated %d times. Increase MAX_RECURSION\n",(data.tag).c_str(), MAX_RECURSION );
-				printf("[%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smin,smax,min,max, licz,licztot);
-				printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
-				//getchar();
-				goto Error;
-			}
-			
-			total=Kahn_Sum(total,valfull,accum,3);
+		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<Aeps ) ){
+			//PASS
+			total=Kahn_Sum(total,valfull,accum,2);
+			total2=Kahn_Sum(total2,valhalf,accum2,2);
 			++licz;
-			//data.div+=pow(4,counter);
-			
 			counter=0;
 			if(fabs(smax-max)==0.0){
 				//data.div/=licz;
-				return(sign*Kahn_total(total,accum,3) );
+				total=sign*Kahn_total(total,accum,2);
+				total2=sign*Kahn_total(total2,accum2,2);
+//				printf(" relative: %.3e / %.3e, %d  points /%d =%f \n", fabs(total2-total),total,data.N*licz, data.N*licztot,((double)licz)/licztot);
+				return(total );
 			}
 			smin=smax;
 			increase=(4*scale);
 			smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 		}else{
+			//IMPROVE
 			smax=smin+(scale/2);
 		}
+
 		if(((max-min)-(smax-smin))==(max-min)){
 			printf("Clenshaw_Curtis:: in \"%s\", division exceeds limitation. in the domain [%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",(data.tag).c_str(), smin,smax,min,max, licz,licztot);						
 			printf("valfull= %.3e , valhalf= %.3e \n",valfull,valhalf);
@@ -118,6 +129,12 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	}
 	
 	Error:
+		const double (&x16)[]=data.x;
+		const double (&w16)[]=data.wfull;
+		const double (&w8)[]=data.whalf;
+		scale=(smax-smin)/2;
+		double mid=(smax+smin)/2;
+		const int N=data.N;
 		for(int i=0;i<N/2;i++){
 			arg=mid-scale*x16[i];
 			printf("f(%.3e) = %.3e\n",arg,func(arg,par));
@@ -226,7 +243,7 @@ CCIntegral CCprepare(const int N,const std::string &tag){
 CCIntegral CCprepare(const int N,const std::string &tag,int d){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
-	data.max_rec=d;
+	data.InitDiv=d;
 	
 	return data;
 }

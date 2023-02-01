@@ -205,24 +205,24 @@ template<typename TYPE,typename args_type>static double dgauss(TYPE &func, args_
 		const double (&x1)[]=x40,(&x2)[]=x20;
 		for(int i=0;i<N;i++){
 			x=(max+min)/2-scale*x1[i];
-			printf("%.3e\n",func(x,param));
+			printf("f(%.3e) = %.3e\n",x,func(x,param));
 		}
 		x=(max+min)/2;
 		printf("%.3e\n",func(x,param));
 		for(int i=0;i<N;i++){
 			x=(max+min)/2+scale*x1[N-i-1];
-			printf("%.3e\n",func(x,param));
+			printf("f(%.3e) = %.3e\n",x,func(x,param));
 		}
 		printf("\n");
 		for(int i=0;i<N/2;i++){
 			x=(max+min)/2-scale*x2[i];
-			printf("%.3e\n",func(x,param));
+			printf("f(%.3e) = %.3e\n",x,func(x,param));
 		}
 		x=(max+min)/2;
 		printf("%.3e\n",func(x,param));
 		for(int i=0;i<N/2;i++){
 			x=(max+min)/2+scale*x2[N/2-i-1];
-			printf("%.3e\n",func(x,param));
+			printf("f(%.3e) = %.3e\n",x,func(x,param));
 		}
 		printf("\n");
 		return 0;

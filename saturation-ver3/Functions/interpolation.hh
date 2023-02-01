@@ -35,11 +35,14 @@ class Laplacian_Sigma{
 		}
 		
 		int counter=0;
+		double x;
 	public:
 		inline int set_kinem(double x){
 			return(approximate(x));
 		}	
 		int approximate(const double x){
+			this->x=x;
+			//printf("approximate(%.3e)\n",x);
 			//static int counter=0;
 			double r;
 			for (int j = 0; j < r_npts; j++){
@@ -53,7 +56,7 @@ class Laplacian_Sigma{
 			}
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 			///printf("Approximated: %d %d\n" ,r_npts,++counter);
-			
+			//printf("\033[1A\033[2K\r");	
 			return(0);
 		}
 		explicit Laplacian_Sigma(){
@@ -78,6 +81,12 @@ class Laplacian_Sigma{
 		}
 		inline double operator()(double r)const{
 			return(gsl_spline_eval(spline_ptr, r,r_accel_ptr));
+		}
+		int export_grid(FILE* file){
+			for(int i=0;i<r_npts;i++){
+				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,r_array[i],sigma_array[i]);
+			}	
+		return 0;	
 		}
 		double operator()(const double r, const std::vector<double> &par)const {
 			const double x=par[0],kt2=par[1];
@@ -118,7 +127,7 @@ class Laplacian_Sigma{
 
 class Dipole_Gluon{
 	Laplacian_Sigma integrand;
-	CCIntegral cc=CCprepare(64,"dipole",10);
+	CCIntegral cc=CCprepare(128,"dipole",100);
 	
 	public: 
 		//void init(Laplacian_Sigma* integrand ){
@@ -139,8 +148,7 @@ class Dipole_Gluon{
 			}
 			const std::vector<double> par={x,kt2};
 			double val=3.0/(8*PI*PI)*dclenshaw< const Laplacian_Sigma , const std::vector<double>& >(cc,integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
-			//double val=3.0/(8*PI*PI)*dclenshaw< const Laplacian_Sigma , const std::vector<double>& >(integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
-			//double val=3.0/(8*PI*PI)*dgauss< const Laplacian_Sigma , const std::vector<double>& >(integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
+		//	double val=3.0/(8*PI*PI)*dgauss< const Laplacian_Sigma , const std::vector<double>& >(integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
 			return val;
 		}
 };
@@ -193,7 +201,16 @@ class Approx_aF{
 			printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}
-	public:	
+	public:
+		int export_grid(FILE*file)const{
+			for(int j=0;j< x_npts;j++){
+				for(int i=0;i<kt2_npts;i++){
+					fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]);
+				}
+			}	
+			return 0;
+		}
+
 		Approx_aF(){
 		}
 		~Approx_aF(){

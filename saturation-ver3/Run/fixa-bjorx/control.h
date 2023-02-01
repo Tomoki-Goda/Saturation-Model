@@ -5,7 +5,7 @@
 #define SUDAKOV 0
 #define NONLINEAR 1
 #define FEJER 1
-#define N_CHEB_R 100 
+#define N_CHEB_R 200 
 #define DGAUSS_PREC 1.0e-9
 #define KT 1
 #define PRINT_PROGRESS 1

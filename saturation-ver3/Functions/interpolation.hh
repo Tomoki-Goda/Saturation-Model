@@ -230,7 +230,7 @@ class Approx_aF{
 			x_accel_ptr = gsl_interp_accel_alloc ();
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
-			aF.init( N_APPROX ,par);
+			aF.init(N_APPROX/2+50,par);
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;

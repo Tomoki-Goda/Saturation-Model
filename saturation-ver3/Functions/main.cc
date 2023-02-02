@@ -87,35 +87,18 @@ int main(int argc, char** argv){
 #endif
 #endif
 	int skip=0;
-	for(unsigned i=0;(i-skip)<N_PAR;i++){
+//	for(unsigned i=0;(i-skip)<N_PAR;i++){
+	for(unsigned i=0;i<N_PAR;i++){
 	
-#if MU02!=0
+#if (ALPHA_RUN==0||MU02!=0)
 		if(par_name[i]=="mu102"){
+			skip++;
 			//std::cout<<"Skip "<< par_name[i]<<" = "<< MU02<<std::endl;;
-			//skip++;
 			continue;
 		}
 #endif
-
-#if MODEL==3
-///////////////
-//parameters  may be shared bet. BGK & Sud, see dipole-cross-section.h parameters() for how they are organized.
-///////////////
-#if INDEPENDENT_C==0
-		if(par_name[i]=="C2"){
-			skip++;
-			continue;
-		}
-#endif
-#if INDEPENDENT_RMAX==0
-		if(par_name[i]=="mu202"){
-			skip++;
-			continue;
-		}
-#endif
-#endif
-		//std::cout<<par_name[i]<<" = "<<par_start[i]<<std::endl;
-		//std::cout<<N_PAR<<"  "<<i<<std::endl;
+		std::cout<<par_name[i]<<" = "<<par_start[i]<<std::endl;
+		std::cout<<N_PAR<<"  "<<skip <<" : parameter position="<<i<<std::endl;
 		upar.Add(par_name[i], par_start[i],par_error[i]);
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
@@ -151,14 +134,19 @@ int main(int argc, char** argv){
 	}
 	
 	
+//	std::cout<<upar<<std::endl;
+//	printf("N_PAR-skip=%d-%d=%d\n",N_PAR,skip,N_PAR-skip );
 	INT_PREC=5.0e-4;
 	N_APPROX=N_CHEB_R/2;
 	prec.SetPrecision(INT_PREC*2);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
+	//printf("N_PAR-skip=%d\n",N_PAR-skip );
+	//std::cout<<upar<<std::endl;
 	printf("***************************\n");
 	ROOT::Minuit2::MnHesse hesse;
 	ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,min.UserParameters());
+//	ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,upar);
 	for(int i=0;i<(N_PAR-skip);i++ ){
 		stat.RemoveLimits(i);
 	}
@@ -167,6 +155,7 @@ int main(int argc, char** argv){
 	ROOT::Minuit2::MnStrategy strat0(0);  	
 	ROOT::Minuit2::MnMigrad migrad1(theFCN,stat,strat0);
 	
+//	ROOT::Minuit2::FunctionMinimum	min=migrad1(10,goal);
    	goal=10;
 	for(int i=0;i<5;i++){
 		min=migrad1(10*(i+1),goal);

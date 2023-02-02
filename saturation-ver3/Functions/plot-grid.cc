@@ -62,6 +62,7 @@ int main(int argc , char** argv){
 	std::vector<double> param(10,0);
 
 	char filenames[500];
+	char filenames2[500];
 	if(opt.path==""){
 		opt.path=getenv("DIR");
 	}	
@@ -82,13 +83,16 @@ int main(int argc , char** argv){
 	
 	sprintf(filenames,"%s/%s",opt.path.c_str(),"dipole-grid.txt");
 	FILE* outfile=fopen(filenames,"w");
+	sprintf(filenames2,"%s/%s",opt.path.c_str(),"laplacian-grid.txt");
+	FILE* outfile2=fopen(filenames2,"w");
 	double x;
 	for(int i=0;i<N_APPROX+50;i++){
 		x=pow(10,-15+15*((double)i)/(N_APPROX+50-1));
 		sigma.approximate(x);
-		sigma.export_grid(outfile);
+		sigma.export_grid(outfile,outfile2);
 	}
 	fclose(outfile);
+	fclose(outfile2);
 
 	
 	sprintf(filenames,"%s/%s",opt.path.c_str(),"gluon-grid.txt");

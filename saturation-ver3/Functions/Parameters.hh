@@ -41,18 +41,19 @@ int i=0,j=0,k=0;
 	sigpar[j++]=(par[i++]);
 	//sigpar[1]=pow(fabs(par[1])*1.0e-4,par[2]);
 	sigpar[j++]=(par[i++]);
+	sigpar[j++]=(par[i++]);
 #endif
 
-#if MU02==0
+#if (MU02==0 && ALPHA_RUN==1)
 	sigpar[j++]=par[i++];
 #else 
-	++i;
+//	++i;
 #endif
-	//printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
+//	printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
 #if(MODEL==1||MODEL==3)
 	sigpar[j++]=(par[i++]);
 	sigpar[j++]=(par[i++]);//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
-	//printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
+//	printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
@@ -87,6 +88,8 @@ int i=0,j=0,k=0;
 	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
 #endif
 #endif
+//	printf("\n");
+//	printf("sig %d  sud %d\n",j,k );
 	//printf("\n");
 	//if(i!=N_PAR){
 	//	printf("parameter number mismatch counted %d, N_PAR= %d\n",i,N_PAR);

@@ -38,7 +38,8 @@ class Laplacian_Sigma{
 		double x;
 	public:
 		inline int set_kinem(double x){
-			return(approximate(x));
+			approximate(x);
+			return 0;
 		}	
 		int approximate(const double x){
 			this->x=x;
@@ -82,9 +83,15 @@ class Laplacian_Sigma{
 		inline double operator()(double r)const{
 			return(gsl_spline_eval(spline_ptr, r,r_accel_ptr));
 		}
-		int export_grid(FILE* file){
+		int export_grid(FILE* file, FILE* file2){
 			for(int i=0;i<r_npts;i++){
 				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,r_array[i],sigma_array[i]);
+			}	
+			double val=0;
+			for(int i=0;i<r_npts;i++){
+				val=gsl_spline_eval_deriv2(spline_ptr, r_array[i],r_accel_ptr);
+				val+=gsl_spline_eval_deriv(spline_ptr, r_array[i],r_accel_ptr)/r_array[i];
+				fprintf(file2,"%.5e\t%.5e\t%.5e\n",x,r_array[i],val);
 			}	
 		return 0;	
 		}
@@ -95,8 +102,9 @@ class Laplacian_Sigma{
 //#if (LAPLACIAN==1||R_FORMULA==1)
 			switch(mode){
 				case 'l':
-					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
-					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
+					//val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
+					//val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
 					break;
 				case 's':
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
@@ -114,7 +122,9 @@ class Laplacian_Sigma{
 				printf("2: val=%.3e for r= %.3e\n",val,r);
 			}
 			
-			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+			//val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+			val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
+			
 			if(not(std::isfinite(val))){
 				printf("3: val=%.3e for r= %.3e\nparameter: ",val,r);
 				for(int i=0;i<par.size();i++){

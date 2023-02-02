@@ -46,7 +46,7 @@ class Sigma{
 		 	return((*this)(r));
 		 }
 
-		double operator()(const double r)const{
+		double operator()(const double r)const {
 			double sigma_0=sigpar[0];
 #if MODEL==0
 			double lambda=sigpar[1];
@@ -70,8 +70,11 @@ class Sigma{
 			double exprrmax=exp(-r*r*(mu02/C));
 	
 			double mu2=mu02/((1.0-exprrmax ));
-			
-			if(mu2<1){
+			if(!std::isfinite(mu2)){
+				printf("r= %.3e C=%.3e mu02=%.3e ,mu2=%.3e\n",r,C,mu02,mu2 );
+				getchar();
+			}
+			if(mu2<1||!std::isfinite(mu2)){
 				return(0);
 			}
 			double qs2=4*PI*PI*alpha(mu2)*xg(x,mu2,sigpar[1],sigpar[2])/(3*sigma_0); 

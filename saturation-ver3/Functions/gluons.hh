@@ -57,7 +57,7 @@ class Collinear_Gluon{
 		~Collinear_Gluon(){
 			//printf("gluon end\n");
 		}
-		double operator()(const double y,const double*par )const{
+		double operator()(const double y,const double*par )const {
 		//doublecomplex xgpdf_integrand(double y, double Y, double t) {
 			doublecomplex n0,n1,n2,g1,g2,gt,ex,l;
 			double val;
@@ -81,15 +81,17 @@ class Collinear_Gluon{
 			m = Cabs(g2)*Cabs(g2);
 
 			val = ((1.0/m)*l*ex).r;
-			int flag=0;
+			//static int flag=0;
 			if(not(std::isfinite(val))){
-				if(flag=1){
+				//if(flag<=100||(flag/100)*100==flag){
 					printf("\033[1A\033[2K\r");
 					printf("\033[1A\033[2K\r");
 					printf("\033[1A\033[2K\r");
-				}else{
-					flag=1;
-				}
+					printf("\033[1A\033[2K\r");
+				//}else{
+				//	++flag;
+				//}
+		    		printf("%.3e %.3e  \n",Yg,tg);
 		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e   \n",n0.r,n1.r,n2.r, g1.r,g2.r,gt.r,ex.r,l.r);
 		    		printf("%.3e %.3e %.3e %.3e \t %.3e %.3e %.3e \t %.3e  %.3e \nval=%.3e\n",n0.i,n1.i,n2.i, g1.i,g2.i,gt.i,ex.i,l.i,m,val);
 		    		//getchar();
@@ -99,6 +101,7 @@ class Collinear_Gluon{
 			return val;
 		}
 
+
 		//void set_xg_parameter(double ag,double lg){
 		//	A_g=ag;
 		//	lambda_g=lg;
@@ -107,9 +110,9 @@ class Collinear_Gluon{
 		/*******************************************************************************
 		* Gluons pdf  function
 		*******************************************************************************/
-		double operator()(const double x, const double QQ,const double A_g,const double l_g)const {
+		double operator()(const double x, const double QQ,const double A_g,const double l_g)const  {
 			//return(A_g*pow(x,-l_g));
-			static int flag=0;
+			static int flag_nan=0;
 			double normalization;
 			double value;
 			const double bprim = 33.0/6.0-NF/3.0;
@@ -121,17 +124,19 @@ class Collinear_Gluon{
 		    	normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
 			//value=dclenshaw<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15);
 			//value=dgauss<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15); 
-			value=dclenshaw<const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-15,1.0e-17);  
-			
+			value=dclenshaw< const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-15,1.0e-17);  
+			//this->flag=0;	
 			value=normalization*value;
 			if(!std::isfinite(value)||value<0){
-				if(flag==0){
+				if(flag_nan==0){
 					std::cout<<std::scientific<<"gluon error:: "<<value<<" for x="<<x<<" Q2= "<<QQ<<std::endl;
 					std::cout<<A_g<<"  "<<l_g<<std::endl;
-					flag=1;
+					flag_nan=1;
 				}
 				return 0;
 			}
+			//printf("x=%.3e mu2= %.3e Ag= %.3e lg= %.3e\n",x,QQ,A_g,l_g);
+			//getchar();
 			return value ;
 		}
 

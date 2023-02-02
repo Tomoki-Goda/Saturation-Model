@@ -648,7 +648,7 @@ class F2_kt{
 				(void*)integrands,
 				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,statefile,NULL, &nregions, &neval,  &fail, integral, error, prob
 			);
-			printf("\033[2A\033[2K\r");
+			printf("\033[1A\033[2K\033[1A\033[2K\r");
 			//cubawait(&spin);
 
 			result=Q2/(2*PI) *integral[0];

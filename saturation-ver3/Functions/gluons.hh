@@ -121,7 +121,7 @@ class Collinear_Gluon{
 		    	normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
 			//value=dclenshaw<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15);
 			//value=dgauss<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15); 
-			value=dclenshaw<const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-15,1.0e-20);  
+			value=dclenshaw<const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-15,1.0e-17);  
 			
 			value=normalization*value;
 			if(!std::isfinite(value)||value<0){

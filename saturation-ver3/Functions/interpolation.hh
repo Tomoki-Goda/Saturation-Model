@@ -14,6 +14,10 @@ extern int N_APPROX;
 #ifndef LAPLACIAN
 	#define LAPLACIAN 0
 #endif
+#ifndef IBP
+	#define IBP 0
+#endif
+
 
 //FOR APPROXIMATION AND DERIVATIVES		
 //class Laplacian_Sigma:public Sigma{
@@ -102,12 +106,18 @@ class Laplacian_Sigma{
 //#if (LAPLACIAN==1||R_FORMULA==1)
 			switch(mode){
 				case 'l':
+#if IBP==1
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
-					//val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
-					//val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
+#else
+					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
+					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+					val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+#endif			
 					break;
 				case 's':
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+					val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
 					break;
 				default:
 					printf("unknown option in laplacian sigma\n");
@@ -122,8 +132,6 @@ class Laplacian_Sigma{
 				printf("2: val=%.3e for r= %.3e\n",val,r);
 			}
 			
-			//val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
-			val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
 			
 			if(not(std::isfinite(val))){
 				printf("3: val=%.3e for r= %.3e\nparameter: ",val,r);

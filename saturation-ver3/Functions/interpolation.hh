@@ -6,6 +6,7 @@
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_interp2d.h>
 #include <gsl/gsl_spline2d.h>
+#include<gsl/gsl_dht.h>
 #include"clenshaw.hh"
 #include"gauss.hh"
 //#include"./gluons.hh"
@@ -107,13 +108,21 @@ class Laplacian_Sigma{
 //#if (LAPLACIAN==1||R_FORMULA==1)
 			switch(mode){
 				case 'l':
-#if IBP==1
+#if (IBP==1 && HANKEL!=1)
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
+					//printf("1 val=%.3e\n",val);
+					//getchar();
+#elif HANKEL==1
+					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
+					//printf("2 val=%.3e\n",val);
+					//getchar();
 #else
 					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
 					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
 					val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+					//printf("3 val=%.3e\n",val);
+					//getchar();
 #endif			
 					break;
 				case 's':
@@ -181,6 +190,7 @@ class Approx_aF{
 		gsl_interp_accel *x_accel_ptr, *kt2_accel_ptr;
 		gsl_spline2d *  spline_ptr;
 		double *kt2_array,*x_array,*aF_array;
+		
 		double kt2min=1.0e-15,kt2max=-1;
 		
 		void free_approx(){
@@ -203,9 +213,6 @@ class Approx_aF{
 				x_array[j] = x;
 				for(int i=0;i<kt2_npts;++i){
 					kt2=((double)i)/(kt2_npts-1);
-					//r=pow(10,std::log10(R_MIN/2) + r * std::log10(4*R_MAX/R_MIN));
-					//kt2=exp(std::log(kt2min/2)+kt2*std::log(4*(this->kt2max)/kt2min));
-					//kt2=pow(10,std::log10(kt2min/2)+kt2*std::log10(4*(this->kt2max)/kt2min));
 					kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;
 					kt2_array[i] = kt2;
 					aF_array[i+ j*kt2_npts] = aF(x,kt2,0);
@@ -242,7 +249,7 @@ class Approx_aF{
 		void init(const int npts1,const int npts2,const double (&par)[] ){
 			x_npts=npts1;
 			kt2_npts=npts2;
-
+			
 			x_array=(double*)malloc(x_npts*sizeof(double));
 			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
 			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
@@ -273,56 +280,72 @@ class Hankel_aF{
 		int kt2_npts,x_npts;
 		gsl_interp_accel *x_accel_ptr, *kt2_accel_ptr;
 		gsl_spline2d *  spline_ptr;
-		double *kt2_array,*x_array,*aF_array;
+		double *r_array,*sigma_array,*kt2_array,*x_array,*aF_array;
 		//double kt2min=1.0e-15,kt2max=-1;
 		//Hankel
 		const double rmax=R_MAX;
-		const int n=1000;
+		//const int n=1000;
+		gsl_dht* trans;
 		int approximate(){
-			gsl_dht* trans=gsl_dht_alloc(kt2_npts);
+			std::vector<double> par(2,0);
+		
+			//printf("Hankel\n");
+			
 			gsl_dht_init(trans,1,rmax);
 			for(int i=0;i<kt2_npts;i++){
 				r_array[i]=gsl_dht_x_sample(trans,i);
-				kt2_array[n]=gsl_dht_k_sample(trans, i);
+				kt2_array[i]=gsl_dht_k_sample(trans, i);
 			}
+			//printf("start\n");
 			for(int j=0;j<x_npts;j++){
 				x_array[j]=pow(10,-15+15*((double)j/(x_npts+1) ));
 				sigma.set_kinem(x_array[j]);
+				//printf("%d\n",j);
 				for(int i=0;i<kt2_npts;i++){
-					sigma_array[i]=sigma(r_array[i]);
+					sigma_array[i]=sigma(r_array[i],par);
+					if(sigma_array[i]<0){
+						sigma_array[i]=0;
+					}
+					//printf("sigma(x= %.3e, r= %.3e)= %.3e\n",x_array[j],r_array[i],sigma_array[i]);
 				}
-				gsl_dht_apply(trans,sigma_array,&(aF_array[j*n]));
-				double k=0;
+				for(int i=0;i<kt2_npts;i++){
+					printf("%.3e\t%.3e\n",kt2_array[i],aF_array[j*kt2_npts+i] );
+				}
+				gsl_dht_apply(trans,sigma_array,aF_array+j*kt2_npts );
 			}
-			gsl_dht_free(trans);
+			
+			//printf("Hankel done\n");
+			//getchar();
+			return 0;
 		}
 	public:
-		void init(const int npts1,const int npts2,const double (&par)[] ){
-			x_npts=npts1;
-			kt2_npts=npts2;
-
-			x_array=(double*)malloc(x_npts*sizeof(double));
-			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
-			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
-			x_accel_ptr = gsl_interp_accel_alloc ();
-			kt2_accel_ptr = gsl_interp_accel_alloc ();
-			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
-			aF.init(N_APPROX+50,par);
-		}
-		
 		Hankel_aF(){
 		}
 		~Hankel_aF(){
 			free_approx();
+		}
+		void free_approx(){
+			gsl_spline2d_free (spline_ptr);
+			gsl_interp_accel_free (x_accel_ptr);
+			gsl_interp_accel_free (kt2_accel_ptr);
+			free(kt2_array);
+			free(x_array);
+			free(sigma_array);
+			free(r_array);
+			free(aF_array);
+			gsl_dht_free(trans);
 		}
 		void set_max(double kt2max){
 			//this->kt2max=kt2max;
 			approximate();
 		}
 		void init(const int npts1,const int npts2,const double (&par)[] ){
+			
 			x_npts=npts1;
-			kt2_npts=npts2;
-
+			kt2_npts=npts2*5;
+			trans=gsl_dht_alloc(kt2_npts);
+			r_array=(double*)malloc(kt2_npts*sizeof(double));
+			sigma_array=(double*)malloc(kt2_npts*sizeof(double));
 			x_array=(double*)malloc(x_npts*sizeof(double));
 			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
 			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
@@ -334,7 +357,9 @@ class Hankel_aF{
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;
-			val=gsl_spline2d_eval_extrap(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
+			val=gsl_spline2d_eval_extrap(spline_ptr, sqrt(kt2), x, kt2_accel_ptr, x_accel_ptr);
+			printf("aF(%.3e, %.3e)= %.3e\n",x,kt2,val);
+			getchar();
 			return(val);
 		}
 		

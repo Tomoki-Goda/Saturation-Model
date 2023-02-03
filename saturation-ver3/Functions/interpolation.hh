@@ -256,6 +256,81 @@ class Approx_aF{
 			return(val);
 		}
 };
+
+class Hankel_aF{
+		Laplacian_Sigma sigma;
+		//Interpolation
+		double max_prev=0;
+		Dipole_Gluon aF;
+		int kt2_npts,x_npts;
+		gsl_interp_accel *x_accel_ptr, *kt2_accel_ptr;
+		gsl_spline2d *  spline_ptr;
+		double *kt2_array,*x_array,*aF_array;
+		//double kt2min=1.0e-15,kt2max=-1;
+		//Hankel
+		const double rmax=R_MAX;
+		const int n=1000;
+		int approximate(){
+			gsl_dht* trans=gsl_dht_alloc(kt2_npts);
+			gsl_dht_init(trans,1,rmax);
+			for(int i=0;i<kt2_npts;i++){
+				r_array[i]=gsl_dht_x_sample(trans,i);
+				kt2_array[n]=gsl_dht_k_sample(trans, i);
+			}
+			for(int j=0;j<x_npts;j++){
+				x_array[j]=pow(10,-15+15*((double)j/(x_npts+1) ));
+				sigma.set_kinem(x_array[j]);
+				for(int i=0;i<kt2_npts;i++){
+					sigma_array[i]=sigma(r_array[i]);
+				}
+				gsl_dht_apply(trans,sigma_array,&(aF_array[j*n]));
+				double k=0;
+			}
+			gsl_dht_free(trans);
+		}
+	public:
+		void init(const int npts1,const int npts2,const double (&par)[] ){
+			x_npts=npts1;
+			kt2_npts=npts2;
+
+			x_array=(double*)malloc(x_npts*sizeof(double));
+			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
+			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
+			x_accel_ptr = gsl_interp_accel_alloc ();
+			kt2_accel_ptr = gsl_interp_accel_alloc ();
+			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
+			aF.init(N_APPROX+50,par);
+		}
+		
+		Hankel_aF(){
+		}
+		~Hankel_aF(){
+			free_approx();
+		}
+		void set_max(double kt2max){
+			//this->kt2max=kt2max;
+			approximate();
+		}
+		void init(const int npts1,const int npts2,const double (&par)[] ){
+			x_npts=npts1;
+			kt2_npts=npts2;
+
+			x_array=(double*)malloc(x_npts*sizeof(double));
+			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
+			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
+			x_accel_ptr = gsl_interp_accel_alloc ();
+			kt2_accel_ptr = gsl_interp_accel_alloc ();
+			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
+		//	aF.init(N_APPROX/2+50,par);
+			sigma.init(N_APPROX,par,'l');
+		}
+		double operator()(const double x,const double kt2,const double mu2)const{			
+			double val = 0;
+			val=gsl_spline2d_eval_extrap(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
+			return(val);
+		}
+		
+};
 /*
 double par[]={25.0, 0.3,3.0e-4};
 double Q0=1;

@@ -52,7 +52,8 @@ class Laplacian_Sigma{
 			double r;
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
-				r=exp(std::log(R_MIN/2) + r * std::log(4*R_MAX/R_MIN));
+				//r=exp(std::log(R_MIN/2) + r * std::log(4*R_MAX/R_MIN));
+				r=R_MIN*pow(4*R_MAX/R_MIN,r)/2;
 				r_array[j]=r;
 				sigma_array[j] = sigma(r,x);
 				if(!isfinite(sigma_array[j])){
@@ -248,7 +249,8 @@ class Approx_aF{
 			x_accel_ptr = gsl_interp_accel_alloc ();
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
-			aF.init(N_APPROX/2+50,par);
+		//	aF.init(N_APPROX/2+50,par);
+			aF.init(N_APPROX+50,par);
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;

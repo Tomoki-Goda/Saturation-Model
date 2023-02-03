@@ -51,7 +51,12 @@ static int accum_sort(double *accum,int len){
 #endif
 	while(1){
 #if KAHN==1
-		if(++counter>10){printf("accum_sort:: Loop Error \n");return 1;}
+		if(++counter>10){printf("accum_sort:: Loop Error \n");
+			printf("Accum= {");
+			for(int i=0;i<len;++i){  printf("%.3e\t",accum[i]); accum[i]=0;}
+			printf("}\n");
+			return 1;
+		}
 #endif
 		
 		//if(fabs(accum[pos])>fabs(accum[pos+1] )){

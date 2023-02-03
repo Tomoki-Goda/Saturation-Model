@@ -39,7 +39,7 @@ typedef double PREC;
 
 ////// upper and lower cut off of r ////////
 #ifndef R_MIN
-	#define R_MIN 1.0e-8
+	#define R_MIN 1.0e-6
 #endif
 #ifndef R_MAX
 	#define R_MAX 30

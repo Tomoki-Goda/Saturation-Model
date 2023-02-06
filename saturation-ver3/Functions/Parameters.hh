@@ -41,7 +41,6 @@ int i=0,j=0,k=0;
 	sigpar[j++]=(par[i++]);
 	//sigpar[1]=pow(fabs(par[1])*1.0e-4,par[2]);
 	sigpar[j++]=(par[i++]);
-	sigpar[j++]=(par[i++]);
 #endif
 
 #if (MU02==0 && ALPHA_RUN==1)
@@ -95,5 +94,13 @@ int i=0,j=0,k=0;
 	//	printf("parameter number mismatch counted %d, N_PAR= %d\n",i,N_PAR);
 	//	exit(0);
 	//}
+	printf("sigpar: ");
+	for(int l=0;l<j;l++){
+		printf(" %.3e  ",sigpar[l]);
+	}
+	printf("\tsudpar: ");
+	for(int l=0;l<k;l++){
+		printf("%.3e  ",sudpar[l]);
+	}printf("\n");
 	return 0;
 }

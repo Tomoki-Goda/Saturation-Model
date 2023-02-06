@@ -9,6 +9,11 @@
 #include"./Parameters.hh"
 #include"cfortran.h"
 
+#ifndef USE_RESULT
+	#define USE_RESULT 0
+#endif
+
+
 PREC INT_PREC=DGAUSS_PREC;
 int N_APPROX=N_CHEB_R;
 #include"./fcn.h"
@@ -86,10 +91,11 @@ int main(int argc, char** argv){
 	}
 #endif
 #endif
+
 	int skip=0;
+#if USE_RESULT==0
 //	for(unsigned i=0;(i-skip)<N_PAR;i++){
 	for(unsigned i=0;i<N_PAR;i++){
-	
 #if (ALPHA_RUN==0||MU02!=0)
 		if(par_name[i]=="mu102"){
 			skip++;
@@ -102,7 +108,25 @@ int main(int argc, char** argv){
 		upar.Add(par_name[i], par_start[i],par_error[i]);
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
+#else//USE_RESULT==1
+	char resfile[100];
+	sprintf(resfile,"%s/result.txt",argv[1]);
 	
+	char name[20];
+	double ival,ierr;
+	FILE* resinputfile=fopen(resfile,"r");
+	fscanf(resinputfile,"%s %le",name,&ival);
+	for(unsigned i=0;i<N_PAR;i++){
+		fscanf(resinputfile,"%s %le %le",name,&ival,&ierr);
+		printf("%s %le %le \n",name,ival,ierr);
+		if(strcmp(name,"chisq")==0){
+			skip=N_PAR-i;
+			break;
+		}
+		upar.Add(name, ival,ierr);
+	}printf("\n");
+	fclose(resinputfile);
+#endif//USE_RESULT
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
 	INT_PREC=5.0e-4;
@@ -123,7 +147,6 @@ int main(int argc, char** argv){
 	//ROOT::Minuit2::MnSimplex simplex2(theFCN,upar,0);
 	
 	for(int i=0;i<2;++i){
-
 		prec.SetPrecision(INT_PREC*2);
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
@@ -131,6 +154,7 @@ int main(int argc, char** argv){
 		min=simplex1(100,1);
 		INT_PREC/=2;
 		//N_APPROX*=2;
+		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 	}
 	
 	
@@ -164,13 +188,15 @@ int main(int argc, char** argv){
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
 		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
 		
+		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
+		
 	}
 	
-	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
+	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
@@ -191,23 +217,22 @@ int main(int argc, char** argv){
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
 		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
 		
+		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
+		
 	}
-	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
+	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 	
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	std::cout<<"min= "<<min<<std::endl;
-	std::fstream file;
+	//std::fstream file;
 	std::chrono::duration<PREC> time=walltime.now()-start;
 	
 	std::cout<<time.count()<<" seconds"<<std::endl;
-	save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
-	
-	
-	
+	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 	return 0;
 	
 }

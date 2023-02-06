@@ -2,7 +2,7 @@
 #define DGAUSS_H
 #include<math.h>
 #include<stdio.h>
-#include"./Kahn.h"
+#include"./Kahn.hh"
 
 static const double x10[]={
 0.148874338981631211,	
@@ -91,54 +91,63 @@ static const double w40[]={
 0.004521277098533191258,
 };
 template<typename TYPE,typename args_type>static double dgauss40(TYPE &func, args_type param , const double smin, const double smax,double& val40,double& val20){
-	double accum[3]={0};
+	//double accum[3]={0};
+	Kahn accum=Kahn_init(3);
 	double x; 
 	double scale=(smax-smin)/2;
 	double mid=(smax+smin)/2;
 
 	val20=0;
-	Kahn_init(accum,3);
 	for(int i=0;i<10;i++){
 		x=scale*x20[i];
-		val20=Kahn_Sum(val20,w20[i]*( func(mid-x,param)+func(mid+x,param) ),accum,3);
+		accum+=w20[i]*func(mid-x,param);
+		accum+=w20[i]*func(mid+x,param);
 	}
-	val20=Kahn_total(val20,accum,3);
+	val20=Kahn_total(accum);
+	Kahn_clear(accum);
 	val40=0;
-	Kahn_init(accum,3);
 	for(int i=0;i<20;i++){
 		x=scale*x40[i];
-		val40=Kahn_Sum(val40,w40[i]*( func(mid-x,param)+func(mid+x,param) ),accum,3);
+		accum+=w40[i]*func(mid-x,param);
+		accum+=w40[i]*func(mid+x,param);
 	}
-	val40=Kahn_total(val40,accum,3);
+	val40=Kahn_total(accum);
 	val20*=scale;
 	val40*=scale;
+	Kahn_free(accum);
+
 	return(val40);
 }
-
-
 template<typename TYPE,typename args_type>static double dgauss20(TYPE &func, args_type param , const double smin, const double smax,double& val20,double& val10){
-	double accum[3]={0};
+	//double accum[3]={0};
+	Kahn accum=Kahn_init(3);
 	double x; 
 	double scale=(smax-smin)/2;
 	double mid=(smax+smin)/2;
-	val10=0;
-	Kahn_init(accum,3);
+
+	val20=0;
 	for(int i=0;i<5;i++){
 		x=scale*x10[i];
-		val10=Kahn_Sum(val10,w10[i]*( func(mid-x,param)+func(mid+x,param) ),accum,3);
+		accum+=w10[i]*func(mid-x,param);
+		accum+=w10[i]*func(mid+x,param);
 	}
-	val10=Kahn_total(val10,accum,3);
+	val10=Kahn_total(accum);
+	Kahn_clear(accum);
 	val20=0;
-	Kahn_init(accum,3);
 	for(int i=0;i<10;i++){
 		x=scale*x20[i];
-		val20=Kahn_Sum(val20,w20[i]*(func(mid-x,param)+func(mid+x,param) ),accum,3);
+		accum+=w20[i]*func(mid-x,param);
+		accum+=w20[i]*func(mid+x,param);
 	}
-	val20=Kahn_total(val20,accum,3);
+	val20=Kahn_total(accum);
 	val10*=scale;
 	val20*=scale;
+	Kahn_free(accum);
+
 	return(val20);
 }
+
+
 
 template<typename TYPE,typename args_type>static double dgauss(TYPE &func, args_type param , const double min, const double max, const double eps, const double epsabs){
 	double smin,smax; //section
@@ -147,7 +156,8 @@ template<typename TYPE,typename args_type>static double dgauss(TYPE &func, args_
 	double total=0, val10=0, val20=0;
 	double scale;
 	double prec=1.0e-14;
-	double accum_total[3]={0};
+	//double accum_total[3]={0};
+	Kahn accum=Kahn_init(3);
 	double error=0;
 	double increase;
 
@@ -176,12 +186,13 @@ template<typename TYPE,typename args_type>static double dgauss(TYPE &func, args_
 				printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",val20,val10,val20-val10);
 				goto Error;
 			}
-			total=Kahn_Sum(total,val20,accum_total,3);
+			//total=Kahn_Sum(total,val20,accum_total,3);
+			accum+=val20;
 			licz++;
 			counter=0;
 			
 			if(smax==max){
-				return(Kahn_total(total,accum_total,3 ));
+				return(Kahn_total(accum));
 			}else{
 				smin=smax;
 				increase=(4*scale);

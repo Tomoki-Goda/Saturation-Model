@@ -3,7 +3,7 @@
 #include<math.h>
 #include<stdio.h>
 #include<string>
-#include"./Kahn.h"
+#include"./Kahn.hh"
 //#include<stdlib.h>
 
 #ifndef PI
@@ -16,33 +16,46 @@ template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral 
 	const double (&w16)[]=data.wfull;
 	const double (&w8)[]=data.whalf;
 	const int N=data.N;
-	double f[N/2+1];
-	double accum2[2]={0};
+	double f[N+1];
+	//double accum2[2]={0};
+	Kahn val1=Kahn_init(3);
+	//Kahn val2=Kahn_init(3);
+
 	double arg;
 	double scale=(smax-smin)/2;
 	double mid=(smax+smin)/2;
 	for(int i=0;i<N/2;i++){
 		arg=scale*x16[i];
-		f[i]=func(mid+arg,par)+func(mid-arg,par);
+		f[2*i]=func(mid-arg,par);
+		f[2*i+1]=func(mid+arg,par);
 	}
 	
-	f[N/2]=func(mid,par);
+	f[N]=func(mid,par);
 	valfull=0;
-	Kahn_init(accum2,2);
+	Kahn_clear(val1);
+	//Kahn_init(accum2,2);
 	
-	for(int i=0;i<=N/2;i++){
-		valfull=Kahn_Sum(valfull,f[i]*w16[i],accum2,2);			
+	for(int i=0;i<N/2;i++){
+		val1+=f[2*i]*w16[i];
+		val1+=f[2*i+1]*w16[i];			
 	}
+	val1+=f[N]*w16[N/2];
 	
-	valfull=Kahn_total(valfull,accum2,2);
+	valfull=Kahn_total(val1);
 	valhalf=0;
-	Kahn_init(accum2,2);
-	for(int i=0;i<=N/4;i++){
-		valhalf=Kahn_Sum(valhalf,f[2*i]*w8[i],accum2,2);
+	Kahn_clear(val1);
+	
+	//Kahn_init(accum2,2);
+	for(int i=0;i<N/4;i++){
+		val1+=f[4*i]*w8[i];
+		val1+=f[4*i+1]*w8[i];
 	}
-	valhalf=Kahn_total(valhalf,accum2,2);
+	val1+=f[N]*w8[N/4];
+
+	valhalf=Kahn_total(val1);
 	valfull*=2*scale/N;
 	valhalf*=4*scale/N;
+	Kahn_free(val1);
 	return 0;
 }
 
@@ -66,8 +79,9 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	double valfull,valhalf;
 	double scale;
 	double arg;
-	double total=0,total2=0;
-	double accum[2]={0},accum2[2]={0};
+	double total=0;//,total2=0;
+	//double accum[2]={0},accum2[2]={0};
+	Kahn accum=Kahn_init(3);//, accum2=Kahn_init(3);
 	//const int N=16;
 	double increase;
 	smin=min;
@@ -100,14 +114,17 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		
 		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<Aeps ) ){
 			//PASS
-			total=Kahn_Sum(total,valfull,accum,2);
-			total2=Kahn_Sum(total2,valhalf,accum2,2);
+			accum+=valfull;
+			//accum2+=valhalf;
 			++licz;
 			counter=0;
 			if(fabs(smax-max)==0.0){
 				//data.div/=licz;
-				total=sign*Kahn_total(total,accum,2);
-				total2=sign*Kahn_total(total2,accum2,2);
+				total=sign*Kahn_total(accum);
+				//total2=sign*Kahn_total(accum2);
+				Kahn_free(accum);
+				//Kahn_free(accum2);
+
 //				printf(" relative: %.3e / %.3e, %d  points /%d =%f \n", fabs(total2-total),total,data.N*licz, data.N*licztot,((double)licz)/licztot);
 				return(total );
 			}
@@ -180,7 +197,9 @@ CCIntegral CCprepare(const int N){
 		c[i]=2.0/(1-4*i*i);
 	}
 	double *__restrict__ t=(double*)calloc((N/4+1),sizeof(double));
-	double accum[3]={0};
+	//double accum[3]={0};
+	Kahn accum=Kahn_init(4);
+	
 	for(int j=0;j<N/4+1;j++){
 		if(j==0){
 			t[j]=0;
@@ -196,15 +215,15 @@ CCIntegral CCprepare(const int N){
 	//double *__restrict arr=(double*)calloc(N/4+1,sizeof(double));
 
 	for(int i=0;i<N/2+1;i++){
-		Kahn_init(accum,3);
+		Kahn_clear(accum);
 		data.wfull[i]=0;
 		for(int j=0;j<N/2+1;j++){
 			pos=t_pos(i,j,N);
 			//t[j]=cos(i*j*2*PI/N);
-			data.wfull[i]=Kahn_Sum(data.wfull[i], sign(pos) * t[abs(pos)] *c[j],accum,3);
+			accum+= sign(pos) * t[abs(pos)] *c[j];
 		//	printf("%.2e\t",t[abs(pos)]);
 		}//printf("\n");
-		data.wfull[i]=Kahn_total(data.wfull[i],accum,3);
+		data.wfull[i]=Kahn_total(accum);
 		if(i==0){
 			data.wfull[i]/=2;
 		}
@@ -213,14 +232,14 @@ CCIntegral CCprepare(const int N){
 	
 	//t[0]=1;
 	for(int i=0;i<N/4+1;i++){
-		Kahn_init(accum,3);
+		Kahn_clear(accum);
 		data.whalf[i]=0;
 		for(int j=0;j<N/4+1;j++){
 			//t[j]=cos(i*j*4*PI/N);
 			pos=t_pos(i,j,N/2);
-			data.whalf[i]=Kahn_Sum(data.whalf[i],sign(pos)*t[2*abs(pos)]*c[j],accum,3);
+			accum+=sign(pos)*t[2*abs(pos)]*c[j];
 		}
-		data.whalf[i]=Kahn_total(data.whalf[i],accum,3);
+		data.whalf[i]=Kahn_total(accum);
 		
 		//data.whalf[i]+=accum;
 		if(i==0){
@@ -231,6 +250,7 @@ CCIntegral CCprepare(const int N){
 	
 	free(c);
 	free(t);
+	Kahn_free(accum);
 	//getchar();
 	return data;
 }

@@ -34,6 +34,15 @@ class Sigma{
 		}
 		void init(const double (&par)[]){
 			sigpar=par;
+			printf("sigma init:");
+			for(int i=0;i<N_PAR;i++){
+				if(par[i]==0.0){
+				 break;
+				}
+				printf("%.3e\t",par[i]);
+			}
+			printf("\n");
+			
 		}
 		explicit Sigma(void){ 
 			//printf("sigma \n");
@@ -48,7 +57,7 @@ class Sigma{
 
 		double operator()(const double r)const {
 			double sigma_0=sigpar[0];
-#if MODEL==0
+#if MODEL==0//GBW
 			double lambda=sigpar[1];
 			double x_0=sigpar[2];
 			if(x_0<1.0e-5||x_0>1.0e-3){
@@ -58,21 +67,20 @@ class Sigma{
 				return 0;
 			}
 			double qs2=pow(x_0/x,lambda); 
-#elif MODEL==1
-			if(sigpar[1]<0){
-				return 0;
-			}
+#elif MODEL==1//BGK
 			//set_xg_parameter(sigpar[1],sigpar[2]);
 			double C=sigpar[3];
 			double mu02=sigpar[4];
-		
+			if(sigpar[1]<=0||C<=0||mu02<1){
+				return 0;
+			}
 			//double mu2=C/(r*r)+mu02;
 			double exprrmax=exp(-r*r*(mu02/C));
 	
 			double mu2=mu02/((1.0-exprrmax ));
 			if(!std::isfinite(mu2)){
 				printf("r= %.3e C=%.3e mu02=%.3e ,mu2=%.3e \n",r,C,mu02,mu2 );
-				return 0;
+				//return 0;
 				getchar();
 
 			}

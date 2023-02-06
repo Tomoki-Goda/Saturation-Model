@@ -25,7 +25,7 @@ extern int N_APPROX;
 class Laplacian_Sigma{
 	private:
 		Sigma sigma;
-		int r_npts;
+		int r_npts=0;
 		gsl_interp_accel *  r_accel_ptr;
 		gsl_spline *  spline_ptr;
 		char mode='l';//l or s
@@ -67,38 +67,49 @@ class Laplacian_Sigma{
 			return(0);
 		}
 		explicit Laplacian_Sigma(){
+			r_npts=0;
+			sigma_array=NULL;
+			r_array=NULL;
 			//printf("sigma approx\n");
 		}
 		~Laplacian_Sigma(){
 			//printf("sigma approx end\n");
 			free_approx();
+			
 		}
 		void init(const int npts1,const double (&par)[] ,char mode){
 			this->mode=mode;
-			if(sigma_array!=NULL){
-				printf("refresh\n");
+			//if(*sigma_array!=NULL){
+		//	printf("1: r_npts=%d\n" ,r_npts);
+			if(r_npts!=0){
+				//printf("refresh\n");
 				free_approx();
-			}
+			}//else{
+				//printf("first\n");
+			//}
+			
 			r_npts=npts1;
 			r_array=(double*)calloc(r_npts,sizeof(double));
 			sigma_array=(double*)calloc(r_npts,sizeof(double));
 			r_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
 			sigma.init(par);
+		//	printf("2: r_npts=%d\n" ,r_npts);
 		}
 		inline double operator()(double r)const{
 			return(gsl_spline_eval(spline_ptr, r,r_accel_ptr));
 		}
-		int export_grid(FILE* file, FILE* file2){
+		//int export_grid(FILE* file, FILE* file2){
+		int export_grid(FILE* file){
 			for(int i=0;i<r_npts;i++){
 				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,r_array[i],sigma_array[i]);
 			}	
-			double val=0;
-			for(int i=0;i<r_npts;i++){
-				val=gsl_spline_eval_deriv2(spline_ptr, r_array[i],r_accel_ptr);
-				val+=gsl_spline_eval_deriv(spline_ptr, r_array[i],r_accel_ptr)/r_array[i];
-				fprintf(file2,"%.5e\t%.5e\t%.5e\n",x,r_array[i],val);
-			}	
+			//double val=0;
+			//for(int i=0;i<r_npts;i++){
+			//	val=gsl_spline_eval_deriv2(spline_ptr, r_array[i],r_accel_ptr);
+			//	val+=gsl_spline_eval_deriv(spline_ptr, r_array[i],r_accel_ptr)/r_array[i];
+			//	fprintf(file2,"%.5e\t%.5e\t%.5e\n",x,r_array[i],val);
+			//}	
 		return 0;	
 		}
 		double operator()(const double r, const std::vector<double> &par)const {
@@ -111,18 +122,12 @@ class Laplacian_Sigma{
 #if (IBP==1 && HANKEL!=1)
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
-					//printf("1 val=%.3e\n",val);
-					//getchar();
 #elif HANKEL==1
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
-					//printf("2 val=%.3e\n",val);
-					//getchar();
 #else
 					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
 					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
 					val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
-					//printf("3 val=%.3e\n",val);
-					//getchar();
 #endif			
 					break;
 				case 's':
@@ -133,15 +138,9 @@ class Laplacian_Sigma{
 					printf("unknown option in laplacian sigma\n");
 			}
 		
-		//	val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
-//#elif LAPLACIAN==0
-		//	val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
-		//	val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
-//#endif//LAPLACIAN R_FORMULA
 			if(not(std::isfinite(val))){
 				printf("2: val=%.3e for r= %.3e\n",val,r);
 			}
-			
 			
 			if(not(std::isfinite(val))){
 				printf("3: val=%.3e for r= %.3e\nparameter: ",val,r);
@@ -203,7 +202,7 @@ class Approx_aF{
 		}
 		int approximate(const double kt2max){
 			this->kt2max=kt2max;
-		clock_t time=clock();
+			clock_t time=clock();
 		//	printf("APPROXIMATE\n1.0e-15 < kt2 < %.3e \n1.0e-10<x<1\n",ktmax);
 		//	printf("kt2: %d, x: %d \n",kt2_npts,x_npts);
 			//if(this->kt2max>kt2max ||  kt2max<(this->kt2max/10)){
@@ -246,7 +245,7 @@ class Approx_aF{
 			this->kt2max=kt2max;
 			approximate(kt2max);
 		}
-		void init(const int npts1,const int npts2,const double (&par)[] ){
+		void init(const int npts1, const int npts2, const int npts3, const double (&par)[] ){
 			x_npts=npts1;
 			kt2_npts=npts2;
 			
@@ -257,7 +256,7 @@ class Approx_aF{
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
 		//	aF.init(N_APPROX/2+50,par);
-			aF.init(N_APPROX+50,par);
+			aF.init(npts3,par);
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;

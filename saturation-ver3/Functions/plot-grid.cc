@@ -56,6 +56,7 @@ extern PREC INT_PREC;
 	#define MU02 1
 #endif
 int N_APPROX=N_CHEB_R;
+
 double INT_PREC=1.0e-5;
 int main(int argc , char** argv){
 	options opt=read_options(argc, argv);
@@ -71,40 +72,44 @@ int main(int argc , char** argv){
 	FILE* infile=fopen(filenames,"r");
 	read_parameters(infile,param);
 	fclose(infile);
-	double sigpar[10],sudpar[10];
-
-
+	double sigpar[10]={0},sudpar[10]={0};
 	parameter(param,sigpar,sudpar);
 	//printf("Start, press any key\n");
 	//getchar();
-	SIGMA sigma;
-	sigma.init(N_CHEB_R+25,sigpar,'s');
+/*	SIGMA sigma;
+	sigma.init(N_CHEB_R,sigpar,'s');
 	printf("kinem set\n");
 	
 	sprintf(filenames,"%s/%s",opt.path.c_str(),"dipole-grid.txt");
 	FILE* outfile=fopen(filenames,"w");
-	sprintf(filenames2,"%s/%s",opt.path.c_str(),"laplacian-grid.txt");
-	FILE* outfile2=fopen(filenames2,"w");
+	//sprintf(filenames2,"%s/%s",opt.path.c_str(),"laplacian-grid.txt");
+	//FILE* outfile2=fopen(filenames2,"w");
 	double x;
 	for(int i=0;i<N_APPROX+50;i++){
 		x=pow(10,-15+15*((double)i)/(N_APPROX+50-1));
 		sigma.approximate(x);
-		sigma.export_grid(outfile,outfile2);
+		sigma.export_grid(outfile);
 	}
 	fclose(outfile);
-	fclose(outfile2);
+	//fclose(outfile2);
 
-	
+*/	
 	sprintf(filenames,"%s/%s",opt.path.c_str(),"gluon-grid.txt");
-	outfile=fopen(filenames,"w");
+	printf("%s/%s\n",opt.path.c_str(),"gluon-grid.txt");
+	
+  	FILE* outfile=fopen(filenames,"w");
 	Gluon gluon;
 //#if GLUON_APPROX==1
-			gluon.init(N_APPROX+50,N_APPROX+50,sigpar);
-			gluon.set_max(5.0e+4);
+	printf("Gluon start\n");
+	gluon.init(2*N_APPROX,2*N_APPROX,N_APPROX,sigpar);
+	printf("Initialized\n");
+	gluon.set_max(5.0e+4);
 //#else
 //			gluon.init(sigpar);
 //#endif//GLUON_APPROX==1			
 	gluon.export_grid(outfile);
+	printf("Gluon end\n");
+
 	fclose(outfile);
 
 	return 0;

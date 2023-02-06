@@ -15,8 +15,9 @@ def main():
     posQ2=0
     savefile="./grid-plot.jpg"
     dipole=False
+    contour=False
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:], "dmhs:g:q:", ['dipole','multiple','help',"save=","grid=","Q2="])
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "dmhs:g:q:c", ['dipole','multiple','help',"save=","grid=","Q2=","contour"])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
@@ -37,6 +38,8 @@ def main():
             sys.exit()
         if opt in ['-m','--multiple']:
             grids=args;
+        if opt in ['-c','--contour']:
+            contour=True
     if grids=="N/A":
         grids=args[0]
 
@@ -45,7 +48,11 @@ def main():
     #with open("../Run/GBW/Mass0.0-Qup650-Model0-Sud0/gluon-grid.dat","r") as fi:
     #with open("../Run/GBWS-Fix-S/Mass0.0-Qup650-Model22-Sud1/gluon-grid.dat","r") as fi:
     #with open(DIR+"KSnonlinear.dat","r") as fi:
-    fig, ax =plt.subplots(1,len(grids), sharex=True,sharey=True,layout='constrained',subplot_kw={'projection':'3d'})
+    if contour:
+        fig, ax =plt.subplots(1,len(grids), sharex=True,sharey=True,layout='constrained')
+    else:
+    	fig, ax =plt.subplots(1,len(grids), sharex=True,sharey=True,layout='constrained',subplot_kw={'projection':'3d'})
+    
     
     fig.set_constrained_layout_pads(hspace=0,wspace=0,h_pad=0.025,w_pad=0.025)
     if len(grids)==1:
@@ -111,16 +118,19 @@ def main():
         X, Y = np.meshgrid(X,Y )
         
         #ax[gpos].set(yscale="log",xscale="log",xlim=[1.0e-7,1.0e-2],ylim=[0.05,5.0e+2])
-        #surf = ax[gpos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),levels=10,cmap=cm.coolwarm)
-        surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=4, ccount=0,color="r",ls="-." )
-        surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=0, ccount=4,color="b",ls="-")
-        if dipole:
-            ax[gpos].view_init(28, -28)
-            ax[gpos].set_ylabel('$\log_{10}(r^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
+        if contour:
+            surf = ax[gpos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),levels=10,cmap=cm.coolwarm)
         else:
-            ax[gpos].view_init(30, 25)
-            ax[gpos].set_ylabel('$\log_{10}(k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
-        ax[gpos].set_xlabel('$\log_{10}x$',loc='right')
+            surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=6, ccount=0,color="r",ls="-." )
+            surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=0, ccount=6,color="b",ls="-")
+            if dipole:
+                ax[gpos].view_init(28, -28)
+                ax[gpos].set_ylabel('$\log_{10}(r^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
+            else:
+                ax[gpos].view_init(30, 25)
+                ax[gpos].set_ylabel('$\log_{10}(k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
+            ax[gpos].set_xlabel('$\log_{10}x$',loc='right')
+        
         #cs=ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)), levels=10,colors="black",linewidths=0.5,linestyles=["solid","dashed"])
     #ax[len(grids)-1].set_xlabel('$x$',loc='right')
     #ax[0].set_ylabel('$k^2\\;[\\mathrm{GeV^2}]$',rotation='vertical',loc='top')

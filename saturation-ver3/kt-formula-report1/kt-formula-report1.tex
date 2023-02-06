@@ -116,6 +116,8 @@ In order to use the GBK dipole, one needs to evaluate
 \end{split}
 \end{equation}
 While $\nabla^2_r\sigma(x,r)$ is relatively smooth function, $J_0(z)$ is oscillatory function imposing difficulty in integration. Thus one may approximate  $\nabla^2_r\sigma(x,r)$.
+
+
 \subsection{Alternatively...}
 $\nabla^2_r\sigma(x,r)$
  of GBW is 
@@ -133,13 +135,38 @@ small-$r$ limit is
 &=\pi \alpha xg(x,1/r).
 \end{split}
 \end{equation}
-For this, we obtain 
+For this, we can propose
 \begin{equation}
 Q_s^2=\frac{4\pi^2 \alpha x g(x,1/r)}{3\sigma_0},
 \end{equation}
 which is almost BGK. 
 
-
+\subsection{On running coupling of BGK}
+\begin{equation}
+\sigma(x,r)=\frac{4\pi}{N_c}\int\frac{d^2\mathbf{k}_t}{k_t^2}\left(1-e^{-i\mathbf{k}_t\cdot \mathbf{r}}\right)\alpha\mathcal{F}(x,k_t)
+\end{equation}
+in small-$r$ limit (for $k_t r\ll1$ considering large-$k_t$ region is irrelevant.), 
+\begin{equation}
+\begin{split}
+\sigma(x,r)&=\frac{4\pi}{N_c}\int^{1/r^2}_0 dk^2_t\left(\frac{k_t^2r^2 \pi}{4}\right)\alpha\mathcal{F}(x,k_t^2)\\
+&=\frac{\pi^2}{N_c}\int^{1/r^2}_0 dk^2_t \alpha\mathcal{F}(x,k_t^2)
+\end{split}
+\end{equation}
+then in BGK,
+\begin{equation}
+%\begin{split}
+=\frac{\pi^2}{N_c}\alpha xg(x,1/r^2).
+%\end{split}
+\end{equation}
+But what exactly happened to $\alpha$? 
+Usually the relation is 
+\begin{equation}
+xg(x,Q^2)=\int^{Q^2}_0 d k^2_t \mathcal{F}(x,k_t^2)
+\end{equation}
+without $\alpha$. 
+if $\alpha=\alpha(\mu^2)$, the BGK derivation fails...
+Also, note, that the argument of $\
+alpha$ being $1/r$ may be a bit odd as it is not just $k^2_t$ in the $k_t$ formula.
 
 \section{Discussion}
 \subsection{Theta function, integration limits and modified $x$}
@@ -263,14 +290,21 @@ x_2&\frac{1}{ ({x'}_1 x_2)+\epsilon}& x_1&\frac{1}{({x'}_2 x_1)+\epsilon}
 \end{equation}
 in small $k$ limit,
 \begin{equation}
-\lim_{k\rightarrow0 } \alpha \mathcal{F} =\frac{3}{8\pi^2}\int^\infty_0dr r \nabla^2_r \sigma
+\begin{split}
+\lim_{k\rightarrow0 } \alpha \mathcal{F} &=\frac{3}{8\pi^2}\int^\infty_0dr r \nabla^2_r \sigma\\
+&=\frac{3}{8\pi^2}\int^\infty_0dr r\left[\frac{\partial^2\sigma}{\partial r^2}+\frac{\partial\sigma}{\partial r}\right]\\
+&=\frac{3}{8\pi^2}\left[r\frac{\partial\sigma}{\partial r}-\int dr \frac{\partial\sigma}{\partial r} +\sigma \right]^\infty_0\\
+&=\frac{3}{8\pi^2}\left[r\frac{\partial\sigma}{\partial r}\right]^\infty_0=\frac{3}{8\pi^2}\left[\frac{\partial\sigma}{\partial \log(r)}\right]^\infty_0
+\end{split}
 \end{equation}
 
 \begin{figure}
 \includegraphics[width=\textwidth]{./dipole1.png}
+\caption{Dipole cross sections. Left: GBW, Right: BGK.}
 \end{figure}
 \begin{figure}
 \includegraphics[width=\textwidth]{./gluon1.png}
+\caption{Observe the new structure arizing from the DGLAP (larger-$k_t$ peak). When $x$ is small it becomes the dominant contributon. Also there is a narrow ridge around $x\sim1$. It is probably a saturation line, i.e. the line is not straight like in GBW case. {\color{green}Some change of variables may be helpfull...}   }
 \end{figure}
 
 \end{document}

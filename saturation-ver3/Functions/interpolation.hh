@@ -7,6 +7,8 @@
 #include <gsl/gsl_interp2d.h>
 #include <gsl/gsl_spline2d.h>
 #include<gsl/gsl_dht.h>
+#include<gsl/gsl_deriv.h>
+#include<gsl/gsl_chebyshev.h>
 #include"clenshaw.hh"
 #include"gauss.hh"
 //#include"./gluons.hh"
@@ -24,6 +26,7 @@ extern int N_APPROX;
 //class Laplacian_Sigma:public Sigma{
 class Laplacian_Sigma{
 	private:
+		double max=R_MAX, min=R_MIN; 
 		Sigma sigma;
 		int r_npts=0;
 		gsl_interp_accel *  r_accel_ptr;
@@ -42,19 +45,22 @@ class Laplacian_Sigma{
 		int counter=0;
 		double x;
 	public:
+		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
 			approximate(x);
 			return 0;
 		}	
 		int approximate(const double x){
 			this->x=x;
+			//max=R_MAX/pow(1-x,4);
+			//max=R_MIN/pow(1-x,2);
 			//printf("approximate(%.3e)\n",x);
 			//static int counter=0;
 			double r;
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
 				//r=exp(std::log(R_MIN/2) + r * std::log(4*R_MAX/R_MIN));
-				r=R_MIN*pow(4*R_MAX/R_MIN,r)/2;
+				r=min*pow(5.0*max/min,r)/2.5;
 				r_array[j]=r;
 				sigma_array[j] = sigma(r,x);
 				if(!isfinite(sigma_array[j])){
@@ -96,24 +102,22 @@ class Laplacian_Sigma{
 			sigma.init(par);
 		//	printf("2: r_npts=%d\n" ,r_npts);
 		}
-		inline double operator()(double r)const{
-			return(gsl_spline_eval(spline_ptr, r,r_accel_ptr));
+		double operator()(const double rho)const{
+			printf("rformula\n");
+			const double r=rho/(1-rho);
+			return(gsl_spline_eval(spline_ptr, r,r_accel_ptr)/pow(1-rho,2));
 		}
 		//int export_grid(FILE* file, FILE* file2){
 		int export_grid(FILE* file){
 			for(int i=0;i<r_npts;i++){
 				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,r_array[i],sigma_array[i]);
-			}	
-			//double val=0;
-			//for(int i=0;i<r_npts;i++){
-			//	val=gsl_spline_eval_deriv2(spline_ptr, r_array[i],r_accel_ptr);
-			//	val+=gsl_spline_eval_deriv(spline_ptr, r_array[i],r_accel_ptr)/r_array[i];
-			//	fprintf(file2,"%.5e\t%.5e\t%.5e\n",x,r_array[i],val);
-			//}	
+			}		
 		return 0;	
 		}
-		double operator()(const double r, const std::vector<double> &par)const {
-			const double x=par[0],kt2=par[1];
+		double operator()(const double rho, const std::vector<double> &par)const {
+			const double r=rho/(1-rho);
+			
+			const double kt2=par[1];
 			double val = 0;
 
 //#if (LAPLACIAN==1||R_FORMULA==1)
@@ -148,13 +152,165 @@ class Laplacian_Sigma{
 					printf(" %.3e\t",par[i]);
 				}printf("\n");
 			}
+			return(val/pow(1-rho,2));
+		}
+		double constant(double rho , const std::vector<double> &par)const {
+			const double r=rho/(1-rho);
+			const double kt2=par[1];
+			double val;
+			val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
+			val*=pow(1-rho,2);
+			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+			//if(fabs(val)>1.0e-3){
+			//	printf("x= %.2e boundar= %.2e\n",x,val);
+			//}
+			return(val);
+		}
+};
+double func_cheb(const double rho, void*p){
+	const double r=rho/(1-rho);
+	Sigma* sigma=(Sigma*)p;		
+	double val=(*sigma)(r);///pow(1-rho,2);
+	//printf("func %.3e r=%.3e, rho=%.3e\n",val,r, rho);getchar();
+	return val;
+}
+double func_deriv(const double rho, void*p){
+	gsl_function F;
+ 	F.function = func_cheb;
+ 	F.params=p;
+	//const double r=rho/(1-rho);
+	double val,err;
+	gsl_deriv_forward(&F,rho,rho/10, &val, &err);
+	
+	return val;
+}
+
+class Laplacian_Sigma_Cheb{
+
+	private:
+		
+		Sigma sigma;
+		gsl_cheb_series *coeffs,*deriv;
+		int r_npts=0;
+		double x=0;
+		char mode='l';
+		void free_approx(){
+			gsl_cheb_free (coeffs);
+			gsl_cheb_free (deriv);
+		}
+		
+	public:
+		//double max=R_MAX, min=R_MIN;
+		inline int set_kinem(double x){
+			approximate(x);
+			return 0;
+		}	
+		int approximate(const double x){
+			this->x=x;
+			sigma.set_kinem(x);
+			//printf("Approximate\n");
+			//getchar();
+			gsl_function F;
+ 			F.function = func_cheb;
+ 			//F.function = func_deriv;
+ 			F.params=(void*)&sigma;
+			//gsl_cheb_init(coeffs,&F,R_MIN,R_MAX);
+			gsl_cheb_init(coeffs,&F,R_MIN/(1+R_MIN),R_MAX/(1+R_MAX));
+			gsl_cheb_calc_deriv(deriv,coeffs);
+			//printf("End\n");
+			//getchar();
+			return(0);
+		}
+		explicit Laplacian_Sigma_Cheb(){
+			r_npts=0;
+			
+			//printf("sigma approx\n");
+		}
+		~Laplacian_Sigma_Cheb(){
+			//printf("sigma approx end\n");
+			free_approx();
+			
+		}
+		void init(const int npts1,const double (&par)[] ,char mode){
+			this->mode=mode;
+			
+			if(r_npts!=0){
+				gsl_cheb_free(coeffs);
+				gsl_cheb_free(deriv);
+			}//else{
+				//printf("first\n");
+			r_npts=npts1;
+			coeffs=gsl_cheb_alloc(npts1);
+			deriv=gsl_cheb_alloc(npts1);
+			sigma.init(par);
+		}
+		double operator()(const double rho)const{
+			//const double r=rho/(1-rho);
+			return(gsl_cheb_eval(deriv,rho));///pow(1-rho,2));
+		}
+		double operator()(const double rho, const std::vector<double> &par)const {
+			const double r=rho/(1-rho);
+			
+			const double kt2=par[1];
+			double val = 0;
+
+//#if (LAPLACIAN==1||R_FORMULA==1)
+			switch(mode){
+				case 'l':
+#if (IBP==1 && HANKEL!=1)
+					val=gsl_cheb_eval(deriv,rho);
+					//val=gsl_cheb_eval(coeffs,rho);
+					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
+#elif HANKEL==1
+					val=gsl_cheb_eval(deriv,r);;
+#else
+					val=0;
+#endif			
+					break;
+				case 's':
+					val=gsl_cheb_eval(coeffs,r);
+					val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+					break;
+				default:
+					printf("unknown option in laplacian sigma\n");
+			}
+		
+			if(not(std::isfinite(val))){
+				printf("2: val=%.3e for r= %.3e\n",val,r);
+			}
+			
+			if(not(std::isfinite(val))){
+				printf("3: val=%.3e for r= %.3e\nparameter: ",val,r);
+				for(int i=0;i<par.size();i++){
+					printf(" %.3e\t",par[i]);
+				}printf("\n");
+			}
+			return(val);
+		}
+		
+		double constant(double rho , const std::vector<double> &par)const {
+			const double r=rho/(1-rho);
+			const double kt2=par[1];
+			double val;
+			val=gsl_cheb_eval(deriv,rho)*pow(1-rho,2);
+			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+			//if(fabs(val)>1.0e-3){
+			//	printf("x= %.2e boundar= %.2e\n",x,val);
+			//}
 			return(val);
 		}
 };
 
+
 class Dipole_Gluon{
-	Laplacian_Sigma integrand;
-	CCIntegral cc=CCprepare(128,"dipole",100);
+//#if IBP==0
+	typedef Laplacian_Sigma  LSigma;
+//#elif IBP==1
+//	typedef Laplacian_Sigma_Cheb LSigma ;
+//#endif
+	
+	LSigma integrand;
+	CCIntegral cc=CCprepare(128,"dipole",50);
 	
 	public: 
 		//void init(Laplacian_Sigma* integrand ){
@@ -174,10 +330,19 @@ class Dipole_Gluon{
 				integrand.approximate(x);
 			}
 			const std::vector<double> par={x,kt2};
-			double val=3.0/(8*PI*PI)*dclenshaw< const Laplacian_Sigma , const std::vector<double>& >(cc,integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
+			double val=0;
+		//	double val=3.0/(8*PI*PI)*dclenshaw< const Laplacian_Sigma , const std::vector<double>& >(cc,integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
 		//	double val=3.0/(8*PI*PI)*dgauss< const Laplacian_Sigma , const std::vector<double>& >(integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
-			return val;
+	
+			val=dclenshaw< const LSigma , const std::vector<double>& >(cc,integrand,par,R_MIN/(1+R_MIN),R_MAX/(1+R_MAX),INT_PREC/10,INT_PREC/100);
+#if IBP==1			
+			val+=integrand.constant(R_MAX/(1+R_MAX),par);
+			val-=integrand.constant(R_MIN/(1+R_MIN),par);
+#endif
+			return (3.0/(8*PI*PI)*val);
 		}
+		
+		
 };
 
 
@@ -208,14 +373,15 @@ class Approx_aF{
 			//if(this->kt2max>kt2max ||  kt2max<(this->kt2max/10)){
 			double kt2,x;
 			for (int j = 0; j < x_npts; ++j){
-				x=pow(10,-15+15*((double)j)/(x_npts-1));
+				//SAME x=pow(2,-30+30*((double)j)/(x_npts-1));
+				x=pow(10,-8+8*((double)j)/(x_npts-1));
+				//x=pow(((double)j+1.0)/(x_npts),2);
 				x_array[j] = x;
 				for(int i=0;i<kt2_npts;++i){
 					kt2=((double)i)/(kt2_npts-1);
 					kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;
 					kt2_array[i] = kt2;
 					aF_array[i+ j*kt2_npts] = aF(x,kt2,0);
-					//printf("%.3e\n", kt2);
 				}
 			}
 				
@@ -255,17 +421,10 @@ class Approx_aF{
 			x_accel_ptr = gsl_interp_accel_alloc ();
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
-		//	aF.init(N_APPROX/2+50,par);
 			aF.init(npts3,par);
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;
-			//if(kt2>kt2max||kt2<kt2min){
-			//	printf("%.3e<%.3e<%.3e\n",kt2min,kt2,kt2max);
-			//}
-			//if(x<1.0e-15||x>1){
-			//	printf("%.3e<%.3e<%.3e\n",1.0e-15,x,1.0);
-			//}
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
 			return(val);
 		}
@@ -287,9 +446,6 @@ class Hankel_aF{
 		gsl_dht* trans;
 		int approximate(){
 			std::vector<double> par(2,0);
-		
-			//printf("Hankel\n");
-			
 			gsl_dht_init(trans,1,rmax);
 			for(int i=0;i<kt2_npts;i++){
 				r_array[i]=gsl_dht_x_sample(trans,i);

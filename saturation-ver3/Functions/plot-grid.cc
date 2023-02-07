@@ -55,7 +55,7 @@ extern PREC INT_PREC;
 #ifndef MU02
 	#define MU02 1
 #endif
-int N_APPROX=N_CHEB_R;
+int N_APPROX=N_CHEB_R/2;
 
 double INT_PREC=1.0e-5;
 int main(int argc , char** argv){
@@ -101,7 +101,7 @@ int main(int argc , char** argv){
 	Gluon gluon;
 //#if GLUON_APPROX==1
 	printf("Gluon start\n");
-	gluon.init(2*N_APPROX,2*N_APPROX,N_APPROX,sigpar);
+	gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX/2+25,sigpar);
 	printf("Initialized\n");
 	gluon.set_max(5.0e+4);
 //#else

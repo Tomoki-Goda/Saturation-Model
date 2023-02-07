@@ -307,4 +307,46 @@ in small $k$ limit,
 \caption{Observe the new structure arizing from the DGLAP (larger-$k_t$ peak). When $x$ is small it becomes the dominant contributon. Also there is a narrow ridge around $x\sim1$. It is probably a saturation line, i.e. the line is not straight like in GBW case. {\color{green}Some change of variables may be helpfull...}   }
 \end{figure}
 
+
+\section{Computational strategies}
+\subsection{$\alpha\mathcal{F}$ and $\nabla^2_r \sigma$}
+\begin{equation}
+\begin{split}
+\alpha\mathcal{F}&=\frac{3}{8\pi^2}\int^\infty_0dr r J_0(r k)\nabla^2_r \sigma(x,r)\\
+&=\frac{3}{8\pi^2}\int^\infty_0dr rJ_0(r k) \left(\frac{1}{r}\frac{\partial}{\partial r}\left(r\frac{\partial}{\partial r}\right)\right) \sigma(x,r)
+\end{split}
+\end{equation}
+Using integration by parts,
+\begin{equation}
+\begin{split}
+\alpha\mathcal{F}&=\frac{3}{8\pi^2}\int^\infty_0dr J_0(r k) \frac{\partial}{\partial r} \left(r\frac{\partial}{\partial r}\right) \sigma(x,r)\\
+&=\frac{3}{8\pi^2}\left[ J_0(r k)\left(r\frac{\partial}{\partial r}\right) \sigma(x,r) - \int dr \frac{\partial J_0(r k)}{\partial r} \left(r\frac{\partial}{\partial r}\right) \sigma(x,r)\right]^\infty_0\\
+&=\frac{3}{8\pi^2}\left[  \int dr r k J_1(r k)\frac{\partial}{\partial r}\sigma(x,r)\right]^\infty_0,
+\end{split}
+\end{equation}
+assuming 
+\begin{equation}
+\lim_{r\rightarrow0,\infty}J_0(r k)\left(r\frac{\partial}{\partial r}\right) \sigma(x,r)=0.
+\end{equation}
+Hence, one has two ways to compute the gluon density;
+\begin{align}
+&\frac{3}{8\pi^2}\int^\infty_0dr r J_0(r k)\nabla^2_r \sigma(x,r)\\
+&\frac{3}{8\pi^2}\int^\infty_0  dr r k J_1(r k)\frac{\partial}{\partial r}\sigma(x,r)
+\end{align}
+Now, these integrals are in the form of\textbf{ Hankel transform}.
+
+as a by-product of interpolation, derivatives are obtainable in gsl\_cheb or gsl\_interp. However in any case second derivative may become a source of inaccuracy...
+
+
+Let us assume small $Q_s^2$, and for $r>>Q_s$, integrand is negligible, then
+\begin{equation}
+\begin{split}
+\frac{3}{8\pi^2}\int^{1/Q_s}_0  dr r k J_1(r k)\frac{\partial}{\partial r}\sigma(x,r)\\
+\simeq \frac{3}{8\pi^2}\int^{1/Q_s}_0  dr  k J_1(r k) r^2 Q_s^2\\
+=\frac{3Q_s^2}{8\pi^2} \frac{J_2(k/Q_s)}{k Q_s^2}  
+\end{split}
+\end{equation}
+
+
+
 \end{document}

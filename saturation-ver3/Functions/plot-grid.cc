@@ -16,7 +16,11 @@
 #endif
 //#if GLUON_APPROX==1
 	#include"./interpolation.hh"
+#if HANKEL==1
+	typedef Hankel_aF Gluon ;
+#else
 	typedef Approx_aF Gluon ;
+#endif
 	typedef Laplacian_Sigma SIGMA;
 //#else
 //	#include"./gluon-gbw.hh"

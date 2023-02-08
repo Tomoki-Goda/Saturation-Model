@@ -42,7 +42,7 @@ typedef double PREC;
 	#define R_MIN 1.0e-6
 #endif
 #ifndef R_MAX
-	#define R_MAX 1e+3
+	#define R_MAX 1e+2
 #endif
 
 
@@ -68,19 +68,9 @@ typedef double PREC;
 	#define PRINT_PROGRESS 0
 #endif
 
-#ifndef N_SIMPS_R
-//number of sampling for R integration, points are 2*N+1. //comparison with Fejer suggests it needs about 250 
-	#define N_SIMPS_R 200 
-#endif
-
 #ifndef N_CHEB_R
 //number of sampling for R integration, points are N divisible by 8
 	#define N_CHEB_R 120 
-#endif
-
-#ifndef DGAUSS_PREC 
-//precision of integration for adaptive gauss quadrature integration. or other methods
-	#define DGAUSS_PREC 1.0e-4
 #endif
 
 #ifndef STAR
@@ -104,20 +94,42 @@ typedef double PREC;
 #endif
 
 
-#ifndef R_CHANGE_VAR
-//use R=r/(1-r) for r integration. //seems to severely affect the quality...
-	#define R_CHANGE_VAR 0
+
+#ifndef LAPLACIAN
+	#define LAPLACIAN 0
+#endif
+#ifndef IBP
+	#define IBP 0
 #endif
 
-#ifndef NONLINEAR
-//whether to use nonlinear transformation for fejer-curtis-clenshaw quadrature.
-	#define NONLINEAR 0 
+#ifndef ALPHA_RUN
+	#define ALPHA_RUN 0 
+#endif
+#ifndef MODX
+	#define MODX 0
+#endif
+#ifndef PHI
+	#define PHI 0
 #endif
 
-#ifndef FEJER
-	#define FEJER 0
+#ifndef SCATTER
+	#define SCATTER 0
 #endif
 
+#ifndef MU02
+	#define MU02 1
+#endif
+
+#ifndef GLUON_APPROX
+	#define GLUON_APPROX 1
+#endif
+
+#ifndef HANKEL
+	#define HANKEL 0
+#endif
+#ifndef FREEZE_QS2 
+#define FREEZE_QS2 0
+#endif
 ///////////////////   IRREGULAR CONTROL ///////////////////////
 //// NOT TESTED, DISCONTINUED, ETC... CHECK WHEN CHANGED //////
 ///////////////////////////////////////////////////////////////

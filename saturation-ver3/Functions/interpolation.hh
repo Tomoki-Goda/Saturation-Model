@@ -14,12 +14,7 @@
 //#include"./gluons.hh"
 extern double INT_PREC;
 extern int N_APPROX;
-#ifndef LAPLACIAN
-	#define LAPLACIAN 0
-#endif
-#ifndef IBP
-	#define IBP 0
-#endif
+
 
 
 //FOR APPROXIMATION AND DERIVATIVES		
@@ -44,6 +39,7 @@ class Laplacian_Sigma{
 		
 		int counter=0;
 		double x;
+		double sigma_0=0;
 	public:
 		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
@@ -60,7 +56,7 @@ class Laplacian_Sigma{
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
 				//r=exp(std::log(R_MIN/2) + r * std::log(4*R_MAX/R_MIN));
-				r=min*pow(5.0*max/min,r)/2.5;
+				r=min*pow(4.0*max/min,r)/2.0;
 				r_array[j]=r;
 				sigma_array[j] = sigma(r,x);
 				if(!isfinite(sigma_array[j])){
@@ -68,7 +64,7 @@ class Laplacian_Sigma{
 				}
 			}
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
-			///printf("Approximated: %d %d\n" ,r_npts,++counter);
+			//printf("Approximated: %d %d\n" ,r_npts,++counter);
 			//printf("\033[1A\033[2K\r");	
 			return(0);
 		}
@@ -84,23 +80,19 @@ class Laplacian_Sigma{
 			
 		}
 		void init(const int npts1,const double (&par)[] ,char mode){
+			sigma_0=par[0];
 			this->mode=mode;
-			//if(*sigma_array!=NULL){
-		//	printf("1: r_npts=%d\n" ,r_npts);
 			if(r_npts!=0){
-				//printf("refresh\n");
 				free_approx();
 			}//else{
 				//printf("first\n");
 			//}
-			
 			r_npts=npts1;
 			r_array=(double*)calloc(r_npts,sizeof(double));
 			sigma_array=(double*)calloc(r_npts,sizeof(double));
 			r_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
 			sigma.init(par);
-		//	printf("2: r_npts=%d\n" ,r_npts);
 		}
 		double operator()(const double rho)const{
 			printf("rformula\n");
@@ -115,19 +107,32 @@ class Laplacian_Sigma{
 		return 0;	
 		}
 		double operator()(const double rho, const std::vector<double> &par)const {
+#if HANKEL==0
 			const double r=rho/(1-rho);
-			
+#else
+			const double r =rho;
+#endif		
 			const double kt2=par[1];
 			double val = 0;
 
 //#if (LAPLACIAN==1||R_FORMULA==1)
 			switch(mode){
 				case 'l':
-#if (IBP==1 && HANKEL!=1)
+#if (IBP>=1 && HANKEL!=1)
+#if IBP==1
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
+#elif IBP==2
+					val=sigma_0-gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+					val*= kt2*r*std::cyl_bessel_j(0,r*sqrt(kt2));
+#endif
 #elif HANKEL==1
+#if IBP==0
+					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
+					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
+#elif IBP==1
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
+#endif
 #else
 					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
 					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
@@ -141,7 +146,7 @@ class Laplacian_Sigma{
 				default:
 					printf("unknown option in laplacian sigma\n");
 			}
-		
+			//printf("2: val=%.3e for r= %.3e\n",val,r);
 			if(not(std::isfinite(val))){
 				printf("2: val=%.3e for r= %.3e\n",val,r);
 			}
@@ -152,7 +157,11 @@ class Laplacian_Sigma{
 					printf(" %.3e\t",par[i]);
 				}printf("\n");
 			}
+#if HANKEL==0
 			return(val/pow(1-rho,2));
+#else
+			return val;
+#endif
 		}
 		double constant(double rho , const std::vector<double> &par)const {
 			const double r=rho/(1-rho);
@@ -161,9 +170,9 @@ class Laplacian_Sigma{
 			val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 			val*=pow(1-rho,2);
 			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
-			//if(fabs(val)>1.0e-3){
-			//	printf("x= %.2e boundar= %.2e\n",x,val);
-			//}
+			if(fabs(val)>1.0e-3){
+				printf("x= %.2e boundar= %.2e\n",x,val);
+			}
 			return(val);
 		}
 };
@@ -257,10 +266,16 @@ class Laplacian_Sigma_Cheb{
 //#if (LAPLACIAN==1||R_FORMULA==1)
 			switch(mode){
 				case 'l':
-#if (IBP==1 && HANKEL!=1)
+#if (IBP>=1 && HANKEL!=1)
+#if IBP==1
 					val=gsl_cheb_eval(deriv,rho);
 					//val=gsl_cheb_eval(coeffs,rho);
 					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
+#elif IBP==2
+					val=gsl_cheb_eval(coeffs,rho);
+					//val=gsl_cheb_eval(coeffs,rho);
+					val*= kt2*r*std::cyl_bessel_j(0,r*sqrt(kt2));
+#endif
 #elif HANKEL==1
 					val=gsl_cheb_eval(deriv,r);;
 #else
@@ -294,9 +309,9 @@ class Laplacian_Sigma_Cheb{
 			double val;
 			val=gsl_cheb_eval(deriv,rho)*pow(1-rho,2);
 			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
-			//if(fabs(val)>1.0e-3){
-			//	printf("x= %.2e boundar= %.2e\n",x,val);
-			//}
+			if(fabs(val)>1.0e-3){
+				printf("x= %.2e boundar= %.2e\n",x,val);
+			}
 			return(val);
 		}
 };
@@ -331,13 +346,10 @@ class Dipole_Gluon{
 			}
 			const std::vector<double> par={x,kt2};
 			double val=0;
-		//	double val=3.0/(8*PI*PI)*dclenshaw< const Laplacian_Sigma , const std::vector<double>& >(cc,integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
-		//	double val=3.0/(8*PI*PI)*dgauss< const Laplacian_Sigma , const std::vector<double>& >(integrand,par,R_MIN,R_MAX,INT_PREC/10,INT_PREC/100);
-	
 			val=dclenshaw< const LSigma , const std::vector<double>& >(cc,integrand,par,R_MIN/(1+R_MIN),R_MAX/(1+R_MAX),INT_PREC/10,INT_PREC/100);
 #if IBP==1			
-			val+=integrand.constant(R_MAX/(1+R_MAX),par);
-			val-=integrand.constant(R_MIN/(1+R_MIN),par);
+		//	val+=integrand.constant(R_MAX/(1+R_MAX),par);
+		//	val-=integrand.constant(R_MIN/(1+R_MIN),par);
 #endif
 			return (3.0/(8*PI*PI)*val);
 		}
@@ -425,7 +437,11 @@ class Approx_aF{
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;
+			
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
+			//if(x<=0.5){
+			//	val*=exp(-pow(1-x,-2));
+			//}
 			return(val);
 		}
 };
@@ -434,7 +450,7 @@ class Hankel_aF{
 		Laplacian_Sigma sigma;
 		//Interpolation
 		double max_prev=0;
-		Dipole_Gluon aF;
+		//Dipole_Gluon aF;
 		int kt2_npts,x_npts;
 		gsl_interp_accel *x_accel_ptr, *kt2_accel_ptr;
 		gsl_spline2d *  spline_ptr;
@@ -446,26 +462,31 @@ class Hankel_aF{
 		gsl_dht* trans;
 		int approximate(){
 			std::vector<double> par(2,0);
+#if IBP==0
+			gsl_dht_init(trans,0,rmax);
+#else
 			gsl_dht_init(trans,1,rmax);
+#endif
 			for(int i=0;i<kt2_npts;i++){
 				r_array[i]=gsl_dht_x_sample(trans,i);
 				kt2_array[i]=gsl_dht_k_sample(trans, i);
 			}
 			//printf("start\n");
 			for(int j=0;j<x_npts;j++){
-				x_array[j]=pow(10,-15+15*((double)j/(x_npts+1) ));
+				x_array[j]=pow(10,-10+10*((double)j/(x_npts+1) ));
 				sigma.set_kinem(x_array[j]);
 				//printf("%d\n",j);
 				for(int i=0;i<kt2_npts;i++){
+					//printf("sigma(x= %.3e, r= %.3e)\n",x_array[j],r_array[i]);
 					sigma_array[i]=sigma(r_array[i],par);
 					if(sigma_array[i]<0){
 						sigma_array[i]=0;
 					}
 					//printf("sigma(x= %.3e, r= %.3e)= %.3e\n",x_array[j],r_array[i],sigma_array[i]);
 				}
-				for(int i=0;i<kt2_npts;i++){
-					printf("%.3e\t%.3e\n",kt2_array[i],aF_array[j*kt2_npts+i] );
-				}
+				//for(int i=0;i<kt2_npts;i++){
+				//	printf("%.3e\t%.3e\n",kt2_array[i],aF_array[j*kt2_npts+i] );
+				//}
 				gsl_dht_apply(trans,sigma_array,aF_array+j*kt2_npts );
 			}
 			
@@ -478,6 +499,16 @@ class Hankel_aF{
 		}
 		~Hankel_aF(){
 			free_approx();
+		}
+		int export_grid(FILE* file){
+			double val;
+			for(int i=0;i<x_npts;i++){
+			for(int j=0;j<kt2_npts;j++){
+				val=gsl_spline2d_eval_extrap(spline_ptr, sqrt(kt2_array[j]), x_array[i], kt2_accel_ptr, x_accel_ptr);
+				fprintf(file,"%.5e\t%.5e\t%.5e\n",x_array[i],kt2_array[j],val);
+			}
+			}	
+			return 0;	
 		}
 		void free_approx(){
 			gsl_spline2d_free (spline_ptr);
@@ -494,10 +525,11 @@ class Hankel_aF{
 			//this->kt2max=kt2max;
 			approximate();
 		}
-		void init(const int npts1,const int npts2,const double (&par)[] ){
+		void init(const int npts1,const int npts2,const int npts3,const double (&par)[] ){
 			
 			x_npts=npts1;
-			kt2_npts=npts2*5;
+			kt2_npts=npts2;
+			
 			trans=gsl_dht_alloc(kt2_npts);
 			r_array=(double*)malloc(kt2_npts*sizeof(double));
 			sigma_array=(double*)malloc(kt2_npts*sizeof(double));
@@ -508,14 +540,14 @@ class Hankel_aF{
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
 		//	aF.init(N_APPROX/2+50,par);
-			sigma.init(N_APPROX,par,'l');
+			sigma.init(npts3,par,'l');
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;
 			val=gsl_spline2d_eval_extrap(spline_ptr, sqrt(kt2), x, kt2_accel_ptr, x_accel_ptr);
 			printf("aF(%.3e, %.3e)= %.3e\n",x,kt2,val);
 			getchar();
-			return(val);
+			return(3.0/(8*PI*PI)*val);
 		}
 		
 };

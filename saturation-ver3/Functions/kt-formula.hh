@@ -9,9 +9,7 @@
 #include"./control-default.h"
 #include"./constants.h"
 #include"./r-formula.hh"
-#ifndef GLUON_APPROX
-	#define GLUON_APPROX 1
-#endif
+
 #if GLUON_APPROX==1
 	#include"./interpolation.hh"
 #if HANKEL==1
@@ -39,23 +37,7 @@ extern int N_APPROX;
 
 
 
-#ifndef ALPHA_RUN
-	#define ALPHA_RUN 0 
-#endif
-#ifndef MODX
-	#define MODX 0
-#endif
-#ifndef PHI
-	#define PHI 0
-#endif
 
-#ifndef SCATTER
-	#define SCATTER 0
-#endif
-
-#ifndef MU02
-	#define MU02 1
-#endif
 
 
 double change_var(double & var,double &  jac,const double min, const double max,const double c){//This version is (in theory) regular at max->Inf
@@ -598,7 +580,7 @@ class F2_kt{
       ///////////////////////////////////////////
 #if GLUON_APPROX==1
 			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-			gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX/2+25,par);
+			gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX+50,par);
 			gluon.set_max(kt2max);
 			//}
 #else

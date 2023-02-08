@@ -87,7 +87,11 @@ class Sigma{
 			if(mu2<1||!std::isfinite(mu2)){
 				return(0);
 			}
+#if FREEZE_QS2==1
+			const double qs2=4*PI*PI*alpha(mu2)*xg(((x>0.5)?0.5:x),mu2,sigpar[1],sigpar[2])/(3*sigma_0); 
+#else
 			const double qs2=4*PI*PI*alpha(mu2)*xg(x,mu2,sigpar[1],sigpar[2])/(3*sigma_0); 
+#endif
 			//double qs2=4*PI*PI*alpha(mu2)*xgpdf_(&x,&mu2,sigpar+1,sigpar+2)/(3*sigma_0); 
 			//double qs2=4*PI*PI*alpha(mu2)*xgpdf(x,mu2)/(3*sigma_0); 
 #endif	//MODEL	

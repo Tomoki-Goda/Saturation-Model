@@ -14,7 +14,7 @@
 #endif
 
 
-PREC INT_PREC=DGAUSS_PREC;
+double INT_PREC=1;
 int N_APPROX=N_CHEB_R;
 #include"./fcn.h"
 
@@ -70,8 +70,12 @@ int main(int argc, char** argv){
 	std::chrono::time_point start= walltime.now();
 	std::cout<<std::scientific<<std::endl;
 	
-	printf("Program Started.\n");
-	printf("Directory=%s\n",(char*)argv[1]);
+	printf("********************Program Started********************.\n");
+	printf("MODEL     = %d, N_CHEB_R = %d,          \t IBP    = %d\n",MODEL, N_CHEB_R,IBP);
+	printf("ALPHA_RUN = %d, R        = [%.2e, %.2e],\t Hankel = %d\n", ALPHA_RUN, R_MIN,R_MAX, HANKEL );
+	printf("FREEZE_QS2= %d                                        \n",FREEZE_QS2);
+	printf("Directory = %s\n",(char*)argv[1]);
+	printf("*******************************************************.\n");
 	
 
 	KtFCN theFCN("/home/tomoki/Saturation-Model/saturation-ver3/data/hera_tot.dat");

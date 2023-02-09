@@ -8,7 +8,7 @@
 
 //#include "main.h"
 #include "./complex.hh"
-#include "cfortran.h"
+//#include "cfortran.h"
 #include "./clenshaw.hh"
 #include "./gauss.hh"
 /* CERNLIB functions*/

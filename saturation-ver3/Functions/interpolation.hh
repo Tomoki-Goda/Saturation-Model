@@ -79,7 +79,7 @@ class Laplacian_Sigma{
 			free_approx();
 			
 		}
-		void init(const int npts1,const double (&par)[] ,char mode){
+		void init(const int npts1,const double *par ,char mode){
 			sigma_0=par[0];
 			this->mode=mode;
 			if(r_npts!=0){
@@ -246,7 +246,7 @@ class Laplacian_Sigma_Cheb{
 			free_approx();
 			
 		}
-		void init(const int npts1,const double (&par)[] ,char mode){
+		void init(const int npts1,const double *par ,char mode){
 			this->mode=mode;
 			
 			if(r_npts!=0){
@@ -339,7 +339,7 @@ class Dipole_Gluon{
 		}
 	public: 
 		//void init(Laplacian_Sigma* integrand ){
-		inline void init(const int n,const double(&par)[] ){
+		inline void init(const int n,const double *par ){
 			this->par=par;
 #if LAPLACIAN==0
 			integrand.init(n,par,'l');	
@@ -445,7 +445,7 @@ class Approx_aF{
 			this->kt2max=kt2max;
 			approximate(kt2max);
 		}
-		void init(const int npts1, const int npts2, const int npts3, const double (&par)[] ){
+		void init(const int npts1, const int npts2, const int npts3, const double *par ){
 			x_npts=npts1;
 			kt2_npts=npts2;
 			
@@ -547,7 +547,7 @@ class Hankel_aF{
 			//this->kt2max=kt2max;
 			approximate();
 		}
-		void init(const int npts1,const int npts2,const int npts3,const double (&par)[] ){
+		void init(const int npts1,const int npts2,const int npts3,const double *par ){
 			
 			x_npts=npts1;
 			kt2_npts=npts2*100;

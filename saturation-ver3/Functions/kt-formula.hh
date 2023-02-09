@@ -260,7 +260,8 @@ template<typename TYPE > class Integrand_kt{
 		}
 		
 	private:
-		int I_array(const double  beta,const  double  kappa_t_prime2,const double  kt2, double (& I)[])const{
+//		int I_array(const double  beta,const  double  kappa_t_prime2,const double  kt2, double (& I)[])const{
+		int I_array(const double  beta,const  double  kappa_t_prime2,const double  kt2, double * I )const{
 			const double  N1=beta*(1-beta)*Q2+mf2;
 			const double  N2=kappa_t_prime2+pow(1-beta,2)*kt2;
 			//const double  N3=kappa_t_prime2-pow(1-beta,2)*kt2;
@@ -559,7 +560,7 @@ class F2_kt{
       ///////////////////////////////////////////
 			//const double*__restricted par;
 	public: 
-		explicit F2_kt(const  double  (& par)[] ){
+		explicit F2_kt(const  double  *par ){
 			//this->par=par;
 			//printf(" F2 \n");
 #if R_FORMULA==1
@@ -649,7 +650,6 @@ class F2_kt{
 		}
 
 };
-
 
 
 

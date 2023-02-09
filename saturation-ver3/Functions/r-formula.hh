@@ -32,7 +32,7 @@ class Sigma{
 		void set_kinem(const double x){
 			this->x=x;
 		}
-		void init(const double (&par)[]){
+		void init(const double *par){
 			sigpar=par;
 			printf("sigma init:");
 			for(int i=0;i<N_PAR;i++){

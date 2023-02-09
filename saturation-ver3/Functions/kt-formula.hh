@@ -551,7 +551,7 @@ class F2_kt{
 			};
 			const int key =11;
 			const int ndim=3;
-			const double kt2max=1.0e+5;
+			const double kt2max=5.0e+4;
 			//printf(" %.3e \n",Q2*(1-x)/x);	
 #endif//R_FORMULA	
       ////////////////////////////////////////////

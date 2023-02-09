@@ -105,7 +105,7 @@ int main(int argc , char** argv){
 	Gluon gluon;
 //#if GLUON_APPROX==1
 	printf("Gluon start\n");
-	gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX/2+25,sigpar);
+	gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX+50,sigpar);
 	printf("Initialized\n");
 	gluon.set_max(5.0e+4);
 //#else

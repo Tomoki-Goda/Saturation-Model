@@ -128,7 +128,14 @@ typedef double PREC;
 	#define HANKEL 0
 #endif
 #ifndef FREEZE_QS2 
-#define FREEZE_QS2 0
+	#define FREEZE_QS2 0
+#endif
+
+#ifndef ADD_END
+	#define ADD_END 1
+#endif
+#ifndef GBW_APPROX
+	#define GBW_APPROX 0
 #endif
 ///////////////////   IRREGULAR CONTROL ///////////////////////
 //// NOT TESTED, DISCONTINUED, ETC... CHECK WHEN CHANGED //////

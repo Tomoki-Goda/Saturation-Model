@@ -19,7 +19,9 @@ INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR}
 
 OPT=-O3 -Wno-unused-result -fp-model=precise#-g # -Wno-format 
 
-CXX=/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx
+#CXX=/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx
+CXX=icpx
+#CXX=g++
 #SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
 #GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h
 #PARNIDIR=/home/tomoki/Tools/Parni

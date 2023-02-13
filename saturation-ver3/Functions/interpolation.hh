@@ -107,6 +107,12 @@ class Laplacian_Sigma{
 		return 0;	
 		}
 		double operator()(const double rho, const std::vector<double> &par)const {
+		/*	if(rho>R_MAX){
+				printf("out of range %.4e - %.4e = %.4e\n",R_MAX,rho,R_MAX-rho);
+			}
+			if(rho<R_MIN){
+				printf("out of range %.4e - %.4e = %.4e\n",rho,R_MIN,rho-R_MIN);
+			}*/
 #if HANKEL==0
 			const double r=rho/(1-rho);
 #else
@@ -331,13 +337,19 @@ class Dipole_Gluon{
 //#endif
 		const double *par;
 		LSigma integrand;
-		CCIntegral cc=CCprepare(128,"dipole",50);
-		
+		CCIntegral cc=CCprepare(128,"dipole",5);
+		Kahn accum=Kahn_init(3);
+
 		inline double alpha(double mu2 )const{
 			static double b0= ((double)(33 -2*NF))/(12*PI);
 			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 		}
 	public: 
+		Dipole_Gluon(){
+		}
+		~Dipole_Gluon(){
+			Kahn_free(accum);
+		}
 		//void init(Laplacian_Sigma* integrand ){
 		inline void init(const int n,const double *par ){
 			this->par=par;
@@ -357,6 +369,7 @@ class Dipole_Gluon{
 			}
 			const std::vector<double> par={x,kt2};
 			double val=0;
+			Kahn_clear(accum);
 #if GBW_APPROX==1
 			if(x>0.7){
 				//printf("approx\n");
@@ -366,7 +379,18 @@ class Dipole_Gluon{
 			}
 #endif
 #if ADD_END>=0
-			val=dclenshaw< const LSigma , const std::vector<double>& >(cc,integrand,par,R_MIN/(1+R_MIN),R_MAX/(1+R_MAX),INT_PREC/10,INT_PREC/100);
+			int j=(int)(sqrt(kt2)+1);
+			//int j=3;
+			double scale=(R_MAX-R_MIN)/j,imin=R_MIN,imax=R_MIN;
+			for(int i=0;i<j;++i){
+				imax=imin+scale;
+				//printf("%d: %.2e %.2e\t",i, imin,imax);
+				accum+=dclenshaw<const LSigma,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/10,INT_PREC/100);
+				//val+=dgauss<const LSigma,const std::vector<double>&>(integrand,par,imin,imax,INT_PREC/10,INT_PREC/100);
+				imin=imax;
+			}
+			val=Kahn_total(accum);
+			//printf("\n");
 #endif
 #if (IBP>=1&&ADD_END!=0)			
 			val+=integrand.constant(R_MAX/(1+R_MAX),par);

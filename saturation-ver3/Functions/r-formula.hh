@@ -80,8 +80,8 @@ class Sigma{
 			const double mu2=mu02/((1.0-exprrmax ));
 			if(!std::isfinite(mu2)){
 				printf("r= %.3e C=%.3e mu02=%.3e ,mu2=%.3e \n",r,C,mu02,mu2 );
-				//return 0;
-				getchar();
+				return 0;
+				//getchar();
 
 			}
 			if(mu2<1||!std::isfinite(mu2)){

@@ -10,7 +10,7 @@
 #include<gsl/gsl_deriv.h>
 #include<gsl/gsl_chebyshev.h>
 #include"clenshaw.hh"
-#include"gauss.hh"
+//#include"gauss.hh"
 //#include"./gluons.hh"
 extern double INT_PREC;
 extern int N_APPROX;

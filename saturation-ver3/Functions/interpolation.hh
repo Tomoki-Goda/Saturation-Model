@@ -79,7 +79,7 @@ class Laplacian_Sigma{
 			free_approx();
 			
 		}
-		void init(const int npts1,const double (&par)[] ,char mode){
+		void init(const int npts1,const double *par ,char mode){
 			sigma_0=par[0];
 			this->mode=mode;
 			if(r_npts!=0){
@@ -123,15 +123,15 @@ class Laplacian_Sigma{
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
 #elif IBP==2
-					val=sigma_0-gsl_spline_eval(spline_ptr, r,r_accel_ptr);
-					val*= kt2*r*std::cyl_bessel_j(0,r*sqrt(kt2));
+					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+					val*=-kt2*r*std::cyl_bessel_j(0,r*sqrt(kt2));
 #endif
 #elif HANKEL==1
 #if IBP==0
 					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
 					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
 #elif IBP==1
-					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
+					val=sqrt(kt2)*gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 #endif
 #else
 					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
@@ -165,14 +165,20 @@ class Laplacian_Sigma{
 		}
 		double constant(double rho , const std::vector<double> &par)const {
 			const double r=rho/(1-rho);
-			const double kt2=par[1];
+			const double kt=sqrt(par[1]);
 			double val;
+#if IBP==1
 			val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
-			val*=pow(1-rho,2);
-			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
-			if(fabs(val)>1.0e-3){
-				printf("x= %.2e boundar= %.2e\n",x,val);
-			}
+			val*=r*std::cyl_bessel_j(0,r*kt);
+#elif IBP==2
+			val=kt*std::cyl_bessel_j(1,r*kt)*(gsl_spline_eval(spline_ptr,r,r_accel_ptr));
+			val+=std::cyl_bessel_j(0,r*kt)*gsl_spline_eval_deriv(spline_ptr,r,r_accel_ptr);
+			val*=r;
+#endif
+
+		//	if(fabs(val)>1.0e-3){
+		//		printf("x= %.2e boundar= %.2e\n",x,val);
+		//	}
 			return(val);
 		}
 };
@@ -240,7 +246,7 @@ class Laplacian_Sigma_Cheb{
 			free_approx();
 			
 		}
-		void init(const int npts1,const double (&par)[] ,char mode){
+		void init(const int npts1,const double *par ,char mode){
 			this->mode=mode;
 			
 			if(r_npts!=0){
@@ -309,9 +315,9 @@ class Laplacian_Sigma_Cheb{
 			double val;
 			val=gsl_cheb_eval(deriv,rho)*pow(1-rho,2);
 			val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
-			if(fabs(val)>1.0e-3){
-				printf("x= %.2e boundar= %.2e\n",x,val);
-			}
+		//	if(fabs(val)>1.0e-3){
+		//		printf("x= %.2e boundar= %.2e\n",x,val);
+		//	}
 			return(val);
 		}
 };
@@ -319,17 +325,22 @@ class Laplacian_Sigma_Cheb{
 
 class Dipole_Gluon{
 //#if IBP==0
-	typedef Laplacian_Sigma  LSigma;
+		typedef Laplacian_Sigma  LSigma;
 //#elif IBP==1
 //	typedef Laplacian_Sigma_Cheb LSigma ;
 //#endif
-	
-	LSigma integrand;
-	CCIntegral cc=CCprepare(128,"dipole",50);
-	
+		const double *par;
+		LSigma integrand;
+		CCIntegral cc=CCprepare(128,"dipole",50);
+		
+		inline double alpha(double mu2 )const{
+			static double b0= ((double)(33 -2*NF))/(12*PI);
+			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
+		}
 	public: 
 		//void init(Laplacian_Sigma* integrand ){
-		inline void init(const int n,const double(&par)[] ){
+		inline void init(const int n,const double *par ){
+			this->par=par;
 #if LAPLACIAN==0
 			integrand.init(n,par,'l');	
 #elif LAPLACIAN==1
@@ -346,11 +357,22 @@ class Dipole_Gluon{
 			}
 			const std::vector<double> par={x,kt2};
 			double val=0;
-			val=dclenshaw< const LSigma , const std::vector<double>& >(cc,integrand,par,R_MIN/(1+R_MIN),R_MAX/(1+R_MAX),INT_PREC/10,INT_PREC/100);
-#if IBP==1			
-		//	val+=integrand.constant(R_MAX/(1+R_MAX),par);
-		//	val-=integrand.constant(R_MIN/(1+R_MIN),par);
+#if GBW_APPROX==1
+			if(x>0.7){
+				//printf("approx\n");
+				double qs2=(4*PI*PI*alpha(par[4])*par[1]*pow(x,-par[2])*pow(1-x,5.6))/(3*par[0]);
+				val=2*par[0]*kt2/qs2*exp(-kt2/qs2);
+				return(3.0/(8*PI*PI)*val);
+			}
 #endif
+#if ADD_END>=0
+			val=dclenshaw< const LSigma , const std::vector<double>& >(cc,integrand,par,R_MIN/(1+R_MIN),R_MAX/(1+R_MAX),INT_PREC/10,INT_PREC/100);
+#endif
+#if (IBP>=1&&ADD_END!=0)			
+			val+=integrand.constant(R_MAX/(1+R_MAX),par);
+			val-=integrand.constant(R_MIN/(1+R_MIN),par);
+#endif
+
 			return (3.0/(8*PI*PI)*val);
 		}
 		
@@ -423,7 +445,7 @@ class Approx_aF{
 			this->kt2max=kt2max;
 			approximate(kt2max);
 		}
-		void init(const int npts1, const int npts2, const int npts3, const double (&par)[] ){
+		void init(const int npts1, const int npts2, const int npts3, const double *par ){
 			x_npts=npts1;
 			kt2_npts=npts2;
 			
@@ -470,6 +492,7 @@ class Hankel_aF{
 			for(int i=0;i<kt2_npts;i++){
 				r_array[i]=gsl_dht_x_sample(trans,i);
 				kt2_array[i]=gsl_dht_k_sample(trans, i);
+				printf("%.3e\n",r_array[i]);
 			}
 			//printf("start\n");
 			for(int j=0;j<x_npts;j++){
@@ -477,11 +500,9 @@ class Hankel_aF{
 				sigma.set_kinem(x_array[j]);
 				//printf("%d\n",j);
 				for(int i=0;i<kt2_npts;i++){
+					par[1]=kt2_array[i];
 					//printf("sigma(x= %.3e, r= %.3e)\n",x_array[j],r_array[i]);
 					sigma_array[i]=sigma(r_array[i],par);
-					if(sigma_array[i]<0){
-						sigma_array[i]=0;
-					}
 					//printf("sigma(x= %.3e, r= %.3e)= %.3e\n",x_array[j],r_array[i],sigma_array[i]);
 				}
 				//for(int i=0;i<kt2_npts;i++){
@@ -490,6 +511,7 @@ class Hankel_aF{
 				gsl_dht_apply(trans,sigma_array,aF_array+j*kt2_npts );
 			}
 			
+			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
 			//printf("Hankel done\n");
 			//getchar();
 			return 0;
@@ -525,10 +547,10 @@ class Hankel_aF{
 			//this->kt2max=kt2max;
 			approximate();
 		}
-		void init(const int npts1,const int npts2,const int npts3,const double (&par)[] ){
+		void init(const int npts1,const int npts2,const int npts3,const double *par ){
 			
 			x_npts=npts1;
-			kt2_npts=npts2;
+			kt2_npts=npts2*100;
 			
 			trans=gsl_dht_alloc(kt2_npts);
 			r_array=(double*)malloc(kt2_npts*sizeof(double));
@@ -545,8 +567,8 @@ class Hankel_aF{
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;
 			val=gsl_spline2d_eval_extrap(spline_ptr, sqrt(kt2), x, kt2_accel_ptr, x_accel_ptr);
-			printf("aF(%.3e, %.3e)= %.3e\n",x,kt2,val);
-			getchar();
+		//	printf("aF(%.3e, %.3e)= %.3e\n",x,kt2,val);
+		//	getchar();
 			return(3.0/(8*PI*PI)*val);
 		}
 		

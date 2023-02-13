@@ -7,7 +7,7 @@
 #include"./control-default.h"
 #include"./constants.h"
 #include"./Parameters.hh"
-#include"cfortran.h"
+//#include"cfortran.h"
 
 #ifndef USE_RESULT
 	#define USE_RESULT 0

@@ -12,9 +12,12 @@
 typedef  struct{int N=128; double wfull[65]={0}, whalf[33]={0}, x[65]={0}; std::string tag="unnamed"; int max_rec=7; int InitDiv=1;} CCIntegral;
 
 template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf){
-	const double (&x16)[]=data.x;
-	const double (&w16)[]=data.wfull;
-	const double (&w8)[]=data.whalf;
+	//const double (&x16)[]=data.x;
+	//const double (&w16)[]=data.wfull;
+	//const double (&w8)[]=data.whalf;
+	const double *x16=data.x;
+	const double *w16=data.wfull;
+	const double *w8=data.whalf;
 	const int N=data.N;
 	double f[N+1];
 	//double accum2[2]={0};
@@ -146,9 +149,12 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	}
 	
 	Error:
-		const double (&x16)[]=data.x;
-		const double (&w16)[]=data.wfull;
-		const double (&w8)[]=data.whalf;
+		//const double (&x16)[]=data.x;
+		//const double (&w16)[]=data.wfull;
+		//const double (&w8)[]=data.whalf;
+		const double *x16=data.x;
+		const double *w16=data.wfull;
+		const double *w8=data.whalf;
 		scale=(smax-smin)/2;
 		double mid=(smax+smin)/2;
 		const int N=data.N;

@@ -20,7 +20,8 @@ double   par_max[] 	= {
 50.00,		20.00,	5.0, 		10.0,		10.0,	10.0,		10,	10.0,		2.0,	2.0};
 #endif
 
-int parameter(const std::vector<double>& par,double (& sigpar)[],double (& sudpar)[]){
+//int parameter(const std::vector<double>& par,double (& sigpar)[],double (& sudpar)[]){
+int parameter(const std::vector<double>& par,double *sigpar,double *sudpar){
 ///////////////////
 //Sigpar are as we all know it, parameters for dipole sigma.
 //sudpar are {C , r_max, g1, g2} but parameters may be given in terms of mu02 (as in BGK), and C and r_max may be that of BGK.

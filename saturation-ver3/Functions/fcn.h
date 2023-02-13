@@ -18,7 +18,7 @@
 	#define RFORMULA 0
 #endif
 
-//extern double F2_kt(const  PREC,const  PREC,const PREC, const PREC(&)[]);
+//extern double F2_kt(const  double,const  double,const double, const double(&)[]);
 //extern double F2_r(const double,double,double,double*);
 class KtFCN : public ROOT::Minuit2::FCNBase {
 	
@@ -114,7 +114,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			//getchar();
 			}
 #endif			
-			PREC sigpar[10],sudpar[10];
+			double sigpar[10]={0},sudpar[10]={0};
 			parameter(par,sigpar, sudpar);//Format
 			F2_kt F2(sigpar);
 			for(int i=0;i<MAX_N;++i){

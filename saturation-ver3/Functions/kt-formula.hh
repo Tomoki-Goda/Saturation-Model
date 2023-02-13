@@ -569,9 +569,9 @@ class F2_kt{
 			sigma[2].init(par);
 #elif GLUON_APPROX==1
 			
-			sigma[0].init(N_APPROX+50,par,'s');
-			sigma[1].init(N_APPROX+50,par,'s');
-			sigma[2].init(N_APPROX+50,par,'s');
+			sigma[0].init(N_APPROX+100,par,'s');
+			sigma[1].init(N_APPROX+100,par,'s');
+			sigma[2].init(N_APPROX+100,par,'s');
 			
 #endif
 #else//R_FORMULA
@@ -580,7 +580,7 @@ class F2_kt{
       ///////////////////////////////////////////
 #if GLUON_APPROX==1
 			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-			gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX+50,par);
+			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+100,par);
 			gluon.set_max(kt2max);
 			//}
 #else

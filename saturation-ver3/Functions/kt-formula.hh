@@ -640,7 +640,7 @@ class F2_kt{
 
 			result=Q2/(2*PI) *integral[0];
 		 
-			 if(std::isnan(result)+std::isinf(result)!=0){
+			 if(!std::isfinite(result)){
 				printf("%.3le encountered \n",(double)result);
 				return 0;
 			 }

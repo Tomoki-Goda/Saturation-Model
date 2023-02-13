@@ -10,7 +10,7 @@
 #include "./complex.hh"
 //#include "cfortran.h"
 #include "./clenshaw.hh"
-#include "./gauss.hh"
+//#include "./gauss.hh"
 /* CERNLIB functions*/
 extern "C" doublecomplex wgamma_(const doublecomplex*);
 extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);

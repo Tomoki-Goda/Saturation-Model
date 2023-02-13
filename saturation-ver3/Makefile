@@ -10,15 +10,16 @@
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
-LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas -lgfortran
+LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas #-lgfortran
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
 
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR} 
 
-OPT=-O3 -Wno-unused-result -std=c++17#-g # -Wno-format 
+OPT=-O3 -Wno-unused-result -fp-model=precise#-g # -Wno-format 
 
+CXX=/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx
 #SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
 #GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h
 #PARNIDIR=/home/tomoki/Tools/Parni
@@ -30,7 +31,7 @@ grid: gluon-grid
 fit: clean main
 
 main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
-	g++ ${FUNCDIR}/main.cc -o ${DIR}/main   ${INC} ${OPT} ${LIBS} 
+	${CXX} ${FUNCDIR}/main.cc -o ${DIR}/main   ${INC} ${OPT} ${LIBS} 
 
 result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
 	g++ ${FUNCDIR}/format-result.cc ${LIBS} -o ${DIR}/result  ${INC} ${OPT}

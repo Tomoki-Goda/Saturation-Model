@@ -213,7 +213,7 @@ template<typename TYPE,typename args_type>static double dgauss(TYPE &func, args_
 	Error:	
 		double x;
 		const int N=20;
-		const double (&x1)[]=x40,(&x2)[]=x20;
+		const double *x1=x40,*x2=x20;
 		for(int i=0;i<N;i++){
 			x=(max+min)/2-scale*x1[i];
 			printf("f(%.3e) = %.3e\n",x,func(x,param));

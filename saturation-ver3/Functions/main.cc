@@ -127,7 +127,7 @@ int main(int argc, char** argv){
 			skip=N_PAR-i;
 			break;
 		}
-		upar.Add(name, ival,ierr);
+		upar.Add(name, ival,10*ierr);
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT

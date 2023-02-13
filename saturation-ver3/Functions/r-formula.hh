@@ -34,14 +34,14 @@ class Sigma{
 		}
 		void init(const double *par){
 			sigpar=par;
-			printf("sigma init:");
+			//printf("sigma init:");
 			for(int i=0;i<N_PAR;i++){
 				if(par[i]==0.0){
 				 break;
 				}
-				printf("%.3e\t",par[i]);
+			//	printf("%.3e\t",par[i]);
 			}
-			printf("\n");
+			//printf("\n");
 			
 		}
 		explicit Sigma(void){ 

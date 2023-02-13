@@ -34,14 +34,14 @@ class Sigma{
 		}
 		void init(const double *par){
 			sigpar=par;
-			printf("sigma init:");
+			//printf("sigma init:");
 			for(int i=0;i<N_PAR;i++){
 				if(par[i]==0.0){
 				 break;
 				}
-				printf("%.3e\t",par[i]);
+			//	printf("%.3e\t",par[i]);
 			}
-			printf("\n");
+			//printf("\n");
 			
 		}
 		explicit Sigma(void){ 
@@ -80,8 +80,8 @@ class Sigma{
 			const double mu2=mu02/((1.0-exprrmax ));
 			if(!std::isfinite(mu2)){
 				printf("r= %.3e C=%.3e mu02=%.3e ,mu2=%.3e \n",r,C,mu02,mu2 );
-				//return 0;
-				getchar();
+				return 0;
+				//getchar();
 
 			}
 			if(mu2<1||!std::isfinite(mu2)){

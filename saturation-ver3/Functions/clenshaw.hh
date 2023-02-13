@@ -89,7 +89,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	double increase;
 	smin=min;
 	//smax=max/data.div;
-	smax=max/data.InitDiv;//data.init_div;
+	smax=min+(max-min)/data.InitDiv;//data.init_div;
 	int licz=0,licztot=0 , counter=0;
 	if(fabs(min-max)<0.0){
 		return(0);

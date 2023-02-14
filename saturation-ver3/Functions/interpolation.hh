@@ -14,6 +14,7 @@
 #include<sys/wait.h>
 #include<unistd.h>
 //#include<pthread.h>
+//#include"gauss.hh"
 //#include"./gluons.hh"
 extern double INT_PREC;
 extern int N_APPROX;

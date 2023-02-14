@@ -108,9 +108,7 @@ int main(int argc , char** argv){
 	gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX+50,sigpar);
 	printf("Initialized\n");
 	gluon.set_max(5.0e+4);
-//#else
-//			gluon.init(sigpar);
-//#endif//GLUON_APPROX==1			
+	printf("Export\n");			
 	gluon.export_grid(outfile);
 	printf("Gluon end\n");
 

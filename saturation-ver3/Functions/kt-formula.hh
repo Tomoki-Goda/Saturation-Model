@@ -432,7 +432,7 @@ int F2_integrand_A(const int  *ndim,const  double  *intv,const int  *ncomp,doubl
 		return 0;
 }
 #endif
-
+#if R_FORMULA==1
 class Integrand_r{
 	SIGMA *sigma_ptr;
 
@@ -512,6 +512,7 @@ int F2_integrand_B(const int *__restrict ndim, const double  *__restrict intv,co
 	*f=res;
 	return(0);
 }
+#endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //
@@ -581,7 +582,7 @@ class F2_kt{
       ///////////////////////////////////////////
 #if GLUON_APPROX==1
 			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+100,par);
+			gluon.init(N_APPROX+200,pow(2,8),N_APPROX+100,par);
 			gluon.set_max(kt2max);
 			//}
 #else

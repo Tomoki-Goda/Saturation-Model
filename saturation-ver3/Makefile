@@ -10,18 +10,19 @@
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
-LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas #-lgfortran
+LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas  -lpthread#-lgfortran
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
 
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR} 
 
-OPT=-O3 -Wno-unused-result -fp-model=precise#-g # -Wno-format 
+#OPT=-O3 -Wno-unused-result -fp-model=precise#-g # -Wno-format 
+OPT=-O3 -Wno-unused-result 
 
 #CXX=/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx
-CXX=icpx
-#CXX=g++
+#CXX=icpx
+CXX=g++
 #SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
 #GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h
 #PARNIDIR=/home/tomoki/Tools/Parni
@@ -34,6 +35,9 @@ fit: clean main
 
 main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
 	${CXX} ${FUNCDIR}/main.cc -o ${DIR}/main   ${INC} ${OPT} ${LIBS} 
+
+#prepr: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
+#	${CXX} -S  ${FUNCDIR}/main.cc -o ${DIR}/main.e   ${INC} ${OPT} ${LIBS} 
 
 result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
 	g++ ${FUNCDIR}/format-result.cc ${LIBS} -o ${DIR}/result  ${INC} ${OPT}
@@ -48,8 +52,8 @@ result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/
 #	g++ ${FUNCDIR}/kt-formula.cc -o ${DIR}/kt-formula.o -c  ${INC} ${OPT} 
 
 plot: ${FUNCDIR}/plot-things.cc #${FUNCDIR}/gluons.o
-	g++ ${FUNCDIR}/plot-things.cc -o ${DIR}/plot ${OPT} ${INC} ${LIBS}
-	g++ ${FUNCDIR}/plot-grid.cc -o ${DIR}/grid  ${OPT} ${INC} ${LIBS}
+	${CXX} ${FUNCDIR}/plot-things.cc -o ${DIR}/plot ${OPT} ${INC} ${LIBS}
+	${CXX} ${FUNCDIR}/plot-grid.cc -o ${DIR}/grid  ${OPT} ${INC} ${LIBS}
 #plot: dipole gluon
 
 gluon: ${DEPS} ${UTILDIR}/tmd-gluon.c ${UTILDIR}/tmd-gluon-2.h

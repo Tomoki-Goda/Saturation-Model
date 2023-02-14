@@ -42,7 +42,7 @@ typedef double PREC;
 	#define R_MIN 1.0e-6
 #endif
 #ifndef R_MAX
-	#define R_MAX 1e+2
+	#define R_MAX 1e+5
 #endif
 
 
@@ -136,6 +136,11 @@ typedef double PREC;
 #endif
 #ifndef GBW_APPROX
 	#define GBW_APPROX 0
+#endif
+
+#ifndef R_CHANGE_VAR
+//use R=r/(1-r) for r integration. 
+	#define R_CHANGE_VAR 0
 #endif
 ///////////////////   IRREGULAR CONTROL ///////////////////////
 //// NOT TESTED, DISCONTINUED, ETC... CHECK WHEN CHANGED //////

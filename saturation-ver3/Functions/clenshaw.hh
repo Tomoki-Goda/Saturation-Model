@@ -96,6 +96,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	}		
 	while(1){
 		if(((max-min)-(smax-smin))==(max-min)||counter==MAX_RECURSION){
+			smax=smin+2*scale;
 			printf("Clenshaw_Curtis:: in \"%s\", evaluated %d times.\n",(data.tag).c_str(),counter );
 			printf("sector size = %.3e\n [%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smax-smin,smin,smax,min,max, licz,licztot);
 			printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
@@ -160,13 +161,16 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		const int N=data.N;
 		for(int i=0;i<N/2;i++){
 			arg=mid-scale*x16[i];
-			printf("f(%.3e) = %.3e\n",arg,func(arg,par));
+			//printf("f(%.3e) = %.3e\n",arg,func(arg,par));
+			printf("%.3e\t%.3e\n",arg,func(arg,par));
 		}
 		arg=mid;
-		printf("f(%.3e) = %.3e\n",arg,func(arg,par));
+		//printf("f(%.3e) = %.3e\n",arg,func(arg,par));
+		printf("%.3e\t%.3e\n",arg,func(arg,par));
 		for(int i=0;i<N/2;i++){
 			arg=mid+scale*x16[N/2-i-1];
-			printf("f(%.3e) = %.3e\n",arg, func(arg,par));
+			//printf("f(%.3e) = %.3e\n",arg,func(arg,par));
+			printf("%.3e\t%.3e\n",arg, func(arg,par));
 		}
 		printf("\n");
 		getchar();
@@ -270,6 +274,14 @@ CCIntegral CCprepare(const int N,const std::string &tag,int d){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
 	data.InitDiv=d;
+	
+	return data;
+}
+CCIntegral CCprepare(const int N,const std::string &tag,int d,int max){
+	CCIntegral data=CCprepare(N);
+	data.tag=tag;
+	data.InitDiv=d;
+	data.max_rec=max;
 	
 	return data;
 }

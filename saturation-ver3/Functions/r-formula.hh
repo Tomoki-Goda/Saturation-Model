@@ -97,15 +97,15 @@ class Sigma{
 #endif	//MODEL	
 
 //#if (LAPLACIAN==0||R_FORMULA==1)
-#if IBP==2
+#if IBP==2/////////////////////////////////////////////////////////////////////////
 			const double val=-sigma_0*exp(-pow(r,2)*qs2/4);
-#else
+#else/////////////////////////////////////////////////////////////////////////////
 #if LAPLACIAN==0
 			const double val=sigma_0*(1-exp( - pow(r , 2)*qs2/4));
 #elif LAPLACIAN==1
 			const double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
 #endif//LAPLACIAN
-#endif//IBP==2
+#endif//IBP==2/////////////////////////////////////////////////////////////////////
 			//printf("%.3e\n",val);
 			//printf("val=%.3e: r= %.3e C=%.3e mu02=%.3e ,mu2=%.3e, Qs2=%.3e \n",val, r,C,mu02,mu2,qs2 );
 			return val;

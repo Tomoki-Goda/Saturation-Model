@@ -6,7 +6,7 @@ class Gluon_GBW{
 	public:
 		explicit Gluon_GBW(){
 		}
-		void init(const double(&par)[]){
+		void init(const double *par){
 			//if(key=="gbw"){
 				//printf("parameters set\n");
 				sigma_0 =(double)par[0];

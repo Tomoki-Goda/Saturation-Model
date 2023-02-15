@@ -11,7 +11,7 @@
 #include"./r-formula.hh"
 
 #if GLUON_APPROX==1
-	#include"./interpolation.hh"
+	#include"./interpolation2.hh"
 #if HANKEL==1
 	typedef Hankel_aF Gluon;
 #else
@@ -67,6 +67,51 @@ double change_var(double & var,double &  jac,const double min, const double max,
 //double change_var(double & var,double &  jac,const double min, const double max){
 //	return(change_var(var,jac,min,  max,1));
 //}
+class Gluon_GBW{
+	double sigma_0=0,lambda=0,x_0=0;
+	//double Q2=0;
+	std::string key;
+	
+	public:
+		explicit Gluon_GBW(){
+		}
+		void init(const double *par){
+			//if(key=="gbw"){
+				//printf("parameters set\n");
+				sigma_0 =(double)par[0];
+				lambda	=(double)par[1];
+				x_0	=(double)par[2];
+			//}else{
+			//	std::cout<<"unknown model: "<<key<<std::endl;
+			//}
+
+		}
+		~Gluon_GBW(){}
+		
+	public:
+		inline double alpha(const double mu2)const{
+			return 4.0/(9.0 *log( ((mu2>2*LQCD2)?(mu2):(2.0*LQCD2))/LQCD2));
+		}
+
+	public:
+		double operator()(const double x,const double k2,double mu2){
+			if(x_0<1.0e-5||x_0>1.0e-3){
+				return 0;
+			}
+			if(lambda<0.05||lambda>0.95){
+				return 0;
+			}
+			double Qs2=pow(x_0/x,lambda);
+			double val=3.0/(4*PI*PI)*k2/Qs2*exp(-k2/Qs2);
+			if(std::isnan(val)==1){
+				return(0);
+			}
+#if RUN==1
+			val*=alpha(mu2);
+#endif
+			return (sigma_0*val) ;
+		}
+};
 
 
 
@@ -532,7 +577,7 @@ void llTest(const int ndim, const int ncomp,
 class F2_kt{
 		//int newpar=1;
 	
-		
+			const double *par;
 #if R_FORMULA==1
 			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
 
@@ -562,7 +607,7 @@ class F2_kt{
 			//const double*__restricted par;
 	public: 
 		explicit F2_kt(const  double  *par ){
-			//this->par=par;
+			this->par=par;
 			//printf(" F2 \n");
 #if R_FORMULA==1
 #if GLUON_APPROX==0
@@ -582,13 +627,14 @@ class F2_kt{
       ///////////////////////////////////////////
 #if GLUON_APPROX==1
 			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-			gluon.init(pow(2,8),pow(2,8),N_APPROX+100,par);
+			gluon.init(pow(2,8),pow(2,8),750,par);
 			gluon.set_max(kt2max);
 			//}
 #else
 			gluon.init(par);
 #endif//GLUON_APPROX==1			
 #endif//R_FORMULA
+			
 		}
 
 		~F2_kt(){
@@ -596,6 +642,21 @@ class F2_kt{
 			//getchar();
 		}
 		
+			
+		void compare(FILE* file){
+			Gluon_GBW gluon_c;//gluon has no flavour dep.
+			gluon_c.init(par);
+			double x, k2;
+			for(int i=0;i<100;i++){
+				x=pow(10,-7.5+7.5*((double)i)/99);
+				for(int j=0;j<100;j++){
+					k2=pow(10,-6.5+10*((double)j)/99);
+					fprintf(file, "%.5e\t%.5e\t%.5e\n",x,k2,gluon(x,k2,0)-gluon_c(x,k2,0));
+				}
+			}
+		}
+			
+			
 		double operator()(const double  x,const  double  Q2,const  double  mf2){
 			static unsigned int count;
 	//		std::string type="gbw";

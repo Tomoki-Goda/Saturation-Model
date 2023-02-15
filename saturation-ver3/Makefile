@@ -10,7 +10,7 @@
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
-LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas  -lpthread#-lgfortran
+LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas #-lgfortran
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
@@ -54,6 +54,7 @@ result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/
 plot: ${FUNCDIR}/plot-things.cc #${FUNCDIR}/gluons.o
 	${CXX} ${FUNCDIR}/plot-things.cc -o ${DIR}/plot ${OPT} ${INC} ${LIBS}
 	${CXX} ${FUNCDIR}/plot-grid.cc -o ${DIR}/grid  ${OPT} ${INC} ${LIBS}
+	${CXX} ${FUNCDIR}/compare-GBW.cc -o ${DIR}/compare  ${OPT} ${INC} ${LIBS}
 #plot: dipole gluon
 
 gluon: ${DEPS} ${UTILDIR}/tmd-gluon.c ${UTILDIR}/tmd-gluon-2.h

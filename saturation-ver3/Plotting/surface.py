@@ -130,7 +130,7 @@ def main():
                 ax[gpos].view_init(30, 25)
                 ax[gpos].set_ylabel('$\log_{10}(k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
             ax[gpos].set_xlabel('$\log_{10}x$',loc='right')
-        
+            ax[gpos].set_zlim3d(-0.001, 0.001)        
         #cs=ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)), levels=10,colors="black",linewidths=0.5,linestyles=["solid","dashed"])
     #ax[len(grids)-1].set_xlabel('$x$',loc='right')
     #ax[0].set_ylabel('$k^2\\;[\\mathrm{GeV^2}]$',rotation='vertical',loc='top')

@@ -11,7 +11,7 @@
 #endif
 typedef  struct{int N=128; double wfull[65]={0}, whalf[33]={0}, x[65]={0}; std::string tag="unnamed"; int max_rec=7; int InitDiv=1;} CCIntegral;
 
-template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf){
+template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf, double*arr){
 	//const double (&x16)[]=data.x;
 	//const double (&w16)[]=data.wfull;
 	//const double (&w8)[]=data.whalf;
@@ -35,15 +35,22 @@ template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral 
 	
 	f[N]=func(mid,par);
 	valfull=0;
-	Kahn_clear(val1);
+	//Kahn_clear(val1);
 	//Kahn_init(accum2,2);
 	
 	for(int i=0;i<N/2;i++){
-		val1+=f[2*i]*w16[i];
-		val1+=f[2*i+1]*w16[i];			
+		//val1+=f[2*i]*w16[i];
+		//val1+=f[2*i+1]*w16[i];
+		arr[2*i]=f[2*i]*w16[i];
+		arr[2*i+1]=f[2*i+1]*w16[i];	
 	}
-	val1+=f[N]*w16[N/2];
-	
+	///val1+=f[N]*w16[N/2];
+	arr[N]=f[N]*w16[N/2];
+	Kahn_clear(val1);
+	for(int i=0;i<N+1;i++){
+		arr[i]*=2*scale/N;
+		val1+=arr[i];	
+	}
 	valfull=Kahn_total(val1);
 	valhalf=0;
 	Kahn_clear(val1);
@@ -56,7 +63,7 @@ template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral 
 	val1+=f[N]*w8[N/4];
 
 	valhalf=Kahn_total(val1);
-	valfull*=2*scale/N;
+	//valfull*=2*scale/N;
 	valhalf*=4*scale/N;
 	Kahn_free(val1);
 	return 0;
@@ -82,8 +89,11 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	double valfull,valhalf;
 	double scale;
 	double arg;
+	//double res;
 	double total=0;//,total2=0;
 	//double accum[2]={0},accum2[2]={0};
+	const int N=data.N;
+	double arr[N+1]={0};
 	Kahn accum=Kahn_init(3);//, accum2=Kahn_init(3);
 	//const int N=16;
 	double increase;
@@ -106,7 +116,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		++counter;
 		++licztot;
 		scale=(smax-smin)/2;
-		fixed_cc<TYPE,args_type>(data,func,par,smin,smax,valfull,valhalf);
+		fixed_cc<TYPE,args_type>(data,func,par,smin,smax,valfull,valhalf,arr);
 #if DCLENSHAW_HH==1		
 		if(not(std::isfinite(valfull)&&std::isfinite(valhalf))){
 			printf("Clenshaw_Curtis:: in \"%s\" %.3e  %.3e encountered\n",(data.tag).c_str(),valfull,valhalf);
@@ -118,7 +128,13 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		
 		if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)<Aeps ) ){
 			//PASS
-			accum+=valfull;
+			//accum+=valfull;
+			//res=0;
+			for(int i=0;i<N+1;i++){
+				//res+=arr[i];
+				accum+=arr[i];
+			}
+			//printf("%.3e %.3e %.3e %.3e \n",res,valfull,valhalf,res-valfull);
 			//accum2+=valhalf;
 			++licz;
 			counter=0;
@@ -158,7 +174,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		const double *w8=data.whalf;
 		scale=(smax-smin)/2;
 		double mid=(smax+smin)/2;
-		const int N=data.N;
+		//const int N=data.N;
 		for(int i=0;i<N/2;i++){
 			arg=mid-scale*x16[i];
 			//printf("f(%.3e) = %.3e\n",arg,func(arg,par));

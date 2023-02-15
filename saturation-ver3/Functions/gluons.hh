@@ -10,7 +10,7 @@
 #include "./complex.hh"
 //#include "cfortran.h"
 #include "./clenshaw.hh"
-//#include "./gauss.hh"
+#include "./gauss.hh"
 /* CERNLIB functions*/
 extern "C" doublecomplex wgamma_(const doublecomplex*);
 extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
@@ -123,7 +123,7 @@ class Collinear_Gluon{
 			};
 		    	normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
 			//value=dclenshaw<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15);
-			//value=dgauss<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15); 
+			//value=dgauss<const Collinear_Gluon, const double*>(*this,par,  0,150,1.0e-15,1.0e-17); 
 			value=dclenshaw< const Collinear_Gluon, const double*>(cc,*this,par, 0,150,1.0e-15,1.0e-17);  
 			//this->flag=0;	
 			value=normalization*value;

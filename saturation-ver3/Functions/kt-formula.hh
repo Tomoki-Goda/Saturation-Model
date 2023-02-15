@@ -582,7 +582,7 @@ class F2_kt{
       ///////////////////////////////////////////
 #if GLUON_APPROX==1
 			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-			gluon.init(N_APPROX+200,pow(2,8),N_APPROX+100,par);
+			gluon.init(pow(2,8),pow(2,8),N_APPROX+100,par);
 			gluon.set_max(kt2max);
 			//}
 #else

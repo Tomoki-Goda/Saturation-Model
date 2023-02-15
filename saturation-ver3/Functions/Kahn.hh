@@ -97,9 +97,12 @@ static int accum_sort(double *accum,int len){
 	}
 	return 0;
 }
-static int Kahn_Sum(Kahn& kahn, double b){
+static int Kahn_Sum(Kahn& kahn, const double b){
+
 	int flag=1;
 	double * accum=kahn.accum,accum_tmp=b;
+	//accum[0]+=b;
+	//return 0;
 	int N=kahn.N;
 #if KAHN==1
 	if(not(std::isfinite(b))){

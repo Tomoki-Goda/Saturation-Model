@@ -12,6 +12,7 @@
 #include"clenshaw.hh"
 #include"gauss.hh"
 #include<sys/wait.h>
+#include<sys/mman.h>
 #include<unistd.h>
 //#include<pthread.h>
 //#include"gauss.hh"
@@ -366,9 +367,11 @@ class Approx_aF{
 			gsl_spline2d_free (spline_ptr);
 			gsl_interp_accel_free (x_accel_ptr);
 			gsl_interp_accel_free (kt2_accel_ptr);
-			free(kt2_array);
+			//free(kt2_array);
 			free(x_array);
-			free(aF_array);
+			//free(aF_array);
+			munmap((void*)aF_array,kt2_npts*x_npts*sizeof(double));
+			munmap((void*)kt2_array,kt2_npts*sizeof(double));
 		}
 		int approximate(const double kt2max){
 			this->kt2max=kt2max;
@@ -414,24 +417,19 @@ class Approx_aF{
 			clock_t time=clock();
 			double x;
 			for (int j = 0; j < x_npts; ++j){
-				if(j!=0){
-					printf("\033[1A\033[2K\r");
-				}
-				printf("[ ");
-				printf("start splitting\n");
+				//printf("[ ");
+				//printf("start splitting\n");
 				x=pow(10,-8+8*((double)j)/(x_npts-1));
 				x_array[j] = x;
 				
 				approximate_loop_recursive(kt2_npts/2, kt2_npts,j);
-				printf("\033[2K\r");
-				printf(" approxed x=%.2e\n", x);
+				printf("\033[2\r approxed x=%.2e", x);
 			}
 			printf("\033[1A\033[2K Grid done\n");
 			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
 			return 0;
 		}	
 		int approximate_loop_recursive(const int i, const int child, const int j){
-			
 			int k,stat;
 			if(child==1){
 				//printf("position=%d child=%d \n",i,child);
@@ -439,23 +437,19 @@ class Approx_aF{
 				kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;	
 				kt2_array[i] = kt2;
 				aF_array[i+ j*kt2_npts] = aF(x_array[j],kt2,0);
-				//exit(0);
-				
+			}else if(child==-1){
+				exit(1);
 			}else{
 				k=fork();
 				if(k==0){//child
 					approximate_loop_recursive(i-(child/4), child/2,j);
-					//wait(&stat);
-					printf("exit %d\n",i);
 					exit(0);
 				}else{//parent
 					approximate_loop_recursive(i+((child+2)/4), child/2,j);
-					wait(&stat);
-					//exit(0);
-					//printf("parent %d\n",j);
+					k=wait(&stat);
+					//printf("%d,%d\n",k,stat);				
 				}
 			}
-			//exit(0);
 			return 0;
 		}
 		/*
@@ -526,16 +520,18 @@ class Approx_aF{
 		}
 		void set_max(double kt2max){
 			this->kt2max=kt2max;
-			//approximate_loop(kt2max);
-			approximate(kt2max);
+			approximate_loop(kt2max);
+			//approximate(kt2max);
 		}
 		void init(const int npts1, const int npts2, const int npts3, const double *par ){
 			x_npts=npts1;
 			kt2_npts=npts2;
 			
 			x_array=(double*)malloc(x_npts*sizeof(double));
-			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
-			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
+			//kt2_array=(double*)malloc(kt2_npts*sizeof(double));
+			kt2_array=(double*)mmap(NULL,kt2_npts*sizeof(double),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
+			//aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
+			aF_array=(double*)mmap(NULL,x_npts*kt2_npts*sizeof(double),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
 			x_accel_ptr = gsl_interp_accel_alloc ();
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 

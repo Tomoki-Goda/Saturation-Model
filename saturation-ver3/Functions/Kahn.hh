@@ -160,4 +160,18 @@ Kahn& operator+=(Kahn& sum,const double a){
 	Kahn_Sum(sum ,a);	
 	return sum;
 }
+static void Kahn_accum_sum(const Kahn& kahn1,Kahn& kahn2){
+	if(kahn1.N!=kahn2.N){
+		printf("incompatible accumulators. %d  %d \n ",kahn1.N,kahn2.N);
+	}
+	
+	for(int i=0;i<kahn1.N;i++){
+		kahn2+=kahn1.accum[i];
+	}
+}
+static void Kahn_accum_times(const double a,Kahn& kahn2){
+	for(int i=0;i<kahn2.N;i++){
+		kahn2.accum[i]*=a;
+	}
+}
 #endif

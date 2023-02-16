@@ -12,6 +12,8 @@
 #include"clenshaw.hh"
 #include"gauss.hh"
 #include<pthread.h>
+//#include<sys/wait.h>
+//#include<unistd.h>
 //#include"gauss.hh"
 //#include"./gluons.hh"
 extern double INT_PREC;
@@ -49,19 +51,12 @@ class Laplacian_Sigma{
 			sigmaopt* param=(sigmaopt*)opt;
 			Laplacian_Sigma *sigmaptr=param->ptr;
 			const int j=param->j;
-			const double x=sigmaptr->x,r_npts=sigmaptr->r_npts;
-			
-			double r=((double)j)/(r_npts-1);
-			r=(sigmaptr->min)*pow(4.0*(sigmaptr->max)/(sigmaptr->min),r)/2.0;
-			(sigmaptr->r_array)[j]=r;
-			//printf("r=%.3e\n",r);
-			//getchar();
-			(sigmaptr->sigma_array)[j] = (sigmaptr->sigma)(r,x);
-			//getchar();
-			if(!isfinite(sigmaptr->sigma_array[j])){
+			(sigmaptr->sigma_array)[j] = (sigmaptr->sigma)((sigmaptr->r_array)[j]);
+			if(!std::isfinite((sigmaptr->sigma_array)[j])){
 				printf("can not approximate sigma=%.3e\n",sigmaptr->sigma_array[j] );
 			}
-			pthread_exit(NULL);
+			
+			return NULL;
 			
 		}
 	public:
@@ -71,13 +66,10 @@ class Laplacian_Sigma{
 			return 0;
 		}	
 		int approximate_thread(const double x){
-			this->x=x;
-			
-			double r;
+			sigma.set_kinem(x);
 			pthread_t thread[r_npts];
 			sigmaopt args[r_npts];
 			int i1;//,i2,i3,i4;
-			
 			for (int j = 0; j < r_npts; j++){
 				args[j].j=j;
 				args[j].ptr=this;
@@ -87,33 +79,19 @@ class Laplacian_Sigma{
 					pthread_join(thread[i],NULL);
 			}
 			//printf("ready\n ");
-			//getchar();
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 				
 			return(0);
 		}
 		int approximate(const double x){
-			this->x=x;
-			//max=R_MAX/pow(1-x,4);
-			//max=R_MIN/pow(1-x,2);
-			//printf("approximate(%.3e)\n",x);
-			//static int counter=0;
-			double r;
-
+			sigma.set_kinem(x);
 			for (int j = 0; j < r_npts; j++){
-				r=((double)j)/(r_npts-1);
-				//r=exp(std::log(R_MIN/2) + r * std::log(4*R_MAX/R_MIN));
-				r=min*pow(4.0*max/min,r)/2.0;
-				r_array[j]=r;
-				sigma_array[j] = sigma(r,x);
+				sigma_array[j] = sigma(r_array[j]);
 				if(!isfinite(sigma_array[j])){
 					printf("can not approximate sigma=%.3e\n",sigma_array[j] );
 				}
 			}
-
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
-			//printf("Approximated: %d %d\n" ,r_npts,++counter);
-			//printf("\033[1A\033[2K\r");	
 			return(0);
 		}
 		explicit Laplacian_Sigma(){
@@ -141,6 +119,13 @@ class Laplacian_Sigma{
 			r_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
 			sigma.init(par);
+			
+			double r;
+			for (int j = 0; j < r_npts; j++){
+				r=((double)j)/(r_npts-1);
+				r=min*pow(4.0*max/min,r)/2.0;
+				r_array[j]=r;
+			}
 		}
 		/*double operator()(const double rho)const{
 			printf("rformula\n");
@@ -270,8 +255,8 @@ class Dipole_Gluon{
 		}
 		void set_x(double x){
 			this->x=x;
-			integrand.approximate(x);
-			//integrand.approximate_thread(x);
+			//integrand.approximate(x);
+			integrand.approximate_thread(x);
 		}
 		double operator()(const double x,const double kt2,const double mu2){
 			if (this->x!=x){
@@ -283,40 +268,26 @@ class Dipole_Gluon{
 		}
 		double operator()(const double kt2,const double mu2){
 			Kahn accum=Kahn_init(3);
-		
 			double rmax=R_MAX,rmin=R_MIN;
-			//this->x=x;
-			//this->kt2=kt2;
 			const std::vector<double> par={kt2};
 			double val=0;
 			Kahn_clear(accum);
 #if GBW_APPROX==1
 			if(x>0.7){
-				//printf("approx\n");
 				double qs2=(4*PI*PI*alpha(par[4])*par[1]*pow(x,-par[2])*pow(1-x,5.6))/(3*par[0]);
 				val=2*par[0]*kt2/qs2*exp(-kt2/qs2);
 				return(3.0/(8*PI*PI)*val);
 			}
 #endif
 #if ADD_END>=0
-			/*int j=(int)(2*Pi*(sqrt(kt2)+1));
-			
-			//int j=3;*/
 			rmax=50.0/pow(1-x,2.5);
 			if(rmax>R_MAX||!std::isfinite(rmax)){
 				//printf("rmax %.3e reduced to %.3e\n",rmax,R_MAX );
 				rmax=R_MAX;
 			}
-			//if(rmax<1){
-			//	rmax=1;
-			//}
-			
-			
-			//double scale=(rmax-rmin)/j,imin=rmin,imax=rmin;
 			double scale=(2*PI)/sqrt(kt2),imin=rmin;
 			int j=(int)(rmax/scale);
 			if(j<3){
-				//printf("increased sector rmax=%.3e scale=%.3e sectors=%d\n",rmax,scale,j);
 				j=3;
 			}
 			
@@ -346,8 +317,6 @@ class Dipole_Gluon{
 				}else{
 					flag=0;
 				}
-				//val_prev=val;
-				
 				accum+=val;
 				imin=imax;
 			}
@@ -453,16 +422,21 @@ class Approx_aF{
 			(to->kt2_array)[i] = kt2;
 			(to->aF_array)[i+ j*(to->kt2_npts)] = (to->aF)(kt2,0);
 			//printf("func end\n");
-			pthread_exit(NULL);
+			//pthread_exit(NULL);
+			return NULL;
 		}
 		int approximate_thread(const double kt2max){
 			this->kt2max=kt2max;
 			clock_t time=clock();
 			
+#pragma omp parallel firstprivate( aF)
+		{
+//
 			double kt2,x;
 			pthread_t thread[kt2_npts];
 			parallel_arg args[kt2_npts];
 			int i1;//,i2,i3,i4;
+#pragma omp for 			
 			for (int j = 0; j < x_npts; ++j){
 				x=pow(10,-8+8*((double)j)/(x_npts-1));
 				x_array[j] = x;
@@ -487,6 +461,7 @@ class Approx_aF{
 				printf(" approxed x=%.2e\n", x);
 
 			}
+}
 			printf("\033[1A\033[2K Grid done\n");
 				
 			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);

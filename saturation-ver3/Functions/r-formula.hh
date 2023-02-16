@@ -8,16 +8,15 @@ inline double  modx(const double  x, const double  Q2, const  double  mf2){
 #endif
 }
 extern double change_var(double & var,double &  jac,const double min, const double max,const double c);
-extern "C" double xgpdf_(const double* x, const double* QQ,const double* A_g, const double* lambda_g );
-//extern "C" double xgpdf(double x, double QQ);
-//extern "C" void set_xg_parameter(double ag,double lg);
+//extern "C" double xgpdf_(const double& x, const double& QQ,const double& A_g, const double& lambda_g );
+//extern "C" double xgpdf_(const double* x, const double* QQ,const double* A_g, const double* lambda_g );
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   GBW
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Sigma{
-		Collinear_Gluon xg;
+		Collinear_Gluon xgpdf;
 		
 		inline double alpha(double mu2 )const{
 			static double b0= ((double)(33 -2*NF))/(12*PI);
@@ -29,28 +28,17 @@ class Sigma{
 		const double* sigpar;
 		double x=0;
 	public:
-		void set_kinem(const double x){
+		inline void set_kinem(const double x){
 			this->x=x;
 		}
-		void init(const double *par){
+		inline void init(const double *par){
 			sigpar=par;
-			//printf("sigma init:");
-			for(int i=0;i<N_PAR;i++){
-				if(par[i]==0.0){
-				 break;
-				}
-			//	printf("%.3e\t",par[i]);
-			}
-			//printf("\n");
-			
 		}
 		explicit Sigma(void){ 
-			//printf("sigma \n");
 		}
 		~Sigma(){
-			//printf("sigma end\n");
 		}
-		double operator()(const double r,const double x){//,const double Q2,const double*sigpar)const {
+		inline double operator()(const double r,const double x){//,const double Q2,const double*sigpar)const {
 		 	this->x=x;
 		 	return((*this)(r));
 		 }
@@ -87,10 +75,17 @@ class Sigma{
 			if(mu2<1||!std::isfinite(mu2)){
 				return(0);
 			}
+			/*
 #if FREEZE_QS2==1
 			const double qs2=4*PI*PI*alpha(mu2)*xg(((x>0.5)?0.5:x),mu2,sigpar[1],sigpar[2])/(3*sigma_0); 
 #else
 			const double qs2=4*PI*PI*alpha(mu2)*xg(x,mu2,sigpar[1],sigpar[2])/(3*sigma_0); 
+#endif*/
+#if FREEZE_QS2==1
+			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(((x>0.5)?0.5:x),mu2,sigpar[1],sigpar[2])/(3*sigma_0); 
+#else
+			//const double qs2=4*PI*PI*alpha(mu2)*xgpdf_(&x,&mu2,sigpar+1,sigpar+2)/(3*sigma_0);
+			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(x,mu2,sigpar[1],sigpar[2])/(3*sigma_0); 
 #endif
 			//double qs2=4*PI*PI*alpha(mu2)*xgpdf_(&x,&mu2,sigpar+1,sigpar+2)/(3*sigma_0); 
 			//double qs2=4*PI*PI*alpha(mu2)*xgpdf(x,mu2)/(3*sigma_0); 

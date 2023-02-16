@@ -10,14 +10,14 @@
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
-LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas #-lgfortran
+LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas -lgfortran #-fopenmp
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
 
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR} 
 
-#OPT=-O3 -Wno-unused-result -fp-model=precise#-g # -Wno-format 
+#OPT= -Wno-unused-result -fp-model=precise -O3#-g # -Wno-format 
 OPT=-O3 -Wno-unused-result -std=c++17
 
 #CXX=/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx
@@ -33,17 +33,18 @@ grid: gluon-grid
 
 fit: clean main
 
+#main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h ${FUNCDIR}/gluons.o
+#	${CXX} ${FUNCDIR}/main.cc -o ${DIR}/main  ${FUNCDIR}/gluons.o  ${INC} ${OPT} ${LIBS} 
 main: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
-	${CXX} ${FUNCDIR}/main.cc -o ${DIR}/main   ${INC} ${OPT} ${LIBS} 
-
+	${CXX} ${FUNCDIR}/main.cc -o ${DIR}/main    ${INC} ${OPT} ${LIBS} 
 #prepr: ${DEPS} ${FUNCDIR}/main.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
 #	${CXX} -S  ${FUNCDIR}/main.cc -o ${DIR}/main.e   ${INC} ${OPT} ${LIBS} 
 
 result: ${DEPS} ${FUNCDIR}/format-result.cc ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h 
 	g++ ${FUNCDIR}/format-result.cc ${LIBS} -o ${DIR}/result  ${INC} ${OPT}
 
-#gluons.o: ${FUNCDIR}/gluons.f ${FUNCDIR}/clenshaw.f
-#	gfortran ${FUNCDIR}/gluons.f -c -o ${FUNCDIR}/gluons.o
+gluons.o: ${FUNCDIR}/gluons.f ${FUNCDIR}/clenshaw.f
+	gfortran ${FUNCDIR}/gluons.f -c -o ${FUNCDIR}/gluons.o -O3
 
 #main: ${DEPS} ${FUNCDIR}/main.cc ${DIR}/kt-formula.o 
 #	g++ ${FUNCDIR}/main.cc  ${DIR}/kt-formula.o ${LIBS} -o ${DIR}/main  ${INC} ${OPT}

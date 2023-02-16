@@ -122,12 +122,12 @@ int main(int argc, char** argv){
 	fscanf(resinputfile,"%s %le",name,&ival);
 	for(unsigned i=0;i<N_PAR;i++){
 		fscanf(resinputfile,"%s %le %le",name,&ival,&ierr);
-		printf("%s %le %le \n",name,ival,ierr);
+		printf("%s %le %le \n",name,ival,ierr*50);
 		if(strcmp(name,"chisq")==0){
 			skip=N_PAR-i;
 			break;
 		}
-		upar.Add(name, ival,ierr*10);
+		upar.Add(name, ival,ierr*50);
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT

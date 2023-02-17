@@ -15,7 +15,7 @@
 	#define GLUON_APPROX 1
 #endif
 //#if GLUON_APPROX==1
-	#include"./interpolation.hh"
+	#include"./interpolation2.hh"
 #if HANKEL==1
 	typedef Hankel_aF Gluon ;
 #else

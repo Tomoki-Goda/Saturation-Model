@@ -118,7 +118,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		if(((max-min)-(smax-smin))==(max-min)||counter==MAX_RECURSION){
 			smax=smin+2*scale;
 			printf("Clenshaw_Curtis:: in \"%s\", evaluated %d times.\n",(data.tag).c_str(),counter );
-			printf("sector size = %.3e\n [%.3e, %.3e] of [%.3e, %.3e] after %d / %d \n",smax-smin,smin,smax,min,max, licz,licztot);
+			printf("sector size = %.3e\n [%.3e, %.3e] of [%.3e, %.3e] after %d / %d /%d\n",smax-smin,smin,smax,min,max, licz,licztot,MAX_RECURSION);
 			printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
 			//getchar();
 			goto Error;
@@ -191,21 +191,24 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		for(int i=0;i<N/2;i++){
 			arg=mid-scale*x16[i];
 			//printf("f(%.3e) = %.3e\n",arg,func(arg,par));
-			printf("%.3e\t%.3e\t%.3e\t%.3e",arg,func(arg,par), arr[2*i]*N/(2*scale*w16[i])  ,w16[i]);
+			printf("%.3e\t%.3e\n",arg,func(arg,par));
+			/*printf("%.3e\t%.3e\t%.3e\t%.3e",arg,func(arg,par), arr[2*i]*N/(2*scale*w16[i])  ,w16[i]);
 			((i/2)*2==i)?
 			(printf("\t%.3e\n",2*w8[i/2])):
-			(printf("\n")) ;
+			(printf("\n")) ;*/
 		}
 		arg=mid;
 		//printf("f(%.3e) = %.3e\n",arg,func(arg,par));
-		printf("%.3e\t%.3e\t%.3e\t%.3e\t%.3e\n",arg,func(arg,par),arr[N]*N/(2*scale*w16[N/2])  ,w16[N/2],2*w8[N/4]);
+		printf("%.3e\t%.3e\n",arg,func(arg,par));
+		//printf("%.3e\t%.3e\t%.3e\t%.3e\t%.3e\n",arg,func(arg,par),arr[N]*N/(2*scale*w16[N/2])  ,w16[N/2],2*w8[N/4]);
 		for(int i=0;i<N/2;i++){
 			arg=mid+scale*x16[N/2-i-1];
 			//printf("f(%.3e) = %.3e\n",arg,func(arg,par));
+			printf("%.3e\t%.3e\n",arg,func(arg,par));/*
 			printf("%.3e\t%.3e\t%.3e\t%.3e",arg,func(arg,par),arr[N-2*i-1]*N/(2*scale*w16[N/2-i-1]) ,w16[N/2-i-1]);
 			((i/2)*2!=i)?
 			(printf("\t%.3e\n",2*w8[N/4-i/2-1])):
-			(printf("\n")) ;
+			(printf("\n")) ;*/
 			//printf("%.3e\t%.3e\t%.3e\n",arg, func(arg,par),w16[N/2-i-1]);
 		}
 		printf("\n");

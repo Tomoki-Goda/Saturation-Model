@@ -5,6 +5,8 @@
 %\usepackage{librebaskerville}
 \usepackage{xcolor}
 \usepackage[]{geometry}
+%\usepackage{caption}
+\usepackage{subcaption}
 
 \geometry{left=2cm,right=2cm,top=2.5cm,bottom=2cm}
 \usepackage{graphicx}
@@ -356,6 +358,53 @@ Let us assume small $Q_s^2$, and for $r>>Q_s$, integrand is negligible, then
 Bottom: IBP1 with 200 and 750 points grid.\\
 All in the same scale.
  }
+\end{figure}
+
+
+\begin{table}
+\begin{subtable}{\textwidth}
+\resizebox{\textwidth}{!}{\begin{tabular}{|c c|c|c|c|c|}
+\hline
+type & light quark mass $[\mathrm{GeV}]$&  $\sigma_0 \;[\mathrm{mb}]$ &  $x_0 (10^{-4})$ &  $\lambda$ &  $\chi^2/\mathrm{dof}$ 
+\\\hline
+$\mathrm{GBW}$& $m_l=0.14$ & 23.8 & 1.12 & 0.308 & 5.27 \\ \hline
+$\mathrm{GBW+Sud}$&$m_l=0.14$ & 23.0 & 1.32 & 0.287 & 3.37 \\ \hline
+\color{red}$\alpha(\mu)\mathcal{F}_\mathrm{GBW} $&$m_l=0$ & \color{red}56.1 & \color{red}2.64 & \color{red}0.32 &\color{red} 2.45\\ \hline
+\color{red}$\alpha\mathcal{F}_\mathrm{GBW} $&$m_l=0$ & \color{red}33.4 & \color{red}1.34 &\color{red}0.33 & \color{red}4.39\\ \hline
+$\mathrm{GBW}$& $m_l=0.0$ & 19.1 & 2.58 & 0.322 & 4.44 \\ \hline
+$\mathrm{GBW+Sud}$& $m_l=0.0$ & 18.6 & 3.11 & 0.299 & 2.66 \\ \hline
+\end{tabular} }
+        %\input{./Plots/GBWS-Fix-S.tex}
+        \vspace{2mm}
+    \end{subtable}
+
+    \begin{subtable}[H]{\textwidth}
+        \centering
+\resizebox{\textwidth}{!}{\begin{tabular}{|c c|c|c|c|c|c|c|}
+\hline
+type&light quark mass $[\mathrm{GeV}]$&  $\sigma_0\; [\mathrm{mb}]$ &  $A_{\mathrm{g}}$ &  $\lambda_{\mathrm{g}}$ &  $C$ &  $\mu_{0}^2\;[\mathrm{GeV^2}]$ &  $\chi^2/\mathrm{dof}$ 
+\\\hline
+$\mathrm{BGK}$& $m_l=0.14$ & 33.1 & 1.33 & 0.0553 & 0.420 & 1.76 & 1.62 \\ \hline
+$\mathrm{BGK+Sud}$& $m_l=0.14$& 30.7 & 6.28 & -0.380 & 0.677 & 3.09 & 1.27 \\ \hline
+\color{red}$\alpha\mathcal{F}_\mathrm{BGK}$& $m_l=0.0$ & \color{red}34.8& \color{red}1.09 & \color{red}0.210 & \color{red}0.215 & \color{red}1.06 &\color{red} 1.60 \\ \hline
+$\mathrm{BGK}$& $m_l=0.0$ & 23.3 & 1.18 & 0.0832 & 0.329 & 1.87 & 1.56 \\ \hline
+$\mathrm{BGK+Sud}$& $m_l=0.0$ & 22.2 & 8.67 & -0.500 & 0.670 & 3.83 & 1.21 \\ \hline
+\end{tabular}
+}
+       % \input{./Plots/BGKS-Fix-S.tex}
+    \end{subtable}
+    \caption{ }
+    \label{table:fullTable}
+\end{table}
+
+
+\begin{figure}
+\includegraphics[width=0.475\textwidth]{./dipole-GBW.png}
+\includegraphics[width=0.475\textwidth]{./dipole-BGK.png}
+\end{figure}
+\begin{figure}
+\includegraphics[width=0.475\textwidth]{./gluon-GBW.png}
+\includegraphics[width=0.475\textwidth]{./gluon-BGK.png}
 \end{figure}
 
 \end{document}

@@ -55,7 +55,7 @@ gluons.o: ${FUNCDIR}/gluons.f ${FUNCDIR}/clenshaw.f
 plot: ${FUNCDIR}/plot-things.cc #${FUNCDIR}/gluons.o
 	${CXX} ${FUNCDIR}/plot-things.cc -o ${DIR}/plot ${OPT} ${INC} ${LIBS}
 	${CXX} ${FUNCDIR}/plot-grid.cc -o ${DIR}/grid  ${OPT} ${INC} ${LIBS}
-	${CXX} ${FUNCDIR}/compare-GBW.cc -o ${DIR}/compare  ${OPT} ${INC} ${LIBS}
+#	${CXX} ${FUNCDIR}/compare-GBW.cc -o ${DIR}/compare  ${OPT} ${INC} ${LIBS}
 #plot: dipole gluon
 
 gluon: ${DEPS} ${UTILDIR}/tmd-gluon.c ${UTILDIR}/tmd-gluon-2.h

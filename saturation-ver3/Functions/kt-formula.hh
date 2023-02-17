@@ -644,7 +644,7 @@ class F2_kt{
 		}
 		
 			
-		void compare(FILE* file){
+		/*void compare(FILE* file){
 			Gluon_GBW gluon_c;//gluon has no flavour dep.
 			gluon_c.init(par);
 			double x, k2;
@@ -655,7 +655,7 @@ class F2_kt{
 					fprintf(file, "%.5e\t%.5e\t%.5e\n",x,k2,gluon(x,k2,0)-gluon_c(x,k2,0));
 				}
 			}
-		}
+		}*/
 			
 			
 		double operator()(const double  x,const  double  Q2,const  double  mf2){

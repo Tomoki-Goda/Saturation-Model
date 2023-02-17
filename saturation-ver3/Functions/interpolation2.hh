@@ -127,11 +127,11 @@ class Laplacian_Sigma{
 				r_array[j]=r;
 			}
 		}
-		/*double operator()(const double rho)const{
+		double operator()(const double rho)const{
 			printf("rformula\n");
 			const double r=rho/(1-rho);
 			return(gsl_spline_eval(spline_ptr, r,r_accel_ptr)/pow(1-rho,2));
-		}*/
+		}
 		//int export_grid(FILE* file, FILE* file2){
 		int export_grid(FILE* file){
 			for(int i=0;i<r_npts;i++){
@@ -255,8 +255,8 @@ class Dipole_Gluon{
 		}
 		void set_x(double x){
 			this->x=x;
-			//integrand.approximate(x);
-			integrand.approximate_thread(x);
+			integrand.approximate(x);
+			//integrand.approximate_thread(x);
 		}
 		double operator()(const double x,const double kt2,const double mu2){
 			if (this->x!=x){
@@ -280,7 +280,10 @@ class Dipole_Gluon{
 			}
 #endif
 #if ADD_END>=0
-			rmax=50.0/pow(1-x,2.5);
+			rmax=50.0;
+#if MODEL==1
+			rmax/=pow(1-x,2.5);
+#endif
 			if(rmax>R_MAX||!std::isfinite(rmax)){
 				//printf("rmax %.3e reduced to %.3e\n",rmax,R_MAX );
 				rmax=R_MAX;

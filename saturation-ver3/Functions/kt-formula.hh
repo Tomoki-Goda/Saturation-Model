@@ -230,9 +230,7 @@ class Integrand_r{
 			this->x=modx(x,Q2,mf2);
 			this->Q2=Q2;
 			this->mf2=mf2;
-			
-			sigma_ptr->set_kinem(x);
-
+			sigma_ptr->set_kinem(this->x);
 			return 0;
 		}
 		double  operator()(double  z,  double  r)const{

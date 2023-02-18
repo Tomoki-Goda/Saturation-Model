@@ -113,6 +113,7 @@ int main(int argc, char** argv){
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
 #else//USE_RESULT==1
+     	printf("USING PREVIOUS RESULT\n");
 	char resfile[100];
 	sprintf(resfile,"%s/result.txt",argv[1]);
 	

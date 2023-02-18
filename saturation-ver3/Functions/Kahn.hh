@@ -59,6 +59,7 @@ static int plus(double *a,double *b){
 	return 0;
 }
 static int accum_sort(double *accum,int len){
+	if(len==1){return 0;};
 	int pos=0;
 #if KAHN==1
 	unsigned int counter=0;
@@ -155,11 +156,11 @@ static double Kahn_list_sum(double* list, int len){
 }
 
 */
-
 Kahn& operator+=(Kahn& sum,const double a){
 	Kahn_Sum(sum ,a);	
 	return sum;
 }
+
 static void Kahn_accum_sum(const Kahn& kahn1,Kahn& kahn2){
 	if(kahn1.N!=kahn2.N){
 		printf("incompatible accumulators. %d  %d \n ",kahn1.N,kahn2.N);
@@ -169,9 +170,21 @@ static void Kahn_accum_sum(const Kahn& kahn1,Kahn& kahn2){
 		kahn2+=kahn1.accum[i];
 	}
 }
+
+
 static void Kahn_accum_times(const double a,Kahn& kahn2){
 	for(int i=0;i<kahn2.N;i++){
 		kahn2.accum[i]*=a;
 	}
+}
+
+Kahn& operator+=(Kahn& sum2,Kahn& sum){
+	Kahn_accum_sum(sum ,sum2);	
+	return sum2;
+}
+
+Kahn& operator*=(Kahn& sum2,const double a){
+	Kahn_accum_times(a,sum2);	
+	return sum2;
 }
 #endif

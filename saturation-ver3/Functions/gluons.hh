@@ -21,7 +21,7 @@ extern "C" doublecomplex wgamma_(const doublecomplex*);
 extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
 extern "C" double dgammf_(const double*);
 class Collinear_Gluon{
-	CCIntegral cc=CCprepare(32,"gluon",10,7);
+	CCIntegral cc=CCprepare(64,"gluon",1,5);
 	
 	private:
 		const double       beta = 6.6;
@@ -121,7 +121,7 @@ class Collinear_Gluon{
 		* Gluons pdf  function
 		*******************************************************************************/
 		double operator()(const double x, const double QQ,const double A_g,const double l_g)const  {
-		 	CCIntegral cc=CCprepare(128,"gluon",50);
+		 	//CCIntegral cc=CCprepare(128,"gluon",50);
 		//	printf("%.3e %.3e %.3e %.3e\n",x, QQ,A_g,l_g);
 		//	return(A_g*pow(x,-l_g));
 			static int flag_nan=0;

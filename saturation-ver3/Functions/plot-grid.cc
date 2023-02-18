@@ -15,7 +15,7 @@
 	#define GLUON_APPROX 1
 #endif
 //#if GLUON_APPROX==1
-	#include"./interpolation2.hh"
+	#include"./interpolation.hh"
 #if HANKEL==1
 	typedef Hankel_aF Gluon ;
 #else
@@ -105,7 +105,7 @@ int main(int argc , char** argv){
 	Gluon gluon;
 //#if GLUON_APPROX==1
 	printf("Gluon start\n");
-	gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX+50,sigpar);
+	gluon.init(N_APPROX+50,N_APPROX+50,N_APPROX+200,sigpar);
 	printf("Initialized\n");
 	gluon.set_max(5.0e+4);
 	printf("Export\n");			

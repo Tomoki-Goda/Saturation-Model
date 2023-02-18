@@ -11,11 +11,9 @@
 #include<gsl/gsl_chebyshev.h>
 #include"clenshaw.hh"
 #include"gauss.hh"
-#include<sys/wait.h>
-#include<sys/mman.h>
-#include<unistd.h>
-#include<omp.h>
-//#include<pthread.h>
+#include<pthread.h>
+//#include<sys/wait.h>
+//#include<unistd.h>
 //#include"gauss.hh"
 //#include"./gluons.hh"
 extern double INT_PREC;
@@ -25,6 +23,8 @@ extern int N_APPROX;
 
 //FOR APPROXIMATION AND DERIVATIVES		
 //class Laplacian_Sigma:public Sigma{
+class Laplacian_Sigma;
+typedef struct {int j; Laplacian_Sigma *ptr;} sigmaopt;
 class Laplacian_Sigma{
 	private:
 		double max=R_MAX, min=R_MIN; 
@@ -46,32 +46,52 @@ class Laplacian_Sigma{
 		int counter=0;
 		double x;
 		double sigma_0=0;
+		
+		static void* compute(void*opt){
+			sigmaopt* param=(sigmaopt*)opt;
+			Laplacian_Sigma *sigmaptr=param->ptr;
+			const int j=param->j;
+			(sigmaptr->sigma_array)[j] = (sigmaptr->sigma)((sigmaptr->r_array)[j]);
+			if(!std::isfinite((sigmaptr->sigma_array)[j])){
+				printf("can not approximate sigma=%.3e\n",sigmaptr->sigma_array[j] );
+			}
+			
+			return NULL;
+			
+		}
 	public:
 		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
 			approximate(x);
 			return 0;
 		}	
-		int approximate(const double x){
-			this->x=x;
-			//max=R_MAX/pow(1-x,4);
-			//max=R_MIN/pow(1-x,2);
-			//printf("approximate(%.3e)\n",x);
-			//static int counter=0;
-			double r;
+		int approximate_thread(const double x){
+			sigma.set_kinem(x);
+			pthread_t thread[r_npts];
+			sigmaopt args[r_npts];
+			int i1;//,i2,i3,i4;
 			for (int j = 0; j < r_npts; j++){
-				r=((double)j)/(r_npts-1);
-				//r=exp(std::log(R_MIN/2) + r * std::log(4*R_MAX/R_MIN));
-				r=min*pow(4.0*max/min,r)/2.0;
-				r_array[j]=r;
-				sigma_array[j] = sigma(r,x);
+				args[j].j=j;
+				args[j].ptr=this;
+				i1=pthread_create(thread+j,NULL,compute,(void*)(args+j) );
+			}
+			for(int i=0;i<r_npts;++i){
+					pthread_join(thread[i],NULL);
+			}
+			//printf("ready\n ");
+			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
+				
+			return(0);
+		}
+		int approximate(const double x){
+			sigma.set_kinem(x);
+			for (int j = 0; j < r_npts; j++){
+				sigma_array[j] = sigma(r_array[j]);
 				if(!isfinite(sigma_array[j])){
 					printf("can not approximate sigma=%.3e\n",sigma_array[j] );
 				}
 			}
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
-			//printf("Approximated: %d %d\n" ,r_npts,++counter);
-			//printf("\033[1A\033[2K\r");	
 			return(0);
 		}
 		explicit Laplacian_Sigma(){
@@ -99,12 +119,19 @@ class Laplacian_Sigma{
 			r_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
 			sigma.init(par);
+			
+			double r;
+			for (int j = 0; j < r_npts; j++){
+				r=((double)j)/(r_npts-1);
+				r=min*pow(4.0*max/min,r)/2.0;
+				r_array[j]=r;
+			}
 		}
-		/*double operator()(const double rho)const{
-			printf("rformula\n");
+		double operator()(const double rho)const{
+			//printf("rformula\n");
 			const double r=rho/(1-rho);
 			return(gsl_spline_eval(spline_ptr, r,r_accel_ptr)/pow(1-rho,2));
-		}*/
+		}
 		//int export_grid(FILE* file, FILE* file2){
 		int export_grid(FILE* file){
 			for(int i=0;i<r_npts;i++){
@@ -204,7 +231,7 @@ class Dipole_Gluon{
 //#endif
 		const double *par;
 		LSigma integrand;
-		CCIntegral cc=CCprepare(128,"dipole",1,5);
+		CCIntegral cc=CCprepare(64,"dipole",1,10);
 		double x;	
 
 		inline double alpha(double mu2 )const{
@@ -229,6 +256,7 @@ class Dipole_Gluon{
 		void set_x(double x){
 			this->x=x;
 			integrand.approximate(x);
+			//integrand.approximate_thread(x);
 		}
 		double operator()(const double x,const double kt2,const double mu2){
 			if (this->x!=x){
@@ -240,44 +268,45 @@ class Dipole_Gluon{
 		}
 		double operator()(const double kt2,const double mu2){
 			Kahn accum=Kahn_init(3);
-		
 			double rmax=R_MAX,rmin=R_MIN;
-			//this->x=x;
-			//this->kt2=kt2;
-			const std::vector<double> par={kt2};
+			const std::vector<double> par(1,kt2);
 			double val=0;
 			Kahn_clear(accum);
 #if GBW_APPROX==1
 			if(x>0.7){
-				//printf("approx\n");
 				double qs2=(4*PI*PI*alpha(par[4])*par[1]*pow(x,-par[2])*pow(1-x,5.6))/(3*par[0]);
 				val=2*par[0]*kt2/qs2*exp(-kt2/qs2);
 				return(3.0/(8*PI*PI)*val);
 			}
 #endif
 #if ADD_END>=0
-			/*int j=(int)(2*Pi*(sqrt(kt2)+1));
-			
-			//int j=3;*/
-			rmax=50.0/pow(1-x,2.5);
+			rmax=50.0;
+#if MODEL==1
+			rmax/=pow(1-x,2.5);
+#endif
 			if(rmax>R_MAX||!std::isfinite(rmax)){
 				//printf("rmax %.3e reduced to %.3e\n",rmax,R_MAX );
 				rmax=R_MAX;
 			}
-			//if(rmax<1){
-			//	rmax=1;
-			//}
-			int j=(int)(sqrt(kt2)/(2*PI)*rmax);
-			if(j<5){j=5;}
+			double scale=(2*PI)/sqrt(kt2),imin=rmin;
+			int j=(int)(rmax/scale);
+			if(j<3){
+				j=3;
+			}
 			
-			//double scale=(rmax-rmin)/j,imin=rmin,imax=rmin;
-			double scale=(2*PI)/sqrt(kt2),imin=rmin,imax=rmin;
+#if IBP==0||IBP==2 //actually important. better cancellation for convergence.
+			double imax=PI/(sqrt(kt2)*4);
+#elif IBP==1
+			double imax=3*PI/(sqrt(kt2)*4);
+#endif
+			
 			int flag=0;
 			//double val_prev=0;
 			for(int i=0;i<j;++i){
-				imax=imin+scale;
+				imax=imax+scale;
 				if(imax>rmax){imax=rmax;};
-				//printf("min, max, %.2e %.2e\n",imin,imax);
+				//printf("min, max, %.2e %.2e, %.2e %.2e\n",imin,imax,x, kt2);
+				
 #if R_CHANGE_VAR==1
 				val=dclenshaw<const LSigma,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/10,INT_PREC/100);
 #elif R_CHANGE_VAR==0
@@ -292,8 +321,6 @@ class Dipole_Gluon{
 				}else{
 					flag=0;
 				}
-				//val_prev=val;
-				
 				accum+=val;
 				imin=imax;
 			}
@@ -311,53 +338,9 @@ class Dipole_Gluon{
 		
 		
 };
-
-///////////FOR PTHREAD//////////////////
-/*
-typedef struct{
-	int *args ;
-	double* kt2_array,*x_array,*aF_array;
-	double kt2max,kt2min;
-	int kt2_npts;
-	Dipole_Gluon* aFptr;
-} aF_arg;
- 
-void* approximate_loop_recursive(void* arg){
-	aF_arg* arg0=(aF_arg*)arg;
-	//printf("branch \n");
-	int i=arg0->args[0], child=arg0->args[1], j=arg0->args[2];
-	if(child==pow(2,7)){
-		getchar();
-	}
-	//int k,stat;
-	if(child==1){
-		
-		//getchar();
-		double kt2=((double)i)/((arg0->kt2_npts)-1);
-		kt2=arg0->kt2min*pow(4*(arg0->kt2max)/(arg0->kt2min),kt2)/2;	
-		(arg0->kt2_array)[i] = kt2;
-		printf("%.2e %.2e %d\n", arg0->x_array[j],kt2, i+ j*(arg0->kt2_npts));
-		//(arg0->aF_array)[i+ j*(arg0->kt2_npts)] = (*(arg0->aFptr))(arg0->x_array[j],kt2,0);
-		printf("position=%d child=%d \n",i,child);
-		
-	}else{	
-		printf("split %d \n",i);
-		pthread_t thread1,thread2;
-		aF_arg arg1=*arg0,arg2=*arg0;
-		int args1[]={i-(child/4), child/2,j },args2[]={i+((child+2)/4), child/2,j};
-		arg1.args=args1;
-		arg2.args=args2;
-		int i1,i2;
-	
-		i1=pthread_create(&thread1,NULL,&approximate_loop_recursive,(void*)&arg1);
-		i2=pthread_create(&thread2,NULL,&approximate_loop_recursive,(void*)&arg2);
-		pthread_join(thread1,NULL);
-		pthread_join(thread2,NULL);
-				
-	}
-}
-*/
 //////////////////////////////////////////
+class Approx_aF;
+typedef struct {int i, j; Approx_aF* ptr; } parallel_arg;
 
 class Approx_aF{
 	private:
@@ -433,98 +416,66 @@ class Approx_aF{
 			printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}
-		/*
-		int approximate_loop(const double kt2max){
+		static void* compute(void* par){
+			//printf("func\n");
+			parallel_arg* param=(parallel_arg*)par;
+			int i=param->i,j=param->j;
+			Approx_aF* to=param->ptr;
+			double kt2=((double)i)/(to->kt2_npts-1);
+			kt2=to->kt2min*pow(4*(to->kt2max)/(to->kt2min),kt2)/2;
+			(to->kt2_array)[i] = kt2;
+			(to->aF_array)[i+ j*(to->kt2_npts)] = (to->aF)(kt2,0);
+			//printf("func end\n");
+			//pthread_exit(NULL);
+			return NULL;
+		}
+		int approximate_thread(const double kt2max){
 			this->kt2max=kt2max;
 			clock_t time=clock();
-			double x;
+			
+#pragma omp parallel firstprivate( aF)
+		{
+//
+			double kt2,x;
+			pthread_t thread[kt2_npts];
+			parallel_arg args[kt2_npts];
+			int i1;//,i2,i3,i4;
+#pragma omp for 			
 			for (int j = 0; j < x_npts; ++j){
-				//printf("[ ");
-				//printf("start splitting\n");
 				x=pow(10,-8+8*((double)j)/(x_npts-1));
 				x_array[j] = x;
-				
-				approximate_loop_recursive(kt2_npts/2, kt2_npts,j);
-				printf("\033[2\r approxed x=%.2e", x);
-			}
-			printf("\033[1A\033[2K Grid done\n");
-			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
-			return 0;
-		}	
-		int approximate_loop_recursive(const int i, const int child, const int j){
-			int k,stat;
-			if(child==1){
-				//printf("position=%d child=%d \n",i,child);
-				double kt2=((double)i)/(kt2_npts-1);
-				kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;	
-				kt2_array[i] = kt2;
-				aF_array[i+ j*kt2_npts] = aF(x_array[j],kt2,0);
-			}else if(child==-1){
-				exit(1);
-			}else{  ;
-				k=fork();
-				if(k==0){//child
-					approximate_loop_recursive(i-(child/4), child/2,j);
-					exit(0);
-				}else{//parent
-					approximate_loop_recursive(i+((child+2)/4), child/2,j);
-					wait(&stat);
-					//printf("%d,%d\n",k,stat);				
+				aF.set_x(x);	
+				if(j!=0){
+					printf("\033[1A\033[2K\r");
 				}
+				printf("[ ");
+				
+				
+				for(int i=0;i<kt2_npts;++i){
+					args[i].i=i;
+					args[i].j=j;
+					args[i].ptr=this;
+					i1=pthread_create(thread+i,NULL,compute,(void*)(args+i) );
+				}					
+				for(int i=0;i<kt2_npts;++i){
+					pthread_join(thread[i],NULL);
+				}
+				printf("\033[2K\r");
+				
+				printf(" approxed x=%.2e\n", x);
+
 			}
-			return 0;
-		}*/
-		/*
-		int approximate_loop(const double kt2max){
-			aF_arg arg0;
-			arg0.kt2min=kt2min;
-			arg0.kt2max=kt2max;
-			arg0.aF_array=aF_array;
-			arg0.kt2_array=kt2_array;
-			arg0.x_array=x_array;
-			arg0.kt2_npts=kt2_npts;
-			arg0.aFptr=&aF;
-			double x;
-			int args[3]={kt2_npts/2, kt2_npts,0};
-			arg0.args=args;
-			printf("af(1,10)=%.3e\n ",(*arg0.aFptr)(1,10,0));
-			for (int j = 0; j < x_npts; ++j){
-				x=pow(10,-8+8*((double)j)/(x_npts-1));
-				x_array[j] = x;
-				args[2]=j;
-				printf("start branching\n");
-				approximate_loop_recursive((void*)&arg0);
-				printf("end branching\n");
-				getchar();
-			}
-			
+}
+			printf("\033[1A\033[2K Grid done\n");
+				
 			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
-			return 0;
-		}*/	
-		/*void* approximate_loop_recursive(void* arg){
-			int*args0=(int*)args;
-			int i=args0[0], child=args0[1], j=args0[2];
+			//}
+			time-=clock();
 			
-			int k,stat;
-			if(child==1){
-				double kt2=((double)i)/(kt2_npts-1);
-				kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;	
-				kt2_array[i] = kt2;
-				aF_array[i+ j*kt2_npts] = aF(x_array[j],kt2,0);
-			}else{
-				pthread_t thread1,thread2;
-				int args1[]={i-(child/4), child/2,j },args2[]={i+((child+2)/4), child/2,j};
-				int i1,i2;
-				
-				i1=pthread_create(&thread1,NULL,&approximate_loop_recursive,(void*)args1);
-				i2=pthread_create(&thread2,NULL,&approximate_loop_recursive,(void*)args2);
-				pthread_join(thread1,NULL);
-				pthread_join(thread2,NULL);
-				
-			}
+			printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
+			return(0);
 		}
-		*/
-		
+
 	public:
 		int export_grid(FILE*file)const{
 			for(int j=0;j< x_npts;j++){
@@ -542,8 +493,8 @@ class Approx_aF{
 		}
 		void set_max(double kt2max){
 			this->kt2max=kt2max;
-			//approximate_loop(kt2max);
 			approximate(kt2max);
+			//approximate_thread(kt2max);
 		}
 		void init(const int npts1, const int npts2, const int npts3, const double *par ){
 			x_npts=npts1;

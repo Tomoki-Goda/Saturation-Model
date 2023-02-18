@@ -1,18 +1,12 @@
-#include"./gluons.hh"
 
-inline double  modx(const double  x, const double  Q2, const  double  mf2){
-#if MODX==1
-	return( (x*(1+4*mf2/Q2)));
-#else 
-	return( x);
-#endif
-}
-extern double change_var(double & var,double &  jac,const double min, const double max,const double c);
+//extern double change_var(double & var,double &  jac,const double min, const double max,const double c);
 //extern "C" double xgpdf_(const double& x, const double& QQ,const double& A_g, const double& lambda_g );
 //extern "C" double xgpdf_(const double* x, const double* QQ,const double* A_g, const double* lambda_g );
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//   GBW
+//   GBW / BGK dipoles
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Sigma{
@@ -92,19 +86,18 @@ class Sigma{
 #endif	//MODEL	
 
 //#if (LAPLACIAN==0||R_FORMULA==1)
-#if IBP==2/////////////////////////////////////////////////////////////////////////
+#if IBP==2
 			const double val=-sigma_0*exp(-pow(r,2)*qs2/4);
-#else/////////////////////////////////////////////////////////////////////////////
+#else
 #if LAPLACIAN==0
 			const double val=sigma_0*(1-exp( - pow(r , 2)*qs2/4));
 #elif LAPLACIAN==1
 			const double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
 #endif//LAPLACIAN
-#endif//IBP==2/////////////////////////////////////////////////////////////////////
+#endif//IBP==2
 			//printf("%.3e\n",val);
 			//printf("val=%.3e: r= %.3e C=%.3e mu02=%.3e ,mu2=%.3e, Qs2=%.3e \n",val, r,C,mu02,mu2,qs2 );
 			return val;
 		}
 
 };
-

@@ -3,19 +3,16 @@
 #include<cmath>
 #include<string>
 #include<vector>
+#include<ctime>
+#include<chrono>
 #include"./control.h"
 #include"./control-default.h"
 #include"./constants.h"
 #include"./Parameters.hh"
-//#include"cfortran.h"
-
-#ifndef USE_RESULT
-	#define USE_RESULT 0
-#endif
-
 
 double INT_PREC=1;
 int N_APPROX=N_CHEB_R;
+#include"kt-formula.hh"
 #include"./fcn.h"
 
 //KtFCN theFCN("/home/tomoki/Saturation-Model/saturation-ver3/data/hera_tot.dat");
@@ -234,7 +231,7 @@ int main(int argc, char** argv){
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	std::cout<<"min= "<<min<<std::endl;
 	//std::fstream file;
-	std::chrono::duration<PREC> time=walltime.now()-start;
+	std::chrono::duration<double> time=walltime.now()-start;
 	
 	std::cout<<time.count()<<" seconds"<<std::endl;
 	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	

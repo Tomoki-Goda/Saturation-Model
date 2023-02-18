@@ -10,9 +10,8 @@
 
 //#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
 //#include"./clenshaw-curtis.hh"
-#include"./kt-formula.hh"
-#include<ctime>
-#include<chrono>
+//#include"./kt-formula.hh"
+
 
 #ifndef R_FORMULA
 	#define RFORMULA 0
@@ -59,18 +58,11 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			}
 			while((!feof(file))&&(j<597)){
 				fscanf(file,"%lf %lf %lf %lf %lf", (Q2_DATA+i),(X_DATA+i),&wdata,(CS_DATA+i),(ERR_DATA+i)); 
-				//printf("%le %le %le %le %le\n", *(Q2_DATA+i),*(X_DATA+i),wdata,*(CS_DATA+i),*(ERR_DATA+i)); 
-				
-			
 				if((X_DATA[i]<=X_MAX)&&( Q2_DATA[i]<=Q2_MAX)){
-					//printf("%le %le %le %le %le\n", *(Q2_DATA+i),*(X_DATA+i),wdata,*(CS_DATA+i),*(ERR_DATA+i)); 
-					/////formula in I. Abt et al 2017////////
 					fac = pow(Q2_DATA[i],2)*(1-X_DATA[i])/ (4*pow(PI,2)*alpha*(Q2_DATA[i]+pow(2*X_DATA[i]*xmp0,2)));
 					fac*=units;	
 					CS_DATA[i] = fac*CS_DATA[i];
 					ERR_DATA[i] = fac*ERR_DATA[i];
-					//fprintf(stdout, "%d: %lE %lE %lE %lE %lE\n",i+1,*(X_DATA+i), *(Y_DATA+i), *(Q2_DATA+i), *(CS_DATA+i), *(ERR_DATA+i));
-					//printf("%.3e %.3e %.3e %.3e %.3e\n", Q2_DATA[i],X_DATA[i],wdata,CS_DATA[i],ERR_DATA[i]); 
 					++i;
 				}
 				if(i==MAX_N){
@@ -119,20 +111,12 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			F2_kt F2(sigpar);
 			for(int i=0;i<MAX_N;++i){
 				val=0;
-				//x=X_DATA[i];
-				//Q2=Q2_DATA[i];
 				val=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
 				if(i>0){
 					printf("\033[1A \033[2K");
 				}
 				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],pow(fabs(val-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);	
 				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
-#if SCATTER==1
-			printf("done %.3e\n",chisq/(i+1));
-			//exit(0);
-			getchar();
-#endif
-				
 			}
 			printf("\033[1A \033[2K");
 
@@ -149,7 +133,6 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				printf("theFCN:: %.3e encountered\n", chisq);
 				return(0);
 			}
-			//getchar();
 			return ((double)chisq);
 		}
 		

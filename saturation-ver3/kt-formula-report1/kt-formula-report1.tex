@@ -5,6 +5,8 @@
 %\usepackage{librebaskerville}
 \usepackage{xcolor}
 \usepackage[]{geometry}
+%\usepackage{caption}
+\usepackage{subcaption}
 
 \geometry{left=2cm,right=2cm,top=2.5cm,bottom=2cm}
 \usepackage{graphicx}
@@ -116,6 +118,8 @@ In order to use the GBK dipole, one needs to evaluate
 \end{split}
 \end{equation}
 While $\nabla^2_r\sigma(x,r)$ is relatively smooth function, $J_0(z)$ is oscillatory function imposing difficulty in integration. Thus one may approximate  $\nabla^2_r\sigma(x,r)$.
+
+
 \subsection{Alternatively...}
 $\nabla^2_r\sigma(x,r)$
  of GBW is 
@@ -133,13 +137,38 @@ small-$r$ limit is
 &=\pi \alpha xg(x,1/r).
 \end{split}
 \end{equation}
-For this, we obtain 
+For this, we can propose
 \begin{equation}
 Q_s^2=\frac{4\pi^2 \alpha x g(x,1/r)}{3\sigma_0},
 \end{equation}
 which is almost BGK. 
 
-
+\subsection{On running coupling of BGK}
+\begin{equation}
+\sigma(x,r)=\frac{4\pi}{N_c}\int\frac{d^2\mathbf{k}_t}{k_t^2}\left(1-e^{-i\mathbf{k}_t\cdot \mathbf{r}}\right)\alpha\mathcal{F}(x,k_t)
+\end{equation}
+in small-$r$ limit (for $k_t r\ll1$ considering large-$k_t$ region is irrelevant.), 
+\begin{equation}
+\begin{split}
+\sigma(x,r)&=\frac{4\pi}{N_c}\int^{1/r^2}_0 dk^2_t\left(\frac{k_t^2r^2 \pi}{4}\right)\alpha\mathcal{F}(x,k_t^2)\\
+&=\frac{\pi^2}{N_c}\int^{1/r^2}_0 dk^2_t \alpha\mathcal{F}(x,k_t^2)
+\end{split}
+\end{equation}
+then in BGK,
+\begin{equation}
+%\begin{split}
+=\frac{\pi^2}{N_c}\alpha xg(x,1/r^2).
+%\end{split}
+\end{equation}
+But what exactly happened to $\alpha$? 
+Usually the relation is 
+\begin{equation}
+xg(x,Q^2)=\int^{Q^2}_0 d k^2_t \mathcal{F}(x,k_t^2)
+\end{equation}
+without $\alpha$. 
+if $\alpha=\alpha(\mu^2)$, the BGK derivation fails...
+Also, note, that the argument of $\
+alpha$ being $1/r$ may be a bit odd as it is not just $k^2_t$ in the $k_t$ formula.
 
 \section{Discussion}
 \subsection{Theta function, integration limits and modified $x$}
@@ -263,7 +292,119 @@ x_2&\frac{1}{ ({x'}_1 x_2)+\epsilon}& x_1&\frac{1}{({x'}_2 x_1)+\epsilon}
 \end{equation}
 in small $k$ limit,
 \begin{equation}
-\lim_{k\rightarrow0 } \alpha \mathcal{F} =\frac{3}{8\pi^2}\int^\infty_0dr r \nabla^2_r \sigma
+\begin{split}
+\lim_{k\rightarrow0 } \alpha \mathcal{F} &=\frac{3}{8\pi^2}\int^\infty_0dr r \nabla^2_r \sigma\\
+&=\frac{3}{8\pi^2}\int^\infty_0dr r\left[\frac{\partial^2\sigma}{\partial r^2}+\frac{\partial\sigma}{\partial r}\right]\\
+&=\frac{3}{8\pi^2}\left[r\frac{\partial\sigma}{\partial r}-\int dr \frac{\partial\sigma}{\partial r} +\sigma \right]^\infty_0\\
+&=\frac{3}{8\pi^2}\left[r\frac{\partial\sigma}{\partial r}\right]^\infty_0=\frac{3}{8\pi^2}\left[\frac{\partial\sigma}{\partial \log(r)}\right]^\infty_0
+\end{split}
 \end{equation}
+
+\begin{figure}
+\includegraphics[width=\textwidth]{./dipole1.png}
+\caption{Dipole cross sections. Left: GBW, Right: BGK.}
+\end{figure}
+\begin{figure}
+\includegraphics[width=\textwidth]{./gluon1.png}
+\caption{Observe the new structure arizing from the DGLAP (larger-$k_t$ peak). When $x$ is small it becomes the dominant contributon. Also there is a narrow ridge around $x\sim1$. It is probably a saturation line, i.e. the line is not straight like in GBW case. {\color{green}Some change of variables may be helpfull...}   }
+\end{figure}
+
+
+\section{Computational strategies}
+\subsection{$\alpha\mathcal{F}$ and $\nabla^2_r \sigma$}
+\begin{equation}
+\begin{split}
+\alpha\mathcal{F}&=\frac{3}{8\pi^2}\int^\infty_0dr r J_0(r k)\nabla^2_r \sigma(x,r)\\
+&=\frac{3}{8\pi^2}\int^\infty_0dr rJ_0(r k) \left(\frac{1}{r}\frac{\partial}{\partial r}\left(r\frac{\partial}{\partial r}\right)\right) \sigma(x,r)
+\end{split}
+\end{equation}
+Using integration by parts,
+\begin{equation}
+\begin{split}
+\alpha\mathcal{F}&=\frac{3}{8\pi^2}\int^\infty_0dr J_0(r k) \frac{\partial}{\partial r} \left(r\frac{\partial}{\partial r}\right) \sigma(x,r)\\
+&=\frac{3}{8\pi^2}\left[ J_0(r k)\left(r\frac{\partial}{\partial r}\right) \sigma(x,r) - \int dr \frac{\partial J_0(r k)}{\partial r} \left(r\frac{\partial}{\partial r}\right) \sigma(x,r)\right]^\infty_0\\
+&=\frac{3}{8\pi^2}\left[  \int dr r k J_1(r k)\frac{\partial}{\partial r}\sigma(x,r)\right]^\infty_0,
+\end{split}
+\end{equation}
+assuming 
+\begin{equation}
+\lim_{r\rightarrow0,\infty}J_0(r k)\left(r\frac{\partial}{\partial r}\right) \sigma(x,r)=0.
+\end{equation}
+Hence, one has two ways to compute the gluon density;
+\begin{align}
+&\frac{3}{8\pi^2}\int^\infty_0dr r J_0(r k)\nabla^2_r \sigma(x,r)\\
+&\frac{3}{8\pi^2}\int^\infty_0  dr r k J_1(r k)\frac{\partial}{\partial r}\sigma(x,r)
+\end{align}
+Now, these integrals are in the form of\textbf{ Hankel transform}.
+
+as a by-product of interpolation, derivatives are obtainable in gsl\_cheb or gsl\_interp. However in any case second derivative may become a source of inaccuracy...
+
+
+Let us assume small $Q_s^2$, and for $r>>Q_s$, integrand is negligible, then
+\begin{equation}
+\begin{split}
+\frac{3}{8\pi^2}\int^{1/Q_s}_0  dr r k J_1(r k)\frac{\partial}{\partial r}\sigma(x,r)\\
+\simeq \frac{3}{8\pi^2}\int^{1/Q_s}_0  dr  k J_1(r k) r^2 Q_s^2\\
+=\frac{3Q_s^2}{8\pi^2} \frac{J_2(k/Q_s)}{k Q_s^2}  
+\end{split}
+\end{equation}
+
+
+\begin{figure}
+\includegraphics[width=\textwidth]{compare-gbw-500.png}
+\includegraphics[width=0.45\textwidth]{ibp1-200.png}
+\includegraphics[width=0.45\textwidth]{ibp1-750.png}
+\caption{IBP2,IBP1,IBP0, comparisom with analytic $\alpha\mathcal{F}$ of GBW. 500 points taken in $r$.
+Bottom: IBP1 with 200 and 750 points grid.\\
+All in the same scale.
+ }
+\end{figure}
+
+
+\begin{table}
+\begin{subtable}{\textwidth}
+\resizebox{\textwidth}{!}{\begin{tabular}{|c c|c|c|c|c|}
+\hline
+type & light quark mass $[\mathrm{GeV}]$&  $\sigma_0 \;[\mathrm{mb}]$ &  $x_0 (10^{-4})$ &  $\lambda$ &  $\chi^2/\mathrm{dof}$ 
+\\\hline
+$\mathrm{GBW}$& $m_l=0.14$ & 23.8 & 1.12 & 0.308 & 5.27 \\ \hline
+$\mathrm{GBW+Sud}$&$m_l=0.14$ & 23.0 & 1.32 & 0.287 & 3.37 \\ \hline
+\color{red}$\alpha(\mu)\mathcal{F}_\mathrm{GBW} $&$m_l=0$ & \color{red}56.1 & \color{red}2.64 & \color{red}0.32 &\color{red} 2.45\\ \hline
+\color{red}$\alpha\mathcal{F}_\mathrm{GBW} $&$m_l=0$ & \color{red}33.4 & \color{red}1.34 &\color{red}0.33 & \color{red}4.39\\ \hline
+$\mathrm{GBW}$& $m_l=0.0$ & 19.1 & 2.58 & 0.322 & 4.44 \\ \hline
+$\mathrm{GBW+Sud}$& $m_l=0.0$ & 18.6 & 3.11 & 0.299 & 2.66 \\ \hline
+\end{tabular} }
+        %\input{./Plots/GBWS-Fix-S.tex}
+        \vspace{2mm}
+    \end{subtable}
+
+    \begin{subtable}[H]{\textwidth}
+        \centering
+\resizebox{\textwidth}{!}{\begin{tabular}{|c c|c|c|c|c|c|c|}
+\hline
+type&light quark mass $[\mathrm{GeV}]$&  $\sigma_0\; [\mathrm{mb}]$ &  $A_{\mathrm{g}}$ &  $\lambda_{\mathrm{g}}$ &  $C$ &  $\mu_{0}^2\;[\mathrm{GeV^2}]$ &  $\chi^2/\mathrm{dof}$ 
+\\\hline
+$\mathrm{BGK}$& $m_l=0.14$ & 33.1 & 1.33 & 0.0553 & 0.420 & 1.76 & 1.62 \\ \hline
+$\mathrm{BGK+Sud}$& $m_l=0.14$& 30.7 & 6.28 & -0.380 & 0.677 & 3.09 & 1.27 \\ \hline
+\color{red}$\alpha\mathcal{F}_\mathrm{BGK}$& $m_l=0.0$ & \color{red}34.8& \color{red}1.09 & \color{red}0.210 & \color{red}0.215 & \color{red}1.06 &\color{red} 1.60 \\ \hline
+$\mathrm{BGK}$& $m_l=0.0$ & 23.3 & 1.18 & 0.0832 & 0.329 & 1.87 & 1.56 \\ \hline
+$\mathrm{BGK+Sud}$& $m_l=0.0$ & 22.2 & 8.67 & -0.500 & 0.670 & 3.83 & 1.21 \\ \hline
+\end{tabular}
+}
+       % \input{./Plots/BGKS-Fix-S.tex}
+    \end{subtable}
+    \caption{ }
+    \label{table:fullTable}
+\end{table}
+
+
+\begin{figure}
+\includegraphics[width=0.475\textwidth]{./dipole-GBW.png}
+\includegraphics[width=0.475\textwidth]{./dipole-BGK.png}
+\end{figure}
+\begin{figure}
+\includegraphics[width=0.475\textwidth]{./gluon-GBW.png}
+\includegraphics[width=0.475\textwidth]{./gluon-BGK.png}
+\end{figure}
 
 \end{document}

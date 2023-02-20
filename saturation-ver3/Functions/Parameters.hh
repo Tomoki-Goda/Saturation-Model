@@ -11,7 +11,7 @@ double   par_max[] 	= {	80.0,	1.00,		100.0,		10,		10.0,	10.0,		2.0,	2.0};
 std::string  par_name[]	= {
 "sigma_0",	"A_g",	"lambda_g",	"mu102",	"C1", 	"mu02",		"C2",	"mu202",	"g1",	"g2"};
 double par_start[]  	= {
-23.3,		1.18,	0.0832,		4.0,		0.329, 	1.87,		1.26,	2.0,		0.1, 	0.1};  
+33.0,		1.0,	0.2,		4.0,		0.2, 	1.5,		1.26,	2.0,		0.1, 	0.1};  
 double par_error[]  	= {
  5.00,  	0.10,	0.2, 		1.0,		1.0,	0.1,		0.1,	0.1,		0.01,	0.01};
 double   par_min[] 	= {
@@ -20,7 +20,8 @@ double   par_max[] 	= {
 50.00,		20.00,	5.0, 		10.0,		10.0,	10.0,		10,	10.0,		2.0,	2.0};
 #endif
 
-int parameter(const std::vector<double>& par,double (& sigpar)[],double (& sudpar)[]){
+//int parameter(const std::vector<double>& par,double (& sigpar)[],double (& sudpar)[]){
+int parameter(const std::vector<double>& par,double *sigpar,double *sudpar){
 ///////////////////
 //Sigpar are as we all know it, parameters for dipole sigma.
 //sudpar are {C , r_max, g1, g2} but parameters may be given in terms of mu02 (as in BGK), and C and r_max may be that of BGK.
@@ -43,16 +44,16 @@ int i=0,j=0,k=0;
 	sigpar[j++]=(par[i++]);
 #endif
 
-#if MU02==0
+#if (MU02==0 && ALPHA_RUN==1)
 	sigpar[j++]=par[i++];
 #else 
-	++i;
+//	++i;
 #endif
-	//printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
+//	printf("SIGMA: %.2e %.2e %.2e ",sigpar[0],sigpar[1],sigpar[2]);
 #if(MODEL==1||MODEL==3)
 	sigpar[j++]=(par[i++]);
 	sigpar[j++]=(par[i++]);//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
-	//printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
+//	printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)
@@ -87,10 +88,20 @@ int i=0,j=0,k=0;
 	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
 #endif
 #endif
+//	printf("\n");
+//	printf("sig %d  sud %d\n",j,k );
 	//printf("\n");
 	//if(i!=N_PAR){
 	//	printf("parameter number mismatch counted %d, N_PAR= %d\n",i,N_PAR);
 	//	exit(0);
 	//}
+	printf("sigpar: ");
+	for(int l=0;l<j;l++){
+		printf(" %.3e  ",sigpar[l]);
+	}
+	printf("\tsudpar: ");
+	for(int l=0;l<k;l++){
+		printf("%.3e  ",sudpar[l]);
+	}printf("\n");
 	return 0;
 }

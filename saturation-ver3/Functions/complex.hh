@@ -70,7 +70,7 @@ doublecomplex operator * (const doublecomplex & b,const double & a ) {
 
 
 
-doublecomplex Complex(double re, double im){
+doublecomplex Complex(const double re, const double im){
 	doublecomplex c;
 	c.r=re;
 	c.i=im;

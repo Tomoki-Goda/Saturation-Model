@@ -1,8 +1,5 @@
 //////////////////////////////////////////////////////////////////
 /////////////////////// regular control //////////////////////////
-//typedef long double PRECISION;
-typedef double PREC;
-//#define PRECISION cubareal
 //////////////////////////////////////////////////////////////////
 //////////////     MODEL AND FIXED PARAMETERS             ////////
 //////////////////////////////////////////////////////////////////
@@ -39,26 +36,10 @@ typedef double PREC;
 
 ////// upper and lower cut off of r ////////
 #ifndef R_MIN
-	#define R_MIN 1.0e-8
+	#define R_MIN 1.0e-6
 #endif
 #ifndef R_MAX
-	#define R_MAX 30
-#endif
-
-
-//////////////////IRREGULAR CONTROL//////////////////////
-#ifndef  SATURATION
-//if 0 use small r limit of model such that it does not have saturation 
-	#define SATURATION  1
-#endif
-
-/////////////////////to control mu02 of the Sudakov/////////////
-#ifndef MU202
-	#define MU202 0 //0 to use default set in Parameter.h
-#endif
-
-#ifndef IIM // IIM model. not for fitting!! and overwrites all selections for dipole.
-	#define IIM 0
+	#define R_MAX 1e+5
 #endif
 
 //////////////////////////////////////////////////////////////////
@@ -68,19 +49,9 @@ typedef double PREC;
 	#define PRINT_PROGRESS 0
 #endif
 
-#ifndef N_SIMPS_R
-//number of sampling for R integration, points are 2*N+1. //comparison with Fejer suggests it needs about 250 
-	#define N_SIMPS_R 200 
-#endif
-
 #ifndef N_CHEB_R
 //number of sampling for R integration, points are N divisible by 8
-	#define N_CHEB_R 120 
-#endif
-
-#ifndef DGAUSS_PREC 
-//precision of integration for adaptive gauss quadrature integration. or other methods
-	#define DGAUSS_PREC 1.0e-4
+	#define N_CHEB_R 250 
 #endif
 
 #ifndef STAR
@@ -104,50 +75,65 @@ typedef double PREC;
 #endif
 
 
+
+#ifndef LAPLACIAN
+	#define LAPLACIAN 0
+#endif
+#ifndef IBP
+	#define IBP 0
+#endif
+
+#ifndef ALPHA_RUN
+	#define ALPHA_RUN 0 
+#endif
+#ifndef MODX
+	#define MODX 0
+#endif
+#ifndef PHI
+	#define PHI 0
+#endif
+
+#ifndef SCATTER
+	#define SCATTER 0
+#endif
+
+#ifndef MU02
+	#define MU02 1
+#endif
+
+#ifndef GLUON_APPROX
+	#define GLUON_APPROX 1
+#endif
+
+#ifndef HANKEL
+	#define HANKEL 0
+#endif
+#ifndef FREEZE_QS2 
+	#define FREEZE_QS2 0
+#endif
+
+#ifndef ADD_END
+	#define ADD_END 0
+#endif
+#ifndef GBW_APPROX
+	#define GBW_APPROX 0
+#endif
+
 #ifndef R_CHANGE_VAR
-//use R=r/(1-r) for r integration. //seems to severely affect the quality...
+//use R=r/(1-r) for r integration. 
 	#define R_CHANGE_VAR 0
 #endif
 
-#ifndef NONLINEAR
-//whether to use nonlinear transformation for fejer-curtis-clenshaw quadrature.
-	#define NONLINEAR 0 
+#ifndef USE_RESULT
+	#define USE_RESULT 0
 #endif
 
-#ifndef FEJER
-	#define FEJER 0
+#ifndef R_FORMULA
+	#define R_FORMULA 0
 #endif
 
-///////////////////   IRREGULAR CONTROL ///////////////////////
-//// NOT TESTED, DISCONTINUED, ETC... CHECK WHEN CHANGED //////
-///////////////////////////////////////////////////////////////
-#ifndef NEW_DATA
-	#define NEW_DATA 1 //1 mean only reading new hera
-#endif
-
-#ifndef Z_INTEGRATE
-//integrate photon wave function over Z in advance
-	#define Z_INTEGRATE 1
-#endif
-
-#ifndef TEST
-// can be used for test... not properly defined...
-	#define TEST 0
-#endif
-
-#ifndef SIMPS_GBS
-//DISCONTINUED. use in-house simpson integration for GBS. 
-	#define SIMPS_GBS 0
-#endif
-
-#ifndef SIMPS_Z_INT
-//DISCONTINIED use in-house integration for z integration of photon psi.
-	#define SIMPS_Z_INT 0
-#endif
-
-#ifndef THETA_OFF
-//DISCONTINUED  . allow lower limit of sudakov to be larger than upper limit. 
-	#define THETA_OFF 0
+#ifndef THRESHOLD
+	#define THRESHOLD 0
 #endif
 
 //////////////////////////////////////////////////////////////////
@@ -155,19 +141,9 @@ typedef double PREC;
 //////////////////////////////////////////////////////////////////
 //N_PAR is number of fit parameters
 #if MODEL ==0 
-#if MU02==0
 	#define N_PAR 4
-#else 
-	#define N_PAR 3
-#endif
-
 #elif MODEL==1
-#if MU02==0
 	#define N_PAR 6
-#else 
-	#define N_PAR 5
-#endif
-
 #elif (MODEL==2||MODEL==22)
 	#if SUDAKOV==0
 		#define N_PAR 3
@@ -199,47 +175,6 @@ typedef double PREC;
 	#endif
 #endif
 
-
-//dipole sigma
- /*
-#if IIM==1
-/////////////////////////////////////////////////////////
-//IIM model
-////////////////////////////////////////////////////////
-	#define SIGMA(r,x,Q2,par,sudpar) sigma_iim(r,x,Q2,par)
-	#define BASE_SIGMA sigma_iim 
-/////////////////////////////////////////////////////////
-#else
-	#if MODEL==0
-		#define SIGMA(r,x,Q2,par, sudpar)  sigma_gbw(r,x,Q2,par)
-	#elif MODEL==1
-		#define SIGMA(r,x,Q2,par, sudpar)  sigma_bgk(r,x,Q2,par)
-	#elif MODEL==2
-		#define SIGMA(r,x,Q2,par, sudpar)  sigma_gbs(r,x,Q2,par)  
-	#elif MODEL==22
-		#define SIGMA sigma_s 
-	#elif MODEL==3
-		#define SIGMA sigma_s
-	#endif
-
-
-//dipole sigma to be combined with sudakov
-	#if SATURATION ==1
-		#if (MODEL==3||MODEL==1)
-			#define BASE_SIGMA sigma_bgk
-		#elif (MODEL==22||MODEL==2||MODEL==0)
-			#define BASE_SIGMA sigma_gbw
-		#endif
-	#elif SATURATION==0
-		#if (MODEL==3||MODEL==1)
-			#define BASE_SIGMA sigma_bgk_ns
-		#elif (MODEL==22||MODEL==2||MODEL==0)
-			#define BASE_SIGMA sigma_gbw_ns
-		#endif
-	#endif
-
-#endif
-*/
 
 
 

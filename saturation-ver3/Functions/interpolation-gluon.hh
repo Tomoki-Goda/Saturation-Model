@@ -46,7 +46,7 @@ class Approx_aF{
 				printf("\033[2K\r");
 				printf(" approxed x=%.2e\n", x);
 			}
-			printf("\033[1A\033[2K Grid done\n");
+			//printf("\033[1A\033[2K Grid done\n");
 				
 			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
 			//}

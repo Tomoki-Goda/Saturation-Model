@@ -21,7 +21,7 @@ extern "C" doublecomplex wgamma_(const doublecomplex*);
 extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
 extern "C" double dgammf_(const double*);
 class Collinear_Gluon{
-	CCIntegral cc=CCprepare(128,"gluon",8,5);
+	CCIntegral cc=CCprepare(256,"gluon",4,3);
 	
 	private:
 		const double       beta = 6.6;
@@ -139,7 +139,7 @@ class Collinear_Gluon{
 		    	normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
 			//value=dclenshaw<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15);
 			//value=dgauss<const Collinear_Gluon, const double*>(*this,par,  0,150,1.0e-15,1.0e-17); 
-			value=dclenshaw< const Collinear_Gluon, const std::vector<double> >(cc,*this,par, 0,150,1.0e-15,1.0e-17);  
+			value=dclenshaw< const Collinear_Gluon, const std::vector<double> >(cc,*this,par, 0,150,1.0e-12,1.0e-16);  
 			//this->flag=0;	
 			value=normalization*value;
 			if(!std::isfinite(value)||value<0){

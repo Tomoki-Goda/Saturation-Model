@@ -174,8 +174,8 @@ class Dipole_Gluon{
 			val=Kahn_total(accum);
 #endif
 #if (IBP>=1&&ADD_END!=0)			
-			val+=integrand.constant(R_MAX/(1+R_MAX),par);
-			val-=integrand.constant(R_MIN/(1+R_MIN),par);
+			val+=integrand.constant(rmax/(1+rmax),par);
+			val-=integrand.constant(rmin/(1+rmin),par);
 #endif
 			Kahn_free(accum);
 

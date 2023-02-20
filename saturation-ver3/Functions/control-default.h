@@ -128,6 +128,13 @@
 	#define USE_RESULT 0
 #endif
 
+#ifndef R_FORMULA
+	#define R_FORMULA 0
+#endif
+
+#ifndef THRESHOLD
+	#define THRESHOLD 0
+#endif
 
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////

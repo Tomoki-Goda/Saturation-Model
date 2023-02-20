@@ -12,11 +12,6 @@
 //#include"./clenshaw-curtis.hh"
 //#include"./kt-formula.hh"
 
-
-#ifndef R_FORMULA
-	#define RFORMULA 0
-#endif
-
 //extern double F2_kt(const  double,const  double,const double, const double(&)[]);
 //extern double F2_r(const double,double,double,double*);
 class KtFCN : public ROOT::Minuit2::FCNBase {

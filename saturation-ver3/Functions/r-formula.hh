@@ -97,6 +97,9 @@ class Sigma{
 #endif//IBP==2
 			//printf("%.3e\n",val);
 			//printf("val=%.3e: r= %.3e C=%.3e mu02=%.3e ,mu2=%.3e, Qs2=%.3e \n",val, r,C,mu02,mu2,qs2 );
+			if(!std::isfinite(val)){
+				return(0);
+			}
 			return val;
 		}
 

@@ -7,6 +7,9 @@ inline double  modx(const double  x, const double  Q2, const  double  mf2){
 	return( x);
 #endif
 }
+inline double alpha(const double mu2){
+	return 4.0/(9.0 *log( ((mu2>2*LQCD2)?(mu2):(2.0*LQCD2))/LQCD2));
+}
 
 double change_var(double & var,double &  jac,const double min, const double max,const double c){//This version is (in theory) regular at max->Inf
 	double den=( (c==1)?(1):(c+var*(1-c)) );
@@ -36,9 +39,10 @@ double change_var(double & var,double &  jac,const double min, const double max,
 //
 ////////////////////////////////////////////////////////////////////
 class Gluon_GBW{
-	double sigma_0=0,lambda=0,x_0=0;
-	double x=0;
+	double sigma_0=0,lambda=0,x_0=0,mu02=0;
+	//double x=0;
 	std::string key;
+
 	
 	public:
 		explicit Gluon_GBW(){
@@ -47,17 +51,20 @@ class Gluon_GBW{
 				sigma_0 =(double)par[0];
 				lambda	=(double)par[1];
 				x_0	=(double)par[2];
+#if MU02==0
+				mu02 = par[3];
+#else 
+				mu02 = MU02;
+#endif
 		}
 		~Gluon_GBW(){}
 		
 	public:
-		inline double alpha(const double mu2)const{
-			return 4.0/(9.0 *log( ((mu2>2*LQCD2)?(mu2):(2.0*LQCD2))/LQCD2));
-		}
-		void set_x(double x){
-			this->x=x;
-		}
-		double operator()(const double k2,double mu2){
+
+		//void set_x(double x){
+		//	this->x=x;
+		//}
+		double operator()(const double x,const double k2,double mu2){
 			if(x_0<1.0e-5||x_0>1.0e-3){
 				return 0;
 			}
@@ -69,8 +76,9 @@ class Gluon_GBW{
 			if(std::isnan(val)==1){
 				return(0);
 			}
-#if RUN==1
-			val*=alpha(mu2);
+#if ALPHA_RUN==1
+			val*=alpha(mu2+mu02)/0.2;
+			//printf("%.2e %.2e\n",mu2,alpha(mu2));
 #endif
 			return (sigma_0*val) ;
 		}
@@ -89,10 +97,6 @@ class Dipole_Gluon{
 		CCIntegral cc=CCprepare(64,"dipole",1,10);
 		double x;	
 
-		inline double alpha(double mu2 )const{
-			static double b0= ((double)(33 -2*NF))/(12*PI);
-			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
-		}
 	public: 
 		Dipole_Gluon(){
 		}
@@ -174,6 +178,11 @@ class Dipole_Gluon{
 			val-=integrand.constant(R_MIN/(1+R_MIN),par);
 #endif
 			Kahn_free(accum);
+
+			
+			if(!std::isfinite(val)){
+				val=0;
+			}
 			return (3.0/(8*PI*PI)*val);
 		}
 		

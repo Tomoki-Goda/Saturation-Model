@@ -10,6 +10,7 @@ class Approx_aF{
 		gsl_interp_accel *x_accel_ptr, *kt2_accel_ptr;
 		gsl_spline2d *  spline_ptr;
 		double *kt2_array,*x_array,*aF_array;
+		double mu02=0;
 		
 		double kt2min=1.0e-15,kt2max=-1;
 		
@@ -132,14 +133,20 @@ class Approx_aF{
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
 			aF.init(npts3,par);
+#if MU02==0
+			mu02 = par[3];
+#else 
+			mu02 = MU02;
+#endif
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;
 			
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
-			//if(x<=0.5){
-			//	val*=exp(-pow(1-x,-2));
-			//}
+#if ALPHA_RUN==1
+			val*=alpha(mu2+mu02)/0.2;
+			//printf("%.2e %.2e\n",mu2+mu02,alpha(mu2+mu02));
+#endif
 			return(val);
 		}
 };

@@ -51,7 +51,7 @@
 
 #ifndef N_CHEB_R
 //number of sampling for R integration, points are N divisible by 8
-	#define N_CHEB_R 200 
+	#define N_CHEB_R 250 
 #endif
 
 #ifndef STAR

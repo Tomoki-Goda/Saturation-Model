@@ -204,8 +204,8 @@ class Laplacian_Sigma{
 			return val;
 #endif
 		}
-		double constant(double rho , const std::vector<double> &par)const {
-			const double r=rho/(1-rho);
+		double constant(double r , const std::vector<double> &par)const {
+			//const double r=rho/(1-rho);
 			const double kt=sqrt(par[0]);
 			double val;
 #if IBP==1

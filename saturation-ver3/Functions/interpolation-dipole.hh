@@ -6,6 +6,7 @@ typedef struct {int j; Laplacian_Sigma *ptr;} sigmaopt;
 //FOR APPROXIMATION AND DERIVATIVES		
 //class Laplacian_Sigma:public Sigma{
 
+//pthread_mutex_t mut;
 class Laplacian_Sigma{
 	private:
 		double max=R_MAX, min=R_MIN; 
@@ -29,6 +30,7 @@ class Laplacian_Sigma{
 		double sigma_0=0;
 		
 		static void* compute(void*opt){
+			//pthread_mutex_lock(&mut);
 			sigmaopt* param=(sigmaopt*)opt;
 			Laplacian_Sigma *sigmaptr=param->ptr;
 			const int j=param->j;
@@ -36,9 +38,8 @@ class Laplacian_Sigma{
 			if(!std::isfinite((sigmaptr->sigma_array)[j])){
 				printf("can not approximate sigma=%.3e\n",sigmaptr->sigma_array[j] );
 			}
-			
-			return NULL;
-			
+			//pthread_mutex_unlock(&mut);
+			return opt;
 		}
 		int approximate_thread(const double x){
 			sigma.set_kinem(x);
@@ -48,11 +49,18 @@ class Laplacian_Sigma{
 			for (int j = 0; j < r_npts; j++){
 				args[j].j=j;
 				args[j].ptr=this;
-				i1=pthread_create(thread+j,NULL,compute,(void*)(args+j) );
+			}
+			for (int j = 0; j < r_npts; j++){
+				i1=pthread_create(thread+j,NULL,&compute,(void*)(&args[j]) );
+			//	if((j/2)*2!=j){
+			//		pthread_join(thread[j],NULL);
+			//		pthread_join(thread[j-1],NULL);
+			//	}
 			}
 			for(int i=0;i<r_npts;++i){
 					pthread_join(thread[i],NULL);
 			}
+
 			//printf("ready\n ");
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 				
@@ -72,8 +80,8 @@ class Laplacian_Sigma{
 	public:
 		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
-			approximate(x);
-			//approximate_thread(x);
+			//approximate(x);
+			approximate_thread(x);
 			return 0;
 		}	
 		

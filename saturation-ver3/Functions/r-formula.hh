@@ -90,7 +90,13 @@ class Sigma{
 			const double val=-sigma_0*exp(-pow(r,2)*qs2/4);
 #else
 #if LAPLACIAN==0
-			const double val=sigma_0*(1-exp( - pow(r , 2)*qs2/4));
+			double val;
+			val=pow(r,2)*qs2/4;
+			if(val<1.0e-6){
+				val*=sigma_0;
+			}else{
+				val=sigma_0*(1-exp( -val));
+			}
 #elif LAPLACIAN==1
 			const double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
 #endif//LAPLACIAN

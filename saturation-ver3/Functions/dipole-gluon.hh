@@ -94,7 +94,7 @@ class Gluon_GBW{
 class Dipole_Gluon{
 		const double *par;
 		Laplacian_Sigma integrand;
-		CCIntegral cc=CCprepare(128,"dipole",8,3);
+		CCIntegral cc=CCprepare(64,"dipole",4,3);
 		double x;	
 
 	public: 
@@ -129,8 +129,9 @@ class Dipole_Gluon{
 				return(3.0/(8*PI*PI)*val);
 			}
 #endif
+			const double minmax=50;
 #if ADD_END>=0
-			rmax=50.0;
+			rmax=minmax;
 #if MODEL==1
 			rmax/=pow(1-x,2.5);
 #endif
@@ -138,23 +139,34 @@ class Dipole_Gluon{
 				//printf("rmax %.3e reduced to %.3e\n",rmax,R_MAX );
 				rmax=R_MAX;
 			}
-			double scale=(2*PI)/sqrt(kt2),imin=rmin;
+			const double scale=(2*PI)/sqrt(kt2);
+			double imin=rmin;
 			int j=(int)(rmax/scale);
 			if(j<3){
 				j=3;
 			}
 			
-#if IBP==0||IBP==2 //actually important. better cancellation for convergence.
-			double imax=PI/(sqrt(kt2)*4);
-#elif IBP==1
+//#if IBP==0||IBP==2 //actually important. better cancellation for convergence.
+			//double imax=PI/(sqrt(kt2)*4);
+			//double imax=PI/(sqrt(kt2)*2);
+			//with this differences coming from the first term of ibp is small.
+//#elif IBP==1
 			double imax=3*PI/(sqrt(kt2)*4);
-#endif
+//#endif
 			
 			int flag=0;
 			//double val_prev=0;
 			for(int i=0;i<j;++i){
-				imax=imax+scale;
-				if(imax>rmax){imax=rmax;};
+				imax+=scale;
+				if(imax>rmax){
+					if(i>0){
+						imax-=scale;
+						j=i-1;
+						break;
+					}else{
+						imax=rmax;
+					}
+				};
 #if R_CHANGE_VAR==1
 				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/10,INT_PREC/100);
 #elif R_CHANGE_VAR==0
@@ -162,7 +174,7 @@ class Dipole_Gluon{
 #endif
 				if(fabs(val)<1.0e-10){
 					++flag;
-					if(flag>3){
+					if(flag>6&&imax>minmax){
 						break;//it is likely beyond this will be trivial
 					}
 				}else{
@@ -173,9 +185,18 @@ class Dipole_Gluon{
 			}
 			val=Kahn_total(accum);
 #endif
-#if (IBP>=1&&ADD_END!=0)			
-			val+=integrand.constant(rmax/(1+rmax),par);
-			val-=integrand.constant(rmin/(1+rmin),par);
+			double diff=0;
+//#if (IBP>=1&&ADD_END!=0)			
+#if (IBP>=1)			
+			diff+=integrand.constant(imax,par);
+			diff-=integrand.constant(rmin,par);
+			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
+				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
+				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(j*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
+			}
+#if ADDEND!=0
+			val+=diff;
+#endif
 #endif
 			Kahn_free(accum);
 

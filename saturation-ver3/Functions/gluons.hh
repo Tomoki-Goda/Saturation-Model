@@ -16,13 +16,15 @@
 #include"./constants.h"
 #include "./clenshaw.hh"
 #include "./gauss.hh"
+#include<pthread.h>
+#include<gsl/gsl_sf_gamma.h>
 /* CERNLIB functions*/
 extern "C" doublecomplex wgamma_(const doublecomplex*);
 extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
 extern "C" double dgammf_(const double*);
+pthread_mutex_t mut1, mut2,mut3;
 class Collinear_Gluon{
 	CCIntegral cc=CCprepare(256,"gluon",4,3);
-	
 	private:
 		const double       beta = 6.6;
 		const double        n_0 = 0.5;       /* Maximal singluraity of integrand */
@@ -30,6 +32,7 @@ class Collinear_Gluon{
 		//double A_g, lambda_g;
 
 		doublecomplex gammatilde(const doublecomplex& n)const{
+			//pthread_mutex_lock(&mut);
 			//return n;
 			doublecomplex n1,n2,n3,l1,l2,t1,t2,t3,cx,value;
 			double m1,m2,rl;
@@ -46,14 +49,17 @@ class Collinear_Gluon{
 			m2 = Cabs(n2)*Cabs(n2)*Cabs(n3)*Cabs(n3);
 			t2 = (1.0/m2)* l2;
 
+			pthread_mutex_lock(&mut2);////////////////////////////////////////
 			t3 = wpsipg_(&n2,&k);
-
+			pthread_mutex_unlock(&mut2);////////////////////////////////////////
+			
 			cx = (t1+t2)-t3;
 			rl = 11.0/2.0-NF/3.0-6.0*GAMMA_E;
 			
 			value = 6.0*cx + rl;
 			//return n;
 			//return n;
+			//pthread_mutex_unlock(&mut);
 			return value;
 		}
 
@@ -68,6 +74,7 @@ class Collinear_Gluon{
 		//double operator()(const double y,const double * par )const {
 		double operator()(const double y,const std::vector<double> &par)const {
 			//return(1);
+			//pthread_mutex_lock(&mut);
 		//doublecomplex xgpdf_integrand(double y, double Y, double t) {
 			doublecomplex n0,n1,n2,g1,g2,gt,ex,l;
 			double val;
@@ -75,20 +82,25 @@ class Collinear_Gluon{
 
 			const double Yg=par[0], tg=par[1];
 			const double lambda_g=par[2];
+			gsl_sf_result resr,resi;
+
 			n0 = Complex(n_0,y);
 			n1 = Complex(-lambda_g+n_0,y);
 			n2 = Complex(-lambda_g+beta+n_0,y);
 
-			g1 = wgamma_(&n1);
-			g2 = wgamma_(&n2);
-			//return tg*gammatilde(n0).r;
+			gsl_sf_lngamma_complex_e(n1.r,n1.i,&resr,&resi );
+			g1=Cexp(Complex(resr.val,resi.val));
+			gsl_sf_lngamma_complex_e(n2.r,n2.i,&resr,&resi );
+			g2=Cexp(Complex(resr.val,resi.val));
+			//pthread_mutex_lock(&mut1);////////////////////////////////////////
+			//g1 = wgamma_(&n1);
+			//g2 = wgamma_(&n2);
+			//pthread_mutex_unlock(&mut1);///////////////////////////////////////
+			
 			gt = tg *gammatilde(n0 );
-
 			ex = Cexp(Complex(0,y* Yg)+gt);
-
 			l = g1*Conjg(g2);
 			m = Cabs(g2)*Cabs(g2);
-
 			val = ((1.0/m)*l*ex).r;
 			//static int flag=0;
 			if(not(std::isfinite(val))){/*
@@ -109,6 +121,7 @@ class Collinear_Gluon{
 		    	//printf(" %.3e ", ex.r);
 		    	//return gammatilde(n0).r;
 		    	//return 1;
+			//pthread_mutex_unlock(&mut);
 			return val;
 		}
 
@@ -123,6 +136,8 @@ class Collinear_Gluon{
 		*******************************************************************************/
 		double operator()(const double x, const double QQ,const double A_g,const double l_g)const  {
 		 	//CCIntegral cc=CCprepare(128,"gluon",50);
+			//pthread_mutex_t mut;
+			//pthread_mutex_lock(&mut);
 		//	printf("%.3e %.3e %.3e %.3e\n",x, QQ,A_g,l_g);
 		//	return(A_g*pow(x,-l_g));
 			static int flag_nan=0;
@@ -136,10 +151,12 @@ class Collinear_Gluon{
 				l_g
 			};
 			//printf("args %.3e %.3e %.3e \t %.3e %.3e\n",par[0],par[1],par[2] ,bprim,QQ);
+			pthread_mutex_lock(&mut3);////////////////////////////////////////
 		    	normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
+			pthread_mutex_unlock(&mut3);////////////////////////////////////////
 			//value=dclenshaw<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15);
 			//value=dgauss<const Collinear_Gluon, const double*>(*this,par,  0,150,1.0e-15,1.0e-17); 
-			value=dclenshaw< const Collinear_Gluon, const std::vector<double> >(cc,*this,par, 0,150,1.0e-12,1.0e-16);  
+			value=dclenshaw<const Collinear_Gluon, const std::vector<double> >(cc,*this,par,0,150,1.0e-12,1.0e-16);  
 			//this->flag=0;	
 			value=normalization*value;
 			if(!std::isfinite(value)||value<0){
@@ -152,6 +169,7 @@ class Collinear_Gluon{
 			}
 			//printf("x=%.3e mu2= %.3e Ag= %.3e lg= %.3e\n",x,QQ,A_g,l_g);
 			//getchar();
+			//pthread_mutex_unlock(&mut);
 			return value ;
 		}
 

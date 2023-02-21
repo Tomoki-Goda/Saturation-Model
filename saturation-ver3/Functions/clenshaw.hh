@@ -159,6 +159,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		Kahn_free(accumfull);
 		Kahn_free(accumhalf);
 		exit(1);
+		//getchar();
 		return 0;
 	
 }
@@ -173,7 +174,9 @@ inline int sign(int i){
 
 CCIntegral CCprepare(const int N){
 	CCIntegral data;
-	
+	Kahn vec[N/4+1];
+	double t[N/4+1];
+	double c[N/2+1];
 	if((N/8)*8!=N || N>256){
 		printf("N=%d has to be multiple of 8, <= 128\n",N );
 	}
@@ -185,13 +188,13 @@ CCIntegral CCprepare(const int N){
 	}
 	data.x[N/2]=0;
 	
-	double *__restrict__ c=(double*)calloc((N/2+1),sizeof(double));
+	//double *__restrict__ c=(double*)calloc((N/2+1),sizeof(double));
 	c[0]=1;
 	c[N/2]=1.0/(1-N*N);
 	for(int i=1;i<N/2;i++){
 		c[i]=2.0/(1-4*i*i);
 	}
-	double *__restrict__ t=(double*)calloc((N/4+1),sizeof(double));
+	//double *__restrict__ t=(double*)calloc((N/4+1),sizeof(double));
 	//double accum[3]={0};
 	Kahn accum=Kahn_init(4);
 	
@@ -207,7 +210,7 @@ CCIntegral CCprepare(const int N){
 		//t[i*(N/2+1)+j]=((i*j==0)?(1):(cos(2*i*j*PI/N)) );
 	}//printf("\n");
 	int pos;
-	Kahn * vec=(Kahn*)malloc((N/4+1)*sizeof(Kahn));
+	//Kahn * vec=(Kahn*)malloc((N/4+1)*sizeof(Kahn));
 	for(int j=0;j<N/4+1;j++){
 		vec[j]=Kahn_init(4);
 		Kahn_clear(vec[j]);
@@ -259,13 +262,13 @@ CCIntegral CCprepare(const int N){
 		//printf("%.10e\t",data.whalf[i]);
 	}//printf("\n");
 	
-	free(c);
-	free(t);
+	//free(c);
+	//free(t);
 	Kahn_free(accum);
 	for(int j=0;j<N/4+1;j++){
 		Kahn_free(vec[j]);
 	}
-	free(vec);
+	//free(vec);
 	//getchar();
 	
 	Kahn sum1=Kahn_init(2),sum2=Kahn_init(2);

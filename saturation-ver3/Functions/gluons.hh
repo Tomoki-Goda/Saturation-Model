@@ -16,6 +16,7 @@
 #include"./constants.h"
 #include "./clenshaw.hh"
 #include "./gauss.hh"
+#include"polygamma.hh"
 #include<pthread.h>
 #include<gsl/gsl_sf_gamma.h>
 /* CERNLIB functions*/
@@ -23,6 +24,8 @@ extern "C" doublecomplex wgamma_(const doublecomplex*);
 extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
 extern "C" double dgammf_(const double*);
 pthread_mutex_t mut1, mut2,mut3;
+
+
 class Collinear_Gluon{
 	CCIntegral cc=CCprepare(256,"gluon",4,3);
 	private:
@@ -49,10 +52,13 @@ class Collinear_Gluon{
 			m2 = Cabs(n2)*Cabs(n2)*Cabs(n3)*Cabs(n3);
 			t2 = (1.0/m2)* l2;
 
-			pthread_mutex_lock(&mut2);////////////////////////////////////////
-			t3 = wpsipg_(&n2,&k);
-			pthread_mutex_unlock(&mut2);////////////////////////////////////////
-			
+			//pthread_mutex_lock(&mut2);////////////////////////////////////////
+			//t3 = wpsipg_(&n2,&k);
+			//pthread_mutex_unlock(&mut2);////////////////////////////////////////
+			std::complex<double > arg(n2.r,n2.i);
+			arg = wpsipg(arg,k);
+			t3=Complex(real(arg),imag(arg));
+
 			cx = (t1+t2)-t3;
 			rl = 11.0/2.0-NF/3.0-6.0*GAMMA_E;
 			

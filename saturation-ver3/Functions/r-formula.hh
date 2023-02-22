@@ -87,7 +87,7 @@ class Sigma{
 
 //#if (LAPLACIAN==0||R_FORMULA==1)
 #if IBP==2
-			const double val=-sigma_0*exp(-pow(r,2)*qs2/4);
+			double val=-sigma_0*exp(-pow(r,2)*qs2/4);
 #else
 #if LAPLACIAN==0
 			double val;
@@ -98,9 +98,13 @@ class Sigma{
 				val=sigma_0*(1-exp( -val));
 			}
 #elif LAPLACIAN==1
-			const double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
+			double val=sigma_0*qs2*(1-r*r*qs2/4)*exp(-r*r*qs2/4);
 #endif//LAPLACIAN
 #endif//IBP==2
+#if THRESHOLD==1 
+			double thresh_power=7;
+			val*=pow(1-x,thresh_power);
+#endif
 			//printf("%.3e\n",val);
 			//printf("val=%.3e: r= %.3e C=%.3e mu02=%.3e ,mu2=%.3e, Qs2=%.3e \n",val, r,C,mu02,mu2,qs2 );
 			if(!std::isfinite(val)){

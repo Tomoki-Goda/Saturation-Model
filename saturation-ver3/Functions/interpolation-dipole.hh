@@ -16,8 +16,6 @@ class Laplacian_Sigma{
 		gsl_spline *  spline_ptr;
 		char mode='l';//l or s
 		double *r_array=NULL,*sigma_array=NULL;
-		double thresh_power=7;
-		
 		void free_approx(){
 			gsl_spline_free (spline_ptr);
 			gsl_interp_accel_free (r_accel_ptr);
@@ -192,9 +190,6 @@ class Laplacian_Sigma{
 					printf(" %.3e\t",par[i]);
 				}printf("\n");
 			}
-#if THRESHOLD==1 
-			val*=pow(1-x,thresh_power);
-#endif
 #if (R_CHANGE_VAR==1)
 			return(val/pow(1-rho,2));
 #elif (HANKEL==1||R_CHANGE_VAR==0)
@@ -212,9 +207,6 @@ class Laplacian_Sigma{
 			val=kt*std::cyl_bessel_j(1,r*kt)*(gsl_spline_eval(spline_ptr,r,r_accel_ptr));
 			val+=std::cyl_bessel_j(0,r*kt)*gsl_spline_eval_deriv(spline_ptr,r,r_accel_ptr);
 			val*=r;
-#endif
-#if THRESHOLD==1 
-			val*=pow(1-x,thresh_power);
 #endif
 
 		//	if(fabs(val)>1.0e-3){

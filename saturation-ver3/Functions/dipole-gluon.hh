@@ -80,6 +80,10 @@ class Gluon_GBW{
 			val*=alpha(mu2+mu02)/0.2;
 			//printf("%.2e %.2e\n",mu2,alpha(mu2));
 #endif
+#if THRESHOLD==1 
+			double thresh_power=7;
+			val*=pow(1-x,thresh_power);
+#endif
 			return (sigma_0*val) ;
 		}
 };

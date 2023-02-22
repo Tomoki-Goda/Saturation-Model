@@ -113,7 +113,7 @@
 #endif
 
 #ifndef ADD_END
-	#define ADD_END 0
+	#define ADD_END 1
 #endif
 #ifndef GBW_APPROX
 	#define GBW_APPROX 0

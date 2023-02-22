@@ -25,6 +25,8 @@ class Approx_aF{
 		int approximate(const double kt2max){
 			this->kt2max=kt2max;
 			clock_t time=clock();
+			std::chrono::system_clock walltime;
+			std::chrono::time_point start= walltime.now();
 			double kt2,x;
 			for (int j = 0; j < x_npts; ++j){
 				x=pow(10,-8+8*((double)j)/(x_npts-1));
@@ -51,8 +53,9 @@ class Approx_aF{
 			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
 			//}
 			time-=clock();
-			
-			printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
+			std::chrono::duration<double> wtime=walltime.now()-start;
+			std::cout<< -((double)time/CLOCKS_PER_SEC)<< " CPU seconds " <<wtime.count()<<" seconds to approx"<<std::endl;
+		//	printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}
 		static void* compute(void* par){
@@ -69,6 +72,8 @@ class Approx_aF{
 		int approximate_thread(const double kt2max){
 			this->kt2max=kt2max;
 			clock_t time=clock();
+			std::chrono::system_clock walltime;
+			std::chrono::time_point start= walltime.now();
 			double kt2,x;
 			pthread_t thread[kt2_npts];
 			parallel_arg args[kt2_npts];
@@ -96,6 +101,8 @@ class Approx_aF{
 			//printf("\033[1A\033[2K Grid done\n");
 			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
 			time-=clock();
+			std::chrono::duration<double> wtime=walltime.now()-start;
+			std::cout<< -((double)time/CLOCKS_PER_SEC)<< " CPU seconds " <<wtime.count()<<" seconds to approx"<<std::endl;
 			printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}

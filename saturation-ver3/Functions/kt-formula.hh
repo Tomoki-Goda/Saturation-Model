@@ -2,6 +2,7 @@
 #include<iostream>
 #include<fstream>
 #include<vector>
+#include<chrono>
 #include <gsl/gsl_errno.h> 
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_interp2d.h>
@@ -341,9 +342,9 @@ class F2_kt{
 			sigma[2].init(par);
 #elif GLUON_APPROX==1
 			
-			sigma[0].init(N_APPROX+300,par,'s');
-			sigma[1].init(N_APPROX+300,par,'s');
-			sigma[2].init(N_APPROX+300,par,'s');
+			sigma[0].init(N_APPROX+250,par,'s');
+			sigma[1].init(N_APPROX+250,par,'s');
+			sigma[2].init(N_APPROX+250,par,'s');
 			
 #endif
 #else//R_FORMULA
@@ -352,7 +353,7 @@ class F2_kt{
       ///////////////////////////////////////////
 #if GLUON_APPROX==1
 			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-			gluon.init(N_APPROX+150,N_APPROX+150,N_APPROX+300,par);
+			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+250,par);
 			//gluon.init(300,300,750,par);
 			gluon.set_max(kt2max);
 			//}

@@ -30,6 +30,7 @@ class Collinear_Gluon{
 	CCIntegral cc=CCprepare(256,"gluon",4,3);
 	private:
 		const double       beta = 6.6;
+		double dgammafbeta;
 		const double        n_0 = 0.5;       /* Maximal singluraity of integrand */
 		//int flag=0;
 		//double A_g, lambda_g;
@@ -71,6 +72,7 @@ class Collinear_Gluon{
 
 	public:
 		explicit Collinear_Gluon(){
+			dgammafbeta=dgammf_(&beta)/PI;
 			//cc=CCprepare(128,"gluon",50);
 			//printf("gluon\n");
 		}
@@ -157,9 +159,10 @@ class Collinear_Gluon{
 				l_g
 			};
 			//printf("args %.3e %.3e %.3e \t %.3e %.3e\n",par[0],par[1],par[2] ,bprim,QQ);
-			pthread_mutex_lock(&mut3);////////////////////////////////////////
-		    	normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
-			pthread_mutex_unlock(&mut3);////////////////////////////////////////
+			//pthread_mutex_lock(&mut3);////////////////////////////////////////
+		    	//normalization = A_g*exp(n_0* par[0] )*dgammf_(&beta)/PI;
+			//pthread_mutex_unlock(&mut3);////////////////////////////////////////
+		    	normalization = A_g*exp(n_0* par[0] )*dgammafbeta;
 			//value=dclenshaw<const Collinear_Gluon, const double*>(*this,par, a,c,NRel,1.0e-15);
 			//value=dgauss<const Collinear_Gluon, const double*>(*this,par,  0,150,1.0e-15,1.0e-17); 
 			value=dclenshaw<const Collinear_Gluon, const std::vector<double> >(cc,*this,par,0,150,1.0e-12,1.0e-16);  

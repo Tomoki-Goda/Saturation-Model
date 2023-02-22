@@ -94,7 +94,7 @@ class Gluon_GBW{
 class Dipole_Gluon{
 		const double *par;
 		Laplacian_Sigma integrand;
-		CCIntegral cc=CCprepare(64,"dipole",4,3);
+		CCIntegral cc=CCprepare(128,"dipole",4,2);
 		double x;	
 
 	public: 
@@ -147,11 +147,11 @@ class Dipole_Gluon{
 			}
 			
 //#if IBP==0||IBP==2 //actually important. better cancellation for convergence.
-			//double imax=PI/(sqrt(kt2)*4);
+			double imax=PI/(sqrt(kt2)*4);
 			//double imax=PI/(sqrt(kt2)*2);
 			//with this differences coming from the first term of ibp is small.
 //#elif IBP==1
-			double imax=3*PI/(sqrt(kt2)*4);
+			//double imax=3*PI/(sqrt(kt2)*4);
 //#endif
 			
 			int flag=0;
@@ -194,7 +194,7 @@ class Dipole_Gluon{
 				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
 				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(j*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
 			}
-#if ADDEND!=0
+#if ADD_END!=0
 			val+=diff;
 #endif
 #endif

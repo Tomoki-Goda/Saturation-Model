@@ -107,7 +107,7 @@ int main(int argc, char** argv){
 		}
 #endif
 		std::cout<<par_name[i]<<" = "<<par_start[i]<<std::endl;
-		std::cout<<N_PAR<<"  "<<skip <<" : parameter position="<<i<<std::endl;
+		//std::cout<<N_PAR<<"  "<<skip <<" : parameter position="<<i<<std::endl;
 		upar.Add(par_name[i], par_start[i],par_error[i]);
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
@@ -122,11 +122,11 @@ int main(int argc, char** argv){
 	fscanf(resinputfile,"%s %le",name,&ival);
 	for(unsigned i=0;i<N_PAR;i++){
 		fscanf(resinputfile,"%s %le %le",name,&ival,&ierr);
-		printf("%s %le %le \n",name,ival,ierr*50);
 		if(strcmp(name,"chisq")==0){
 			skip=N_PAR-i;
 			break;
 		}
+		printf("%s %le %le \n",name,ival,ierr*50);
 		upar.Add(name, ival,ierr*50);
 	}printf("\n");
 	fclose(resinputfile);
@@ -139,15 +139,15 @@ int main(int argc, char** argv){
 	int flag=0;
 	double goal=1;
 	ROOT::Minuit2::MnSimplex simplex1(theFCN,upar,0);
-	std::cout<<"TEST RUN 15, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
-	ROOT::Minuit2::FunctionMinimum min=simplex1(15,1);//Just initialization /check.
+	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
+	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
 	ROOT::Minuit2::FunctionMinimum min_prev=min;
 	//ROOT::Minuit2::MnEigen eigen;
 	//min_prev=min;
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	INT_PREC=1.0e-3;
-	N_APPROX=N_CHEB_R/4;
+	N_APPROX=N_CHEB_R/3;
 	//ROOT::Minuit2::MnSimplex simplex2(theFCN,upar,0);
 	
 	for(int i=0;i<2;++i){

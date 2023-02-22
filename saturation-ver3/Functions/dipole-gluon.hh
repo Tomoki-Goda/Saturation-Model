@@ -203,7 +203,7 @@ class Dipole_Gluon{
 #endif
 #endif
 			Kahn_free(accum);
-
+//Threshold 1-x^7 is in dipole sigma. 
 			
 			if(!std::isfinite(val)){
 				val=0;

@@ -10,20 +10,21 @@
 //#include "main.h"
 
 #include<cmath>
-#include "./complex.hh"
+//#include "./complex.hh"
 //#include "cfortran.h"
 #include"./control-default.h"
 #include"./constants.h"
 #include "./clenshaw.hh"
 #include "./gauss.hh"
 #include"polygamma.hh"
+#include<complex>
 #include<pthread.h>
 #include<gsl/gsl_sf_gamma.h>
 /* CERNLIB functions*/
-extern "C" doublecomplex wgamma_(const doublecomplex*);
-extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
-extern "C" double dgammf_(const double*);
-pthread_mutex_t mut1, mut2,mut3;
+//extern "C" doublecomplex wgamma_(const doublecomplex*);
+//extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
+//extern "C" double dgammf_(const double*);
+//pthread_mutex_t mut1, mut2,mut3;
 
 
 class Collinear_Gluon{
@@ -35,30 +36,30 @@ class Collinear_Gluon{
 		//int flag=0;
 		//double A_g, lambda_g;
 
-		doublecomplex gammatilde(const doublecomplex& n)const{
+		std::complex<double> gammatilde(const std::complex<double>& n)const{
 			//pthread_mutex_lock(&mut);
 			//return n;
-			doublecomplex n1,n2,n3,l1,l2,t1,t2,t3,cx,value;
+			std::complex<double> n1,n2,n3,l1,l2,t1,t2,t3,cx,value;
 			double m1,m2,rl;
 			int k=0;
 			n1 = n+1.0;
 		    	n2 = n+2.0;
 		    	n3 = n+3.0;
 
-		    	l1 = Conjg(n)*Conjg(n1);
-		   	m1 = Cabs(n)*Cabs(n)*Cabs(n1)*Cabs(n1);
+		    	l1 = conj(n)*conj(n1);
+		   	m1 = abs(n)*abs(n)*abs(n1)*abs(n1);
 		   	t1 = (1.0/m1)*l1;
 
-		  	l2 = Conjg(n2)*Conjg(n3);
-			m2 = Cabs(n2)*Cabs(n2)*Cabs(n3)*Cabs(n3);
+		  	l2 = conj(n2)*conj(n3);
+			m2 = abs(n2)*abs(n2)*abs(n3)*abs(n3);
 			t2 = (1.0/m2)* l2;
 
 			//pthread_mutex_lock(&mut2);////////////////////////////////////////
-			//t3 = wpsipg_(&n2,&k);
+	//t3 = wpsipg_(&n2,&k);
 			//pthread_mutex_unlock(&mut2);////////////////////////////////////////
-			std::complex<double > arg(n2.r,n2.i);
-			arg = wpsipg(arg,k);
-			t3=Complex(real(arg),imag(arg));
+			//std::complex<double > arg(n2.r,n2.i);
+			t3 = digamma(n2);
+			//t3=Complex(real(arg),imag(arg));
 
 			cx = (t1+t2)-t3;
 			rl = 11.0/2.0-NF/3.0-6.0*GAMMA_E;
@@ -72,7 +73,8 @@ class Collinear_Gluon{
 
 	public:
 		explicit Collinear_Gluon(){
-			dgammafbeta=dgammf_(&beta)/PI;
+		//	dgammafbeta=dgammf_(&beta)/PI;
+			dgammafbeta=gsl_sf_gamma(beta)/PI;
 			//cc=CCprepare(128,"gluon",50);
 			//printf("gluon\n");
 		}
@@ -84,32 +86,32 @@ class Collinear_Gluon{
 			//return(1);
 			//pthread_mutex_lock(&mut);
 		//doublecomplex xgpdf_integrand(double y, double Y, double t) {
-			doublecomplex n0,n1,n2,g1,g2,gt,ex,l;
+			std::complex<double> n0,n1,n2,g1,g2,gt,ex,l;
 			double val;
 			double m;
 
 			const double Yg=par[0], tg=par[1];
 			const double lambda_g=par[2];
 			gsl_sf_result resr,resi;
+			std::complex<double>comp(0,1);
+			n0 = n_0+y*comp;
+			n1 =-lambda_g+n_0+comp*y;
+			n2 =-lambda_g+beta+n_0+comp*y;
 
-			n0 = Complex(n_0,y);
-			n1 = Complex(-lambda_g+n_0,y);
-			n2 = Complex(-lambda_g+beta+n_0,y);
-
-			gsl_sf_lngamma_complex_e(n1.r,n1.i,&resr,&resi );
-			g1=Cexp(Complex(resr.val,resi.val));
-			gsl_sf_lngamma_complex_e(n2.r,n2.i,&resr,&resi );
-			g2=Cexp(Complex(resr.val,resi.val));
+			gsl_sf_lngamma_complex_e(n1.real(),n1.imag(),&resr,&resi );
+			g1=exp(resr.val+comp*resi.val);
+			gsl_sf_lngamma_complex_e(n2.real(),n2.imag(),&resr,&resi );
+			g2=exp(resr.val+comp*resi.val);
 			//pthread_mutex_lock(&mut1);////////////////////////////////////////
 			//g1 = wgamma_(&n1);
 			//g2 = wgamma_(&n2);
 			//pthread_mutex_unlock(&mut1);///////////////////////////////////////
 			
 			gt = tg *gammatilde(n0 );
-			ex = Cexp(Complex(0,y* Yg)+gt);
-			l = g1*Conjg(g2);
-			m = Cabs(g2)*Cabs(g2);
-			val = ((1.0/m)*l*ex).r;
+			ex = exp(comp*y* Yg+gt);
+			l = g1*conj(g2);
+			m = abs(g2)*abs(g2);
+			val = ((1.0/m)*l*ex).real();
 			//static int flag=0;
 			if(not(std::isfinite(val))){/*
 				//if(flag<=100||(flag/100)*100==flag){

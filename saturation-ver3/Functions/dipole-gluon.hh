@@ -176,9 +176,9 @@ class Dipole_Gluon{
 #elif R_CHANGE_VAR==0
 				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/10,INT_PREC/100);
 #endif
-				if(fabs(val)<1.0e-10){
+				if(fabs(val)<INT_PREC/1000){
 					++flag;
-					if(flag>6&&imax>minmax){
+					if(flag>5&&imax>minmax){
 						break;//it is likely beyond this will be trivial
 					}
 				}else{

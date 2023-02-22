@@ -10,7 +10,7 @@ dc wpsipg(dc z,int k){
 	      c4 = 8*pow(PI,5);
      	const double sign[]={-1,+1,-1,+1,-1};
        	const double fct[]= {0,1,1,2,6,24};
-	const double c[5][6]={
+	const double c[5][6]={:
 		{8.33333333333333333e-2, 
 		-8.33333333333333333e-3,
 		3.96825396825396825e-3,
@@ -36,8 +36,9 @@ dc wpsipg(dc z,int k){
 		1.00000000000000000e+1,
 		-4.60666666666666667e+1},
 		{10,-7,12,-33,130,-691}};
-	const double del=1.0e-15;	
-	double im=imag(z), re=real(z);
+	const double del=1.0e-15;
+
+	double y=imag(z), x=real(z);
 	dc u,v,h,r,p;
 	dc comp(0,1);
 
@@ -47,18 +48,18 @@ dc wpsipg(dc z,int k){
 		printf("error 1\n");
 		exit(1);
 	}	
-	if(fabs(im)<del&&fabs(re+lrint(re))<del){
+	if(fabs(x)<del&&fabs(x+lrint(x))<del){
 		printf("error 2\n");
 		exit(1);
 	}
 	k1=k+1;
 	
-	if(re<0){
+	if(x<0){
 		u=-u;
 	}
 	v=u;
 	h=0;
-	if(fabs(re)<15){
+	if(fabs(x)<15){
 		h=1.0/pow(v,k1);
 		for(int i=1;i<(15-int(fabs(re)));++i){
 			v+=1.0;
@@ -67,11 +68,11 @@ dc wpsipg(dc z,int k){
 		v+=1;
 	}
 	r=1.0/pow(v,2);
-	p=c[k][6]*r;
-	for(int i=5;i>=1;--i){
+	p=c[k][5]*r;
+	for(int i=4;i>=0;--i){
 		p=r*(c[k][i]+p);
 	}
-	h=sign[k]*(fct[k]*h+(v*(fct[k-1]+p)+0.5*fct[k])/pow(v,k1) );
+	h=sign[k]*(fct[k+1]*h+(v*(fct[k]+p)+0.5*fct[k+1])/pow(v,k1) );
 	if(k==0){
 		h+=log(v);
 	}

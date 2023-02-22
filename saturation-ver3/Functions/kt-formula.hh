@@ -2,6 +2,7 @@
 #include<iostream>
 #include<fstream>
 #include<vector>
+#include<chrono>
 #include <gsl/gsl_errno.h> 
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_interp2d.h>

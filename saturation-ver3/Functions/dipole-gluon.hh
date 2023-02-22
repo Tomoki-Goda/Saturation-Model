@@ -94,7 +94,7 @@ class Gluon_GBW{
 class Dipole_Gluon{
 		const double *par;
 		Laplacian_Sigma integrand;
-		CCIntegral cc=CCprepare(64,"dipole",4,3);
+		CCIntegral cc=CCprepare(128,"dipole",4,2);
 		double x;	
 
 	public: 

@@ -49,13 +49,10 @@ class Laplacian_Sigma{
 			for (int j = 0; j < r_npts; j++){
 				args[j].j=j;
 				args[j].ptr=this;
-			}
-			for (int j = 0; j < r_npts; j++){
+			//}
+			//for (int j = 0; j < r_npts; j++){
 				i1=pthread_create(thread+j,NULL,&compute,(void*)(&args[j]) );
-			//	if((j/2)*2!=j){
-			//		pthread_join(thread[j],NULL);
-			//		pthread_join(thread[j-1],NULL);
-			//	}
+
 			}
 			for(int i=0;i<r_npts;++i){
 					pthread_join(thread[i],NULL);

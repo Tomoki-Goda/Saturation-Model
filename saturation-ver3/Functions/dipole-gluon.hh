@@ -137,7 +137,7 @@ class Dipole_Gluon{
 #if ADD_END>=0
 			rmax=minmax;
 #if MODEL==1
-			rmax/=pow(1-x,2.5);
+			rmax/=pow(1-x,4);
 #endif
 			if(rmax>R_MAX||!std::isfinite(rmax)){
 				//printf("rmax %.3e reduced to %.3e\n",rmax,R_MAX );
@@ -176,7 +176,7 @@ class Dipole_Gluon{
 #elif R_CHANGE_VAR==0
 				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/10,INT_PREC/100);
 #endif
-				if(fabs(val)<INT_PREC/1000){
+				if(fabs(val)< pow(INT_PREC,2) ){
 					++flag;
 					if(flag>5&&imax>minmax){
 						break;//it is likely beyond this will be trivial

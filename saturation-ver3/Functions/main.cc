@@ -43,7 +43,7 @@ int save_res(std::string name, const ROOT::Minuit2::FunctionMinimum *min,const K
 	file<<"Qup"<<"\t"<<Q2_MAX<<std::endl;
 	for(int i=0;i<ndata;i++){
 		//fprintf(file,"%s\t%.10e\n",
-		 file<<par_name[i]<<"\t"<<min->UserState().Value(i)<<"\t"<<min->UserState().Error(i)<<std::endl;
+		 file<<min->UserState().Name(i)<<"\t"<<min->UserState().Value(i)<<"\t"<<min->UserState().Error(i)<<std::endl;
 	}
 	file<<"chisq"<<"\t"<<min->UserState().Fval()<<"\t"<<min->UserState().Edm()<<std::endl;
 	file<<"n_data\t"<<theFCN->MAX_N<<std::endl;
@@ -100,7 +100,7 @@ int main(int argc, char** argv){
 //	for(unsigned i=0;(i-skip)<N_PAR;i++){
 	for(unsigned i=0;i<N_PAR;i++){
 #if (ALPHA_RUN==0||MU02!=0)
-		if(par_name[i]=="mu102"){
+		if(par_name[i]=="mu02"){
 			skip++;
 			//std::cout<<"Skip "<< par_name[i]<<" = "<< MU02<<std::endl;;
 			continue;

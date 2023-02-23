@@ -9,13 +9,17 @@ typedef struct {int j; Laplacian_Sigma *ptr;} sigmaopt;
 //pthread_mutex_t mut;
 class Laplacian_Sigma{
 	private:
-		double max=R_MAX, min=R_MIN; 
 		Sigma sigma;
-		int r_npts=0;
+		double max=R_MAX, min=R_MIN; 
+		double *r_array=NULL,*sigma_array=NULL;
 		gsl_interp_accel *  r_accel_ptr;
 		gsl_spline *  spline_ptr;
 		char mode='l';//l or s
-		double *r_array=NULL,*sigma_array=NULL;
+		int r_npts=0;
+		int counter=0;
+		double x=0;
+		double sigma_0=0;
+		
 		void free_approx(){
 			gsl_spline_free (spline_ptr);
 			gsl_interp_accel_free (r_accel_ptr);
@@ -23,9 +27,6 @@ class Laplacian_Sigma{
 			free(sigma_array);
 		}
 		
-		int counter=0;
-		double x;
-		double sigma_0=0;
 		
 		static void* compute(void*opt){
 			//pthread_mutex_lock(&mut);
@@ -75,6 +76,7 @@ class Laplacian_Sigma{
 	public:
 		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
+			this->x=x;
 			//approximate(x);
 			approximate_thread(x);
 			return 0;
@@ -129,7 +131,7 @@ class Laplacian_Sigma{
 		//int export_grid(FILE* file, FILE* file2){
 		int export_grid(FILE* file){
 			for(int i=0;i<r_npts;i++){
-				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,r_array[i],sigma_array[i]);
+				fprintf(file,"%.5e\t%.5e\t%.5e\n",x,r_array[i],sigma_array[i]/sigma_0);
 			}		
 		return 0;	
 		}

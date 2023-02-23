@@ -3,7 +3,11 @@ typedef struct {int i, j; Approx_aF* ptr; } parallel_arg;
 
 class Approx_aF{
 	private:
+#if GLUON_APPROX!=0
 		Dipole_Gluon aF;
+#else
+		Gluon_GBW aF;
+#endif
 		double max_prev=0;
 		
 		int kt2_npts,x_npts;
@@ -11,7 +15,7 @@ class Approx_aF{
 		gsl_spline2d *  spline_ptr;
 		double *kt2_array,*x_array,*aF_array;
 		double mu02=0;
-		
+		double sigma_0=0;
 		double kt2min=1.0e-15,kt2max=-1;
 		
 		void free_approx(){
@@ -111,7 +115,7 @@ class Approx_aF{
 		int export_grid(FILE*file)const{
 			for(int j=0;j< x_npts;j++){
 				for(int i=0;i<kt2_npts;i++){
-					fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]);
+					fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]/sigma_0);
 				}
 			}	
 			return 0;
@@ -139,7 +143,12 @@ class Approx_aF{
 			x_accel_ptr = gsl_interp_accel_alloc ();
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
+#if GLUON_APPROX!=0
 			aF.init(npts3,par);
+#else 
+			aF.init(par);
+#endif
+			sigma_0=par[0];
 #if MU02==0
 			mu02 = par[3];
 #else 

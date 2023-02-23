@@ -1,6 +1,6 @@
 /* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2,g1 */
 #if ((MODEL==0)||( MODEL==2 )||( MODEL==22 )) 
-std::string par_name[]	= {"sigma_0",	"lambda",	"x_0",		"mu102",	 "C2", 	"mu202",	"g1",	"g2"};
+std::string par_name[]	= {"sigma_0",	"lambda",	"x_0",		"mu02",	 "C2", 	"mu202",	"g1",	"g2"};
 double par_start[]	= {3.0e+01,	3.3e-01,	2.0e+00,	4.0,		1.26,	2.0,		0.5,	0.5};
 double par_error[]	= {	5.0,	0.05,		0.1,		1.0,		0.01,	0.1,		0.1,	0.1 };
 
@@ -9,7 +9,7 @@ double   par_max[] 	= {	80.0,	1.00,		100.0,		10,		10.0,	10.0,		2.0,	2.0};
 //#endif
 #elif (MODEL==1)||(MODEL==3)
 std::string  par_name[]	= {
-"sigma_0",	"A_g",	"lambda_g",	"mu102",	"C1", 	"mu02",		"C2",	"mu202",	"g1",	"g2"};
+"sigma_0",	"A_g",	"lambda_g",	"mu02",		"C1", 	"mu102",		"C2",	"mu202",	"g1",	"g2"};
 double par_start[]  	= {
 33.0,		1.0,	0.2,		4.0,		0.2, 	1.5,		1.26,	2.0,		0.1, 	0.1};  
 double par_error[]  	= {

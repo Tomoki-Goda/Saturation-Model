@@ -40,7 +40,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 ////////////////////////////////////////////////////////////////////
 class Gluon_GBW{
 	double sigma_0=0,lambda=0,x_0=0,mu02=0;
-	//double x=0;
+	double x=0;
 	std::string key;
 
 	
@@ -61,10 +61,10 @@ class Gluon_GBW{
 		
 	public:
 
-		//void set_x(double x){
-		//	this->x=x;
-		//}
-		double operator()(const double x,const double k2,double mu2){
+		void set_x(double x){
+			this->x=x;
+		}
+		double operator()(const double k2,double mu2){
 			if(x_0<1.0e-5||x_0>1.0e-3){
 				return 0;
 			}
@@ -203,7 +203,7 @@ class Dipole_Gluon{
 #endif
 #endif
 			Kahn_free(accum);
-
+//Threshold 1-x^7 is in dipole sigma. 
 			
 			if(!std::isfinite(val)){
 				val=0;

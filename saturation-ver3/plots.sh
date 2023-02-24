@@ -2,10 +2,11 @@
 
 SAT=/home/tomoki/Saturation-Model/saturation-ver3
 
-for i in  ./Run2/fixa-bjorx ./Run2/fixa-bjorx2 \
-	./Run2/runa-bjorx-4 ./Run2/runa-bjorx2-4 \
-	./Run2/fixa-bjorx-BGK ./Run2/fixa-bjorx-BGK2 \
-	./Run2/GBW ./Run2/GBW-Massive ./Run2/BGK ./Run2/BGK
+#for i in  ./Run2/fixa-bjorx ./Run2/fixa-bjorx2 \
+#	./Run2/runa-bjorx-4 ./Run2/runa-bjorx2-4 \
+#	./Run2/fixa-bjorx-BGK ./Run2/fixa-bjorx-BGK2 \
+#	./Run2/GBW ./Run2/GBW-Massive \
+for i in ./Run2/BGK
 do
 	echo ${i}
  	export DIR=${i}
@@ -44,57 +45,74 @@ done
 	-m ./Run2/BGK/dipole-grid.txt  ./Run2/fixa-bjorx-BGK/dipole-grid.txt #./Run2/fixa-bjorx-BGK2/dipole-grid.txt
 
 
+exit 0
 
-./plot.py -s "./kt-formula-report1/GBW-gluon.png" -y "linear" \
-	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
-	${SAT}/Run2/GBW/gluon-2-100.txt \
-	${SAT}/Run2/fixa-bjorx/gluon-2-100.txt \
-	${SAT}/Run2/runa-bjorx-4/gluon-2-100.txt \
-	${SAT}/Run2/GBW/gluon-6-100.txt \
-	${SAT}/Run2/fixa-bjorx/gluon-6-100.txt \
-	${SAT}/Run2/runa-bjorx-4/gluon-6-100.txt 
+#./plot.py -s "./kt-formula-report1/GBW-gluon.png" -y "linear" \
+#	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
+#	${SAT}/Run2/GBW/gluon-2-100.txt \
+#	${SAT}/Run2/fixa-bjorx/gluon-2-100.txt \
+#	${SAT}/Run2/runa-bjorx-4/gluon-2-100.txt \
+#	${SAT}/Run2/GBW/gluon-6-100.txt \
+#	${SAT}/Run2/fixa-bjorx/gluon-6-100.txt \
+#	${SAT}/Run2/runa-bjorx-4/gluon-6-100.txt 
 	
-./plot.py -s "./kt-formula-report1/GBW-dipole.png" \
-	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
-	${SAT}/Run2/GBW/dipole-2-100.txt \
-	${SAT}/Run2/fixa-bjorx/dipole-2-100.txt \
-	${SAT}/Run2/runa-bjorx-4/dipole-2-100.txt \
-	${SAT}/Run2/GBW/dipole-6-100.txt \
-	${SAT}/Run2/fixa-bjorx/dipole-6-100.txt \
-	${SAT}/Run2/runa-bjorx-4/dipole-6-100.txt 
+#./plot.py -s "./kt-formula-report1/GBW-dipole.png" \
+#	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
+#	${SAT}/Run2/GBW/dipole-2-100.txt \
+#	${SAT}/Run2/fixa-bjorx/dipole-2-100.txt \
+#	${SAT}/Run2/runa-bjorx-4/dipole-2-100.txt \
+#	${SAT}/Run2/GBW/dipole-6-100.txt \
+#	${SAT}/Run2/fixa-bjorx/dipole-6-100.txt \
+#	${SAT}/Run2/runa-bjorx-4/dipole-6-100.txt 
 	
-./plot.py -s "./kt-formula-report1/GBW-thresh-gluon.png" -y "linear" \
-	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
-	${SAT}/Run2/GBW/gluon-2-100.txt \
-	${SAT}/Run2/fixa-bjorx2/gluon-2-100.txt \
-	${SAT}/Run2/runa-bjorx2-4/gluon-2-100.txt \
-	${SAT}/Run2/GBW/gluon-6-100.txt \
-	${SAT}/Run2/fixa-bjorx2/gluon-6-100.txt \
-	${SAT}/Run2/runa-bjorx2-4/gluon-6-100.txt 
+#./plot.py -s "./kt-formula-report1/GBW-saturation.png" \
+#	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
+#	${SAT}/Run2/GBW/saturation.txt \
+#	${SAT}/Run2/fixa-bjorx/saturation.txt \
+#	${SAT}/Run2/runa-bjorx-4/saturation.txt 
+#	
+#./plot.py -s "./kt-formula-report1/GBW-thresh-gluon.png" -y "linear" \
+#	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
+#	${SAT}/Run2/GBW/gluon-2-100.txt \
+#	${SAT}/Run2/fixa-bjorx2/gluon-2-100.txt \
+#	${SAT}/Run2/runa-bjorx2-4/gluon-2-100.txt \
+#	${SAT}/Run2/GBW/gluon-6-100.txt \
+#	${SAT}/Run2/fixa-bjorx2/gluon-6-100.txt \
+#	${SAT}/Run2/runa-bjorx2-4/gluon-6-100.txt 
 	
-./plot.py -s "./kt-formula-report1/GBW-thresh-dipole.png" \
-	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
-	${SAT}/Run2/GBW/dipole-2-100.txt \
-	${SAT}/Run2/fixa-bjorx2/dipole-2-100.txt \
-	${SAT}/Run2/runa-bjorx2-4/dipole-2-100.txt \
-	${SAT}/Run2/GBW/dipole-6-100.txt \
-	${SAT}/Run2/fixa-bjorx2/dipole-6-100.txt \
-	${SAT}/Run2/runa-bjorx2-4/dipole-6-100.txt 
+#./plot.py -s "./kt-formula-report1/GBW-thresh-dipole.png" \
+#	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
+#	${SAT}/Run2/GBW/dipole-2-100.txt \
+#	${SAT}/Run2/fixa-bjorx2/dipole-2-100.txt \
+#	${SAT}/Run2/runa-bjorx2-4/dipole-2-100.txt \
+#	${SAT}/Run2/GBW/dipole-6-100.txt \
+#	${SAT}/Run2/fixa-bjorx2/dipole-6-100.txt \
+#	${SAT}/Run2/runa-bjorx2-4/dipole-6-100.txt 
 	
-./plot.py -s "./kt-formula-report1/BGK-gluon.png" -y "linear" \
-	-c "b r b r b r" -p "-. - -. - -. -" -l "BGK-r:BGK-kt::::::" \
-	${SAT}/Run2/BGK/gluon-2-100.txt \
-	${SAT}/Run2/fixa-bjorx-BGK/gluon-2-100.txt \
-	${SAT}/Run2/BGK/gluon-6-100.txt \
-	${SAT}/Run2/fixa-bjorx-BGK/gluon-6-100.txt 
-./plot.py -s "./kt-formula-report1/BGK-dipole.png" \
-	 -c "b r b r b r" -p "-. - -. - -. -" -l "BGK-r:BGK-kt::::::" \
-	${SAT}/Run2/BGK/dipole-2-100.txt \
-	${SAT}/Run2/fixa-bjorx-BGK/dipole-2-100.txt \
-	${SAT}/Run2/BGK/dipole-6-100.txt \
-	${SAT}/Run2/fixa-bjorx-BGK/dipole-6-100.txt 
+#./plot.py -s "./kt-formula-report1/GBW-thresh-saturation.png" \
+#	-c "b r r b r r b r r" -p "-. -. - -. -. - -. -. -" -l "GBW-r:GBW-kt:GBW-kt-run::::::" \
+#	${SAT}/Run2/GBW/saturation.txt \
+#	${SAT}/Run2/fixa-bjorx2/saturation.txt \
+#	${SAT}/Run2/runa-bjorx2-4/saturation.txt
+
+#./plot.py -s "./kt-formula-report1/BGK-gluon.png" -y "linear" \
+#	-c "b r b r b r" -p "-. - -. - -. -" -l "BGK-r:BGK-kt::::::" \
+#	${SAT}/Run2/BGK/gluon-2-100.txt \
+#	${SAT}/Run2/fixa-bjorx-BGK/gluon-2-100.txt \
+#	${SAT}/Run2/BGK/gluon-6-100.txt \
+#	${SAT}/Run2/fixa-bjorx-BGK/gluon-6-100.txt 
+#./plot.py -s "./kt-formula-report1/BGK-dipole.png" \
+#	 -c "b r b r b r" -p "-. - -. - -. -" -l "BGK-r:BGK-kt::::::" \
+#	${SAT}/Run2/BGK/dipole-2-100.txt \
+#	${SAT}/Run2/fixa-bjorx-BGK/dipole-2-100.txt \
+#	${SAT}/Run2/BGK/dipole-6-100.txt \
+#	${SAT}/Run2/fixa-bjorx-BGK/dipole-6-100.txt 
 	
 	
+#./plot.py -s "./kt-formula-report1/BGK-saturation.png" \
+#	 -c "b r b r b r" -p "-. - -. - -. -" -l "BGK-r:BGK-kt::::::" \
+#	${SAT}/Run2/BGK/saturation.txt \
+#	${SAT}/Run2/fixa-bjorx-BGK/saturation.txt \
 	
 #for x in 2 4 6
 #do

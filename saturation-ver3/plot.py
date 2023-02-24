@@ -94,10 +94,11 @@ def main():
         if (labels!=[] and labels[counter]!=""):
         	legs.append(leg[0])
         counter+=1
-    #if labels!=[]:
-    #    labels.remove("")
-    #    if len(legs)>0:
-    #        ax.legend(legs,labels)
+    print("LABELS ", labels);
+    if "" in labels:
+        labels.remove("")
+        if len(legs)>0:
+            ax.legend(legs,labels)
     ax.set(title=plottitle,  ylabel=axes[1],    xlabel=axes[0],  xscale= xs ,   yscale=ys )
     if(xlim[0]!=xlim[1]):
         ax.set_xlim(xlim[0],xlim[1])

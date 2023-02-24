@@ -133,8 +133,8 @@ int main(int argc, char** argv){
 #endif//USE_RESULT
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=5.0e-4;
-	N_APPROX=N_CHEB_R/2;
+	INT_PREC=1.0e-4;
+	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;

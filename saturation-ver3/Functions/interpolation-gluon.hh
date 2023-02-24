@@ -122,9 +122,7 @@ class Approx_aF{
 			double grad=0;
 			while(counter++<200){
 				val=gsl_spline2d_eval_deriv_x(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
-				//printf("%.3e at %.3e\n",val,kt2);
 				if(fabs(val)<1.0e-5){
-					printf("ok\n\n");
 					return kt2;
 				}else if(val>0&&flag==0){
 					kt2+=diff;
@@ -133,14 +131,12 @@ class Approx_aF{
 					flag=1;
 					grad=(val-valprev)/diff;
 					diff=-val/grad;
-					printf("%.3e -> %.3e at %.3e move by %.3e \n",valprev, val,kt2,diff);
 					kt2+=diff;
 				}
 				valprev=val;
 			}
 			printf("FAILED to find peak derivative is %.3e at %.3e\n",val,kt2);
 			return 0;
-
 		}
 		int export_grid(FILE*file)const{
 			for(int j=0;j< x_npts;j++){
@@ -164,12 +160,9 @@ class Approx_aF{
 		void init(const int npts1, const int npts2, const int npts3, const double *par ){
 			x_npts=npts1;
 			kt2_npts=npts2;
-			
 			x_array=(double*)malloc(x_npts*sizeof(double));
 			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
-			//kt2_array=(double*)mmap(NULL,kt2_npts*sizeof(double),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
 			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
-			//aF_array=(double*)mmap(NULL,x_npts*kt2_npts*sizeof(double),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
 			x_accel_ptr = gsl_interp_accel_alloc ();
 			kt2_accel_ptr = gsl_interp_accel_alloc ();
 			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
@@ -187,11 +180,9 @@ class Approx_aF{
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;
-			
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
 #if ALPHA_RUN==1
 			val*=alpha(mu2+mu02)/0.2;
-			//printf("%.2e %.2e\n",mu2+mu02,alpha(mu2+mu02));
 #endif
 			return(val);
 		}

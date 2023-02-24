@@ -19,9 +19,9 @@ int InitDiv=1;
 
 //template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf, double*arr){
 template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax, Kahn &full, Kahn &half){
-	const double *x16=data.x;
-	const double *w16=data.wfull;
-	const double *w8=data.whalf;
+	const double (&x16)[]=data.x;
+	const double (&w16)[]=data.wfull;
+	const double (&w8)[]=data.whalf;
 	const int N=data.N;
 	double f[N+1];
 	double arg;
@@ -84,15 +84,16 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	smin=min;
 	smax=(min-min/data.InitDiv)+max/data.InitDiv;//data.init_div;
 	int licz=0,licztot=0 , counter=0;
-			
+	double error_ratio;//,derivs0=1,derivs1=1;		
 	while(1){
-		if(((max-min)-(smax-smin))==(max-min)||counter==MAX_RECURSION){
+		if(counter==MAX_RECURSION){
 			smax=smin+2*scale;
 			printf("Clenshaw_Curtis:: in \"%s\", evaluated %d times.\n",(data.tag).c_str(),counter );
 			printf("sector size = %.3e\n [%.3e, %.3e] of [%.3e, %.3e] after %d / %d /%d\n",smax-smin,smin,smax,min,max, licz,licztot,MAX_RECURSION);
-			
 			//getchar();
-			goto Error;
+			//if(counter>=MAX_RECURSION+2){
+				goto Error;
+			//}
 		}
 		++counter;
 		++licztot;
@@ -106,10 +107,11 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 			goto Error;
 		}
 #endif
-		accumhalf*=-1;
-		accumhalf+=accumfull;
+		//accumhalf*=-1;
+		//accumhalf+=accumfull;
+		error_ratio=fabs( (valfull-valhalf)/(eps*valfull) );
 		//if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)< fabs(smax-smin)*Aeps ) ){
-		if(( fabs(Kahn_total(accumhalf))<eps*(fabs(valfull)) ) || (  fabs(Kahn_total(accumhalf))< fabs(smax-smin)*Aeps ) ){
+		if((error_ratio<1 ) || (  fabs(valhalf-valfull)< fabs(smax-smin)*Aeps ) ){
 			accum+=accumfull;
 			++licz;
 			counter=0;
@@ -125,7 +127,8 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 			smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 		}else{
 			//IMPROVE
-			smax=smin+(scale/2);
+			smax=smin+(scale/(1+counter*pow(error_ratio, 0.25 )));
+			//smax=smin+(scale/2);
 		}
 
 		if(((max-min)-(smax-smin))==(max-min)){
@@ -138,7 +141,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	}
 	
 	Error:
-		printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,Kahn_total(accumhalf));
+		printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
 		const double *x16=data.x;
 		const double *w16=data.wfull;
 		const double *w8=data.whalf;

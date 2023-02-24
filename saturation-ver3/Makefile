@@ -18,7 +18,7 @@ FUNCDIR=./Functions
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR} 
 
 #OPT= -Wno-unused-result -fp-model=precise -O3#-g # -Wno-format 
-OPT=-O3 -Wno-unused-result -std=c++17
+OPT=-O3 -Wno-unused-result 
 
 #CXX=/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx
 #CXX=icpx

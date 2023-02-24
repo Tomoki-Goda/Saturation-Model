@@ -28,7 +28,7 @@
 
 
 class Collinear_Gluon{
-	CCIntegral cc=CCprepare(256,"gluon",4,3);
+	CCIntegral cc=CCprepare(256,"gluon",1,3);
 	private:
 		const double       beta = 6.6;
 		double dgammafbeta;

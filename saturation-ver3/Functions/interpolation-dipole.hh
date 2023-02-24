@@ -29,7 +29,6 @@ class Laplacian_Sigma{
 		
 		
 		static void* compute(void*opt){
-			//pthread_mutex_lock(&mut);
 			sigmaopt* param=(sigmaopt*)opt;
 			Laplacian_Sigma *sigmaptr=param->ptr;
 			const int j=param->j;
@@ -37,29 +36,21 @@ class Laplacian_Sigma{
 			if(!std::isfinite((sigmaptr->sigma_array)[j])){
 				printf("can not approximate sigma=%.3e\n",sigmaptr->sigma_array[j] );
 			}
-			//pthread_mutex_unlock(&mut);
 			return opt;
 		}
 		int approximate_thread(const double x){
 			sigma.set_kinem(x);
 			pthread_t thread[r_npts];
 			sigmaopt args[r_npts];
-			int i1;//,i2,i3,i4;
 			for (int j = 0; j < r_npts; j++){
 				args[j].j=j;
 				args[j].ptr=this;
-			//}
-			//for (int j = 0; j < r_npts; j++){
-				i1=pthread_create(thread+j,NULL,&compute,(void*)(&args[j]) );
-
+				pthread_create(thread+j,NULL,&compute,(void*)(&args[j]) );
 			}
 			for(int i=0;i<r_npts;++i){
 					pthread_join(thread[i],NULL);
 			}
-
-			//printf("ready\n ");
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
-				
 			return(0);
 		}
 		int approximate(const double x){
@@ -98,9 +89,7 @@ class Laplacian_Sigma{
 			this->mode=mode;
 			if(r_npts!=0){
 				free_approx();
-			}//else{
-				//printf("first\n");
-			//}
+			}
 			r_npts=npts1;
 			r_array=(double*)calloc(r_npts,sizeof(double));
 			sigma_array=(double*)calloc(r_npts,sizeof(double));
@@ -117,10 +106,10 @@ class Laplacian_Sigma{
 		}
 		double operator()(const double rho)const{
 			double var;
-#if (R_CHANGE_VAR==1)
+#if R_CHANGE_VAR==1
 			const double r=rho/(1-rho);
 			var=pow(1-rho,-2);
-#elif (HANKEL==1||R_CHANGE_VAR==0)
+#elif R_CHANGE_VAR==0
 			const double r =rho;
 			var=1;
 #endif		
@@ -136,9 +125,9 @@ class Laplacian_Sigma{
 		return 0;	
 		}
 		double operator()(const double rho, const std::vector<double> &par)const {
-#if (R_CHANGE_VAR==1)
+#if R_CHANGE_VAR==1
 			const double r=rho/(1-rho);
-#elif (HANKEL==1||R_CHANGE_VAR==0)
+#elif R_CHANGE_VAR==0
 			const double r =rho;
 #endif		
 			if(r>2*R_MAX){
@@ -153,21 +142,12 @@ class Laplacian_Sigma{
 //#if (LAPLACIAN==1||R_FORMULA==1)
 			switch(mode){
 				case 'l':
-#if (IBP>=1 && HANKEL!=1)
 #if IBP==1
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
 #elif IBP==2
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
 					val*=-kt2*r*std::cyl_bessel_j(0,r*sqrt(kt2));
-#endif
-#elif HANKEL==1
-#if IBP==0
-					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
-					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
-#elif IBP==1
-					val=sqrt(kt2)*gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
-#endif
 #else
 					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
 					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
@@ -198,10 +178,11 @@ class Laplacian_Sigma{
 			return val;
 #endif
 		}
+		
 		double constant(double r , const std::vector<double> &par)const {
 			//const double r=rho/(1-rho);
 			const double kt=sqrt(par[0]);
-			double val;
+			double val=0;
 #if IBP==1
 			val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 			val*=r*std::cyl_bessel_j(0,r*kt);
@@ -210,10 +191,6 @@ class Laplacian_Sigma{
 			val+=std::cyl_bessel_j(0,r*kt)*gsl_spline_eval_deriv(spline_ptr,r,r_accel_ptr);
 			val*=r;
 #endif
-
-		//	if(fabs(val)>1.0e-3){
-		//		printf("x= %.2e boundar= %.2e\n",x,val);
-		//	}
 			return(val);
 		}
 };

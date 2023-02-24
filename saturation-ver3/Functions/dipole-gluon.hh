@@ -80,8 +80,8 @@ class Gluon_GBW{
 			val*=alpha(mu2+mu02)/0.2;
 			//printf("%.2e %.2e\n",mu2,alpha(mu2));
 #endif
-#if THRESHOLD==1 
-			double thresh_power=7;
+#if THRESHOLD!=0 
+			double thresh_power=THRESHOLD;
 			val*=pow(1-x,thresh_power);
 #endif
 			return (sigma_0*val) ;
@@ -98,7 +98,7 @@ class Gluon_GBW{
 class Dipole_Gluon{
 		const double *par;
 		Laplacian_Sigma integrand;
-		CCIntegral cc=CCprepare(128,"dipole",4,2);
+		CCIntegral cc=CCprepare(64,"dipole",1,4);
 		double x;	
 
 	public: 
@@ -122,63 +122,49 @@ class Dipole_Gluon{
 		}
 		double operator()(const double kt2,const double mu2){
 			Kahn accum=Kahn_init(3);
-			double rmax=R_MAX,rmin=R_MIN;
 			const std::vector<double> par{kt2,x};
+			double rmax=R_MAX,rmin=R_MIN;
 			double val=0;
 			Kahn_clear(accum);
-#if GBW_APPROX==1
-			if(x>0.7){
-				double qs2=(4*PI*PI*alpha(par[4])*par[1]*pow(x,-par[2])*pow(1-x,5.6))/(3*par[0]);
-				val=2*par[0]*kt2/qs2*exp(-kt2/qs2);
-				return(3.0/(8*PI*PI)*val);
-			}
-#endif
+
 			const double minmax=50;
-#if ADD_END>=0
+#if ADD_END>=0 //negative value is for testing purpose.
 			rmax=minmax;
 #if MODEL==1
 			rmax/=pow(1-x,4);
 #endif
 			if(rmax>R_MAX||!std::isfinite(rmax)){
-				//printf("rmax %.3e reduced to %.3e\n",rmax,R_MAX );
 				rmax=R_MAX;
 			}
 			const double scale=(2*PI)/sqrt(kt2);
 			double imin=rmin;
-			int j=(int)(rmax/scale);
-			if(j<3){
-				j=3;
+			int sectors=(int)(rmax/scale);
+			if(sectors<3){
+				sectors=3;
 			}
 			
-//#if IBP==0||IBP==2 //actually important. better cancellation for convergence.
-			double imax=PI/(sqrt(kt2)*4);
-			//double imax=PI/(sqrt(kt2)*2);
-			//with this differences coming from the first term of ibp is small.
-//#elif IBP==1
-			//double imax=3*PI/(sqrt(kt2)*4);
-//#endif
-			
+			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient 
 			int flag=0;
 			//double val_prev=0;
-			for(int i=0;i<j;++i){
+			for(int i=0;i<sectors;++i){
 				imax+=scale;
 				if(imax>rmax){
 					if(i>0){
 						imax-=scale;
-						j=i-1;
+						sectors=i-1;
 						break;
 					}else{
 						imax=rmax;
 					}
 				};
 #if R_CHANGE_VAR==1
-				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/10,INT_PREC/100);
+				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
 #elif R_CHANGE_VAR==0
-				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/10,INT_PREC/100);
+				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
 #endif
 				if(fabs(val)< pow(INT_PREC,2) ){
 					++flag;
-					if(flag>5&&imax>minmax){
+					if(flag>5&&imax>minmax){//if consecutively small 5 times
 						break;//it is likely beyond this will be trivial
 					}
 				}else{
@@ -196,12 +182,12 @@ class Dipole_Gluon{
 			diff-=integrand.constant(rmin,par);
 			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
 				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
-				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(j*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
+				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
 			}
 #if ADD_END!=0
 			val+=diff;
-#endif
-#endif
+#endif//ADD_END
+#endif//IBP
 			Kahn_free(accum);
 //Threshold 1-x^7 is in dipole sigma. 
 			

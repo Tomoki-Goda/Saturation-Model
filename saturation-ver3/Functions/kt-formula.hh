@@ -55,17 +55,8 @@ template<typename TYPE > class Integrand_kt{
 		double  betamin=0,betamax=0, k2max=0,kappamax=0;
 		explicit Integrand_kt(TYPE & gluon){
 			gluptr=&gluon;
-			//set_kinem(a,b,c);
-			//gluptr->set_kinem(b);
-/*#if SCATTER==1
-			//file.open("home/tomoki/Saturation-Model/saturation-ver3/"+gluon.key+"scatter.txt",std::fstream::out);
-			file.open("/home/tomoki/Saturation-Model/saturation-ver3/scatter.txt",std::fstream::app);
-#endif*/
 		}
 		~Integrand_kt(){
-/*#if SCATTER==1
-			file.close();	
-#endif*/	
 		}
 		
 		int set_kinem(const double  a,const double  b,const double  c){
@@ -140,11 +131,7 @@ template<typename TYPE > class Integrand_kt{
 
 		}
 		
-//#if SCATTER==1
-//		double   integrand(const double  kappa_t_prime2,const double  kt2,const double  beta){
-//#else 
 		double   integrand(const double  kappa_t_prime2,const double  kt2,const double  beta)const{
-//#endif
 			const double  xz=x*inv_z(beta,kappa_t_prime2,kt2) ;
 			if(xz>1.0){
 #if TEST==1
@@ -181,9 +168,6 @@ template<typename TYPE > class Integrand_kt{
 				getchar();
 			}
 #endif
-//#if SCATTER==1
-//		file<<std::scientific<<kappa_t_prime2<<"\t"<<kt2<<"\t"<<beta<<"\t"<<Q2<<"\t"<<x<<"\t"<<mf2<<"\t"<<val<<std::endl;
-//#endif
 			return(val);
 		}
 		

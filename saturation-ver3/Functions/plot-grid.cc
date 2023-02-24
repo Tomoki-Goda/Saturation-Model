@@ -131,7 +131,18 @@ int main(int argc , char** argv){
 	printf("Export\n");			
 	gluon.export_grid(outfile);
 	printf("Gluon end\n");
-
+	fclose(outfile);
+	
+	double sat;
+	sprintf(filenames,"%s/%s",opt.path.c_str(),"saturation.txt");
+	printf("%s/%s\n",opt.path.c_str(),"saturation.txt");
+  	outfile=fopen(filenames,"w");
+	
+	for(int i=0;i<10;i++){
+		x=pow(10,-8+6*((double)i)/(10-1));
+		sat=gluon.saturation(x,0.2);
+		fprintf(outfile,"%.5e\t%.5e\n",x,sat );
+	}
 	fclose(outfile);
 
 	return 0;

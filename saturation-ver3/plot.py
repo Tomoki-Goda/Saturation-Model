@@ -35,6 +35,7 @@ def main():
     argv=sys.argv[1:]
     plotcolour=["red", "blue", "green", "cyan", "magenta", "brown", "orange", "purple", "yellow"]
     scatter=False
+    labels=[]
  
     fig,ax=plt.subplots()
  
@@ -90,13 +91,13 @@ def main():
         else:
             leg=ax.plot(data_array[column[0]],data_array[column[1]],label=labels[counter],linestyle=plotstyle[counter] ,color=plotcolour[counter] ) 
         #if counter<len(labels):
-        if labels[counter]!="":
+        if (labels!=[] and labels[counter]!=""):
         	legs.append(leg[0])
         counter+=1
-    
-    labels.remove("")
-    if len(legs)>0:
-    	ax.legend(legs,labels)
+    #if labels!=[]:
+    #    labels.remove("")
+    #    if len(legs)>0:
+    #        ax.legend(legs,labels)
     ax.set(title=plottitle,  ylabel=axes[1],    xlabel=axes[0],  xscale= xs ,   yscale=ys )
     if(xlim[0]!=xlim[1]):
         ax.set_xlim(xlim[0],xlim[1])

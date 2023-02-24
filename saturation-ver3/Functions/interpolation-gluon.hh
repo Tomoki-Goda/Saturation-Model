@@ -110,8 +110,38 @@ class Approx_aF{
 			//printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}
-
+		
 	public:
+		double saturation(double x,double kt2_start){
+			double val;
+			double kt2=kt2_start;
+			double diff=1.0e-1;
+			double valprev=0;
+			int flag=0;
+			int counter=0;
+			double grad=0;
+			while(counter++<200){
+				val=gsl_spline2d_eval_deriv_x(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
+				//printf("%.3e at %.3e\n",val,kt2);
+				if(fabs(val)<1.0e-5){
+					printf("ok\n\n");
+					return kt2;
+				}else if(val>0&&flag==0){
+					kt2+=diff;
+					diff*=1.5;
+				}else{
+					flag=1;
+					grad=(val-valprev)/diff;
+					diff=-val/grad;
+					printf("%.3e -> %.3e at %.3e move by %.3e \n",valprev, val,kt2,diff);
+					kt2+=diff;
+				}
+				valprev=val;
+			}
+			printf("FAILED to find peak derivative is %.3e at %.3e\n",val,kt2);
+			return 0;
+
+		}
 		int export_grid(FILE*file)const{
 			for(int j=0;j< x_npts;j++){
 				for(int i=0;i<kt2_npts;i++){

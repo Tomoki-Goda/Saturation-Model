@@ -209,9 +209,11 @@ int main(int argc, char** argv){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		simplex1.~MnSimplex();
 		ROOT::Minuit2::MnSimplex simplex1(theFCN,min.UserParameters(),0);
 		min=simplex1(25,goal);
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	}
 	
 	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
@@ -242,9 +244,11 @@ int main(int argc, char** argv){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		simplex1.~MnSimplex();
 		ROOT::Minuit2::MnSimplex simplex1(theFCN,min.UserParameters(),0);
-		min=simplex1(25,goal);		
+		min=simplex1(25,goal);	
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;	
 	}
 	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 	

@@ -66,7 +66,7 @@ class Gluon_GBW{
 
 				mu02 = MU02;
 #endif
-#if THRESH==-1
+#if THRESHOLD==-1
 				thresh_power=par[count++];
 #else
 				thresh_power=THRESHOLD;

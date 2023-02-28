@@ -309,7 +309,7 @@ void llTest(const int ndim, const int ncomp,
 template <typename T> class F2_kt{
 		//int newpar=1;
 	
-			const double *par=NULL;
+			//const double *par=NULL;
 			T *integrands;
 #if R_FORMULA==1
 			/*SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
@@ -347,8 +347,8 @@ template <typename T> class F2_kt{
 			}
 		}
 		
-		explicit F2_kt(const  double  *par,T(&integrands)[] ){
-			this->par=par;
+		explicit F2_kt(T(&integrands)[] ){
+			//this->par=par;
 			this->integrands=integrands;
 			//printf(" F2 \n");
 /*

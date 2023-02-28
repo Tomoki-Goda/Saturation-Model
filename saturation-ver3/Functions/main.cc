@@ -143,8 +143,8 @@ int main(int argc, char** argv){
 	//INT_PREC=1.0e-4;
 	//N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(5*INT_PREC);
-	INT_PREC=1.0e-2;
-	N_APPROX=N_CHEB_R/10;
+	INT_PREC=1.0e-3;
+	N_APPROX=N_CHEB_R/4;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;

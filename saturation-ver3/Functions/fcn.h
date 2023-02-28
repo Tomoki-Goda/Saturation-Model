@@ -93,7 +93,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			static int licznik;
 			++licznik;
 			double x,Q2;
-			double val;
+			
 			double chisq=0;
 			const int len=par.size();
 			//printf("%d parameters\n",len);
@@ -141,35 +141,36 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			
 			
 			double chisq_arr[MAX_N]={0};
-#pragma omp parallel private (val) //firstprivate(F2)
+#pragma omp parallel 
 { 
+			double val;
 #if GLUON_APPROX==0	
-#if R_FORMULA==1
+#if R_FORMULA==1///////////////////////////////////////////////////////////////////////
 			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
 			sigma[0].init(sigpar);
 			sigma[1].init(sigpar);
 			sigma[2].init(sigpar);
-#else//R_FORMULA///////////////////////////////////////////////////////////////////////
+#else//R_FORMULA//////////////////////////////////////////////////////////////////////
 			Gluon gluon;//gluon has no flavour dep.
 			gluon.init(sigpar);
-#endif//R_FORMULA
+#endif//R_FORMULA//////////////////////////////////////////////////////////////////////
 #endif //GLUON_APPROX==0
-#if R_FORMULA==1			
+#if R_FORMULA==1		
 			Integrand_r integrands[3]={
 				Integrand_r(sigma[0]) ,
 				Integrand_r(sigma[1]) ,
 				Integrand_r(sigma[2])
 			};
-			F2_kt<Integrand_r> F2(sigpar,integrands);
+			F2_kt<Integrand_r> F2(integrands);
 #else
 			Integrand_kt<Gluon> integrands[3]={
 				Integrand_kt( gluon),
 				Integrand_kt( gluon),
 				Integrand_kt( gluon)
 			};
-			F2_kt<Integrand_kt<Gluon>> F2(sigpar,integrands);
+			F2_kt<Integrand_kt<Gluon>> F2(integrands);
 #endif
-#pragma omp for 
+#pragma omp for schedule(dynamic)
 			for(int i=0;i<MAX_N;++i){
 				//F2_kt F2(sigpar);
 				val=0;

@@ -31,9 +31,13 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			ERR_DATA=(double*)realloc(ERR_DATA,MAX_N*sizeof(double));
 		}
 		double Up() const {return 1;}
+		FILE* file;
 	public:
 		unsigned MAX_N=0;
-		explicit KtFCN(std::string data_file ){
+		explicit KtFCN(std::string data_file,std::string dir ){
+			std::string file_name=dir+"/log.txt";
+			file=fopen(file_name.c_str(),"w");
+
 		//KtFCN(char* data_file){
 			data_alloc(500);
 			const double alpha =1.0/137 ;//fine structure const 1/137;
@@ -77,6 +81,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			free(X_DATA);
 			free(CS_DATA);
 			free(ERR_DATA);
+			fclose(file);
 		}
 		
 		double operator()(const std::vector<double>& par)const{
@@ -115,6 +120,10 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			}
 			printf("\033[1A \033[2K");
 
+			for(int i =0;i<len;++i){
+				fprintf(file,"%.5e\t",par[i]);
+			}
+			fprintf(file,"%.5e\n",chisq);
 
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();

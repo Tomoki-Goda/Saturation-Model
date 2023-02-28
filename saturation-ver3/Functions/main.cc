@@ -77,7 +77,7 @@ int main(int argc, char** argv){
 	printf("*******************************************************.\n");
 	
 
-	KtFCN theFCN("/home/tomoki/Saturation-Model/saturation-ver3/data/hera_tot.dat");
+	KtFCN theFCN("/home/tomoki/Saturation-Model/saturation-ver3/data/hera_tot.dat",argv[1]);
 	ROOT::Minuit2::MnUserParameters upar;
 
 #if MU202!=0
@@ -135,7 +135,7 @@ int main(int argc, char** argv){
 	//prec.SetPrecision(1.0e-8);
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
-	//prec.SetPrecision(INT_PREC);
+	prec.SetPrecision(5*INT_PREC);
 	int flag=0;
 	double goal=1;
 	ROOT::Minuit2::MnSimplex simplex1(theFCN,upar,0);
@@ -151,7 +151,7 @@ int main(int argc, char** argv){
 	//ROOT::Minuit2::MnSimplex simplex2(theFCN,upar,0);
 	
 	for(int i=0;i<2;++i){
-		prec.SetPrecision(INT_PREC*2);
+		prec.SetPrecision(INT_PREC*5);
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 		printf("*****************************\n");
@@ -166,7 +166,7 @@ int main(int argc, char** argv){
 //	printf("N_PAR-skip=%d-%d=%d\n",N_PAR,skip,N_PAR-skip );
 	INT_PREC=5.0e-4;
 	N_APPROX=N_CHEB_R/2;
-	prec.SetPrecision(INT_PREC*2);
+	prec.SetPrecision(INT_PREC*5);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
 	//printf("N_PAR-skip=%d\n",N_PAR-skip );
@@ -204,7 +204,7 @@ int main(int argc, char** argv){
 
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
-	prec.SetPrecision(4*INT_PREC);
+	prec.SetPrecision(5*INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");

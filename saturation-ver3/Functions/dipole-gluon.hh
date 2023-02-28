@@ -60,7 +60,10 @@ class Gluon_GBW{
 		~Gluon_GBW(){}
 		
 	public:
-
+		inline double operator()(const double x,const double k2,double mu2){
+			set_x(x);
+			return((*this)(k2,mu2));
+		}
 		void set_x(double x){
 			this->x=x;
 		}

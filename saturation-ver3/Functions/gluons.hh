@@ -108,7 +108,7 @@ class Collinear_Gluon{
 				l_g
 			};
 		    	normalization = A_g*exp(n_0* par[0] )*dgammafbeta;
-			value=dclenshaw<const Collinear_Gluon, const std::vector<double> >(cc,*this,par,0,150,1.0e-12,1.0e-16);  
+			value=dclenshaw<const Collinear_Gluon, const std::vector<double> >(cc,*this,par,0,150,1.0e-10,1.0e-15);  
 			//this->flag=0;	
 			value=normalization*value;
 		 	if(!std::isfinite(value)||value<0){

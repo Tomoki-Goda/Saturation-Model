@@ -26,8 +26,13 @@ class Laplacian_Sigma{
 			free(r_array);
 			free(sigma_array);
 		}
-		
-		
+		void allocate(int npts1){
+			r_npts=npts1;
+			r_array=(double*)calloc(r_npts,sizeof(double));
+			sigma_array=(double*)calloc(r_npts,sizeof(double));
+			r_accel_ptr = gsl_interp_accel_alloc ();
+			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
+		}
 		static void* compute(void*opt){
 			sigmaopt* param=(sigmaopt*)opt;
 			Laplacian_Sigma *sigmaptr=param->ptr;
@@ -51,6 +56,7 @@ class Laplacian_Sigma{
 					pthread_join(thread[i],NULL);
 			}
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
+			//test();
 			return(0);
 		}
 		int approximate(const double x){
@@ -64,6 +70,26 @@ class Laplacian_Sigma{
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 			return(0);
 		}
+		int test(){
+			double diff[2*r_npts-1];
+			double sigma_array_2[2*r_npts-1];
+			for (int j = 0; j < r_npts-1; j++){
+				sigma_array_2[j] = sigma( (r_array[j]+2*r_array[j+1])/3 );
+				diff[j]=sigma_array_2[j]-gsl_spline_eval(spline_ptr, (r_array[j]+2*r_array[j+1])/3 ,r_accel_ptr);
+				//sigma_array_2[j] = sigma( r_array[j] );
+				//diff[j]=sigma_array_2[j]-gsl_spline_eval(spline_ptr, r_array[j] ,r_accel_ptr);
+				if(!isfinite(sigma_array[j])){
+					printf("can not approximate sigma=%.3e\n",sigma_array[j] );
+				}
+				if(fabs(diff[j]/sigma_array_2[j])>1.0e-5&& abs(diff[j])>1.0e-10){
+					printf("%.3e\t%.3e\t%.3e\t%.3e\n",x,r_array[j],sigma_array_2[j],diff[j]);
+				}
+			}printf("\n");
+			//exit(1);
+			//gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
+			return(0);
+		}
+		
 	public:
 		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
@@ -90,11 +116,7 @@ class Laplacian_Sigma{
 			if(r_npts!=0){
 				free_approx();
 			}
-			r_npts=npts1;
-			r_array=(double*)calloc(r_npts,sizeof(double));
-			sigma_array=(double*)calloc(r_npts,sizeof(double));
-			r_accel_ptr = gsl_interp_accel_alloc ();
-			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
+			allocate(npts1);
 			sigma.init(par);
 			
 			double r;

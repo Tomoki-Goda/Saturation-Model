@@ -133,8 +133,8 @@ int main(int argc, char** argv){
 #endif//USE_RESULT
 	ROOT::Minuit2::MnMachinePrecision prec;
 	//prec.SetPrecision(1.0e-8);
-	INT_PREC=1.0e-4;
-	N_APPROX=N_CHEB_R;
+	INT_PREC=1.0e-2;
+	N_APPROX=N_CHEB_R/10;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
@@ -147,7 +147,7 @@ int main(int argc, char** argv){
 	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	INT_PREC=1.0e-3;
-	N_APPROX=N_CHEB_R/4;
+	N_APPROX=N_CHEB_R/8;
 	//ROOT::Minuit2::MnSimplex simplex2(theFCN,upar,0);
 	
 	for(int i=0;i<2;++i){
@@ -157,7 +157,7 @@ int main(int argc, char** argv){
 		printf("*****************************\n");
 		min=simplex1(100,pow(10,1-i));
 		INT_PREC/=2;
-		N_APPROX=(int)(N_APPROX*1.4);
+		N_APPROX=(int)(N_APPROX*2);
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 	}
 	

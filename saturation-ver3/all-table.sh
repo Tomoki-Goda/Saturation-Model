@@ -8,10 +8,10 @@
 	./Run2/fixa-bjorx2/result.txt \
 	./Run2/runa-bjorx-4/result.txt \
 	./Run2/runa-bjorx2-4/result.txt \
-	./kt-formula-report1/GBW-parameters.tex
+	./kt-formula-report1/GBW-parameters2.tex
 ./table "sigma_0, A_g, lambda_g,C1,mu102, chisq/dof" \
 	"BGK-r, BGK,BGK-Thresh" \
 	./Run2/BGK/result.txt \
 	./Run2/fixa-bjorx-BGK/result.txt \
 	./Run2/fixa-bjorx-BGK2/result.txt \
-	./kt-formula-report1/BGK-parameters.tex
+	./kt-formula-report1/BGK-parameters2.tex

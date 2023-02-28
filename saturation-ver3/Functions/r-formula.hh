@@ -56,7 +56,7 @@ class Sigma{
 #if LAPLACIAN==0
 			double val;
 			val=pow(r,2)*qs2/4;
-			if(val<1.0e-5){
+			if(val<1.0e-7){
 				val*=sigma_0;
 			}else{
 				val=sigma_0*(1-exp( -val));

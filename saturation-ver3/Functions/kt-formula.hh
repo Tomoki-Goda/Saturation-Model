@@ -155,6 +155,7 @@ template<typename TYPE > class Integrand_kt{
 			val+=(mf2+4*Q2*beta*beta*pow(1-beta,2) )*(I[2]-I[3]);
 			double mu2=kt2+kappa_t_prime2+mf2;
 			val*=(*gluptr)(xz,kt2,mu2);
+			//val*=(*gluptr)(kt2,mu2);
 			
 		
 			val= val/kt2;

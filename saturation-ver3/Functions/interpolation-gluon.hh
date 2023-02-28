@@ -13,18 +13,39 @@ class Approx_aF{
 		int kt2_npts,x_npts;
 		gsl_interp_accel *x_accel_ptr, *kt2_accel_ptr;
 		gsl_spline2d *  spline_ptr;
-		double *kt2_array,*x_array,*aF_array;
+		double *kt2_array=NULL,*x_array=NULL,*aF_array=NULL;
 		double mu02=0;
 		double sigma_0=0;
 		double kt2min=1.0e-15,kt2max=-1;
 		
+		int alloc_flag=0;
+		
 		void free_approx(){
-			gsl_spline2d_free (spline_ptr);
-			gsl_interp_accel_free (x_accel_ptr);
-			gsl_interp_accel_free (kt2_accel_ptr);
-			free(kt2_array);
-			free(x_array);
-			free(aF_array);
+			if(alloc_flag!=0){
+				gsl_spline2d_free (spline_ptr);
+				gsl_interp_accel_free (x_accel_ptr);
+				gsl_interp_accel_free (kt2_accel_ptr);
+				free(kt2_array);
+				free(x_array);
+				free(aF_array);
+				alloc_flag=0;
+			}else{
+				printf("Approx_aF cannot free\n");
+			}
+			
+		}
+		void alloc(int x_npts,int kt2_npts){
+			if(alloc_flag!=1){
+				x_array=(double*)malloc(x_npts*sizeof(double));
+				kt2_array=(double*)malloc(kt2_npts*sizeof(double));
+				aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
+				x_accel_ptr = gsl_interp_accel_alloc ();
+				kt2_accel_ptr = gsl_interp_accel_alloc ();
+				spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts);
+				alloc_flag=1;
+			}else{
+				printf("Approx_aF cannot allocate\n");
+			}
 		}
 		int approximate(const double kt2max){
 			this->kt2max=kt2max;
@@ -110,6 +131,7 @@ class Approx_aF{
 			//printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}
+			
 		
 	public:
 		double saturation(double x,double kt2_start){
@@ -146,7 +168,30 @@ class Approx_aF{
 			}	
 			return 0;
 		}
-
+		Approx_aF(const Approx_aF& rhs){
+			aF=rhs.aF;
+			x_npts=rhs.x_npts;
+			kt2_npts=rhs.kt2_npts;
+			alloc(x_npts,kt2_npts);
+			sigma_0=rhs.sigma_0;
+			mu02=rhs.mu02;
+			
+			if(rhs.alloc_flag!=0){
+				for(int i=0;i<x_npts;++i){
+					x_array[i]=rhs.x_array[i];
+					
+					for(int j=0;j<kt2_npts;++j){
+							aF_array[j+kt2_npts*i]=	rhs.aF_array[j+kt2_npts*i];			
+					}
+				}
+				for(int j=0;j<kt2_npts;++j){
+					kt2_array[j]=rhs.kt2_array[j];			
+				}
+				gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
+			}
+			
+			
+		}
 		Approx_aF(){
 		}
 		~Approx_aF(){
@@ -160,12 +205,7 @@ class Approx_aF{
 		void init(const int npts1, const int npts2, const int npts3, const double *par ){
 			x_npts=npts1;
 			kt2_npts=npts2;
-			x_array=(double*)malloc(x_npts*sizeof(double));
-			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
-			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
-			x_accel_ptr = gsl_interp_accel_alloc ();
-			kt2_accel_ptr = gsl_interp_accel_alloc ();
-			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
+			alloc(x_npts,kt2_npts);
 #if GLUON_APPROX!=0
 			aF.init(npts3,par);
 #else 

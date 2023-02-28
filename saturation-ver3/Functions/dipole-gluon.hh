@@ -39,22 +39,37 @@ double change_var(double & var,double &  jac,const double min, const double max,
 //
 ////////////////////////////////////////////////////////////////////
 class Gluon_GBW{
-	double sigma_0=0,lambda=0,x_0=0,mu02=0;
+	const double *sigpar;
+	double sigma_0=0,lambda=0,x_0=0,mu02=0,thresh_power=0;
 	double x=0;
-	std::string key;
+	//std::string key;
 
 	
 	public:
+		explicit Gluon_GBW(const Gluon_GBW& rhs){
+			sigpar=rhs.sigpar;
+			init(sigpar);
+			x=rhs.x;			
+		}
+		
 		explicit Gluon_GBW(){
 		}
 		void init(const double *par){
-				sigma_0 =(double)par[0];
-				lambda	=(double)par[1];
-				x_0	=(double)par[2];
+		 int count=0;
+		 sigpar=par;
+				sigma_0 =(double)par[count++];
+				lambda	=(double)par[count++];
+				x_0	=(double)par[count++];
 #if MU02==0
-				mu02 = par[3];
+				mu02 = par[count++];
 #else 
+
 				mu02 = MU02;
+#endif
+#if THRESH==-1
+				thresh_power=par[count++];
+#else
+				thresh_power=THRESHOLD;
 #endif
 		}
 		~Gluon_GBW(){}
@@ -84,7 +99,7 @@ class Gluon_GBW{
 			//printf("%.2e %.2e\n",mu2,alpha(mu2));
 #endif
 #if THRESHOLD!=0 
-			double thresh_power=THRESHOLD;
+			//double thresh_power=THRESHOLD;
 			val*=pow(1-x,thresh_power);
 #endif
 			return (sigma_0*val) ;
@@ -105,6 +120,11 @@ class Dipole_Gluon{
 		double x;	
 
 	public: 
+		Dipole_Gluon(const Dipole_Gluon&rhs ){
+			par=rhs.par;
+			integrand=rhs.integrand;
+			x=rhs.x;
+		}
 		Dipole_Gluon(){
 		}
 		~Dipole_Gluon(){
@@ -165,7 +185,7 @@ class Dipole_Gluon{
 #elif R_CHANGE_VAR==0
 				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
 #endif
-				if(fabs(val)< pow(INT_PREC,2) ){
+				if(fabs(val+integrand.constant(imax,par))< pow(INT_PREC,2) ){
 					++flag;
 					if(flag>5&&imax>minmax){//if consecutively small 5 times
 						break;//it is likely beyond this will be trivial
@@ -182,7 +202,7 @@ class Dipole_Gluon{
 //#if (IBP>=1&&ADD_END!=0)			
 #if (IBP>=1)			
 			diff+=integrand.constant(imax,par);
-			diff-=integrand.constant(rmin,par);
+			//diff-=integrand.constant(rmin,par);
 			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
 				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
 				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);

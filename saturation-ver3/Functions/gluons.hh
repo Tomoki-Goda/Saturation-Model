@@ -60,6 +60,11 @@ class Collinear_Gluon{
 		}
 
 	public:
+		//Collinear_Gluon operator=(Collinear_Gluon Collinear_Gluon )
+		Collinear_Gluon(const Collinear_Gluon& init){
+			dgammafbeta=init.dgammafbeta;
+		}
+		
 		explicit Collinear_Gluon(){
 			dgammafbeta=gsl_sf_gamma(beta)/PI;
 		}

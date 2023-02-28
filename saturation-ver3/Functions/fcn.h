@@ -108,23 +108,92 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 #endif			
 			double sigpar[10]={0},sudpar[10]={0};
 			parameter(par,sigpar, sudpar);//Format
-			F2_kt F2(sigpar);
+//////////////////////////////////////////////////////////////////////////////////////////
+#if GLUON_APPROX==1		
+#if R_FORMULA==1
+			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+
+#if GLUON_APPROX==0
+			sigma[0].init(sigpar);
+			sigma[1].init(sigpar);
+			sigma[2].init(sigpar);
+#elif GLUON_APPROX==1
+			
+			sigma[0].init(N_APPROX+250,sigpar,'s');
+			sigma[1].init(N_APPROX+250,sigpar,'s');
+			sigma[2].init(N_APPROX+250,sigpar,'s');
+			
+#endif
+			
+#else//R_FORMULA///////////////////////////////////////////////////////////////////////
+			Gluon gluon;//gluon has no flavour dep.
+#if GLUON_APPROX==1
+			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+250,sigpar);
+			const double kt2max=5.0e+4;
+			gluon.set_max(kt2max);
+#else
+			gluon.init(sigpar);
+#endif//GLUON_APPROX==1	
+			
+#endif//R_FORMULA
+#endif //GLUON_APPROX==1	
+///////////////////////////////////////////////////////////////////////////////////////////		
+			
+			
+			double chisq_arr[MAX_N]={0};
+#pragma omp parallel private (val) //firstprivate(F2)
+{ 
+#if GLUON_APPROX==0	
+#if R_FORMULA==1
+			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+			sigma[0].init(sigpar);
+			sigma[1].init(sigpar);
+			sigma[2].init(sigpar);
+#else//R_FORMULA///////////////////////////////////////////////////////////////////////
+			Gluon gluon;//gluon has no flavour dep.
+			gluon.init(sigpar);
+#endif//R_FORMULA
+#endif //GLUON_APPROX==0
+#if R_FORMULA==1			
+			Integrand_r integrands[3]={
+				Integrand_r(sigma[0]) ,
+				Integrand_r(sigma[1]) ,
+				Integrand_r(sigma[2])
+			};
+			F2_kt<Integrand_r> F2(sigpar,integrands);
+#else
+			Integrand_kt<Gluon> integrands[3]={
+				Integrand_kt( gluon),
+				Integrand_kt( gluon),
+				Integrand_kt( gluon)
+			};
+			F2_kt<Integrand_kt<Gluon>> F2(sigpar,integrands);
+#endif
+#pragma omp for 
 			for(int i=0;i<MAX_N;++i){
+				//F2_kt F2(sigpar);
 				val=0;
 				val=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
 				if(i>0){
 					printf("\033[1A \033[2K");
 				}
-				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],pow(fabs(val-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);	
-				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
+				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],pow(fabs(val-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
+				chisq_arr[i]=pow((val-CS_DATA[i])/ERR_DATA[i],2);
+
+			}
+			//getchar();
+			
+}
+			chisq=0;
+			for(int i=0;i<MAX_N;++i){
+			 	chisq+=chisq_arr[i];
 			}
 			printf("\033[1A \033[2K");
-
 			for(int i =0;i<len;++i){
 				fprintf(file,"%.5e\t",par[i]);
 			}
 			fprintf(file,"%.5e\n",chisq);
-
+			
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();
 #if PRINT_PROGRESS!=0

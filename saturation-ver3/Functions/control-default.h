@@ -141,9 +141,9 @@
 //////////////////////////////////////////////////////////////////
 //N_PAR is number of fit parameters
 #if MODEL ==0 
-	#define N_PAR 4
+	#define N_PAR 5
 #elif MODEL==1
-	#define N_PAR 6
+	#define N_PAR 7
 #elif (MODEL==2||MODEL==22)
 	#if SUDAKOV==0
 		#define N_PAR 3

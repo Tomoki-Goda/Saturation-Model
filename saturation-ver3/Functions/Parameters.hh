@@ -1,23 +1,23 @@
 /* GBW Starting parameter values, errors: sigma_0,lambda,x_0, C, mu2,g1 */
 #if ((MODEL==0)||( MODEL==2 )||( MODEL==22 )) 
-std::string par_name[]	= {"sigma_0",	"lambda",	"x_0",		"mu02",	 "C2", 	"mu202",	"g1",	"g2"};
-double par_start[]	= {3.0e+01,	3.3e-01,	2.0e+00,	4.0,		1.26,	2.0,		0.5,	0.5};
-double par_error[]	= {	5.0,	0.05,		0.1,		1.0,		0.01,	0.1,		0.1,	0.1 };
+std::string par_name[]	= {"sigma_0",	"lambda",	"x_0",		"mu02",	 	"thresh",	"C2", 	"mu202",	"g1",	"g2"};
+double par_start[]	= {3.0e+01,	3.3e-01,	2.0e+00,	4.0,		5,		1.26,	2.0,		0.5,	0.5};
+double par_error[]	= {	5.0,	0.05,		0.1,		1.0,		0.5,		0.01,	0.1,		0.1,	0.1 };
 
-double   par_min[]	= {	0.0,	0.00,		0.0,		1.0,		0.1,	1.0 ,		0.0,	0.0};
-double   par_max[] 	= {	80.0,	1.00,		100.0,		10,		10.0,	10.0,		2.0,	2.0};
+double   par_min[]	= {	0.0,	0.00,		0.0,		1.0,		0,		0.1,	1.0 ,		0.0,	0.0};
+double   par_max[] 	= {	80.0,	1.00,		100.0,		10,		10,		10.0,	10.0,		2.0,	2.0};
 //#endif
 #elif (MODEL==1)||(MODEL==3)
 std::string  par_name[]	= {
-"sigma_0",	"A_g",	"lambda_g",	"mu02",		"C1", 	"mu102",		"C2",	"mu202",	"g1",	"g2"};
+"sigma_0",	"A_g",	"lambda_g",	"mu02",		"C1", 	"mu102",	"thresh",		"C2",	"mu202",	"g1",	"g2"};
 double par_start[]  	= {
-33.0,		1.0,	0.2,		4.0,		0.2, 	1.5,		1.26,	2.0,		0.1, 	0.1};  
+33.0,		1.0,	0.2,		4.0,		0.2, 	1.5,   		1,		1.26,	2.0,		0.1, 	0.1};  
 double par_error[]  	= {
- 5.00,  	0.10,	0.2, 		1.0,		1.0,	0.1,		0.1,	0.1,		0.01,	0.01};
+ 5.00,  	0.10,	0.2, 		1.0,		1.0,	0.1,		0.5,		0.1,	0.1,		0.01,	0.01};
 double   par_min[] 	= {
- 0.00,  	0.00,	-5.0,		1.0,		0.01, 	1.0,		0.5,	1.0,		0.0,	0.0};
+ 0.00,  	0.00,	-5.0,		1.0,		0.01, 	1.0,		0,		0.5,	1.0,		0.0,	0.0};
 double   par_max[] 	= {
-50.00,		20.00,	5.0, 		10.0,		10.0,	10.0,		10,	10.0,		2.0,	2.0};
+50.00,		20.00,	5.0, 		10.0,		10.0,	10.0,		10,		10,	10.0,		2.0,	2.0};
 #endif
 
 //int parameter(const std::vector<double>& par,double (& sigpar)[],double (& sudpar)[]){
@@ -54,6 +54,9 @@ int i=0,j=0,k=0;
 	sigpar[j++]=(par[i++]);
 	sigpar[j++]=(par[i++]);//sqrt(fabs(sigpar[3]/par[4]));//rmax^2= C/mu02
 //	printf(" %.2e %.2e ",sigpar[3],sigpar[4]);
+#endif
+#if THRESHOLD==-1
+	sigpar[j++]=(par[i++]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
 #if (MODEL==22||MODEL==2)

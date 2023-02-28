@@ -49,14 +49,35 @@
 template<typename TYPE > class Integrand_kt{
 		//Gluon * gluptr=NULL;
 		TYPE *gluptr=NULL;
-		std::fstream file;
+		//std::fstream file;
 	public:
 		double  x=0,Q2=0,mf2=0;
 		double  betamin=0,betamax=0, k2max=0,kappamax=0;
+		
+		Integrand_kt& operator=(const Integrand_kt& rhs){
+			x=rhs.x;
+			Q2=rhs.Q2;
+			mf2=rhs.mf2;
+			betamax=rhs.betamin;
+			k2max=rhs.k2max;
+			kappamax=rhs.kappamax;
+			gluptr=rhs.gluptr;
+			return *this;
+		}
+		explicit Integrand_kt(const Integrand_kt& rhs){
+			x=rhs.x;
+			Q2=rhs.Q2;
+			mf2=rhs.mf2;
+			betamax=rhs.betamin;
+			k2max=rhs.k2max;
+			kappamax=rhs.kappamax;
+			gluptr=rhs.gluptr;
+		}
 		explicit Integrand_kt(TYPE & gluon){
 			gluptr=&gluon;
 		}
 		~Integrand_kt(){
+			//printf("Integrand_kt\n");
 		}
 		
 		int set_kinem(const double  a,const double  b,const double  c){
@@ -285,28 +306,29 @@ void llTest(const int ndim, const int ncomp,
   printf("calling\n");
   
   }
-class F2_kt{
+template <typename T> class F2_kt{
 		//int newpar=1;
 	
-			const double *par;
+			const double *par=NULL;
+			T *integrands;
 #if R_FORMULA==1
-			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+			/*SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
 
 			Integrand_r integrands[3]={
 				Integrand_r(sigma[0]) ,
 				Integrand_r(sigma[1]) ,
 				Integrand_r(sigma[2])
-			};
+			};*/
 			const int key =13;
 			const int ndim=2;
 #else//R_FORMULA
-			Gluon gluon;//gluon has no flavour dep.
+			/*Gluon gluon;//gluon has no flavour dep.
 			
 			Integrand_kt<Gluon> integrands[3]={
 				Integrand_kt( gluon),
 				Integrand_kt( gluon),
 				Integrand_kt( gluon)
-			};
+			};*/
 			const int key =11;
 			const int ndim=3;
 			const double kt2max=5.0e+4;
@@ -317,9 +339,19 @@ class F2_kt{
       ///////////////////////////////////////////
 			//const double*__restricted par;
 	public: 
-		explicit F2_kt(const  double  *par ){
+		explicit F2_kt(const F2_kt & init){
+			this->par=init.par;
+			this->integrands=init.integrands;
+			for(int i=0;i<3;i++){
+				(this->integrands)[i]=(init.integrands)[i];
+			}
+		}
+		
+		explicit F2_kt(const  double  *par,T(&integrands)[] ){
 			this->par=par;
+			this->integrands=integrands;
 			//printf(" F2 \n");
+/*
 #if R_FORMULA==1
 #if GLUON_APPROX==0
 			sigma[0].init(par);
@@ -346,7 +378,7 @@ class F2_kt{
 			gluon.init(par);
 #endif//GLUON_APPROX==1			
 #endif//R_FORMULA
-			
+			*/
 		}
 
 		~F2_kt(){

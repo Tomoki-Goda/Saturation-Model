@@ -10,7 +10,7 @@ typedef struct {int j; Laplacian_Sigma *ptr;} sigmaopt;
 class Laplacian_Sigma{
 	private:
 		Sigma sigma;
-		double max=R_MAX, min=R_MIN; 
+		//double max=R_MAX, min=R_MIN; 
 		double *r_array=NULL,*sigma_array=NULL;
 		gsl_interp_accel *  r_accel_ptr;
 		gsl_spline *  spline_ptr;
@@ -19,19 +19,31 @@ class Laplacian_Sigma{
 		int counter=0;
 		double x=0;
 		double sigma_0=0;
+		int alloc_flag=0;
 		
 		void free_approx(){
+			if(alloc_flag!=0){
 			gsl_spline_free (spline_ptr);
 			gsl_interp_accel_free (r_accel_ptr);
 			free(r_array);
 			free(sigma_array);
+			alloc_flag=0;
+			}else{
+				printf("Laplacian_Sigma cannot free\n");
+			}
 		}
 		void allocate(int npts1){
-			r_npts=npts1;
-			r_array=(double*)calloc(r_npts,sizeof(double));
-			sigma_array=(double*)calloc(r_npts,sizeof(double));
-			r_accel_ptr = gsl_interp_accel_alloc ();
-			spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
+			if(alloc_flag!=1){
+				r_npts=npts1;
+				r_array=(double*)calloc(r_npts,sizeof(double));
+				sigma_array=(double*)calloc(r_npts,sizeof(double));
+				r_accel_ptr = gsl_interp_accel_alloc ();
+				spline_ptr = gsl_spline_alloc(gsl_interp_cspline, r_npts); // cubic spline
+				alloc_flag=1;
+			}else{
+				printf("Laplacian_Sigma cannot allocate\n");
+			}
+			
 		}
 		static void* compute(void*opt){
 			sigmaopt* param=(sigmaopt*)opt;
@@ -91,13 +103,23 @@ class Laplacian_Sigma{
 		}
 		
 	public:
-		//double max=R_MAX, min=R_MIN;
-		inline int set_kinem(double x){
-			this->x=x;
-			//approximate(x);
-			approximate_thread(x);
-			return 0;
-		}	
+	
+		explicit Laplacian_Sigma(const Laplacian_Sigma& rhs){
+			x=rhs.x;
+			sigma_0=rhs.sigma_0;
+			mode=rhs.mode;
+			r_npts=rhs.r_npts;
+			sigma=rhs.sigma;
+			allocate(r_npts);
+			
+			if(rhs.sigma_array!=NULL){
+				for(int i=0;i<r_npts;i++){
+					sigma_array[i]=rhs.sigma_array[i];
+					r_array[i]=rhs.r_array[i];
+				}
+				gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
+			}
+		}
 		
 		explicit Laplacian_Sigma(){
 			r_npts=0;
@@ -106,10 +128,16 @@ class Laplacian_Sigma{
 			//printf("sigma approx\n");
 		}
 		~Laplacian_Sigma(){
-			//printf("sigma approx end\n");
 			free_approx();
-			
 		}
+		//double max=R_MAX, min=R_MIN;
+		inline int set_kinem(double x){
+			this->x=x;
+			//approximate(x);
+			approximate_thread(x);
+			return 0;
+		}	
+		
 		void init(const int npts1,const double *par ,char mode){
 			sigma_0=par[0];
 			this->mode=mode;
@@ -122,7 +150,7 @@ class Laplacian_Sigma{
 			double r;
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
-				r=min*pow(4.0*max/min,r)/2.0;
+				r=R_MIN*pow(4.0*R_MAX/R_MIN,r)/2.0;
 				r_array[j]=r;
 			}
 		}

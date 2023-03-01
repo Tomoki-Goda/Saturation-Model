@@ -16,7 +16,7 @@ int N_APPROX=N_CHEB_R;
 #include"./fcn.h"
 
 double double_round(double val,int i){
-	int l=(int)log10(val);
+	int l=lrint(floor(log10(val)));
 	l-=i-1;
 	return(round( val*pow(10,-l) )*pow(10,l));
 }

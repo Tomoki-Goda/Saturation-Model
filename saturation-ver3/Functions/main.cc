@@ -182,23 +182,25 @@ int main(int argc, char** argv){
 	//printf("N_PAR-skip=%d\n",N_PAR-skip );
 	//std::cout<<upar<<std::endl;
 	printf("***************************\n");
-	ROOT::Minuit2::MnHesse hesse;
-	ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,min.UserParameters());
+	//ROOT::Minuit2::MnHesse hesse;
+	//ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,min.UserParameters());
 //	ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,upar);
+	
+	
+	//std::cout<<"Hesse "<<stat<<std::endl; 
+	//ROOT::Minuit2::MnStrategy strat0(0);
+	{  	
+	ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
 	for(int i=0;i<(N_PAR-skip);i++ ){
-		stat.RemoveLimits(i);
+		migrad.RemoveLimits(i);
 	}
-	
-	std::cout<<"Hesse "<<stat<<std::endl; 
-	ROOT::Minuit2::MnStrategy strat0(0);  	
-	ROOT::Minuit2::MnMigrad migrad1(theFCN,stat,strat0);
-	
-	min=migrad1(10,10);
+	min=migrad(10,10);
+	}
    	goal=10;
 	for(int i=0;i<5;i++){
-		migrad1.~MnMigrad();
-		ROOT::Minuit2::MnMigrad migrad1(theFCN,min.UserParameters(),0);
-		min=migrad1(30*(i+1),goal);
+		//migrad1.~MnMigrad();
+		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
+		min=migrad(25*(i+1),goal);
 				
 		printf("EDM/FVal %.3e/%.3e = %.3e\n",min.UserState().Edm(),min.UserState().Fval(),((min.UserState().Edm())/(min.UserState().Fval())) );
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -210,9 +212,9 @@ int main(int argc, char** argv){
 			break;
 		}
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		simplex1.~MnSimplex();
-		ROOT::Minuit2::MnSimplex simplex1(theFCN,min.UserParameters(),0);
-		min=simplex1(25,goal);
+		//simplex1.~MnSimplex();
+		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
+		min=simplex(25,goal);
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	}
 	
@@ -231,9 +233,9 @@ int main(int argc, char** argv){
 	
    	goal=5;
 	for(int i=0;i<5;i++){
-		migrad1.~MnMigrad();
-		ROOT::Minuit2::MnMigrad migrad1(theFCN,min.UserParameters(),1);
-		min=migrad1(30*(i+1),goal);
+		//migrad1.~MnMigrad();
+		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),1);
+		min=migrad(30*(i+1),goal);
 				
 		printf("EDM/FVal %.3e/%.3e = %.3e\n",min.UserState().Edm(),min.UserState().Fval(),((min.UserState().Edm())/(min.UserState().Fval())) );
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -245,9 +247,9 @@ int main(int argc, char** argv){
 			break;
 		}
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		simplex1.~MnSimplex();
-		ROOT::Minuit2::MnSimplex simplex1(theFCN,min.UserParameters(),0);
-		min=simplex1(25,goal);	
+		//simplex1.~MnSimplex();
+		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
+		min=simplex(25,goal);	
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;	
 	}
 	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	

@@ -37,7 +37,7 @@ def main():
     scatter=False
     labels=[]
  
-    fig,ax=plt.subplots()
+    fig,ax=plt.subplots(1,1,layout="constrained")
  
     try:
         opts , args =getopt.getopt(argv,"x:y:l:s:a:t:p:c:n:X:Y:S" )

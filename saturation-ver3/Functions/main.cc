@@ -15,6 +15,11 @@ int N_APPROX=N_CHEB_R;
 #include"kt-formula.hh"
 #include"./fcn.h"
 
+double double_round(double val,int i){
+	int l=(int)log10(val);
+	l-=i-1;
+	return(round( val*pow(10,-l) )*pow(10,l));
+}
 //KtFCN theFCN("/home/tomoki/Saturation-Model/saturation-ver3/data/hera_tot.dat");
 int check_min(ROOT::Minuit2::FunctionMinimum *min, int ndata){
 	for(int i=0;i<ndata;i++){
@@ -133,16 +138,14 @@ int main(int argc, char** argv){
 			skip=N_PAR-i;
 			break;
 		}
-		printf("%s %le %le \n",name,ival,ierr*50);
-		upar.Add(name, ival,ierr*50);
+		ival=double_round(ival,2);
+		printf("%s %le %le \n",name,ival,ierr*10);
+		upar.Add(name, ival,ierr*10);
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT
 	ROOT::Minuit2::MnMachinePrecision prec;
-	//prec.SetPrecision(1.0e-8);
-	//INT_PREC=1.0e-4;
-	//N_APPROX=N_CHEB_R;
-	//prec.SetPrecision(5*INT_PREC);
+	
 	INT_PREC=1.0e-3;
 	N_APPROX=N_CHEB_R/4;
 	//prec.SetPrecision(INT_PREC);
@@ -151,15 +154,11 @@ int main(int argc, char** argv){
 	ROOT::Minuit2::MnSimplex simplex1(theFCN,upar,0);
 	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
 	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
-	ROOT::Minuit2::FunctionMinimum min_prev=min;
-	//ROOT::Minuit2::MnEigen eigen;
-	//min_prev=min;
-	//std::cout<<"Parameters "<<min_prev.UserState()<<std::endl;
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+	
+	
 	INT_PREC=1.0e-3;
 	N_APPROX=N_CHEB_R/8;
-	//ROOT::Minuit2::MnSimplex simplex2(theFCN,upar,0);
-	
 	for(int i=0;i<2;++i){
 		prec.SetPrecision(INT_PREC*5);
 		printf("*****************************\n");
@@ -172,33 +171,22 @@ int main(int argc, char** argv){
 	}
 	
 	
-//	std::cout<<upar<<std::endl;
-//	printf("N_PAR-skip=%d-%d=%d\n",N_PAR,skip,N_PAR-skip );
 	INT_PREC=5.0e-4;
 	N_APPROX=N_CHEB_R/2;
 	prec.SetPrecision(INT_PREC*5);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
-	//printf("N_PAR-skip=%d\n",N_PAR-skip );
-	//std::cout<<upar<<std::endl;
 	printf("***************************\n");
-	//ROOT::Minuit2::MnHesse hesse;
-	//ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,min.UserParameters());
-//	ROOT::Minuit2::MnUserParameterState stat=hesse(theFCN,upar);
 	
-	
-	//std::cout<<"Hesse "<<stat<<std::endl; 
-	//ROOT::Minuit2::MnStrategy strat0(0);
 	{  	
-	ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
-	for(int i=0;i<(N_PAR-skip);i++ ){
-		migrad.RemoveLimits(i);
-	}
-	min=migrad(10,10);
+	  ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
+	  for(int i=0;i<(N_PAR-skip);i++ ){
+	 	migrad.RemoveLimits(i);
+	  }
+	  min=migrad(10,10);
 	}
    	goal=10;
 	for(int i=0;i<5;i++){
-		//migrad1.~MnMigrad();
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
 		min=migrad(25*(i+1),goal);
 				
@@ -207,33 +195,27 @@ int main(int argc, char** argv){
 		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
 		
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
-		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
+		if(min.IsValid()/*&&(min.UserState().CovarianceStatus()==3 )*/){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
+		INT_PREC/=1.4142;//sqrt(2)
+		N_APPROX=((int)(1.4142*N_APPROX));
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		//simplex1.~MnSimplex();
 		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
 		min=simplex(25,goal);
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	}
 	
-	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
-
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
 	prec.SetPrecision(5*INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
-	//stat=hesse(theFCN,min.UserParameters());
-	//std::cout<<"Hesse "<<stat<<std::endl;   	
-	//ROOT::Minuit2::MnStrategy strat1(1);  	
-	//ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat1);
 	
    	goal=5;
 	for(int i=0;i<5;i++){
-		//migrad1.~MnMigrad();
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),1);
 		min=migrad(30*(i+1),goal);
 				
@@ -246,21 +228,19 @@ int main(int argc, char** argv){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
+		INT_PREC/=1.732;//sqrt(3)
+		N_APPROX=((int)(1.732*N_APPROX));
+		
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		//simplex1.~MnSimplex();
 		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
-		min=simplex(25,goal);	
+		min=simplex(30,goal);	
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;	
 	}
-	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 	
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	std::cout<<"min= "<<min<<std::endl;
-	//std::fstream file;
 	std::chrono::duration<double> time=walltime.now()-start;
-	
 	std::cout<<time.count()<<" seconds"<<std::endl;
-	//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 	return 0;
 	
 }

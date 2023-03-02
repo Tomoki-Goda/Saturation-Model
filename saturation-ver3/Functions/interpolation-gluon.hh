@@ -52,24 +52,25 @@ class Approx_aF{
 			clock_t time=clock();
 			std::chrono::system_clock walltime;
 			std::chrono::time_point start= walltime.now();
-			double kt2,x;
+			//double kt2,x;
+
 			for (int j = 0; j < x_npts; ++j){
-				x=pow(10,-8+8*((double)j)/(x_npts-1));
+				double x=pow(10,-8+8*((double)j)/(x_npts-1));
 				x_array[j] = x;
 				aF.set_x(x);	
 				if(j!=0){
 					printf("\033[1A\033[2K\r");
 				}
-				printf("[ ");
+#pragma omp parallel
+{
+#pragma omp for
 				for(int i=0;i<kt2_npts;++i){
-					kt2=((double)i)/(kt2_npts-1);
+					double kt2=((double)i)/(kt2_npts-1);
 					kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;
 					kt2_array[i] = kt2;
 					aF_array[i+ j*kt2_npts] = aF(kt2,0);
-					if((i/4)*4==i){
-						printf("=");
-					}
 				}
+}
 				printf("\033[2K\r");
 				printf(" approxed x=%.2e\n", x);
 			}

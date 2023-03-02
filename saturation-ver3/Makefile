@@ -17,12 +17,12 @@ FUNCDIR=./Functions
 
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR} 
 
-#OPT= -Wno-unused-result -fp-model=precise -O3#-g # -Wno-format 
-OPT=-O3 -Wno-unused-result 
+OPT= -Wno-unused-result -fp-model=precise -O3#-g # -Wno-format 
+#OPT=-O3 -Wno-unused-result 
 
 #CXX=/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx
-#CXX=icpx
-CXX=g++
+CXX=icpx
+#CXX=g++
 #SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
 #GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h
 #PARNIDIR=/home/tomoki/Tools/Parni

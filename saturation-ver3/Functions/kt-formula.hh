@@ -347,7 +347,8 @@ template <typename T> class F2_kt{
 			}
 		}
 		
-		explicit F2_kt(T(&integrands)[] ){
+		//explicit F2_kt(T(&integrands)[] ){
+		explicit F2_kt(T* integrands ){
 			//this->par=par;
 			this->integrands=integrands;
 			//printf(" F2 \n");

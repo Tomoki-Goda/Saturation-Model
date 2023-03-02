@@ -140,7 +140,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 ///////////////////////////////////////////////////////////////////////////////////////////		
 			
 			
-			double chisq_arr[MAX_N]={0};
+			double chisq_arr[MAX_N];
 #pragma omp parallel 
 { 
 			double val;

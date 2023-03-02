@@ -19,9 +19,9 @@ int InitDiv=1;
 
 //template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf, double*arr){
 template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax, Kahn &full, Kahn &half){
-	const double (&x16)[]=data.x;
-	const double (&w16)[]=data.wfull;
-	const double (&w8)[]=data.whalf;
+	const double (&x16)[129]=data.x;
+	const double (&w16)[129]=data.wfull;
+	const double (&w8)[65]=data.whalf;
 	const int N=data.N;
 	double f[N+1];
 	double arg;

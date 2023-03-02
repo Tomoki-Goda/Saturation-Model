@@ -73,12 +73,16 @@ class Laplacian_Sigma{
 		}
 		int approximate(const double x){
 			sigma.set_kinem(x);
+#pragma omp parallel
+{
+#pragma omp for
 			for (int j = 0; j < r_npts; j++){
 				sigma_array[j] = sigma(r_array[j]);
 				if(!isfinite(sigma_array[j])){
 					printf("can not approximate sigma=%.3e\n",sigma_array[j] );
 				}
 			}
+}
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 			return(0);
 		}
@@ -133,8 +137,8 @@ class Laplacian_Sigma{
 		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
 			this->x=x;
-			//approximate(x);
-			approximate_thread(x);
+			approximate(x);
+			//approximate_thread(x);
 			return 0;
 		}	
 		

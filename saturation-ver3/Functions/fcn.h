@@ -197,13 +197,17 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);
 			}
 			if(flag==1){	
-				FILE* file=fopen((directory+"/data.txt").c_str(),"w" );
+				FILE* file1=fopen((directory+"/data.txt").c_str(),"w" );
+				FILE* file2=fopen((directory+"/F2.txt").c_str(),"w" );
 				for(int i=0;i<MAX_N;++i){
-					fprintf(file, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],CS_DATA[i],ERR_DATA[i],arr[i]);
-					fprintf(file, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.7,Q2_DATA[i],0.0,0.0,arr1[i]);
-					fprintf(file, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.5,Q2_DATA[i],0.0,0.0,arr2[i]);
+					fprintf(file1, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],CS_DATA[i],ERR_DATA[i],arr[i]);
+					
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.7,Q2_DATA[i],arr1[i]);
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],arr[i]);
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.5,Q2_DATA[i],arr2[i]);
 				}
-				fclose(file);
+				fclose(file1);
+				fclose(file2);
 				free(arr1);
 				free(arr2);
 			}

@@ -138,7 +138,9 @@ int main(int argc, char** argv){
 			skip=N_PAR-i;
 			break;
 		}
+#if USE_RESULT==2
 		ival=double_round(ival,2);
+#endif
 		printf("%s %le %le \n",name,ival,ierr*10);
 		upar.Add(name, ival,ierr*10);
 	}printf("\n");
@@ -146,8 +148,8 @@ int main(int argc, char** argv){
 #endif//USE_RESULT
 	ROOT::Minuit2::MnMachinePrecision prec;
 	
-	INT_PREC=1.0e-3;
-	N_APPROX=N_CHEB_R/4;
+	INT_PREC=1.0e-4;
+	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
@@ -237,6 +239,8 @@ int main(int argc, char** argv){
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;	
 	}
 	
+	
+
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	std::cout<<"min= "<<min<<std::endl;
 	std::chrono::duration<double> time=walltime.now()-start;

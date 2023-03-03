@@ -32,11 +32,14 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		}
 		double Up() const {return 1;}
 		FILE* file;
+		std::string directory;
 	public:
 		unsigned MAX_N=0;
+		int flag=0;
 		explicit KtFCN(std::string data_file,std::string dir ){
 			std::string file_name=dir+"/log.txt";
 			file=fopen(file_name.c_str(),"w");
+			directory=dir;
 
 		//KtFCN(char* data_file){
 			data_alloc(500);
@@ -83,9 +86,9 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			free(ERR_DATA);
 			fclose(file);
 		}
-		
 		double operator()(const std::vector<double>& par)const{
 			std::chrono::system_clock walltime;
+
 				
 			std::chrono::time_point start= walltime.now();
 
@@ -140,10 +143,14 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 ///////////////////////////////////////////////////////////////////////////////////////////		
 			
 			
-			double chisq_arr[MAX_N];
+			double arr[MAX_N];
+			double *arr1,*arr2;
+			if(flag==1){
+				arr1=(double*)malloc(MAX_N*sizeof(double));
+				arr2=(double*)malloc(MAX_N*sizeof(double));
+			}			
 #pragma omp parallel 
 { 
-			double val;
 #if GLUON_APPROX==0	
 #if R_FORMULA==1///////////////////////////////////////////////////////////////////////
 			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
@@ -170,25 +177,37 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			};
 			F2_kt<Integrand_kt<Gluon>> F2(integrands);
 #endif
+
 #pragma omp for schedule(dynamic)
 			for(int i=0;i<MAX_N;++i){
 				//F2_kt F2(sigpar);
-				val=0;
-				val=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
+				arr[i]=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
+				if(flag==1){
+					arr1[i]=F2(X_DATA[i]*0.7,Q2_DATA[i],0);//don't forget to match fprintf below
+					arr2[i]=F2(X_DATA[i]*1.5,Q2_DATA[i],0);
+				}
 				if(i>0){
 					printf("\033[1A \033[2K");
 				}
-				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],pow(fabs(val-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
-				chisq_arr[i]=pow((val-CS_DATA[i])/ERR_DATA[i],2);
-
+				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,arr[i],CS_DATA[i],pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
 			}
-			//getchar();
-			
 }
 			chisq=0;
 			for(int i=0;i<MAX_N;++i){
-			 	chisq+=chisq_arr[i];
+				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);
 			}
+			if(flag==1){	
+				FILE* file=fopen((directory+"/data.txt").c_str(),"w" );
+				for(int i=0;i<MAX_N;++i){
+					fprintf(file, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],CS_DATA[i],ERR_DATA[i],arr[i]);
+					fprintf(file, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.7,Q2_DATA[i],0.0,0.0,arr1[i]);
+					fprintf(file, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.5,Q2_DATA[i],0.0,0.0,arr2[i]);
+				}
+				fclose(file);
+				free(arr1);
+				free(arr2);
+			}
+			
 			printf("\033[1A \033[2K");
 			for(int i =0;i<len;++i){
 				fprintf(file,"%.5e\t",par[i]);
@@ -212,25 +231,5 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		
 
 };
-/*
-ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
-		ROOT::Minuit2::MnStrategy strat(str);
-		ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat);	
-		ROOT::Minuit2::FunctionMinimum min=migrad2(50,goal);
-		
-   		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
-   		stat=min.UserState();
-		return min;		
-}
-ROOT::Minuit2::FunctionMinimum simplex(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
-		ROOT::Minuit2::MnStrategy strat(str);
-		ROOT::Minuit2::MnSimplex simplex2(theFCN,stat,strat);	
-		ROOT::Minuit2::FunctionMinimum min=simplex2(50,goal);
-		
-   		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
-   		stat=min.UserState();
-		return min;		
-}
-	*/
-	
+
 

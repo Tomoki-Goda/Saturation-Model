@@ -10,7 +10,7 @@
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
 
-LIBS=-lm -lcuba -lMinuit2 -lgsl -lgslcblas -lgfortran -lpthread -fopenmp
+LIBS=-lm -lcuba -lMinuit2 -lgsl -lgslcblas -lgfortran -fopenmp #-lpthread
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
@@ -55,6 +55,8 @@ gluons.o: ${FUNCDIR}/gluons.f ${FUNCDIR}/clenshaw.f
 plot: ${FUNCDIR}/plot-things.cc #${FUNCDIR}/gluons.o
 	${CXX} ${FUNCDIR}/plot-things.cc -o ${DIR}/plot ${OPT} ${INC} ${LIBS}
 	${CXX} ${FUNCDIR}/plot-grid.cc -o ${DIR}/grid  ${OPT} ${INC} ${LIBS}
+	${CXX} ${FUNCDIR}/plot-grid-F2.cc -o ${DIR}/F2 ${OPT} ${INC} ${LIBS}
+
 #	${CXX} ${FUNCDIR}/compare-GBW.cc -o ${DIR}/compare  ${OPT} ${INC} ${LIBS}
 #plot: dipole gluon
 

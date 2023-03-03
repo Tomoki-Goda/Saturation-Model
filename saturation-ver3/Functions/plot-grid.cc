@@ -79,9 +79,10 @@ extern double  INT_PREC;
 #ifndef MU02
 	#define MU02 1
 #endif
-int N_APPROX=N_CHEB_R/2;
+int N_APPROX=250;
 
 double INT_PREC=5.0e-4;
+
 int main(int argc , char** argv){
 	options opt=read_options(argc, argv);
 	std::vector<double> param(10,0);

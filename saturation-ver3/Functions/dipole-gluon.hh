@@ -90,6 +90,9 @@ class Gluon_GBW{
 				return 0;
 			}
 			double Qs2=pow(x_0/x,lambda);
+#if THRESHOLD==-2
+			Qs2*=pow(1-x,5);
+#endif
 			double val=3.0/(4*PI*PI)*k2/Qs2*exp(-k2/Qs2);
 			if(std::isnan(val)==1){
 				return(0);
@@ -98,7 +101,7 @@ class Gluon_GBW{
 			val*=alpha(mu2+mu02)/0.2;
 			//printf("%.2e %.2e\n",mu2,alpha(mu2));
 #endif
-#if THRESHOLD!=0 
+#if THRESHOLD>0||THRESHOLD==-1 
 			//double thresh_power=THRESHOLD;
 			val*=pow(1-x,thresh_power);
 #endif

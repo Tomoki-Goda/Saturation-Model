@@ -183,8 +183,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				//F2_kt F2(sigpar);
 				arr[i]=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
 				if(flag==1){
-					arr1[i]=F2(X_DATA[i]*0.7,Q2_DATA[i],0);//don't forget to match fprintf below
-					arr2[i]=F2(X_DATA[i]*1.5,Q2_DATA[i],0);
+					arr1[i]=F2(X_DATA[i]*0.9,Q2_DATA[i],0);//don't forget to match fprintf below
+					arr2[i]=F2(X_DATA[i]*1.1,Q2_DATA[i],0);
 				}
 				if(i>0){
 					printf("\033[1A \033[2K");
@@ -202,9 +202,9 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				for(int i=0;i<MAX_N;++i){
 					fprintf(file1, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],CS_DATA[i],ERR_DATA[i],arr[i]);
 					
-					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.7,Q2_DATA[i],arr1[i]);
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.9,Q2_DATA[i],arr1[i]);
 					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],arr[i]);
-					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.5,Q2_DATA[i],arr2[i]);
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.1,Q2_DATA[i],arr2[i]);
 				}
 				fclose(file1);
 				fclose(file2);

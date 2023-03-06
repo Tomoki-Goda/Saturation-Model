@@ -9,8 +9,7 @@
 
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
-
-LIBS=-lm -lcuba -lMinuit2 -lgsl -lgslcblas -lgfortran -fopenmp #-lpthread
+LIBS=-lm -lcuba -lMinuit2 -lgsl -lgslcblas -lpthread
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions

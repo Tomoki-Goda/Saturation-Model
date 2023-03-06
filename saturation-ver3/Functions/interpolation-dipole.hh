@@ -137,8 +137,8 @@ class Laplacian_Sigma{
 		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
 			this->x=x;
-			approximate(x);
-			//approximate_thread(x);
+			//approximate(x);
+			approximate_thread(x);
 			return 0;
 		}	
 		

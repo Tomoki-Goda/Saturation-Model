@@ -81,7 +81,7 @@ extern double  INT_PREC;
 #endif
 int N_APPROX=250;
 
-double INT_PREC=5.0e-4;
+double INT_PREC=1.0e-4;
 
 int main(int argc , char** argv){
 	options opt=read_options(argc, argv);

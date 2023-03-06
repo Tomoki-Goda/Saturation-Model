@@ -7,15 +7,21 @@ import os
 
 def main():
     try:
-        opts, args=getopt.gnu_getopt(sys.argv[1:],"",[])
+        opts, args=getopt.gnu_getopt(sys.argv[1:],"l:p:c:",["label","plot-style","color"])
     except getopt.GetoptError as err:
         print("error")
 
     print(opts);
     label=["" for i in range(len(args))] 
+    color=['b','r','g']
+    ls=['-.','-.','-.']
     for opt,arg in opts:
         if opt in ["-l","-label"]:
             label=arg.split(":")
+        elif opt in ["-c","-color"]:
+            color=arg.split(":")
+        elif opt in ["-p","-plot-style"]:
+            ls=arg.split(" ")
            
 
     data=[]
@@ -63,7 +69,7 @@ def main():
             ax1[i//col][i%col].errorbar(x,y,yerr=e ,c='green',ls='none' )
             ax1[i//col][i%col].scatter(x,y,s=5,marker="x",c='green' )
             for k in range(len(x2)):
-                ax1[i//col][i%col].plot(x2[k],y2[k],c='b',linewidth=1 )
+                ax1[i//col][i%col].plot(x2[k],y2[k],c=color[k],ls=ls[k],linewidth=1 )
                 
             ax1[i//col][i%col].set(xscale='log')
             ax1[i//col][i%col].text(0.05,0.9,"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(Q2)),fontsize=9,transform=ax1[i//col][i%col].transAxes)
@@ -76,13 +82,12 @@ def main():
             ax2[(i-col*row)//col][(i-col*row)%col].scatter(x,y, s=5,marker="x",c='green')
             leg=[]
             for k in range(len(x2)):
-                 leg.append(ax2[(i-col*row)//col][(i-col*row)%col].plot(x2[k],y2[k],c='b',linewidth=1 ))
+                 leg.append(ax2[(i-col*row)//col][(i-col*row)%col].plot(x2[k],y2[k],c=color[k],ls=ls[k],linewidth=1 ))
             ax2[(i-col*row)//col][(i-col*row)%col].set(xscale='log')
             ax2[(i-col*row)//col][(i-col*row)%col].text(0.05,0.9,"$Q^2={val}\\;\\mathrm{{GeV^2}}$".format(val=float(Q2)),fontsize=9,transform=ax2[(i-col*row)//col][(i-col*row)%col].transAxes) 
             ax2[(i-col*row)//col][(i-col*row)%col].xaxis.set_major_locator(plt.FixedLocator([1.0e-3,1.0e-5] ))
         
-    
-    ax2[row-1][col-1].legend(leg[:][0],label)
+    ax2[row-1][col-1].legend(np.transpose(leg)[0],label)
     fig1.get_layout_engine().set(hspace=None, wspace=None)
     fig2.get_layout_engine().set(hspace=None, wspace=None)
     fig1.set_figheight(8)

@@ -75,7 +75,7 @@ class Laplacian_Sigma{
 			sigma.set_kinem(x);
 #pragma omp parallel
 {
-#pragma omp for
+#pragma omp for schedule(dynamic)
 			for (int j = 0; j < r_npts; j++){
 				sigma_array[j] = sigma(r_array[j]);
 				if(!isfinite(sigma_array[j])){
@@ -137,8 +137,8 @@ class Laplacian_Sigma{
 		//double max=R_MAX, min=R_MIN;
 		inline int set_kinem(double x){
 			this->x=x;
-			//approximate(x);
-			approximate_thread(x);
+			approximate(x);
+			//approximate_thread(x);
 			return 0;
 		}	
 		
@@ -226,6 +226,9 @@ class Laplacian_Sigma{
 					printf(" %.3e\t",par[i]);
 				}printf("\n");
 			}
+#if NS==1
+			val*=exp(-pow(r/500,2));
+#endif
 #if (R_CHANGE_VAR==1)
 			return(val/pow(1-rho,2));
 #elif (HANKEL==1||R_CHANGE_VAR==0)
@@ -244,6 +247,9 @@ class Laplacian_Sigma{
 			val=kt*std::cyl_bessel_j(1,r*kt)*(gsl_spline_eval(spline_ptr,r,r_accel_ptr));
 			val+=std::cyl_bessel_j(0,r*kt)*gsl_spline_eval_deriv(spline_ptr,r,r_accel_ptr);
 			val*=r;
+#endif
+#if NS==1
+			val*=exp(-pow(r/500,2));
 #endif
 			return(val);
 		}

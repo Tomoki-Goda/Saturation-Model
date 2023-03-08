@@ -61,9 +61,9 @@ class Approx_aF{
 				if(j!=0){
 					printf("\033[1A\033[2K\r");
 				}
-#pragma omp parallel
+#pragma omp parallel 
 {
-#pragma omp for
+#pragma omp for schedule(dynamic)
 				for(int i=0;i<kt2_npts;++i){
 					double kt2=((double)i)/(kt2_npts-1);
 					kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;
@@ -200,8 +200,8 @@ class Approx_aF{
 		}
 		void set_max(double kt2max){
 			this->kt2max=kt2max;
-			//approximate(kt2max);
-			approximate_thread(kt2max);
+			approximate(kt2max);
+			//approximate_thread(kt2max);
 		}
 		void init(const int npts1, const int npts2, const int npts3, const double *par ){
 			x_npts=npts1;

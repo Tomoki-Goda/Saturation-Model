@@ -79,6 +79,7 @@ int main(int argc, char** argv){
 	printf("ALPHA_RUN = %d, Hankel       = %d\n", ALPHA_RUN,  HANKEL);
 	printf("FREEZE_QS2= %d, ADD_END      = %d,             \t THRESHOLD    = %d\n",FREEZE_QS2,ADD_END,THRESHOLD);
 	printf("Directory = %s ,\t R  = [%.1e, %.1e]\n",(char*)argv[1],R_MIN,R_MAX);
+	printf("NS=%d\n",NS);
 	printf("*******************************************************.\n");
 	
 
@@ -142,7 +143,7 @@ int main(int argc, char** argv){
 		ival=double_round(ival,2);
 #endif
 		printf("%s %le %le \n",name,ival,ierr*10);
-		upar.Add(name, ival,ierr*10);
+		upar.Add(name, ival,(fabs(ierr)<1.0e-5)?(ival/50):(ierr*10));
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT

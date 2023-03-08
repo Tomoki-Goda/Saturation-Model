@@ -20,6 +20,7 @@ class Laplacian_Sigma{
 		double x=0;
 		double sigma_0=0;
 		int alloc_flag=0;
+		double ns_pow=100;
 		
 		void free_approx(){
 			if(alloc_flag!=0){
@@ -190,7 +191,7 @@ class Laplacian_Sigma{
 			if(r<R_MIN/2){
 				printf("too small, out of range %.4e - %.4e = %.4e , rho=%.3e,%d\n",r,R_MIN,r-R_MIN,rho,R_CHANGE_VAR);
 			}
-			const double kt2=par[0],x=par[1];
+			const double kt=sqrt(par[0]),x=par[1];
 			double val = 0;
 
 //#if (LAPLACIAN==1||R_FORMULA==1)
@@ -198,19 +199,24 @@ class Laplacian_Sigma{
 				case 'l':
 #if IBP==1
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
-					val*= sqrt(kt2)*r*std::cyl_bessel_j(1,r*sqrt(kt2));
+	#if NS==2
+					val*=( kt*r*std::cyl_bessel_j(1,r*kt) + 2*pow(r/ns_pow,2)*std::cyl_bessel_j(0,r*kt));
+	#else
+					val*= kt*r*std::cyl_bessel_j(1,r*kt);
+	#endif
+	
 #elif IBP==2
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
-					val*=-kt2*r*std::cyl_bessel_j(0,r*sqrt(kt2));
+					val*=-kt*kt*r*std::cyl_bessel_j(0,r*kt);
 #else
 					val=gsl_spline_eval_deriv2(spline_ptr, r,r_accel_ptr);
 					val+=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr)/r;
-					val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+					val*=r*std::cyl_bessel_j(0,r*kt);
 #endif			
 					break;
 				case 's':
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
-					val*=r*std::cyl_bessel_j(0,r*sqrt(kt2));
+					val*=r*std::cyl_bessel_j(0,r*kt);
 					break;
 				default:
 					printf("unknown option in laplacian sigma\n");
@@ -226,8 +232,8 @@ class Laplacian_Sigma{
 					printf(" %.3e\t",par[i]);
 				}printf("\n");
 			}
-#if NS==1
-			val*=exp(-pow(r/500,2));
+#if NS>=1
+			val*=exp(-pow(r/ns_pow,2));
 #endif
 #if (R_CHANGE_VAR==1)
 			return(val/pow(1-rho,2));
@@ -248,8 +254,8 @@ class Laplacian_Sigma{
 			val+=std::cyl_bessel_j(0,r*kt)*gsl_spline_eval_deriv(spline_ptr,r,r_accel_ptr);
 			val*=r;
 #endif
-#if NS==1
-			val*=exp(-pow(r/500,2));
+#if NS>=1
+			val*=exp(-pow(r/ns_pow,2));
 #endif
 			return(val);
 		}

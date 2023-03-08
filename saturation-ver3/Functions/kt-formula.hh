@@ -13,7 +13,6 @@
 
 #include<pthread.h>
 #include<cuba.h>
-
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"

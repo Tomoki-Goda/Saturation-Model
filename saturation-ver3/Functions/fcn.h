@@ -88,7 +88,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		}
 		double operator()(const std::vector<double>& par)const{
 			std::chrono::system_clock walltime;
-
+			int cub=0;
+			cubacores(&cub,&cub);
 				
 			std::chrono::time_point start= walltime.now();
 
@@ -112,34 +113,23 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			double sigpar[10]={0},sudpar[10]={0};
 			parameter(par,sigpar, sudpar);//Format
 //////////////////////////////////////////////////////////////////////////////////////////
-#if GLUON_APPROX==1		
 #if R_FORMULA==1
+	#if GLUON_APPROX==0
 			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
-
-#if GLUON_APPROX==0
 			sigma[0].init(sigpar);
 			sigma[1].init(sigpar);
 			sigma[2].init(sigpar);
-#elif GLUON_APPROX==1
-			
-			sigma[0].init(N_APPROX+250,sigpar,'s');
-			sigma[1].init(N_APPROX+250,sigpar,'s');
-			sigma[2].init(N_APPROX+250,sigpar,'s');
-			
-#endif
-			
+	#endif
 #else//R_FORMULA///////////////////////////////////////////////////////////////////////
 			Gluon gluon;//gluon has no flavour dep.
-#if GLUON_APPROX==1
+	#if GLUON_APPROX==1
 			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+250,sigpar);
-			const double kt2max=5.0e+4;
+			const double kt2max=7.0e+4;
 			gluon.set_max(kt2max);
-#else
+	#else
 			gluon.init(sigpar);
-#endif//GLUON_APPROX==1	
-			
+	#endif//GLUON_APPROX==1	
 #endif//R_FORMULA
-#endif //GLUON_APPROX==1	
 ///////////////////////////////////////////////////////////////////////////////////////////		
 			
 			
@@ -152,17 +142,23 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 #pragma omp parallel 
 { 
 #if GLUON_APPROX==0	
-#if R_FORMULA==1///////////////////////////////////////////////////////////////////////
+	#if R_FORMULA==1///////////////////////////////////////////////////////////////////////
 			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
 			sigma[0].init(sigpar);
 			sigma[1].init(sigpar);
 			sigma[2].init(sigpar);
-#else//R_FORMULA//////////////////////////////////////////////////////////////////////
+	#else//R_FORMULA//////////////////////////////////////////////////////////////////////
 			Gluon gluon;//gluon has no flavour dep.
 			gluon.init(sigpar);
-#endif//R_FORMULA//////////////////////////////////////////////////////////////////////
+	#endif//R_FORMULA//////////////////////////////////////////////////////////////////////
 #endif //GLUON_APPROX==0
 #if R_FORMULA==1		
+	#if GLUON_APPROX==1
+			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+			sigma[0].init(N_APPROX+250,sigpar,'s');
+			sigma[1].init(N_APPROX+250,sigpar,'s');
+			sigma[2].init(N_APPROX+250,sigpar,'s');
+	#endif
 			Integrand_r integrands[3]={
 				Integrand_r(sigma[0]) ,
 				Integrand_r(sigma[1]) ,
@@ -183,8 +179,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				//F2_kt F2(sigpar);
 				arr[i]=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
 				if(flag==1){
-					arr1[i]=F2(X_DATA[i]*0.9,Q2_DATA[i],0);//don't forget to match fprintf below
-					arr2[i]=F2(X_DATA[i]*1.1,Q2_DATA[i],0);
+					arr1[i]=F2(X_DATA[i]*0.75,Q2_DATA[i],0);//don't forget to match fprintf below
+					arr2[i]=F2(X_DATA[i]*1.25,Q2_DATA[i],0);
 				}
 				if(i>0){
 					printf("\033[1A \033[2K");
@@ -197,15 +193,18 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);
 			}
 			if(flag==1){	
+				//FILE* file0=fopen((directory+"/aF.txt").c_str(),"w" );
 				FILE* file1=fopen((directory+"/data.txt").c_str(),"w" );
 				FILE* file2=fopen((directory+"/F2.txt").c_str(),"w" );
+				//gluon.export_grid(file0);
 				for(int i=0;i<MAX_N;++i){
 					fprintf(file1, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],CS_DATA[i],ERR_DATA[i],arr[i]);
 					
-					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.9,Q2_DATA[i],arr1[i]);
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.75,Q2_DATA[i],arr1[i]);
 					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],arr[i]);
-					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.1,Q2_DATA[i],arr2[i]);
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.25,Q2_DATA[i],arr2[i]);
 				}
+				//fclose(file0);
 				fclose(file1);
 				fclose(file2);
 				free(arr1);
@@ -222,7 +221,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			time-=clock();
 #if PRINT_PROGRESS!=0
 			if((licznik/PRINT_PROGRESS)*PRINT_PROGRESS==licznik){
-				printf("CHISQ = %.5e (%.3f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);			
+				printf("CHISQ = %.5e (%.3f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);	
+				printf("%d, %.2e\t",N_CHEB_R,INT_PREC );		
 				std::cout<<interval.count()<<" seconds, ("<< -((double)time)/CLOCKS_PER_SEC<<" CPU seconds)"<<std::endl;
 			}
 #endif	

@@ -10,11 +10,11 @@
 #define PI 3.141592653589793238462643383279502884197
 #endif
 typedef  struct{
-int N=256;
-double wfull[129]={0}, whalf[65]={0}, x[129]={0};
-std::string tag="unnamed";
-int max_rec=7;
-int InitDiv=1;
+std::string tag;
+double wfull[129], whalf[65], x[129];
+int max_rec;
+int InitDiv;
+int N;
 } CCIntegral;
 
 //template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf, double*arr){
@@ -176,7 +176,7 @@ inline int sign(int i){
 }
 
 CCIntegral CCprepare(const int N){
-	CCIntegral data;
+	CCIntegral data={"no name",{0},{0},{0},5,1,16};
 	Kahn vec[N/4+1];
 	double t[N/4+1];
 	double c[N/2+1];
@@ -309,14 +309,12 @@ CCIntegral CCprepare(const int N){
 CCIntegral CCprepare(const int N,const std::string &tag){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
-	
 	return data;
 }
 CCIntegral CCprepare(const int N,const std::string &tag,int d){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
 	data.InitDiv=d;
-	
 	return data;
 }
 CCIntegral CCprepare(const int N,const std::string &tag,int d,int max){

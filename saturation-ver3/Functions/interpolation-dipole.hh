@@ -20,7 +20,7 @@ class Laplacian_Sigma{
 		double x=0;
 		double sigma_0=0;
 		int alloc_flag=0;
-		double ns_pow=100;
+		double ns_pow=10;
 		
 		void free_approx(){
 			if(alloc_flag!=0){

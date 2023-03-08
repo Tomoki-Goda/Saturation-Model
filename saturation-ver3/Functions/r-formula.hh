@@ -23,7 +23,8 @@ class Sigma{
 			const double exprrmax=exp(-pow(r,2)*(mu02/C));
 			const double mu2=mu02/((1.0-exprrmax ));
 #if FREEZE_QS2!=0
-			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(((x>0.1)?0.1:x),mu2,A_g,lambda_g)/(3*sigma_0); 
+			double x1=x/(1-x+x/0.1);
+			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(x1,mu2,A_g,lambda_g)/(3*sigma_0); 
 #else
 			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(x,mu2,A_g,lambda_g)/(3*sigma_0); 
 #endif

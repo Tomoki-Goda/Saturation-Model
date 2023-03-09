@@ -222,7 +222,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 #if PRINT_PROGRESS!=0
 			if((licznik/PRINT_PROGRESS)*PRINT_PROGRESS==licznik){
 				printf("CHISQ = %.5e (%.3f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);	
-				printf("%d, %.2e\t",N_CHEB_R,INT_PREC );		
+				printf("%d, %.2e\t",N_APPROX,INT_PREC );		
 				std::cout<<interval.count()<<" seconds, ("<< -((double)time)/CLOCKS_PER_SEC<<" CPU seconds)"<<std::endl;
 			}
 #endif	

@@ -22,9 +22,11 @@ class Sigma{
 			//const double sigma_0=sigpar[0], C=sigpar[3], mu02=sigpar[4];
 			const double exprrmax=exp(-pow(r,2)*(mu02/C));
 			const double mu2=mu02/((1.0-exprrmax ));
-#if FREEZE_QS2!=0
+#if FREEZE_QS2==1
 			double x1=0.5*x/(0.5*(1-x)+x);
 			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(x1,mu2,A_g,lambda_g)/(3*sigma_0); 
+#elif FREEZE_QS2==2
+			const double qs2=4*PI*PI*alpha(mu2)*xgpdf((x>0.5)?(0.5):x,mu2,A_g,lambda_g)/(3*sigma_0); 
 #else
 			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(x,mu2,A_g,lambda_g)/(3*sigma_0); 
 #endif

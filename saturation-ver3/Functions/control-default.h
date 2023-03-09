@@ -113,7 +113,7 @@
 #endif
 
 #ifndef ADD_END
-	#define ADD_END 0
+	#define ADD_END 1
 #endif
 #ifndef GBW_APPROX
 	#define GBW_APPROX 0
@@ -135,15 +135,17 @@
 #ifndef THRESHOLD
 	#define THRESHOLD 0
 #endif
-
+#ifndef NS
+	#define NS 0
+#endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////
 //////////////////////////////////////////////////////////////////
 //N_PAR is number of fit parameters
 #if MODEL ==0 
-	#define N_PAR 4
+	#define N_PAR 5
 #elif MODEL==1
-	#define N_PAR 6
+	#define N_PAR 7
 #elif (MODEL==2||MODEL==22)
 	#if SUDAKOV==0
 		#define N_PAR 3

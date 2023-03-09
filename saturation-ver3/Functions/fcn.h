@@ -31,9 +31,18 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			ERR_DATA=(double*)realloc(ERR_DATA,MAX_N*sizeof(double));
 		}
 		double Up() const {return 1;}
+		FILE* file=NULL;
+		std::string directory;
 	public:
 		unsigned MAX_N=0;
-		explicit KtFCN(std::string data_file ){
+		int flag=0;
+		explicit KtFCN(std::string data_file,std::string dir ){
+			
+				//std::string file_name=dir+"/log.txt";
+				//file=fopen(file_name.c_str(),"a");
+				directory=dir;
+			
+
 		//KtFCN(char* data_file){
 			data_alloc(500);
 			const double alpha =1.0/137 ;//fine structure const 1/137;
@@ -77,10 +86,12 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			free(X_DATA);
 			free(CS_DATA);
 			free(ERR_DATA);
+			//fclose(file);
 		}
-		
 		double operator()(const std::vector<double>& par)const{
 			std::chrono::system_clock walltime;
+			int cub=0;
+			cubacores(&cub,&cub);
 				
 			std::chrono::time_point start= walltime.now();
 
@@ -88,7 +99,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			static int licznik;
 			++licznik;
 			double x,Q2;
-			double val;
+			
 			double chisq=0;
 			const int len=par.size();
 			//printf("%d parameters\n",len);
@@ -103,24 +114,123 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 #endif			
 			double sigpar[10]={0},sudpar[10]={0};
 			parameter(par,sigpar, sudpar);//Format
-			F2_kt F2(sigpar);
+//////////////////////////////////////////////////////////////////////////////////////////
+#if R_FORMULA==1
+	#if GLUON_APPROX==0
+			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+			sigma[0].init(sigpar);
+			sigma[1].init(sigpar);
+			sigma[2].init(sigpar);
+	#endif
+#else//R_FORMULA///////////////////////////////////////////////////////////////////////
+			Gluon gluon;//gluon has no flavour dep.
+	#if GLUON_APPROX==1
+			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+250,sigpar);
+			const double kt2max=7.0e+4;
+			gluon.set_max(kt2max);
+	#else
+			gluon.init(sigpar);
+	#endif//GLUON_APPROX==1	
+#endif//R_FORMULA
+///////////////////////////////////////////////////////////////////////////////////////////		
+			
+			
+			double arr[MAX_N];
+			double *arr1,*arr2;
+			if(flag==1){
+				arr1=(double*)malloc(MAX_N*sizeof(double));
+				arr2=(double*)malloc(MAX_N*sizeof(double));
+			}			
+#pragma omp parallel 
+{ 
+#if GLUON_APPROX==0	
+	#if R_FORMULA==1///////////////////////////////////////////////////////////////////////
+			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+			sigma[0].init(sigpar);
+			sigma[1].init(sigpar);
+			sigma[2].init(sigpar);
+	#else//R_FORMULA//////////////////////////////////////////////////////////////////////
+			Gluon gluon;//gluon has no flavour dep.
+			gluon.init(sigpar);
+	#endif//R_FORMULA//////////////////////////////////////////////////////////////////////
+#endif //GLUON_APPROX==0
+#if R_FORMULA==1		
+	#if GLUON_APPROX==1
+			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+			sigma[0].init(N_APPROX+250,sigpar,'s');
+			sigma[1].init(N_APPROX+250,sigpar,'s');
+			sigma[2].init(N_APPROX+250,sigpar,'s');
+	#endif
+			Integrand_r integrands[3]={
+				Integrand_r(sigma[0]) ,
+				Integrand_r(sigma[1]) ,
+				Integrand_r(sigma[2])
+			};
+			F2_kt<Integrand_r> F2(integrands);
+#else
+			Integrand_kt<Gluon> integrands[3]={
+				Integrand_kt( gluon),
+				Integrand_kt( gluon),
+				Integrand_kt( gluon)
+			};
+			F2_kt<Integrand_kt<Gluon>> F2(integrands);
+#endif
+
+#pragma omp for schedule(dynamic)
 			for(int i=0;i<MAX_N;++i){
-				val=0;
-				val=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
+				//F2_kt F2(sigpar);
+				arr[i]=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
+				if(flag==1){
+					arr1[i]=F2(X_DATA[i]*0.75,Q2_DATA[i],0);//don't forget to match fprintf below
+					arr2[i]=F2(X_DATA[i]*1.25,Q2_DATA[i],0);
+				}
 				if(i>0){
 					printf("\033[1A \033[2K");
 				}
-				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,val,CS_DATA[i],pow(fabs(val-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);	
-				chisq+=pow((val-CS_DATA[i])/ERR_DATA[i],2);
+				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,arr[i],CS_DATA[i],pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
+			}
+}
+			chisq=0;
+			for(int i=0;i<MAX_N;++i){
+				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);
+			}
+			if(flag==1){	
+				//FILE* file0=fopen((directory+"/aF.txt").c_str(),"w" );
+				FILE* file1=fopen((directory+"/data.txt").c_str(),"w" );
+				FILE* file2=fopen((directory+"/F2.txt").c_str(),"w" );
+				//gluon.export_grid(file0);
+				for(int i=0;i<MAX_N;++i){
+					fprintf(file1, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],CS_DATA[i],ERR_DATA[i],arr[i]);
+					
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.75,Q2_DATA[i],arr1[i]);
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],arr[i]);
+					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.25,Q2_DATA[i],arr2[i]);
+				}
+				//fclose(file0);
+				fclose(file1);
+				fclose(file2);
+				free(arr1);
+				free(arr2);
+			}else{
+				//if(file==NULL){
+					FILE* file=fopen((directory+"/log.txt").c_str(),"a");
+				//}
+				for(int i =0;i<len;++i){
+					fprintf(file,"%.5e\t",par[i]);
+				}
+				fprintf(file,"%.5e\n",chisq);
+				fflush(file);
+				fclose(file);
 			}
 			printf("\033[1A \033[2K");
-
-
+			
+			
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();
 #if PRINT_PROGRESS!=0
 			if((licznik/PRINT_PROGRESS)*PRINT_PROGRESS==licznik){
-				printf("CHISQ = %.5e (%.3f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);			
+				printf("CHISQ = %.5e (%.3f) \t",chisq, chisq/(MAX_N-len) );//, -((double)time)/CLOCKS_PER_SEC);	
+				printf("%d, %.2e\t",N_APPROX,INT_PREC );		
 				std::cout<<interval.count()<<" seconds, ("<< -((double)time)/CLOCKS_PER_SEC<<" CPU seconds)"<<std::endl;
 			}
 #endif	
@@ -133,25 +243,5 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		
 
 };
-/*
-ROOT::Minuit2::FunctionMinimum migrad(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
-		ROOT::Minuit2::MnStrategy strat(str);
-		ROOT::Minuit2::MnMigrad migrad2(theFCN,stat,strat);	
-		ROOT::Minuit2::FunctionMinimum min=migrad2(50,goal);
-		
-   		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
-   		stat=min.UserState();
-		return min;		
-}
-ROOT::Minuit2::FunctionMinimum simplex(const ROOT::Minuit2::FCNBase& theFCN, ROOT::Minuit2::MnUserParameterState& stat, const int  str, const double  goal){
-		ROOT::Minuit2::MnStrategy strat(str);
-		ROOT::Minuit2::MnSimplex simplex2(theFCN,stat,strat);	
-		ROOT::Minuit2::FunctionMinimum min=simplex2(50,goal);
-		
-   		std::cout<<"Parameters "<<min.UserState()<<"\n"<<std::endl; 
-   		stat=min.UserState();
-		return min;		
-}
-	*/
-	
+
 

@@ -5,7 +5,7 @@
 //	double *accum=(double*)malloc(N);
 //}
 //#include<cassert>
-typedef struct Kahn{double * accum=NULL; int N=0;} Kahn;
+typedef struct Kahn{double accum[5]; int N=0;} Kahn;
 
 static void Kahn_clear(Kahn& kahn){
 	for(int i=0;i<kahn.N;i++){
@@ -15,7 +15,7 @@ static void Kahn_clear(Kahn& kahn){
 
 static Kahn Kahn_init(int N){
 	Kahn kahn;
-	kahn.accum=(double*)malloc(N*sizeof(double));
+	//kahn.accum=(double*)malloc(N*sizeof(double));
 	kahn.N=N;
 	Kahn_clear(kahn);
 	return kahn;
@@ -23,7 +23,7 @@ static Kahn Kahn_init(int N){
 
 
 static void Kahn_free(Kahn kahn){
-	free(kahn.accum);
+	//free(kahn.accum);
 }
 
 static double Kahn_total(Kahn kahn){

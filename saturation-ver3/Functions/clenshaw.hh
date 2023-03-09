@@ -10,18 +10,18 @@
 #define PI 3.141592653589793238462643383279502884197
 #endif
 typedef  struct{
-int N=256;
-double wfull[129]={0}, whalf[65]={0}, x[129]={0};
-std::string tag="unnamed";
-int max_rec=7;
-int InitDiv=1;
+std::string tag;
+double wfull[129], whalf[65], x[129];
+int max_rec;
+int InitDiv;
+int N;
 } CCIntegral;
 
 //template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf, double*arr){
 template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax, Kahn &full, Kahn &half){
-	const double *x16=data.x;
-	const double *w16=data.wfull;
-	const double *w8=data.whalf;
+	const double (&x16)[129]=data.x;
+	const double (&w16)[129]=data.wfull;
+	const double (&w8)[65]=data.whalf;
 	const int N=data.N;
 	double f[N+1];
 	double arg;
@@ -84,15 +84,16 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	smin=min;
 	smax=(min-min/data.InitDiv)+max/data.InitDiv;//data.init_div;
 	int licz=0,licztot=0 , counter=0;
-			
+	double error_ratio;//,derivs0=1,derivs1=1;		
 	while(1){
-		if(((max-min)-(smax-smin))==(max-min)||counter==MAX_RECURSION){
+		if(counter==MAX_RECURSION){
 			smax=smin+2*scale;
 			printf("Clenshaw_Curtis:: in \"%s\", evaluated %d times.\n",(data.tag).c_str(),counter );
 			printf("sector size = %.3e\n [%.3e, %.3e] of [%.3e, %.3e] after %d / %d /%d\n",smax-smin,smin,smax,min,max, licz,licztot,MAX_RECURSION);
-			
 			//getchar();
-			goto Error;
+			//if(counter>=MAX_RECURSION+2){
+				goto Error;
+			//}
 		}
 		++counter;
 		++licztot;
@@ -106,10 +107,11 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 			goto Error;
 		}
 #endif
-		accumhalf*=-1;
-		accumhalf+=accumfull;
+		//accumhalf*=-1;
+		//accumhalf+=accumfull;
+		error_ratio=fabs( (valfull-valhalf)/(eps*valfull) );
 		//if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)< fabs(smax-smin)*Aeps ) ){
-		if(( fabs(Kahn_total(accumhalf))<eps*(fabs(valfull)) ) || (  fabs(Kahn_total(accumhalf))< fabs(smax-smin)*Aeps ) ){
+		if((error_ratio<1 ) || (  fabs(valhalf-valfull)< fabs(smax-smin)*Aeps ) ){
 			accum+=accumfull;
 			++licz;
 			counter=0;
@@ -125,7 +127,8 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 			smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 		}else{
 			//IMPROVE
-			smax=smin+(scale/2);
+			smax=smin+(scale/(1+counter*pow(error_ratio, 0.25 )));
+			//smax=smin+(scale/2);
 		}
 
 		if(((max-min)-(smax-smin))==(max-min)){
@@ -138,7 +141,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 	}
 	
 	Error:
-		printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,Kahn_total(accumhalf));
+		printf("valfull= %.3e , valhalf= %.3e  diff=%.3e\n",valfull,valhalf,valfull-valhalf);
 		const double *x16=data.x;
 		const double *w16=data.wfull;
 		const double *w8=data.whalf;
@@ -159,6 +162,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		Kahn_free(accumfull);
 		Kahn_free(accumhalf);
 		exit(1);
+		//getchar();
 		return 0;
 	
 }
@@ -172,8 +176,10 @@ inline int sign(int i){
 }
 
 CCIntegral CCprepare(const int N){
-	CCIntegral data;
-	
+	CCIntegral data={"no name",{0},{0},{0},5,1,16};
+	Kahn vec[N/4+1];
+	double t[N/4+1];
+	double c[N/2+1];
 	if((N/8)*8!=N || N>256){
 		printf("N=%d has to be multiple of 8, <= 128\n",N );
 	}
@@ -185,13 +191,13 @@ CCIntegral CCprepare(const int N){
 	}
 	data.x[N/2]=0;
 	
-	double *__restrict__ c=(double*)calloc((N/2+1),sizeof(double));
+	//double *__restrict__ c=(double*)calloc((N/2+1),sizeof(double));
 	c[0]=1;
 	c[N/2]=1.0/(1-N*N);
 	for(int i=1;i<N/2;i++){
 		c[i]=2.0/(1-4*i*i);
 	}
-	double *__restrict__ t=(double*)calloc((N/4+1),sizeof(double));
+	//double *__restrict__ t=(double*)calloc((N/4+1),sizeof(double));
 	//double accum[3]={0};
 	Kahn accum=Kahn_init(4);
 	
@@ -207,7 +213,7 @@ CCIntegral CCprepare(const int N){
 		//t[i*(N/2+1)+j]=((i*j==0)?(1):(cos(2*i*j*PI/N)) );
 	}//printf("\n");
 	int pos;
-	Kahn * vec=(Kahn*)malloc((N/4+1)*sizeof(Kahn));
+	//Kahn * vec=(Kahn*)malloc((N/4+1)*sizeof(Kahn));
 	for(int j=0;j<N/4+1;j++){
 		vec[j]=Kahn_init(4);
 		Kahn_clear(vec[j]);
@@ -259,13 +265,13 @@ CCIntegral CCprepare(const int N){
 		//printf("%.10e\t",data.whalf[i]);
 	}//printf("\n");
 	
-	free(c);
-	free(t);
+	//free(c);
+	//free(t);
 	Kahn_free(accum);
 	for(int j=0;j<N/4+1;j++){
 		Kahn_free(vec[j]);
 	}
-	free(vec);
+	//free(vec);
 	//getchar();
 	
 	Kahn sum1=Kahn_init(2),sum2=Kahn_init(2);
@@ -303,14 +309,12 @@ CCIntegral CCprepare(const int N){
 CCIntegral CCprepare(const int N,const std::string &tag){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
-	
 	return data;
 }
 CCIntegral CCprepare(const int N,const std::string &tag,int d){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
 	data.InitDiv=d;
-	
 	return data;
 }
 CCIntegral CCprepare(const int N,const std::string &tag,int d,int max){

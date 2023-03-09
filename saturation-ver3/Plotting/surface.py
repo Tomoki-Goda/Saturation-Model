@@ -13,7 +13,7 @@ import getopt,sys
 def main():
     grids="N/A"
     posQ2=0
-    savefile="./grid-plot.jpg"
+    savefile=""
     dipole=False
     contour=False
     try:
@@ -33,8 +33,7 @@ def main():
             dipole=True
         if opt in ['-h', '--hellp']:
             print("-s <save file>\n-g <grid>\n-q <position of Q2 in the list of Q2 in the grid...> ")
-            print("-g flag is no longer needed simply write grid file at the end")
-            print("-m to say multiple grid files, and list grids files after options. ")
+            print("-m to say multiple grid files, and list grids files after options.\nuse -d to indicate it is  dipole cross section. ")
             sys.exit()
         if opt in ['-m','--multiple']:
             grids=args;
@@ -119,7 +118,11 @@ def main():
         
         #ax[gpos].set(yscale="log",xscale="log",xlim=[1.0e-7,1.0e-2],ylim=[0.05,5.0e+2])
         if contour:
-            surf = ax[gpos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),levels=10,cmap=cm.coolwarm)
+            #if dipole :
+            #    lev=[0,0.1,0.2,]
+            #else:
+            #    lev=[-2,-1,0,1,2,3,4,5,6,8,10]
+            surf = ax[gpos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),levels=25,cmap=cm.coolwarm)
         else:
             surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=6, ccount=0,color="r",ls="-." )
             surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=0, ccount=6,color="b",ls="-")
@@ -130,17 +133,18 @@ def main():
                 ax[gpos].view_init(30, 25)
                 ax[gpos].set_ylabel('$\log_{10}(k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
             ax[gpos].set_xlabel('$\log_{10}x$',loc='right')
-            ax[gpos].set_zlim3d(-0.01, 0.001)        
+            #ax[gpos].set_zlim3d(-0.01, 0.001)        
         #cs=ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)), levels=10,colors="black",linewidths=0.5,linestyles=["solid","dashed"])
     #ax[len(grids)-1].set_xlabel('$x$',loc='right')
     #ax[0].set_ylabel('$k^2\\;[\\mathrm{GeV^2}]$',rotation='vertical',loc='top')
     #fig.set_figheight(2.75)
     #fig.set_figwidth(3*len(grids))
-    #fig.set_figheight(10)
-    fig.set_figwidth(10*len(grids))
-    
-    fig.savefig(savefile)
-    plt.show()
+    fig.set_figheight(5)
+    fig.set_figwidth(5*len(grids))
+    if savefile!="":
+    	fig.savefig(savefile)
+    else:
+    	plt.show()
 
 if __name__=="__main__":
     main()

@@ -2,6 +2,7 @@
 #include<iostream>
 #include<fstream>
 #include<vector>
+#include<chrono>
 #include <gsl/gsl_errno.h> 
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_interp2d.h>
@@ -12,7 +13,6 @@
 
 #include<pthread.h>
 #include<cuba.h>
-
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
@@ -48,23 +48,35 @@
 template<typename TYPE > class Integrand_kt{
 		//Gluon * gluptr=NULL;
 		TYPE *gluptr=NULL;
-		std::fstream file;
+		//std::fstream file;
 	public:
 		double  x=0,Q2=0,mf2=0;
 		double  betamin=0,betamax=0, k2max=0,kappamax=0;
+		
+		Integrand_kt& operator=(const Integrand_kt& rhs){
+			x=rhs.x;
+			Q2=rhs.Q2;
+			mf2=rhs.mf2;
+			betamax=rhs.betamin;
+			k2max=rhs.k2max;
+			kappamax=rhs.kappamax;
+			gluptr=rhs.gluptr;
+			return *this;
+		}
+		explicit Integrand_kt(const Integrand_kt& rhs){
+			x=rhs.x;
+			Q2=rhs.Q2;
+			mf2=rhs.mf2;
+			betamax=rhs.betamin;
+			k2max=rhs.k2max;
+			kappamax=rhs.kappamax;
+			gluptr=rhs.gluptr;
+		}
 		explicit Integrand_kt(TYPE & gluon){
 			gluptr=&gluon;
-			//set_kinem(a,b,c);
-			//gluptr->set_kinem(b);
-/*#if SCATTER==1
-			//file.open("home/tomoki/Saturation-Model/saturation-ver3/"+gluon.key+"scatter.txt",std::fstream::out);
-			file.open("/home/tomoki/Saturation-Model/saturation-ver3/scatter.txt",std::fstream::app);
-#endif*/
 		}
 		~Integrand_kt(){
-/*#if SCATTER==1
-			file.close();	
-#endif*/	
+			//printf("Integrand_kt\n");
 		}
 		
 		int set_kinem(const double  a,const double  b,const double  c){
@@ -139,11 +151,7 @@ template<typename TYPE > class Integrand_kt{
 
 		}
 		
-//#if SCATTER==1
-//		double   integrand(const double  kappa_t_prime2,const double  kt2,const double  beta){
-//#else 
 		double   integrand(const double  kappa_t_prime2,const double  kt2,const double  beta)const{
-//#endif
 			const double  xz=x*inv_z(beta,kappa_t_prime2,kt2) ;
 			if(xz>1.0){
 #if TEST==1
@@ -167,6 +175,7 @@ template<typename TYPE > class Integrand_kt{
 			val+=(mf2+4*Q2*beta*beta*pow(1-beta,2) )*(I[2]-I[3]);
 			double mu2=kt2+kappa_t_prime2+mf2;
 			val*=(*gluptr)(xz,kt2,mu2);
+			//val*=(*gluptr)(kt2,mu2);
 			
 		
 			val= val/kt2;
@@ -180,9 +189,6 @@ template<typename TYPE > class Integrand_kt{
 				getchar();
 			}
 #endif
-//#if SCATTER==1
-//		file<<std::scientific<<kappa_t_prime2<<"\t"<<kt2<<"\t"<<beta<<"\t"<<Q2<<"\t"<<x<<"\t"<<mf2<<"\t"<<val<<std::endl;
-//#endif
 			return(val);
 		}
 		
@@ -299,28 +305,29 @@ void llTest(const int ndim, const int ncomp,
   printf("calling\n");
   
   }
-class F2_kt{
+template <typename T> class F2_kt{
 		//int newpar=1;
 	
-			const double *par;
+			//const double *par=NULL;
+			T *integrands;
 #if R_FORMULA==1
-			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+			/*SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
 
 			Integrand_r integrands[3]={
 				Integrand_r(sigma[0]) ,
 				Integrand_r(sigma[1]) ,
 				Integrand_r(sigma[2])
-			};
+			};*/
 			const int key =13;
 			const int ndim=2;
 #else//R_FORMULA
-			Gluon gluon;//gluon has no flavour dep.
+			/*Gluon gluon;//gluon has no flavour dep.
 			
 			Integrand_kt<Gluon> integrands[3]={
 				Integrand_kt( gluon),
 				Integrand_kt( gluon),
 				Integrand_kt( gluon)
-			};
+			};*/
 			const int key =11;
 			const int ndim=3;
 			const double kt2max=5.0e+4;
@@ -331,9 +338,20 @@ class F2_kt{
       ///////////////////////////////////////////
 			//const double*__restricted par;
 	public: 
-		explicit F2_kt(const  double  *par ){
-			this->par=par;
+		explicit F2_kt(const F2_kt & init){
+			this->par=init.par;
+			this->integrands=init.integrands;
+			for(int i=0;i<3;i++){
+				(this->integrands)[i]=(init.integrands)[i];
+			}
+		}
+		
+		//explicit F2_kt(T(&integrands)[] ){
+		explicit F2_kt(T* integrands ){
+			//this->par=par;
+			this->integrands=integrands;
 			//printf(" F2 \n");
+/*
 #if R_FORMULA==1
 #if GLUON_APPROX==0
 			sigma[0].init(par);
@@ -341,9 +359,9 @@ class F2_kt{
 			sigma[2].init(par);
 #elif GLUON_APPROX==1
 			
-			sigma[0].init(N_APPROX+300,par,'s');
-			sigma[1].init(N_APPROX+300,par,'s');
-			sigma[2].init(N_APPROX+300,par,'s');
+			sigma[0].init(N_APPROX+250,par,'s');
+			sigma[1].init(N_APPROX+250,par,'s');
+			sigma[2].init(N_APPROX+250,par,'s');
 			
 #endif
 #else//R_FORMULA
@@ -352,7 +370,7 @@ class F2_kt{
       ///////////////////////////////////////////
 #if GLUON_APPROX==1
 			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-			gluon.init(N_APPROX+150,N_APPROX+150,N_APPROX+300,par);
+			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+250,par);
 			//gluon.init(300,300,750,par);
 			gluon.set_max(kt2max);
 			//}
@@ -360,7 +378,7 @@ class F2_kt{
 			gluon.init(par);
 #endif//GLUON_APPROX==1			
 #endif//R_FORMULA
-			
+			*/
 		}
 
 		~F2_kt(){

@@ -99,15 +99,17 @@ int read_parameters(FILE * parfile, std::vector< double>& param){
 	fscanf(parfile,"%s\t%lf",name,&dum);//line for Qup
 	
 	//for(unsigned i=0;i<N_PAR;i++){
+	int len=0;
 	for(int i=0;i<10/*any large enough*/;i++){
 		fscanf(parfile,"%s\t%lf\t%lf\n",name,&(param[i]),&dum);
 		if(strcmp(name,"chisq")==0){
+			len=i;
 			break;
 		}
 		fprintf(stdout,"%s \t\t %.3e  \n",name ,(param[i]));
 	}
-	
-	return 0;
+	param.resize(len);
+	return len;
 
 }
 

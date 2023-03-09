@@ -3,56 +3,85 @@ typedef struct {int i, j; Approx_aF* ptr; } parallel_arg;
 
 class Approx_aF{
 	private:
+#if GLUON_APPROX!=0
 		Dipole_Gluon aF;
+#else
+		Gluon_GBW aF;
+#endif
 		double max_prev=0;
 		
 		int kt2_npts,x_npts;
 		gsl_interp_accel *x_accel_ptr, *kt2_accel_ptr;
 		gsl_spline2d *  spline_ptr;
-		double *kt2_array,*x_array,*aF_array;
+		double *kt2_array=NULL,*x_array=NULL,*aF_array=NULL;
 		double mu02=0;
-		
+		double sigma_0=0;
 		double kt2min=1.0e-15,kt2max=-1;
 		
+		int alloc_flag=0;
+		
 		void free_approx(){
-			gsl_spline2d_free (spline_ptr);
-			gsl_interp_accel_free (x_accel_ptr);
-			gsl_interp_accel_free (kt2_accel_ptr);
-			free(kt2_array);
-			free(x_array);
-			free(aF_array);
+			if(alloc_flag!=0){
+				gsl_spline2d_free (spline_ptr);
+				gsl_interp_accel_free (x_accel_ptr);
+				gsl_interp_accel_free (kt2_accel_ptr);
+				free(kt2_array);
+				free(x_array);
+				free(aF_array);
+				alloc_flag=0;
+			}else{
+				printf("Approx_aF cannot free\n");
+			}
+			
+		}
+		void alloc(int x_npts,int kt2_npts){
+			if(alloc_flag!=1){
+				x_array=(double*)malloc(x_npts*sizeof(double));
+				kt2_array=(double*)malloc(kt2_npts*sizeof(double));
+				aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
+				x_accel_ptr = gsl_interp_accel_alloc ();
+				kt2_accel_ptr = gsl_interp_accel_alloc ();
+				spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts);
+				alloc_flag=1;
+			}else{
+				printf("Approx_aF cannot allocate\n");
+			}
 		}
 		int approximate(const double kt2max){
 			this->kt2max=kt2max;
 			clock_t time=clock();
-			double kt2,x;
+			std::chrono::system_clock walltime;
+			std::chrono::time_point start= walltime.now();
+			//double kt2,x;
+
 			for (int j = 0; j < x_npts; ++j){
-				x=pow(10,-8+8*((double)j)/(x_npts-1));
+				double x=pow(10,-8+8*((double)j)/(x_npts-1));
 				x_array[j] = x;
 				aF.set_x(x);	
 				if(j!=0){
 					printf("\033[1A\033[2K\r");
 				}
-				printf("[ ");
+#pragma omp parallel 
+{
+#pragma omp for schedule(dynamic)
 				for(int i=0;i<kt2_npts;++i){
-					kt2=((double)i)/(kt2_npts-1);
+					double kt2=((double)i)/(kt2_npts-1);
 					kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;
 					kt2_array[i] = kt2;
 					aF_array[i+ j*kt2_npts] = aF(kt2,0);
-					if((i/4)*4==i){
-						printf("=");
-					}
 				}
+}
 				printf("\033[2K\r");
 				printf(" approxed x=%.2e\n", x);
 			}
 			//printf("\033[1A\033[2K Grid done\n");
-				
+			printf("\033[1A\033[2K\r");
 			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
 			//}
 			time-=clock();
-			
-			printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
+			std::chrono::duration<double> wtime=walltime.now()-start;
+			std::cout<< -((double)time/CLOCKS_PER_SEC)<< " CPU seconds " <<wtime.count()<<" seconds to approx"<<std::endl;
+		//	printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}
 		static void* compute(void* par){
@@ -69,6 +98,8 @@ class Approx_aF{
 		int approximate_thread(const double kt2max){
 			this->kt2max=kt2max;
 			clock_t time=clock();
+			std::chrono::system_clock walltime;
+			std::chrono::time_point start= walltime.now();
 			double kt2,x;
 			pthread_t thread[kt2_npts];
 			parallel_arg args[kt2_npts];
@@ -93,23 +124,75 @@ class Approx_aF{
 				printf("\033[2K\r");
 				printf(" approxed x=%.2e\n", x);
 			}
-			printf("\033[1A\033[2K Grid done\n");
+			printf("\033[1A\033[2K\r");
 			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
 			time-=clock();
-			printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
+			std::chrono::duration<double> wtime=walltime.now()-start;
+			std::cout<< -((double)time/CLOCKS_PER_SEC)<< " CPU seconds " <<wtime.count()<<" seconds to approx"<<std::endl;
+			//printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}
-
+			
+		
 	public:
+		double saturation(double x,double kt2_start){
+			double val;
+			double kt2=kt2_start;
+			double diff=1.0e-1;
+			double valprev=0;
+			int flag=0;
+			int counter=0;
+			double grad=0;
+			while(counter++<200){
+				val=gsl_spline2d_eval_deriv_x(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
+				if(fabs(val)<1.0e-5){
+					return kt2;
+				}else if(val>0&&flag==0){
+					kt2+=diff;
+					diff*=1.5;
+				}else{
+					flag=1;
+					grad=(val-valprev)/diff;
+					diff=-val/grad;
+					kt2+=diff;
+				}
+				valprev=val;
+			}
+			printf("FAILED to find peak derivative is %.3e at %.3e\n",val,kt2);
+			return 0;
+		}
 		int export_grid(FILE*file)const{
 			for(int j=0;j< x_npts;j++){
 				for(int i=0;i<kt2_npts;i++){
-					fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]);
+					fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]/sigma_0);
 				}
 			}	
 			return 0;
 		}
-
+		Approx_aF(const Approx_aF& rhs){
+			aF=rhs.aF;
+			x_npts=rhs.x_npts;
+			kt2_npts=rhs.kt2_npts;
+			alloc(x_npts,kt2_npts);
+			sigma_0=rhs.sigma_0;
+			mu02=rhs.mu02;
+			
+			if(rhs.alloc_flag!=0){
+				for(int i=0;i<x_npts;++i){
+					x_array[i]=rhs.x_array[i];
+					
+					for(int j=0;j<kt2_npts;++j){
+							aF_array[j+kt2_npts*i]=	rhs.aF_array[j+kt2_npts*i];			
+					}
+				}
+				for(int j=0;j<kt2_npts;++j){
+					kt2_array[j]=rhs.kt2_array[j];			
+				}
+				gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
+			}
+			
+			
+		}
 		Approx_aF(){
 		}
 		~Approx_aF(){
@@ -117,22 +200,19 @@ class Approx_aF{
 		}
 		void set_max(double kt2max){
 			this->kt2max=kt2max;
-			//approximate(kt2max);
-			approximate_thread(kt2max);
+			approximate(kt2max);
+			//approximate_thread(kt2max);
 		}
-		void init(const int npts1, const int npts2, const int npts3, const double *par ){
+		void init(const int npts1, const int npts2, const int npts3, const double * const &par ){
 			x_npts=npts1;
 			kt2_npts=npts2;
-			
-			x_array=(double*)malloc(x_npts*sizeof(double));
-			kt2_array=(double*)malloc(kt2_npts*sizeof(double));
-			//kt2_array=(double*)mmap(NULL,kt2_npts*sizeof(double),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
-			aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
-			//aF_array=(double*)mmap(NULL,x_npts*kt2_npts*sizeof(double),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
-			x_accel_ptr = gsl_interp_accel_alloc ();
-			kt2_accel_ptr = gsl_interp_accel_alloc ();
-			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts); 
+			alloc(x_npts,kt2_npts);
+#if GLUON_APPROX!=0
 			aF.init(npts3,par);
+#else 
+			aF.init(par);
+#endif
+			sigma_0=par[0];
 #if MU02==0
 			mu02 = par[3];
 #else 
@@ -141,11 +221,9 @@ class Approx_aF{
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{			
 			double val = 0;
-			
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
 #if ALPHA_RUN==1
 			val*=alpha(mu2+mu02)/0.2;
-			//printf("%.2e %.2e\n",mu2+mu02,alpha(mu2+mu02));
 #endif
 			return(val);
 		}

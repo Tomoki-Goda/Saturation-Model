@@ -1,3 +1,4 @@
+
 #include<iostream>
 #include<fstream>
 #define TEST 0
@@ -7,15 +8,33 @@
 #include <vector>
 #include <string>
 #include"control.h"
-#include"./control-default.h"
-#include"./constants.h"
+#include"control-default.h"
+#include"constants.h"
 #include"Parameters.hh"
-#include"./r-formula.hh"
 #ifndef GLUON_APPROX
 	#define GLUON_APPROX 1
 #endif
+
+#include<chrono>
+#include <gsl/gsl_errno.h> 
+#include <gsl/gsl_spline.h>
+#include <gsl/gsl_interp2d.h>
+#include <gsl/gsl_spline2d.h>
+
+extern double  INT_PREC;
+#include<pthread.h>
+#include<cuba.h>
+
+#include"clenshaw.hh"
+#include"gauss.hh"
+
+#include"gluons.hh"
+#include"r-formula.hh"
+#include"interpolation-dipole.hh"
+#include"dipole-gluon.hh"
+#include"interpolation-gluon.hh"
 //#if GLUON_APPROX==1
-	#include"./interpolation.hh"
+//	#include"interpolation.hh"
 //	typedef Approx_aF Gluon ;
 //	typedef Laplacian_Sigma SIGMA;
 //#else
@@ -30,7 +49,6 @@
 
 //#include"./dgauss.h"
 //#include"./clenshaw-curtis.hh"
-extern PREC INT_PREC;
 //#include"./r-formula.hh"
 //int CUBACORES=4;
 //#include"./Photon.hh"
@@ -91,8 +109,9 @@ int main(int argc , char** argv){
 	}
 	double r;
 	for(int i =0;i<=100;++i){
-		r=R_MIN*pow(R_MAX/R_MIN, ((double)i)/(100-1));
-		fprintf(outfile,"%.5e\t%.5e\n",r,sigma(r));
+		//r=R_MIN*pow(R_MAX/R_MIN, ((double)i)/(100-1));
+		r=1.0e-4*pow(10/1.0e-4, ((double)i)/(100-1));
+		fprintf(outfile,"%.5e\t%.5e\n",r,sigma(r)/sigpar[0]);
 
 	}
 	fclose(outfile);
@@ -107,12 +126,12 @@ int main(int argc , char** argv){
 		printf("OK: %s\n",filenames);
 	}
 	Gluon gluon;
-	gluon.init(N_APPROX+25,sigpar);
-
+	gluon.init(N_APPROX+250,sigpar);
+	gluon.set_x(opt.x);
 	double k2;
 	for(int i =0;i<=100;++i){
-		k2=1.0e-7*pow(1.0e+11, ((double)i)/(100-1));
-		fprintf(outfile,"%.5e\t%.5e\n",k2,gluon(opt.x,k2,opt.Q2));
+		k2=1.0e-4*pow(1.0e+7, ((double)i)/(100-1));
+		fprintf(outfile,"%.5e\t%.5e\n",k2,gluon(k2,opt.Q2)/sigpar[0]);
 
 	}
 	fclose(outfile);

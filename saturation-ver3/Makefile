@@ -9,20 +9,19 @@
 
 ########################################################################################################
 DEPS= ${DIR}/control.h  ./Functions/control-default.h ./Functions/constants.h ./Functions/Parameters.hh 
-
-LIBS=-lm -lmathlib -lkernlib -lpacklib -lquadmath -lcuba -lMinuit2 -lgsl -lgslcblas -lgfortran #-fopenmp
+LIBS=-lm -lcuba -lMinuit2 -lgsl -lgslcblas -lpthread -fopenmp
 
 UTILDIR=./Utilities
 FUNCDIR=./Functions
 
 INC=-I ${DIR} -I ${FUNCDIR} -I ${UTILDIR} 
 
-#OPT= -Wno-unused-result -fp-model=precise -O3#-g # -Wno-format 
-OPT=-O3 -Wno-unused-result -std=c++17
+OPT= -Wno-unused-result -fp-model=precise -O3#-g # -Wno-format 
+#OPT=-O3 -Wno-unused-result 
 
 #CXX=/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx
-#CXX=icpx
-CXX=g++
+CXX=icpx
+#CXX=g++
 #SUDDEP=./Functions/mu2.h ./Functions/sudakov.h
 #GLUDEP=./Functions/gluon-chebyshev.h ./Functions/gluons.h ./Functions/chebyshev-1.h ./Functions/complex.h
 #PARNIDIR=/home/tomoki/Tools/Parni
@@ -55,6 +54,8 @@ gluons.o: ${FUNCDIR}/gluons.f ${FUNCDIR}/clenshaw.f
 plot: ${FUNCDIR}/plot-things.cc #${FUNCDIR}/gluons.o
 	${CXX} ${FUNCDIR}/plot-things.cc -o ${DIR}/plot ${OPT} ${INC} ${LIBS}
 	${CXX} ${FUNCDIR}/plot-grid.cc -o ${DIR}/grid  ${OPT} ${INC} ${LIBS}
+	${CXX} ${FUNCDIR}/plot-grid-F2.cc -o ${DIR}/F2 ${OPT} ${INC} ${LIBS}
+
 #	${CXX} ${FUNCDIR}/compare-GBW.cc -o ${DIR}/compare  ${OPT} ${INC} ${LIBS}
 #plot: dipole gluon
 

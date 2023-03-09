@@ -133,7 +133,7 @@ class Dipole_Gluon{
 		~Dipole_Gluon(){
 			
 		}
-		inline void init(const int n,const double *par ){
+		inline void init(const int n,const double * const &par ){
 			this->par=par;
 #if LAPLACIAN==0
 			integrand.init(n,par,'l');	

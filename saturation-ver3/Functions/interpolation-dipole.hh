@@ -143,7 +143,7 @@ class Laplacian_Sigma{
 			return 0;
 		}	
 		
-		void init(const int npts1,const double *par ,char mode){
+		void init(const int npts1,const double * const &par ,char mode){
 			sigma_0=par[0];
 			this->mode=mode;
 			if(r_npts!=0){

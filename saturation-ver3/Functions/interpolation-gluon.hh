@@ -203,7 +203,7 @@ class Approx_aF{
 			approximate(kt2max);
 			//approximate_thread(kt2max);
 		}
-		void init(const int npts1, const int npts2, const int npts3, const double *par ){
+		void init(const int npts1, const int npts2, const int npts3, const double * const &par ){
 			x_npts=npts1;
 			kt2_npts=npts2;
 			alloc(x_npts,kt2_npts);

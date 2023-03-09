@@ -53,7 +53,7 @@ class Sigma{
 		inline void set_kinem(const double x){
 			this->x=x;
 		}
-		inline void init(const double *sigpar){
+		inline void init(const double * const &sigpar){
 			par=sigpar;
 			int i=0;
 #if MODEL==0//GBW

@@ -17,19 +17,43 @@ class Sigma{
 		}
 		double Qs2(const double x,const double r)const{
 #if MODEL==0//GBW
+#if VARIANT==0
 			const double qs2=pow(x_0/x,lambda);//*pow(1-x,5.6); 
+#elif VARIANT==1
+			const double qs2=pow(x_0/x,lambda)*pow(1-x,5.6); 
+#elif VARIANT==2
+			const double exprrmax=exp(-pow(r,2)*(1/0.25));
+			const double mu2=1/((1.0-exprrmax ));
+			const double qs2=alpha(mu2)*pow(x_0/x,lambda);//*pow(1-x,5.6); 
+#elif VARIANT==3
+			const double exprrmax=exp(-pow(r,2)*(1/0.25));
+			const double mu2=1/((1.0-exprrmax ));
+			const double qs2=alpha(mu2)*pow(x_0/x,lambda)*pow(1-x,5.6); 
+#endif
 #elif MODEL==1//BGK
-			//const double sigma_0=sigpar[0], C=sigpar[3], mu02=sigpar[4];
 			const double exprrmax=exp(-pow(r,2)*(mu02/C));
 			const double mu2=mu02/((1.0-exprrmax ));
 #if FREEZE_QS2==1
 			double x1=0.5*x/(0.5*(1-x)+x);
-			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(x1,mu2,A_g,lambda_g)/(3*sigma_0); 
+#elif FREEZE_QS2==0
+			double x1=x;
 #elif FREEZE_QS2==2
-			const double qs2=4*PI*PI*alpha(mu2)*xgpdf((x>0.5)?(0.5):x,mu2,A_g,lambda_g)/(3*sigma_0); 
-#else
-			const double qs2=4*PI*PI*alpha(mu2)*xgpdf(x,mu2,A_g,lambda_g)/(3*sigma_0); 
+			double x1=((x>0.5)?0.5:x);
 #endif
+
+#if VARIANT<=2      
+			const double al=alpha(mu2);
+#elif VARIANT==3
+			const double al=0.2;
+#endif			
+#if VARIANT==1
+			const double qs2=4*PI*PI*al*A_g*pow(x,-lambda_g)*pow(1-x1,5.6)/(3*sigma_0); 
+#elif VARIANT==2
+			const double qs2=4*PI*PI*al*A_g*pow(x,-lambda_g)/(3*sigma_0); 
+#else
+			const double qs2=4*PI*PI*al*xgpdf(x1,mu2,A_g,lambda_g)/(3*sigma_0); 
+#endif
+
 #endif	//MODEL	
 			return qs2;		
 		}

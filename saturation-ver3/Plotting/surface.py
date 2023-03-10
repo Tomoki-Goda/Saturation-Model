@@ -16,29 +16,36 @@ def main():
     savefile=""
     dipole=False
     contour=False
+    run=False
+    alpha=1
+    rapidity=False
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:], "dmhs:g:q:c", ['dipole','multiple','help',"save=","grid=","Q2=","contour"])
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "Yrdmhs:g:q:c", ['Y','run','dipole','multiple','help',"save=","grid=","Q2=","contour"])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
     for opt, arg in opts:
         if opt in ["-s","--save"]:
             savefile=arg
-        if opt in ["-g","--grid"]:
+        elif opt in ["-g","--grid"]:
             grids=[arg]
-        if opt in ["-q","--Q2"]:
+        elif opt in ["-q","--Q2"]:
             print(arg)
             posQ2=int(arg)
-        if opt in ['-d','--dipole']:
+        elif opt in ['-d','--dipole']:
             dipole=True
-        if opt in ['-h', '--hellp']:
+        elif opt in ['-h', '--hellp']:
             print("-s <save file>\n-g <grid>\n-q <position of Q2 in the list of Q2 in the grid...> ")
             print("-m to say multiple grid files, and list grids files after options.\nuse -d to indicate it is  dipole cross section. ")
             sys.exit()
-        if opt in ['-m','--multiple']:
+        elif opt in ['-m','--multiple']:
             grids=args;
-        if opt in ['-c','--contour']:
+        elif opt in ['-c','--contour']:
             contour=True
+        elif opt in ['-r','--run']:
+            run=True
+        elif opt in ['-Y','--Y']:
+            rapidity=True
     if grids=="N/A":
         grids=args[0]
 
@@ -59,8 +66,6 @@ def main():
     for gpos in range(len(grids)):
         grid=grids[gpos]
         with open(grid,"r") as fi:
-        #with open("../Run/BGK/Mass0.0-Qup650-Model1-Sud0/gluon-grid.dat","r") as fi:
-        #with open("../Run/BGKS-Fix-S/Mass0.0-Qup650-Model3-Sud1/gluon-grid.dat","r") as fi:
             X=[]
             Y=[]
             z=[]
@@ -73,8 +78,6 @@ def main():
             printflag=True
             for i in fi:
                 data=i.strip().split()
-                #print(data)
-                #print(data)
                 if len(data)==4:
                     Q2.add(data[2])
                     if float(prevQ2)>float(data[2]):
@@ -86,26 +89,29 @@ def main():
                     elif printflag:
                         printflag=False
                         print("$Q^2$=",np.exp(float(data[2])));
-
+                        
+                kt2=float(data[1])
+                if run:
+                    alpha=4*3.1415/(9*np.log((kt2+1)/0.09));
+                     
                 if((x=="n") or (data[0]!=x)):
-                    X.append(np.log10(float(data[0])))
-                    #X.append(np.exp(float(data[0])))
-                    #X.append(float(data[0]))
+                    if rapidity:
+                        X.append(np.log(1/float(data[0])))
+                    else:
+                        X.append(np.log10(float(data[0])))
                     if x!="n":
-                        #print(len(z))
                         Z.append(z)
                         z=[]
                         counter+=1
-                    z.append( float(data[len(data)-1]) )
-                    #z.append( np.log10(abs(float(data[len(data)-1]))) )
+                    z.append(alpha* float(data[len(data)-1]) )
                     x=data[0];
                 else:            
-                    #z.append(np.log10( abs(float(data[len(data)-1])) ))
-                    z.append( float(data[len(data)-1]) )
+                    z.append(alpha* float(data[len(data)-1]) )
+                    
                 if(counter==0):
-                    Y.append(np.log10(float(data[1])))
-                    #Y.append(np.exp(float(data[1])))
-                    #Y.append(float(data[1]))
+                    
+                    Y.append(np.log10(kt2))
+                
 
             Z.append(z)
         if len(Q2)>0:
@@ -133,7 +139,9 @@ def main():
                 ax[gpos].view_init(30, 25)
                 ax[gpos].set_ylabel('$\log_{10}(k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
             ax[gpos].set_xlabel('$\log_{10}x$',loc='right')
-            #ax[gpos].set_zlim3d(-0.01, 0.001)        
+        #ax[gpos].set_xlim(0, 10)        
+        ax[gpos].set_ylim(-2, 2)        
+
         #cs=ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)), levels=10,colors="black",linewidths=0.5,linestyles=["solid","dashed"])
     #ax[len(grids)-1].set_xlabel('$x$',loc='right')
     #ax[0].set_ylabel('$k^2\\;[\\mathrm{GeV^2}]$',rotation='vertical',loc='top')

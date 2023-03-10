@@ -124,19 +124,22 @@
 	#define R_CHANGE_VAR 0
 #endif
 
-#ifndef USE_RESULT
+#ifndef USE_RESULT//use result.txt. Select 2 to round up the result.
 	#define USE_RESULT 0
 #endif
 
-#ifndef R_FORMULA
+#ifndef R_FORMULA//dipole factorization
 	#define R_FORMULA 0
 #endif
 
-#ifndef THRESHOLD
+#ifndef THRESHOLD//threshold factor (1-x)^a
 	#define THRESHOLD 0
 #endif
-#ifndef NS
+#ifndef NS//non-pert. sudakov like factor in the fourier-hankel trans-integral. see dipole-gluon.hh
 	#define NS 0
+#endif
+#ifndef VARIANT //variants of models. see r-formula.h
+	#define VARIANT 0
 #endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////

@@ -73,13 +73,13 @@ int main(int argc, char** argv){
 	std::cout<<std::scientific<<std::endl;
 	
 	printf("********************Program Started********************.\n");
-	printf("MODEL     = %d, N_CHEB_R     = %d,             \t IBP          = %d\n",MODEL, N_CHEB_R,IBP);
+	printf("MODEL     = %d, VARIANT      = %d,                N_CHEB_R     = %d\n",MODEL,VARIANT, N_CHEB_R);
 	printf("R_FORMULA = %d, MU02         = %d\n",R_FORMULA, MU02);
 	printf("MODX      = %d, R_CHANGE_VAR = %d,             \t GLUON_APPROX = %d\n",MODX,R_CHANGE_VAR,GLUON_APPROX);
 	printf("ALPHA_RUN = %d, Hankel       = %d\n", ALPHA_RUN,  HANKEL);
 	printf("FREEZE_QS2= %d, ADD_END      = %d,             \t THRESHOLD    = %d\n",FREEZE_QS2,ADD_END,THRESHOLD);
+	printf("NS        = %d, IBP          = %d\n",NS,IBP);
 	printf("Directory = %s ,\t R  = [%.1e, %.1e]\n",(char*)argv[1],R_MIN,R_MAX);
-	printf("NS=%d\n",NS);
 	printf("*******************************************************.\n");
 	
 

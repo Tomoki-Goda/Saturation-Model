@@ -174,7 +174,7 @@ int main(int argc, char** argv){
 	}
 	
 	
-	INT_PREC=5.0e-4;
+	INT_PREC=2.5e-4;
 	N_APPROX=N_CHEB_R/2;
 	prec.SetPrecision(INT_PREC*5);
 	printf("***************************\n");
@@ -188,10 +188,19 @@ int main(int argc, char** argv){
 	  }
 	  min=migrad(10,10);
 	}
-   	goal=10;
+   	goal=25;
 	for(int i=0;i<5;i++){
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
-		min=migrad(25*(i+1),goal);
+		for(int j=0;j<5;j++){
+			min=migrad(10*(i+1),goal);
+			std::cout<<"Parameters "<<min.UserState()<<std::endl;
+			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
+			printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
+			save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+			if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
+				break;
+			}
+		}
 				
 		printf("EDM/FVal %.3e/%.3e = %.3e\n",min.UserState().Edm(),min.UserState().Fval(),((min.UserState().Edm())/(min.UserState().Fval())) );
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -217,22 +226,27 @@ int main(int argc, char** argv){
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
 	
-   	goal=5;
+   	goal=10;
 	for(int i=0;i<5;i++){
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),1);
-		min=migrad(30*(i+1),goal);
-				
-		printf("EDM/FVal %.3e/%.3e = %.3e\n",min.UserState().Edm(),min.UserState().Fval(),((min.UserState().Edm())/(min.UserState().Fval())) );
-		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
-		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
-		
-		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+
+		for(int j=0;j<5;j++){
+			min=migrad(10*(i+1),goal);
+			std::cout<<"Parameters "<<min.UserState()<<std::endl;
+			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
+			printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
+			save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+			if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
+				break;
+			}
+		}
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
-		INT_PREC/=1.732;//sqrt(3)
-		N_APPROX=((int)(1.732*N_APPROX));
+
+		INT_PREC/=1.41421356;//sqrt(2)
+		N_APPROX=((int)(1.41421356*N_APPROX));
 		
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);

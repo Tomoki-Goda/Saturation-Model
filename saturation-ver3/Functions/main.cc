@@ -125,7 +125,7 @@ int main(int argc, char** argv){
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
 #else//USE_RESULT==1
-     	printf("USING PREVIOUS RESULT\n");
+     	printf("USING PREVIOUS RESULT %d\n",USE_RESULT);
 	char resfile[100];
 	sprintf(resfile,"%s/result.txt",argv[1]);
 	
@@ -139,8 +139,8 @@ int main(int argc, char** argv){
 			skip=N_PAR-i;
 			break;
 		}
-#if USE_RESULT==2
-		ival=double_round(ival,2);
+#if USE_RESULT>0
+		ival=double_round(ival,USE_RESULT);
 #endif
 		printf("%s %le %le \n",name,ival,ierr*10);
 		upar.Add(name, ival,(fabs(ierr)<1.0e-5)?(ival/50):(ierr*10));

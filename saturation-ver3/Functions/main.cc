@@ -176,7 +176,7 @@ int main(int argc, char** argv){
 	
 	INT_PREC=2.5e-4;
 	N_APPROX=N_CHEB_R/2;
-	prec.SetPrecision(INT_PREC*5);
+	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
@@ -191,13 +191,13 @@ int main(int argc, char** argv){
    	goal=25;
 	for(int i=0;i<5;i++){
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
-		for(int j=0;j<5;j++){
-			min=migrad(10*(i+1),goal);
+		for(int j=0;j<i+2;j++){
+			min=migrad(10*(j+1),goal);
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
 			printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
 			save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
-			if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
+			if(min.IsValid()){
 				break;
 			}
 		}
@@ -221,7 +221,7 @@ int main(int argc, char** argv){
 	
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
-	prec.SetPrecision(5*INT_PREC);
+	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
@@ -230,8 +230,8 @@ int main(int argc, char** argv){
 	for(int i=0;i<5;i++){
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),1);
 
-		for(int j=0;j<5;j++){
-			min=migrad(10*(i+1),goal);
+		for(int j=0;j<i+2;j++){
+			min=migrad(10*(j+1),goal);
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
 			printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());

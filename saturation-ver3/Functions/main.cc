@@ -213,6 +213,7 @@ int main(int argc, char** argv){
 		}
 		INT_PREC/=1.4142;//sqrt(2)
 		N_APPROX=((int)(1.4142*N_APPROX));
+		prec.SetPrecision(2*INT_PREC);
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
 		min=simplex(25,goal);
@@ -247,7 +248,7 @@ int main(int argc, char** argv){
 
 		INT_PREC/=1.41421356;//sqrt(2)
 		N_APPROX=((int)(1.41421356*N_APPROX));
-		
+		prec.SetPrecision(2*INT_PREC);
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
 		min=simplex(30,goal);	

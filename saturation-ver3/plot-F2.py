@@ -35,8 +35,8 @@ def main():
         for line in fi:
             row=line.strip().split("\t")
             data.append(row)
-    #data=pd.DataFrame(data,columns=["x","Q2","data","err","val"])
-    data=pd.DataFrame(data,columns=["val","data","err","x","Q2"])
+    data=pd.DataFrame(data,columns=["x","Q2","data","err","val"])
+    #data=pd.DataFrame(data,columns=["val","data","err","x","Q2"])
     comp=[]
     
     for i in range(1,len(args)):
@@ -45,8 +45,8 @@ def main():
             for line in fi:
                 row=line.strip().split("\t")
                 data2.append(row)
-        #comp.append(pd.DataFrame(data2,columns=["x","Q2","val"]))
-        comp.append(pd.DataFrame(data2,columns=["x","val","Q2"]))
+        comp.append(pd.DataFrame(data2,columns=["x","Q2","val"]))
+        #comp.append(pd.DataFrame(data2,columns=["x","val","Q2"]))
     if limit:
         Q2set=["1.10000e-01","5.00000e-01", "6.50000e+00","1.80000e+01","4.50000e+01","1.20000e+02","5.00000e+02"]
     else:

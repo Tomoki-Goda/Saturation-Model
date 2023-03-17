@@ -37,8 +37,8 @@ def main():
             for line in fi:
                 row=line.strip().split("\t")
                 data2.append(row)
-        #comp.append(pd.DataFrame(data2,columns=["x","Q2","data","err","val"]))
-        comp.append(pd.DataFrame(data2,columns=["val","data","err","x","Q2"]))
+        comp.append(pd.DataFrame(data2,columns=["x","Q2","data","err","val"]))
+        #comp.append(pd.DataFrame(data2,columns=["val","data","err","x","Q2"]))
     data=comp[0]
     Q2set=data['Q2'].values
     Q2set=set(Q2set)

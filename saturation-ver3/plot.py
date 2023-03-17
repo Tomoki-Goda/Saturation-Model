@@ -102,10 +102,13 @@ def main():
     ax.set(title=plottitle,  ylabel=axes[1],    xlabel=axes[0],  xscale= xs ,   yscale=ys )
     if(xlim[0]!=xlim[1]):
         ax.set_xlim(xlim[0],xlim[1])
+        ax.set_ylim()
     
     if(ylim[0]!=ylim[1]):
         ax.set_ylim(ylim[0],ylim[1])
-    	
+    
+
+    
     ax.grid("true")
     ax.legend()
    

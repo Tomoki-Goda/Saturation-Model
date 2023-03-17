@@ -110,7 +110,7 @@ int main(int argc , char** argv){
 	double r;
 	for(int i =0;i<=100;++i){
 		//r=R_MIN*pow(R_MAX/R_MIN, ((double)i)/(100-1));
-		r=1.0e-4*pow(10/1.0e-4, ((double)i)/(100-1));
+		r=1.0e-2*pow(30/1.0e-2, ((double)i)/(100-1));
 		fprintf(outfile,"%.5e\t%.5e\n",r,sigma(r)/sigpar[0]);
 
 	}
@@ -130,7 +130,7 @@ int main(int argc , char** argv){
 	gluon.set_x(opt.x);
 	double k2;
 	for(int i =0;i<=100;++i){
-		k2=1.0e-4*pow(1.0e+7, ((double)i)/(100-1));
+		k2=1.0e-2*pow(1.0e+4, ((double)i)/(100-1));
 		fprintf(outfile,"%.5e\t%.5e\n",k2,gluon(k2,opt.Q2)/sigpar[0]);
 
 	}

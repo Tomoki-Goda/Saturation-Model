@@ -143,11 +143,11 @@ int main(int argc, char** argv){
 		{"x_0","$x_0 \\left(10^{-4}\\right)$"},
 		{"A_g","$A_g$"},
 		{"lambda_g","$\\lambda_g$"},
-		{"mu02","$\\mu_0^2 \\left[GeV^2\\right]$"},
+		{"mu02","$\\mu_0^2 \\left[\\mathrm{GeV^2}\\right]$"},
 		{"C1","$C$"},
-		{"mu102","$\\mu_0^2 \\left[GeV^2\\right]$"},
+		{"mu102","$\\mu_0^2 \\left[\\mathrm{GeV^2}\\right]$"},
 		{"C2","$C$"},
-		{"mu202","$\\mu_0^2 \\left[GeV^2\\right]$"},
+		{"mu202","$\\mu_0^2 \\left[\\mathrm{GeV^2}\\right]$"},
 		{"chisq/dof","$\\chi^2/\\mathrm{dof}$"},
 		{"Flag","Flag"}
       	};
@@ -205,21 +205,17 @@ int main(int argc, char** argv){
 			name=names[i];	
 			fprintf(out,"& %.3e",result[j][name]);
 			printf("%.2e ",result[j][name]);
-			/*if(error[j][name]!=0.0){
-				printf(" +/- %.2e\t",error[j][name]);
-				fprintf(out," {\\tiny $\\pm$ %.3e}" ,error[j][name]);
-			}*/
 		}
-		fprintf(out,"\\\\\n");
-		for(int i=0;i<names.size();++i){	
-			name=names[i];	
-			if(error[j][name]!=0.0){
-				printf(" +/- %.2e\t",error[j][name]);
-				fprintf(out,"&\\hfill {\\tiny $\\pm$ %.3e}" ,error[j][name]);
-			}else{
-				fprintf(out,"& " );
-			}
-		}
+		//fprintf(out,"\\\\\n");
+		//for(int i=0;i<names.size();++i){	
+		//	name=names[i];	
+		//	if(error[j][name]!=0.0){
+		//		printf(" +/- %.2e\t",error[j][name]);
+		//		fprintf(out,"&\\hfill {\\tiny $\\pm$ %.3e}" ,error[j][name]);
+		//	}else{
+		//		fprintf(out,"& " );
+		//	}
+		//}
 		fprintf(out,"\\\\\\hline \n");
 		printf("\n");
 	}

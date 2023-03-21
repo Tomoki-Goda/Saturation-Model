@@ -5,7 +5,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Sigma{
 // par and indivisual parameters are redundant. 
-		Collinear_Gluon xgpdf;
+		//Collinear_Gluon xgpdf;
+#if MODEL==1
+		Interpolate_Collinear_Gluon xg;
+#endif
 		double x=0;
 		double sigma_0,lambda, x_0, A_g,lambda_g,C,mu02,mu102,thresh_power;
 		const double *par;
@@ -16,6 +19,9 @@ class Sigma{
 			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 		}
 		double Qs2(const double x,const double r)const{
+			if(x>1){
+				printf("x is too large %.3e\n",x);
+			}
 #if MODEL==0//GBW
 #if VARIANT==0
 			const double qs2=pow(x_0/x,lambda);//*pow(1-x,5.6); 
@@ -31,8 +37,8 @@ class Sigma{
 			const double qs2=alpha(mu2)*pow(x_0/x,lambda)*pow(1-x,5.6); 
 #endif
 #elif MODEL==1//BGK
-			const double exprrmax=exp(-pow(r,2)*(mu02/C));
-			const double mu2=mu02/((1.0-exprrmax ));
+			const double rrmax=pow(r,2)/C;
+			const double mu2=(r>1.0e-5)?(mu02/((1.0-exp(-mu02*rrmax) ))):(1/rrmax) ;
 #if FREEZE_QS2==1
 			double x1=0.5*x/(0.5*(1-x)+x);
 #elif FREEZE_QS2==0
@@ -51,7 +57,8 @@ class Sigma{
 #elif VARIANT==2
 			const double qs2=4*PI*PI*al*A_g*pow(x,-lambda_g)/(3*sigma_0); 
 #else
-			const double qs2=4*PI*PI*al*xgpdf(x1,mu2,A_g,lambda_g)/(3*sigma_0); 
+			//const double qs2=4*PI*PI*al*xgpdf(x1,mu2,A_g,lambda_g)/(3*sigma_0); 
+			const double qs2=4*PI*PI*al*xg(x1,mu2)/(3*sigma_0); 
 #endif
 
 #endif	//MODEL	
@@ -95,6 +102,8 @@ class Sigma{
 #if MODEL==1
 			C=sigpar[i++];
 			mu02=sigpar[i++];
+			printf("C=%.3e, mu02=%.3e, R_MIN=%.3e -> %.3e \n",C,mu02,R_MIN,C/pow(R_MIN,2)+mu02);
+			xg.init(5.0e-9,1,mu02*0.5,2*(C/pow(R_MIN,2)+mu02),A_g,lambda_g);
 #endif
 
 #if THRESHOLD==-1
@@ -105,12 +114,10 @@ class Sigma{
 			//sigpar=par;
 		}
 		
-		inline double operator()(const double r,const double x){//,const double Q2,const double*sigpar)const {
-		 	this->x=x;
-		 	return((*this)(r));
-		 }
-
-		double operator()(const double r)const {
+		inline double operator()(const double r)const {
+			return ((*this)(r,this->x));
+		}
+		inline double operator()(const double r,const double x)const{//,const double Q2,const double*sigpar)const {
 			//const double sigma_0=sigpar[0];
 			double qs2=Qs2(x,r);
 #if IBP==2

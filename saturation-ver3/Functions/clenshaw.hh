@@ -111,7 +111,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 		//accumhalf+=accumfull;
 		error_ratio=fabs( (valfull-valhalf)/(eps*valfull) );
 		//if(( fabs(valfull-valhalf)<eps*(fabs(valfull)) ) || (  fabs(valfull-valhalf)< fabs(smax-smin)*Aeps ) ){
-		if((error_ratio<1 ) || (  fabs(valhalf-valfull)< fabs(smax-smin)*Aeps ) ){
+		if((error_ratio<1 ) || (  fabs(valhalf-valfull)< Aeps ) ){
 			accum+=accumfull;
 			++licz;
 			counter=0;

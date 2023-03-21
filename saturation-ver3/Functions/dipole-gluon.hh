@@ -116,9 +116,12 @@ class Gluon_GBW{
 //
 /////////////////////////////////////////////////////////////////////
 //template <typename LSigma>class Dipole_Gluon{
+//typedef Gluon_Integrand Integrand;				
+typedef Laplacian_Sigma Integrand;				
 class Dipole_Gluon{
 		const double *par;
-		Laplacian_Sigma integrand;
+		//Laplacian_Sigma integrand;
+		Integrand integrand;
 		CCIntegral cc=CCprepare(64,"dipole",1,4);
 		double x;	
 
@@ -184,9 +187,9 @@ class Dipole_Gluon{
 					}
 				};
 #if R_CHANGE_VAR==1
-				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<const Integrand,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
 #elif R_CHANGE_VAR==0
-				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<const Integrand,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
 #endif
 				if(fabs(val+integrand.constant(imax,par))< pow(INT_PREC,2) ){
 					++flag;
@@ -225,4 +228,120 @@ class Dipole_Gluon{
 		
 		
 };
+/////////////////////////////////////////////////////////////////////
+//
+//WW gluon
+//
+/////////////////////////////////////////////////////////////////////
+class WW_Gluon{
+		const double *par;
+		Integrand integrand;
+		CCIntegral cc=CCprepare(64,"dipole",1,4);
+		double x;	
+
+	public: 
+		WW_Gluon(const WW_Gluon&rhs ){
+			par=rhs.par;
+			integrand=rhs.integrand;
+			x=rhs.x;
+		}
+		WW_Gluon(){
+		}
+		~WW_Gluon(){
+			
+		}
+		inline void init(const int n,const double * const &par ){
+			this->par=par;
+#if LAPLACIAN==0
+			integrand.init(n,par,'l');	
+#elif LAPLACIAN==1
+			integrand.init(n,par,'s');
+#endif	
+		}
+		void set_x(double x){
+			this->x=x;
+			integrand.set_kinem(x);
+			//integrand.approximate_thread(x);
+		}
+		double operator()(const double kt2,const double mu2){
+			Kahn accum=Kahn_init(3);
+			const std::vector<double> par{kt2,x};
+			double rmax=R_MAX,rmin=R_MIN;
+			double val=0;
+			Kahn_clear(accum);
+
+			const double minmax=50;
+#if ADD_END>=0 //negative value is for testing purpose.
+			rmax=minmax;
+#if MODEL==1
+			rmax/=pow(1-x,4);
+#endif
+			if(rmax>R_MAX||!std::isfinite(rmax)){
+				rmax=R_MAX;
+			}
+			const double scale=(2*PI)/sqrt(kt2);
+			double imin=rmin;
+			int sectors=(int)(rmax/scale);
+			if(sectors<3){
+				sectors=3;
+			}
+			
+			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient 
+			int flag=0;
+			//double val_prev=0;
+			for(int i=0;i<sectors;++i){
+				imax+=scale;
+				if(imax>rmax){
+					if(i>0){
+						imax-=scale;
+						sectors=i-1;
+						break;
+					}else{
+						imax=rmax;
+					}
+				};
+#if R_CHANGE_VAR==1
+				val=dclenshaw<const Integrand,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
+#elif R_CHANGE_VAR==0
+				val=dclenshaw<const Integrand,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
+#endif
+				if(fabs(val+integrand.constant(imax,par))< pow(INT_PREC,2) ){
+					++flag;
+					if(flag>5&&imax>minmax){//if consecutively small 5 times
+						break;//it is likely beyond this will be trivial
+					}
+				}else{
+					flag=0;
+				}
+				accum+=val;
+				imin=imax;
+			}
+			val=Kahn_total(accum);
+#endif
+			double diff=0;
+//#if (IBP>=1&&ADD_END!=0)			
+#if (IBP>=1)			
+			diff+=integrand.constant(imax,par);
+			//diff-=integrand.constant(rmin,par);
+			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
+				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
+				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
+			}
+#if ADD_END!=0
+			val+=diff;
+#endif//ADD_END
+#endif//IBP
+			Kahn_free(accum);
+//Threshold 1-x^7 is in dipole sigma. 
+			
+			if(!std::isfinite(val)){
+				val=0;
+			}
+			return (3.0/(8*PI*PI)*val);
+		}
+		
+		
+};
+
+
 

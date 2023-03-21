@@ -131,5 +131,81 @@ class Collinear_Gluon{
 		}
 
 };
+
+class Interpolate_Collinear_Gluon{
+	private:
+		Collinear_Gluon xg;
+		gsl_interp_accel *x_accel_ptr=NULL, *q2_accel_ptr=NULL;
+		gsl_spline2d *  spline_ptr=NULL;
+		double A_g=0,l_g=0;
+		int xlen=50,q2len=50;
+		double *xarr=NULL,*q2arr=NULL,*xgarr=NULL;
+		double xmin,xmax,q2min,q2max;
+	public:
+		//explicit Interpolate_Collinear_Gluon(int xlen,int q2len){
+		explicit Interpolate_Collinear_Gluon(){
+			//this->q2len=q2len;
+			//this->xlen=xlen;
+
+			xarr=(double*)malloc(xlen*sizeof(double));
+			q2arr=(double*)malloc(q2len*sizeof(double));
+			xgarr=(double*)malloc(xlen*q2len*sizeof(double));
+			x_accel_ptr = gsl_interp_accel_alloc ();
+			q2_accel_ptr = gsl_interp_accel_alloc ();
+			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,q2len,xlen);
+		}
+		~Interpolate_Collinear_Gluon(){
+			gsl_spline2d_free (spline_ptr);
+			gsl_interp_accel_free (x_accel_ptr);
+			gsl_interp_accel_free (q2_accel_ptr);
+			free(xarr);
+			free(q2arr);
+			free(xgarr);
+		}
+		int init(double xmin,double xmax,double q2min, double q2max, double A_g,double l_g ){
+			//this->A_g=A_g;
+			//this->l_g=l_g;
+#pragma omp parallel
+{
+//			double x,q2;
+#pragma omp for
+			for( int i=0;i<xlen;++i){
+				double x=xmin*pow(xmax/xmin,((double)i)/(xlen-1));
+				xarr[i]=x;
+				for(int j=0;j<q2len;++j){
+					double q2=q2min*pow(q2max/q2min,((double)j)/(q2len-1));
+					if(i==0){
+						q2arr[j]=q2;
+					}
+					xgarr[i*q2len+j]=xg(x,q2,A_g,l_g);
+				}
+			}
+}
+			this->xmin=xmin;
+			this->xmax=xmax;
+			this->q2min=q2min;
+			this->q2max=q2max;
+
+			gsl_spline2d_init (spline_ptr,q2arr, xarr, xgarr, q2len, xlen);
+			printf("gluon approxed \n");
+			return 0;
+		}
+		double operator()(const double x,const double Q2)const{
+			if(x>xmax){
+				printf("x too large: %.3e < %.3e < %.3e\n",xmin,x,xmax );
+			}
+			if(x<xmin){
+				printf("x too small: %.3e < %.3e < %.3e\n",xmin,x,xmax );
+			}
+			if(Q2>q2max){
+				printf("Q2 too large: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
+			}
+			if(Q2<q2min){
+				printf("Q2 too small: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
+			}
+			return(gsl_spline2d_eval(spline_ptr,Q2, x,q2_accel_ptr, x_accel_ptr));
+		}
+
+};
 #endif
 

@@ -144,6 +144,13 @@
 #ifndef VARIANT //variants of models. see r-formula.h
 	#define VARIANT 0
 #endif
+
+#ifndef N_CHEB//variants of models. see r-formula.h
+	#define N_CHEB 50
+#endif
+#ifndef CHEB_D//variants of models. see r-formula.h
+	#define CHEB_D 2
+#endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////
 //////////////////////////////////////////////////////////////////

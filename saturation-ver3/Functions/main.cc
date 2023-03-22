@@ -80,7 +80,7 @@ int main(int argc, char** argv){
 	printf("FREEZE_QS2= %d, ADD_END      = %d,             \t THRESHOLD    = %d\n",FREEZE_QS2,ADD_END,THRESHOLD);
 	printf("NS        = %d, IBP          = %d\n",NS,IBP);
 	printf("Directory = %s ,\t R  = [%.1e, %.1e]\n",(char*)argv[1],R_MIN,R_MAX);
-	printf("SIGMA_APPROX = %d\n",SIGMA_APPROX);
+	printf("SIGMA_APPROX = %d\t N_CHEB   = %d              \t CHEB_D       = %d \n",SIGMA_APPROX,N_CHEB,CHEB_D);
 	printf("*******************************************************.\n");
 	
 

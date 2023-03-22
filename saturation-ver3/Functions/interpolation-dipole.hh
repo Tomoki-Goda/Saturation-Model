@@ -329,7 +329,7 @@ template <typename Sig> class Gluon_Integrand{
 		//	return 0;
 		//}
 
-		double operator()(const double rho, const std::vector<double> &par)const {
+		double operator()(const double rho, const std::vector<double> &par) {
 		//	const Sigma& sigma=&(this->sigma);
 #if R_CHANGE_VAR==1
 			const double r=rho/(1-rho);
@@ -349,7 +349,7 @@ template <typename Sig> class Gluon_Integrand{
 			switch(mode){
 				case 'l':
 #if IBP==1
-					val=deriv<const Sig>(*sigma,x,r,h,1);
+					val=deriv<Sig>(*sigma,x,r,h,1);
 	#if NS==2
 					val*=( kt*r*std::cyl_bessel_j(1,r*kt) + 2*pow(r/ns_pow,2)*std::cyl_bessel_j(0,r*kt));
 	#else
@@ -360,8 +360,8 @@ template <typename Sig> class Gluon_Integrand{
 					val*=-kt*kt*r*std::cyl_bessel_j(0,r*kt);
 #else
 					//The following line is very inefficient!!
-					val=deriv<const Sig>(*sigma,x,r,h,2);
-					val+=deriv<const Sig>(*sigma,x,r,h,1)/r;
+					val=deriv<Sig>(*sigma,x,r,h,2);
+					val+=deriv<Sig>(*sigma,x,r,h,1)/r;
 					val*=r*std::cyl_bessel_j(0,r*kt);
 #endif			
 					break;
@@ -392,18 +392,18 @@ template <typename Sig> class Gluon_Integrand{
 			return val;
 #endif
 		}
-		double constant(double r , const std::vector<double> &par)const {
+		double constant(double r , const std::vector<double> &par) {
 			//const Sigma& sigma=&(this->sigma);
 			//const double r=rho/(1-rho);
 			const double kt=sqrt(par[0]),x=par[1];
 			double val=0;
 			double h=r/50;
 #if IBP==1
-			val=deriv<const Sig>(*sigma,x,r,h,1);
+			val=deriv< Sig>(*sigma,x,r,h,1);
 			val*=r*std::cyl_bessel_j(0,r*kt);
 #elif IBP==2
 			val=kt*std::cyl_bessel_j(1,r*kt)*(*sigma)(x,r);
-			val+=std::cyl_bessel_j(0,r*kt)*deriv<const Sig>(*sigma,x,r,h,1);
+			val+=std::cyl_bessel_j(0,r*kt)*deriv< Sig>(*sigma,x,r,h,1);
 			val*=r;
 #endif
 #if NS>=1

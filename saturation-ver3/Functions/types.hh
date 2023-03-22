@@ -4,7 +4,11 @@
 
 #if SIGMA_APPROX<0
 	//typedef Interpolate_Collinear_Gluon COLGLU;
+#if CHEB_D==2
 	typedef Chebyshev_Collinear_Gluon COLGLU;
+#elif CHEB_D==1
+	typedef Chebyshev1D_Collinear_Gluon COLGLU;
+#endif
 #else 	
 	typedef Collinear_Gluon COLGLU;
 #endif

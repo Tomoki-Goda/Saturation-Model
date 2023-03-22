@@ -136,7 +136,7 @@ class Gluon_GBW{
 template<typename INTEG>class Dipole_Gluon{
 		const double *par;
 		//Laplacian_Sigma integrand;
-		const INTEG *integrand;
+		INTEG *integrand;
 		CCIntegral cc=CCprepare(64,"dipole",1,4);
 		//double x;	
 
@@ -207,9 +207,9 @@ template<typename INTEG>class Dipole_Gluon{
 					}
 				};
 #if R_CHANGE_VAR==1
-				val=dclenshaw<const INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
 #elif R_CHANGE_VAR==0
-				val=dclenshaw<const INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
 #endif
 				if(fabs(val+integrand->constant(imax,par))< pow(INT_PREC,2) ){
 					++flag;

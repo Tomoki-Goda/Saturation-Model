@@ -127,7 +127,7 @@ void chebyshevT(double x,unsigned degree, double * T ){
 	*(T+1)=x;
 	double t, c, t0, t1;
 
-	for(unsigned i=2;i<(degree);i++){
+	/*for(unsigned i=2;i<(degree);i++){
 		t1=2*x*(*(T+i-1));
 		t0=-(*(T+i-2));
 
@@ -141,6 +141,9 @@ void chebyshevT(double x,unsigned degree, double * T ){
 			printf("accum= %.3e %.3e \n",c,t);
 		}
 		*(T+i)=t+c;
+	}*/
+	for(unsigned i=2;i<(degree);i++){
+		*(T+i)=cos(i*acos(x));
 	}
 }
 void chebyshevU(double x,unsigned degree, double * U ){
@@ -320,9 +323,12 @@ inline cheby PrepareChebyshev(const unsigned deg,const unsigned dim){
 	return(PrepareChebyshev(degree,dim));
 }
 int FreeChebyshev(cheby & cont){
-	free(cont.coeff);
-	free(cont.degree);
-	//free(cont.accel);
+	if(cont.coeff!=NULL){
+		free(cont.coeff);
+	}
+	if(cont.degree!=NULL){
+		free(cont.degree);
+	}
 	return 0;
 }
 
@@ -410,7 +416,7 @@ double chebyshev(const cheby & data, const double* args ){
 	}
 	return res;
 }
-cheby chebyshev_reduce(const cheby & data, const double arg,const int redpos ){
+int chebyshev_reduce(const cheby & data,cheby & newcheb, const double arg,const int redpos ){
 	unsigned ind1[data.dim];
 	unsigned ind2[data.dim-1];
 	unsigned newdeg[data.dim-1];
@@ -423,7 +429,7 @@ cheby chebyshev_reduce(const cheby & data, const double arg,const int redpos ){
 		}
 	}
 	
-	cheby newcheb=PrepareChebyshev(newdeg,data.dim-1);
+	//cheby newcheb=PrepareChebyshev(newdeg,data.dim-1);
 	//evaluate chebyshev polynomials Ti(x)
 	double Tlist[data.degree[redpos]];
 	chebyshevT(arg, data.degree[redpos], Tlist); 
@@ -449,7 +455,7 @@ cheby chebyshev_reduce(const cheby & data, const double arg,const int redpos ){
 		
 		ind_vec_increment(ind2,newcheb.degree,newcheb.dim);		
 	}
-	return newcheb;
+	return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////// derivative  /////////////////////////////////////////////////////////

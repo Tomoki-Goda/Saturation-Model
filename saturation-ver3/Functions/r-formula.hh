@@ -25,11 +25,11 @@ class Sigma{
 		const double *par;
 		
 		//double Qs2(const double x,const double r,const double (&sigpar)[])const{
-		inline double alpha(double mu2 )const{
+		inline double alpha(double mu2 ){
 			static double b0= ((double)(33 -2*NF))/(12*PI);
 			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 		}
-		double Qs2(const double x,const double r)const{
+		double Qs2(const double x,const double r){
 			if(x>1){
 				printf("x is too large %.3e\n",x);
 				getchar();
@@ -126,7 +126,7 @@ class Sigma{
 		//inline double operator()(const double r)const {
 		//	return ((*this)(r,this->x));
 		//}
-		double operator()(const double x, const double r)const {//,const double Q2,const double*sigpar)const {
+		double operator()(const double x, const double r) {//,const double Q2,const double*sigpar)const {
 			//static double x0=0;
 			
 #if FREEZE_QS2==1

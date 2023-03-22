@@ -139,22 +139,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 
-#if R_FORMULA==1
-		SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
-		sigma[0].init(sigpar);
-		sigma[1].init(sigpar);
-		sigma[2].init(sigpar);
-	#if SIGMA_APPROX==0||SIGMA_APPROX==-1
-		SIGMA (&dsigma)[3]=sigma;
-//	#elif SIGMA_APPROX==-1
-		//DSIGMA dsigma[3]={DSIGMA(sigma[0]) ,DSIGMA(sigma[1]) ,DSIGMA(sigma[2]) };
-//		dsigma[0].init(sigpar,'s');
-//		dsigma[1].init(sigpar,'s');
-//		dsigma[2].init(sigpar,'s');
-	//Here other options are thread unsafe with x		
-	#endif
-	
-#elif R_FORMULA==0///////////////////////////////////////////////////////////////////////
+
+#if R_FORMULA==0///////////////////////////////////////////////////////////////////////
 	#if GLUON_APPROX==1
 		#if SIGMA_APPROX==-1||SIGMA_APPROX==0//if sigma is not in 1d grid
 			SIGMA sigma;
@@ -190,7 +176,12 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 { 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-#if R_FORMULA==1		
+#if R_FORMULA==1	
+	SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+		sigma[0].init(sigpar);
+		sigma[1].init(sigpar);
+		sigma[2].init(sigpar);	
+
 	#if SIGMA_APPROX==-2||SIGMA_APPROX==1 // AS GBW/BGK K   This require instance per thread
 			DSIGMA dsigma[3]={DSIGMA(sigma[0]) ,DSIGMA(sigma[1]) ,DSIGMA(sigma[2]) };
 			dsigma[0].init(N_APPROX+250,sigpar,'s');
@@ -203,7 +194,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				Integrand_r<DSIGMA>(dsigma[2])
 			};
 			F2_kt<Integrand_r<DSIGMA>> F2(integrands);
-	#else///////////////////////////////////////////////////////////////////////////////////
+	#elif SIGMA_APPROX==0||SIGMA_APPROX==-1
+		SIGMA (&dsigma)[3]=sigma;
 			Integrand_r<SIGMA> integrands[3]={
 				Integrand_r<SIGMA>(dsigma[0]) ,
 				Integrand_r<SIGMA>(dsigma[1]) ,

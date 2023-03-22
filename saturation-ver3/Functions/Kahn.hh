@@ -156,6 +156,7 @@ static double Kahn_list_sum(double* list, int len){
 }
 
 */
+
 Kahn& operator+=(Kahn& sum,const double a){
 	Kahn_Sum(sum ,a);	
 	return sum;
@@ -186,5 +187,13 @@ Kahn& operator+=(Kahn& sum2,Kahn& sum){
 Kahn& operator*=(Kahn& sum2,const double a){
 	Kahn_accum_times(a,sum2);	
 	return sum2;
+}
+
+static double Kahn_list_sum(double* list, int len){
+	Kahn acc=Kahn_init(3);
+	for(int i=0;i<len;i++){
+		acc+=list[i];
+	}
+	return(Kahn_total(acc));
 }
 #endif

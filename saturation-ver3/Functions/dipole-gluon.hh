@@ -1,4 +1,21 @@
+/////////////////////////////////////////////////////////////////////
+// Gluon_GBW af
+// af.init(par) //double* par sigma parameters 
+// af(x,kt2,mu2) // 
+//
+// Dipole gluon
+// Dipole_Gluon af
+// af.init(par,integ) //Integrand integ; see below
+// af(x,kt2,mu2)
+//
+//WW_Gluon
+////////////////////////////////////////////////////////////////////
 
+//#if SIGMA_APPROX<2
+//	typedef Gluon_Integrand Integrand;				
+//#else
+//	typedef Laplacian_Sigma Integrand;				
+//#endif
 
 inline double  modx(const double  x, const double  Q2, const  double  mf2){
 #if MODX==1
@@ -46,11 +63,11 @@ class Gluon_GBW{
 
 	
 	public:
-		explicit Gluon_GBW(const Gluon_GBW& rhs){
-			sigpar=rhs.sigpar;
-			init(sigpar);
-			x=rhs.x;			
-		}
+		//explicit Gluon_GBW(const Gluon_GBW& rhs){
+		//	sigpar=rhs.sigpar;
+		//	init(sigpar);
+		//	x=rhs.x;			
+		//}
 		
 		explicit Gluon_GBW(){
 		}
@@ -75,14 +92,14 @@ class Gluon_GBW{
 		~Gluon_GBW(){}
 		
 	public:
-		inline double operator()(const double x,const double k2,double mu2){
-			set_x(x);
-			return((*this)(k2,mu2));
-		}
-		void set_x(double x){
-			this->x=x;
-		}
-		double operator()(const double k2,double mu2){
+		//inline double operator()(const double x,const double k2,double mu2){
+		//	set_x(x);
+		//	return((*this)(k2,mu2));
+		//}
+		//void set_x(double x){
+		//	this->x=x;
+		//}
+		double operator()(const double  x,const double k2,double mu2){
 			if(x_0<1.0e-5||x_0>1.0e-3){
 				return 0;
 			}
@@ -116,40 +133,43 @@ class Gluon_GBW{
 //
 /////////////////////////////////////////////////////////////////////
 //template <typename LSigma>class Dipole_Gluon{
-//typedef Gluon_Integrand Integrand;				
-typedef Laplacian_Sigma Integrand;				
-class Dipole_Gluon{
+template<typename INTEG>class Dipole_Gluon{
 		const double *par;
 		//Laplacian_Sigma integrand;
-		Integrand integrand;
+		const INTEG *integrand;
 		CCIntegral cc=CCprepare(64,"dipole",1,4);
-		double x;	
+		//double x;	
 
 	public: 
-		Dipole_Gluon(const Dipole_Gluon&rhs ){
-			par=rhs.par;
-			integrand=rhs.integrand;
-			x=rhs.x;
-		}
-		Dipole_Gluon(){
+		//Dipole_Gluon(const Dipole_Gluon&rhs ){
+		//	par=rhs.par;
+		//	integrand=rhs.integrand;
+		//	x=rhs.x;
+		//}
+		Dipole_Gluon(INTEG& integ){
+			integrand =& integ;
 		}
 		~Dipole_Gluon(){
 			
 		}
-		inline void init(const int n,const double * const &par ){
+		inline void init(const double * const &par ){
+			
 			this->par=par;
-#if LAPLACIAN==0
-			integrand.init(n,par,'l');	
-#elif LAPLACIAN==1
-			integrand.init(n,par,'s');
-#endif	
+			
+			//init(n,par) if Laplacian_Sigma is used
+//#if LAPLACIAN==0
+//			integrand.init(par,'l');	
+//#elif LAPLACIAN==1
+//			integrand.init(par,'s');
+//#endif	
 		}
-		void set_x(double x){
-			this->x=x;
-			integrand.set_kinem(x);
+		//void set_x(double x){
+			//this->x=x;
+		//	integrand->set_kinem(x);
 			//integrand.approximate_thread(x);
-		}
-		double operator()(const double kt2,const double mu2){
+		//}
+		double operator()(const double x,const double kt2,const double mu2)const{
+			
 			Kahn accum=Kahn_init(3);
 			const std::vector<double> par{kt2,x};
 			double rmax=R_MAX,rmin=R_MIN;
@@ -187,11 +207,11 @@ class Dipole_Gluon{
 					}
 				};
 #if R_CHANGE_VAR==1
-				val=dclenshaw<const Integrand,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<const INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
 #elif R_CHANGE_VAR==0
-				val=dclenshaw<const Integrand,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<const INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
 #endif
-				if(fabs(val+integrand.constant(imax,par))< pow(INT_PREC,2) ){
+				if(fabs(val+integrand->constant(imax,par))< pow(INT_PREC,2) ){
 					++flag;
 					if(flag>5&&imax>minmax){//if consecutively small 5 times
 						break;//it is likely beyond this will be trivial
@@ -207,7 +227,7 @@ class Dipole_Gluon{
 			double diff=0;
 //#if (IBP>=1&&ADD_END!=0)			
 #if (IBP>=1)			
-			diff+=integrand.constant(imax,par);
+			diff+=integrand->constant(imax,par);
 			//diff-=integrand.constant(rmin,par);
 			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
 				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
@@ -223,6 +243,7 @@ class Dipole_Gluon{
 			if(!std::isfinite(val)){
 				val=0;
 			}
+			
 			return (3.0/(8*PI*PI)*val);
 		}
 		
@@ -233,7 +254,7 @@ class Dipole_Gluon{
 //WW gluon
 //
 /////////////////////////////////////////////////////////////////////
-class WW_Gluon{
+/*class WW_Gluon{
 		const double *par;
 		Integrand integrand;
 		CCIntegral cc=CCprepare(64,"dipole",1,4);
@@ -344,4 +365,4 @@ class WW_Gluon{
 };
 
 
-
+*/

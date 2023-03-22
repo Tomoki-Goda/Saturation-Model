@@ -131,6 +131,9 @@
 #ifndef R_FORMULA//dipole factorization
 	#define R_FORMULA 0
 #endif
+#ifndef SIGMA_APPROX
+	#define SIGMA_APPROX -1
+#endif
 
 #ifndef THRESHOLD//threshold factor (1-x)^a
 	#define THRESHOLD 0

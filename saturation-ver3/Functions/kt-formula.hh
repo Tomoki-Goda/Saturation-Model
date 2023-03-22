@@ -24,19 +24,11 @@
 #include"interpolation-dipole.hh"
 #include"dipole-gluon.hh"
 #include"interpolation-gluon.hh"
+#include"types.hh"
 
-#if GLUON_APPROX==1
-	#if HANKEL==1
-		typedef Hankel_aF Gluon;
-	#else
-		typedef Approx_aF Gluon ;
-	#endif
-	typedef Laplacian_Sigma SIGMA;
-#else
-	typedef Gluon_GBW Gluon ;
-	typedef Sigma SIGMA;
 
-#endif
+
+
 
 //extern double  INT_PREC ;
 //extern int N_APPROX;
@@ -45,6 +37,7 @@
 //  phi integrated 
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if R_FORMULA==0
 template<typename TYPE > class Integrand_kt{
 		//Gluon * gluptr=NULL;
 		TYPE *gluptr=NULL;
@@ -63,7 +56,7 @@ template<typename TYPE > class Integrand_kt{
 			gluptr=rhs.gluptr;
 			return *this;
 		}
-		explicit Integrand_kt(const Integrand_kt& rhs){
+		/*explicit Integrand_kt(const Integrand_kt& rhs){
 			x=rhs.x;
 			Q2=rhs.Q2;
 			mf2=rhs.mf2;
@@ -71,10 +64,12 @@ template<typename TYPE > class Integrand_kt{
 			k2max=rhs.k2max;
 			kappamax=rhs.kappamax;
 			gluptr=rhs.gluptr;
-		}
+		}*/
+		
 		explicit Integrand_kt(TYPE & gluon){
 			gluptr=&gluon;
 		}
+
 		~Integrand_kt(){
 			//printf("Integrand_kt\n");
 		}
@@ -204,7 +199,7 @@ template<typename TYPE > class Integrand_kt{
 
 };
 
-int F2_integrand_A(const int  *ndim,const  double  *intv,const int  *ncomp,double  * f, void * __restrict p){
+template <typename Gluon> int F2_integrand_A(const int  *ndim,const  double  *intv,const int  *ncomp,double  * f, void * __restrict p){
 		Integrand_kt<Gluon>* integrand=(Integrand_kt<Gluon>*)p;
 		const double  beta=intv[0];
 		const double  kappa_t_prime2=intv[1];
@@ -221,22 +216,25 @@ int F2_integrand_A(const int  *ndim,const  double  *intv,const int  *ncomp,doubl
 		return 0;
 }
 
-#if R_FORMULA==1
-class Integrand_r{
-	SIGMA *sigma_ptr;
+#elif R_FORMULA==1
+template <typename Sig> class Integrand_r{
+	Sig *sigma_ptr;
 	public:
-		explicit Integrand_r(SIGMA&  sig){
+		explicit Integrand_r(Sig&  sig){
 			sigma_ptr=&sig;
 		}
-		int set_kinem(const double  x,const double  Q2,const double  mf2){
-			if(!std::isfinite(x+Q2+mf2)){
-				printf("Integrand:: Q2=%.3le x=%.3le mf2=%.3le\n",Q2,x,mf2);
-				getchar();
-			}
+		int set_kinem(const double x,const double Q2,const double  mf2){
+		//	if(!std::isfinite(x+Q2+mf2)){
+		//		printf("Integrand:: Q2=%.3le x=%.3le mf2=%.3le\n",Q2,x,mf2);
+		//		getchar();
+		//	}
 			this->x=modx(x,Q2,mf2);
+			if(this->x>1){
+				printf("set_kinem:: x toolarge %.3e\n",x);
+			}
 			this->Q2=Q2;
 			this->mf2=mf2;
-			sigma_ptr->set_kinem(this->x);
+		//	//sigma_ptr->set_kinem(this->x);
 			return 0;
 		}
 		double  operator()(double  z,  double  r)const{
@@ -244,11 +242,11 @@ class Integrand_r{
 			change_var(r,jacr,R_MIN,R_MAX,100);// 1+Q2);
 			double  jacz=0;
 			change_var(z,jacz,0,0.5,10);
-			double  val=(*sigma_ptr)(r)* psisq_f (z, r)/r;
+			double  val=(*sigma_ptr)(x,r)* psisq_f (z, r)/r;
 			return(jacr*jacz*2*val);//r^2 comes from photon wave function. just extracted... 2 pi r is angular integration 
 		}
 	private:
-		double  x, Q2, mf2;
+		double  x,Q2, mf2;
 		double  psisq_f (const double  z,const double  r)const  {
 			double 	value;
 			double 	z_bar =  z*z+(1-z)*(1-z);
@@ -274,8 +272,8 @@ class Integrand_r{
 		}
 };
 
-int F2_integrand_B(const int *__restrict ndim, const double  *__restrict intv,const int *__restrict ncomp,double *__restrict  f, void* __restrict p){
-	Integrand_r *integrand=(Integrand_r*)p;
+template <typename Sig>int F2_integrand_B(const int *__restrict ndim, const double  *__restrict intv,const int *__restrict ncomp,double *__restrict  f, void* __restrict p){
+	Integrand_r<Sig> *integrand=(Integrand_r<Sig>*)p;
 	double  z=intv[0];
 	double  r=intv[1];
 	double  res=0;
@@ -346,64 +344,15 @@ template <typename T> class F2_kt{
 			}
 		}
 		
-		//explicit F2_kt(T(&integrands)[] ){
 		explicit F2_kt(T* integrands ){
-			//this->par=par;
 			this->integrands=integrands;
-			//printf(" F2 \n");
-/*
-#if R_FORMULA==1
-#if GLUON_APPROX==0
-			sigma[0].init(par);
-			sigma[1].init(par);
-			sigma[2].init(par);
-#elif GLUON_APPROX==1
-			
-			sigma[0].init(N_APPROX+250,par,'s');
-			sigma[1].init(N_APPROX+250,par,'s');
-			sigma[2].init(N_APPROX+250,par,'s');
-			
-#endif
-#else//R_FORMULA
-      ////////////////////////////////////////////
-      ///   Momentum space
-      ///////////////////////////////////////////
-#if GLUON_APPROX==1
-			//if( kt2max<Q2*(1-x)/x){//|| (kt2max/10000)>(Q2*(1-x)/x)  ){//EVALUATE ONLY WHEN RANGE IS TOO DIFFERENT
-			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+250,par);
-			//gluon.init(300,300,750,par);
-			gluon.set_max(kt2max);
-			//}
-#else
-			gluon.init(par);
-#endif//GLUON_APPROX==1			
-#endif//R_FORMULA
-			*/
 		}
 
 		~F2_kt(){
-			//printf(" F2 end \n");
-			//getchar();
 		}
 		
-			
-		/*void compare(FILE* file){
-			Gluon_GBW gluon_c;//gluon has no flavour dep.
-			gluon_c.init(par);
-			double x, k2;
-			for(int i=0;i<100;i++){
-				x=pow(10,-7.5+7.5*((double)i)/99);
-				for(int j=0;j<100;j++){
-					k2=pow(10,-6.5+10*((double)j)/99);
-					fprintf(file, "%.5e\t%.5e\t%.5e\n",x,k2,gluon(x,k2,0)-gluon_c(x,k2,0));
-				}
-			}
-		}*/
-			
-			
 		double operator()(const double  x,const  double  Q2,const  double  mf2){
 			static unsigned int count;
-	//		std::string type="gbw";
 			printf("Start F2\t");
 			//getchar();
 			integrands[0].set_kinem(x,Q2,MASS_L2);
@@ -433,9 +382,13 @@ template <typename T> class F2_kt{
 			llCuhre(ndim, 1,
 			//llTest(ndim, 1,
 #if R_FORMULA==1
-				&F2_integrand_B,
+	#if SIGMA_APPROX==-2||SIGMA_APPROX==1
+				&F2_integrand_B<DSIGMA>,
+	#else
+				&F2_integrand_B<SIGMA>,
+	#endif
 #else
-				&F2_integrand_A,
+				&F2_integrand_A<Approx_aF<GLUON>>,
 #endif  
 				(void*)integrands,
 				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,statefile,NULL, &nregions, &neval,  &fail, integral, error, prob

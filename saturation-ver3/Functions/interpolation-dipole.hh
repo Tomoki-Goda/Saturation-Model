@@ -1,10 +1,25 @@
+///////////////////////////////////////////////////////
+// Gluon Integrand.
+// Thread safe
+//
+// USAGE 
+// Gluon_Integrand integ
+// integ.init(sigpar, mode, sig)// double*sigpar, mode is 'l' or 's' , Sigma sig
+// integ(r, par) // double r is integ variable ch.var. is possible with R_CHANGE_VAR, doube* par={kt2,x}
+// integ.constant(rmax,par)  // additional term for IBP  
+//
+// DSIGMA define at the end
+//
+// ///////////////////////////////////////////////////// 
+
 //template<typename T, typename T2>double deriv(T & func,T2 par,double x,double h,int i) {
-template<typename T>double deriv(T & func,double x,double h,int i) {
+template<typename T>double deriv(T & func,double y, double x,double h,int i) {
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//take ith numerical derivative with step h wrt the second argument "x" while the first arg 'y' is fixed 
+	//////////////////////////////////////////////////////////////////////////////////////////
 	double xi[5];
-	int c;
-	//const int c1[5];//;={1.0/12,-2.0/3,0,2.0/3,-1.0/12};
 	double c2[3];//={-1.0/12,4.0/3,-5.0/2,4.0/3,-1.0/12};
-	//const double *c;
+	int c;
 	switch(i){
 	case 1:
 		c=-1;
@@ -27,24 +42,25 @@ template<typename T>double deriv(T & func,double x,double h,int i) {
 		xi[j]=x+(j-2)*h;
 	}
 	double val=0;
-	val =c2[0]*( func(xi[0])+c*func(xi[4]) );
-	val+=c2[1]*( func(xi[1])+c*func(xi[3]) );
-	val+=c2[2]*  func(xi[2]);
-
+	val =c2[0]*( func(y,xi[0])+c*func(y,xi[4]) );
+	val+=c2[1]*( func(y,xi[1])+c*func(y,xi[3]) );
+	if(i!=1){
+		val+=c2[2]*  func(y,xi[2]);
+	}
 	val*=pow(h,-i);
 	return(val);	
 }
 
-class Laplacian_Sigma;
-typedef struct {int j; Laplacian_Sigma *ptr;} sigmaopt;
-
+//class Laplacian_Sigma;
+//typedef struct {int j; Laplacian_Sigma *ptr;} sigmaopt;
+/*
 //FOR APPROXIMATION AND DERIVATIVES		
 //class Laplacian_Sigma:public Sigma{
 
 //pthread_mutex_t mut;
 class Laplacian_Sigma{
 	private:
-		Sigma sigma;
+		Sigma *sigma;
 		//double max=R_MAX, min=R_MIN; 
 		double *r_array=NULL,*sigma_array=NULL;
 		gsl_interp_accel *  r_accel_ptr;
@@ -296,44 +312,25 @@ class Laplacian_Sigma{
 		}
 };
 
-
-class Gluon_Integrand{
-		Sigma sigma;
-		double sigma_0;
+*/
+template <typename Sig> class Gluon_Integrand{
+		Sig *sigma;
 		char mode='l';//l or s
 	public:
-		inline int set_kinem(double x){
-			sigma.set_kinem(x);
-			return 0;
-		}	
-		
-		void init(int npts,const double * const &par ,char mode){
+		Gluon_Integrand(Sig& sig){
+			sigma=&sig;
+		}
+		void init(const double * const &par ,char mode){
 			this->mode=mode;
-			sigma_0=par[0];
-			sigma.init(par);
+			//sigma->init(par);
 		}
-
-		double operator()(const double rho)const{
-			double var;
-#if R_CHANGE_VAR==1
-			const double r=rho/(1-rho);
-			var=pow(1-rho,-2);
-#elif R_CHANGE_VAR==0
-			const double r =rho;
-			var=1;
-#endif		
-			var*=sigma(r);
-		
-			return(var);
-		}
-		//int export_grid(FILE* file, FILE* file2){
-		//int export_grid(FILE* file){
-		//	for(int i=0;i<r_npts;i++){
-		//		fprintf(file,"%.5e\t%.5e\t%.5e\n",x,r_array[i],sigma_array[i]/sigma_0);
-		//	}		
-		//return 0;	
+		//inline int set_kinem(double x){
+		//	sigma->set_kinem(x);
+		//	return 0;
 		//}
+
 		double operator()(const double rho, const std::vector<double> &par)const {
+		//	const Sigma& sigma=&(this->sigma);
 #if R_CHANGE_VAR==1
 			const double r=rho/(1-rho);
 #elif R_CHANGE_VAR==0
@@ -348,28 +345,28 @@ class Gluon_Integrand{
 			const double kt=sqrt(par[0]),x=par[1];
 			double val = 0;
 
-//#if (LAPLACIAN==1||R_FORMULA==1)
 			double h=r/50;
 			switch(mode){
 				case 'l':
 #if IBP==1
-					val=deriv<const Sigma>(sigma,r,h,1);
+					val=deriv<const Sig>(*sigma,x,r,h,1);
 	#if NS==2
 					val*=( kt*r*std::cyl_bessel_j(1,r*kt) + 2*pow(r/ns_pow,2)*std::cyl_bessel_j(0,r*kt));
 	#else
 					val*= kt*r*std::cyl_bessel_j(1,r*kt);
 	#endif
 #elif IBP==2
-					val=sigma(r);
+					val=(*sigma)(x,r);
 					val*=-kt*kt*r*std::cyl_bessel_j(0,r*kt);
 #else
-					val=deriv<const Sigma>(sigma,r,h,2);
-					val+=deriv<const Sigma>(sigma,r,h,1)/r;
+					//The following line is very inefficient!!
+					val=deriv<const Sig>(*sigma,x,r,h,2);
+					val+=deriv<const Sig>(*sigma,x,r,h,1)/r;
 					val*=r*std::cyl_bessel_j(0,r*kt);
 #endif			
 					break;
 				case 's':
-					val=sigma(r);
+					val=(*sigma)(x,r);
 					val*=r*std::cyl_bessel_j(0,r*kt);
 					break;
 				default:
@@ -396,16 +393,17 @@ class Gluon_Integrand{
 #endif
 		}
 		double constant(double r , const std::vector<double> &par)const {
+			//const Sigma& sigma=&(this->sigma);
 			//const double r=rho/(1-rho);
-			const double kt=sqrt(par[0]);
+			const double kt=sqrt(par[0]),x=par[1];
 			double val=0;
 			double h=r/50;
 #if IBP==1
-			val=deriv<const Sigma>(sigma,r,h,1);
+			val=deriv<const Sig>(*sigma,x,r,h,1);
 			val*=r*std::cyl_bessel_j(0,r*kt);
 #elif IBP==2
-			val=kt*std::cyl_bessel_j(1,r*kt)*sigma(r);
-			val+=std::cyl_bessel_j(0,r*kt)*deriv<const Sigma>(sigma,r,h,1);
+			val=kt*std::cyl_bessel_j(1,r*kt)*(*sigma)(x,r);
+			val+=std::cyl_bessel_j(0,r*kt)*deriv<const Sig>(*sigma,x,r,h,1);
 			val*=r;
 #endif
 #if NS>=1
@@ -419,6 +417,7 @@ class Gluon_Integrand{
 
 
 };
+
 
 
 /*

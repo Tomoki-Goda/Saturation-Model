@@ -346,7 +346,7 @@ class Interpolate_Collinear_Gluon{
 #pragma omp parallel
 {
 //			double x,q2;
-#pragma omp for
+#pragma omp for schedule(dynamic)
 			for( int i=0;i<xlen;++i){
 				double x=xmin*pow(xmax/xmin,((double)i)/(xlen-1));
 				xarr[i]=x;

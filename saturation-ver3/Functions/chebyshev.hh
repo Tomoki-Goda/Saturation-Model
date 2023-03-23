@@ -228,7 +228,7 @@ template<typename T, typename T2>void sample(T & func, T2& par,  const unsigned 
 
 #pragma omp parallel
 {
-#pragma omp for
+#pragma omp for schedule(dynamic)
 	for(unsigned i=0;i<max;i++){
 		sample_arr[i]=func(argvec+i*dim,par);
 	}

@@ -316,6 +316,7 @@ class Laplacian_Sigma{
 template <typename Sig> class Gluon_Integrand{
 		Sig *sigma;
 		char mode='l';//l or s
+		double ns_pow=500;
 	public:
 		Gluon_Integrand(Sig& sig){
 			sigma=&sig;

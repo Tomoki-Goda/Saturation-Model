@@ -30,7 +30,7 @@
 	#endif
 #elif ((SIGMA_APPROX>0)||(SIGMA_APPROX<-1))
 	//typedef Gluon_Integrand<SIGMA> DSIGMA;
-	typedef Laplacian_Sigma DSIGMA;
+	typedef Laplacian_Sigma<SIGMA> DSIGMA;
 #endif
 
 #if ((GLUON_APPROX==0)&&(MODEL==0))

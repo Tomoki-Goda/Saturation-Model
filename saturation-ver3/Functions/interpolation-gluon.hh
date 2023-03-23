@@ -56,9 +56,9 @@ template<typename GLU >class Approx_aF{
 			for (int j = 0; j < x_npts; ++j){
 				double x=pow(10,-8+8*((double)j)/(x_npts-1));
 				x_array[j] = x;
-//#if SIGMA_APPROX==-2||SIGMA_APPROX==1
-				//aF->set_x(x);	
-//#endif
+#if SIGMA_APPROX==-2||SIGMA_APPROX==1
+				aF->set_x(x);	
+#endif
 				
 #pragma omp parallel 
 {
@@ -213,7 +213,7 @@ template<typename GLU >class Approx_aF{
 			approximate(kt2max);
 			//approximate_thread(kt2max);
 		}
-		void init(const int npts1, const int npts2, const int npts3, const double * const &par){
+		void init(const int npts1, const int npts2, const double * const &par){
 			//aF=&glu;
 			x_npts=npts1;
 			kt2_npts=npts2;

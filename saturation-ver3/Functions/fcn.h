@@ -148,16 +148,16 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			DSIGMA dsigma(sigma);
 			dsigma.init(sigpar,'l');
  		#else //-2 and 1  
- 			printf("not written yet!! \n");
- 			exit(0);
-//  			DSIGMA dsigma(sigma);
-//			dsigma.init(, sigpar,'l');
+ 			SIGMA sigma;
+			sigma.init(sigpar);
+			DSIGMA dsigma(sigma);
+			dsigma.init(N_APPROX+250,sigpar,'l');
 		#endif
 		
 		GLUON dipole_gluon(dsigma);
 		dipole_gluon.init(sigpar);
 		Approx_aF<GLUON> gluon(dipole_gluon);
-		gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+250,sigpar);
+		gluon.init(N_APPROX+100,N_APPROX+100,sigpar);
 		const double kt2max=7.0e+4;
 		gluon.set_max(kt2max);
 	#else               //only GBW K

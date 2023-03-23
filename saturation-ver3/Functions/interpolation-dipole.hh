@@ -53,14 +53,14 @@ template<typename T>double deriv(T & func,double y, double x,double h,int i) {
 
 //class Laplacian_Sigma;
 //typedef struct {int j; Laplacian_Sigma *ptr;} sigmaopt;
-/*
+
 //FOR APPROXIMATION AND DERIVATIVES		
 //class Laplacian_Sigma:public Sigma{
 
 //pthread_mutex_t mut;
-class Laplacian_Sigma{
+template <typename Sig>  class Laplacian_Sigma{
 	private:
-		Sigma *sigma;
+		Sig *sigma;
 		//double max=R_MAX, min=R_MIN; 
 		double *r_array=NULL,*sigma_array=NULL;
 		gsl_interp_accel *  r_accel_ptr;
@@ -97,7 +97,7 @@ class Laplacian_Sigma{
 			}
 			
 		}
-		static void* compute(void*opt){
+/*		static void* compute(void*opt){
 			sigmaopt* param=(sigmaopt*)opt;
 			Laplacian_Sigma *sigmaptr=param->ptr;
 			const int j=param->j;
@@ -123,13 +123,13 @@ class Laplacian_Sigma{
 			//test();
 			return(0);
 		}
-		int approximate(const double x){
-			sigma.set_kinem(x);
+*/		int approximate(const double x){
+			//sigma.set_kinem(x);
 #pragma omp parallel
 {
 #pragma omp for schedule(dynamic)
 			for (int j = 0; j < r_npts; j++){
-				sigma_array[j] = sigma(r_array[j]);
+				sigma_array[j] = (*sigma)(x,r_array[j]);
 				if(!isfinite(sigma_array[j])){
 					printf("can not approximate sigma=%.3e\n",sigma_array[j] );
 				}
@@ -138,11 +138,13 @@ class Laplacian_Sigma{
 			gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 			return(0);
 		}
+		
+/*		
 		int test(){
 			double diff[2*r_npts-1];
 			double sigma_array_2[2*r_npts-1];
 			for (int j = 0; j < r_npts-1; j++){
-				sigma_array_2[j] = sigma( (r_array[j]+2*r_array[j+1])/3 );
+				sigma_array_2[j] = (*sigma)( (r_array[j]+2*r_array[j+1])/3 );
 				diff[j]=sigma_array_2[j]-gsl_spline_eval(spline_ptr, (r_array[j]+2*r_array[j+1])/3 ,r_accel_ptr);
 				//sigma_array_2[j] = sigma( r_array[j] );
 				//diff[j]=sigma_array_2[j]-gsl_spline_eval(spline_ptr, r_array[j] ,r_accel_ptr);
@@ -157,10 +159,11 @@ class Laplacian_Sigma{
 			//gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 			return(0);
 		}
+		*/
 		
 	public:
 	
-		explicit Laplacian_Sigma(const Laplacian_Sigma& rhs){
+		/*explicit Laplacian_Sigma(const Laplacian_Sigma& rhs){
 			x=rhs.x;
 			sigma_0=rhs.sigma_0;
 			mode=rhs.mode;
@@ -175,9 +178,10 @@ class Laplacian_Sigma{
 				}
 				gsl_spline_init (spline_ptr, r_array, sigma_array, r_npts);
 			}
-		}
+		}*/
 		
-		explicit Laplacian_Sigma(){
+		explicit Laplacian_Sigma(Sig & sig){
+			sigma=&sig;
 			r_npts=0;
 			sigma_array=NULL;
 			r_array=NULL;
@@ -201,7 +205,7 @@ class Laplacian_Sigma{
 				free_approx();
 			}
 			allocate(npts1);
-			sigma.init(par);
+			//sigma.init(par);
 			
 			double r;
 			for (int j = 0; j < r_npts; j++){
@@ -230,7 +234,7 @@ class Laplacian_Sigma{
 			}		
 		return 0;	
 		}
-		double operator()(const double rho, const std::vector<double> &par)const {
+		double operator()(const double rho, const std::vector<double> &par){
 #if R_CHANGE_VAR==1
 			const double r=rho/(1-rho);
 #elif R_CHANGE_VAR==0
@@ -243,6 +247,10 @@ class Laplacian_Sigma{
 				printf("too small, out of range %.4e - %.4e = %.4e , rho=%.3e,%d\n",r,R_MIN,r-R_MIN,rho,R_CHANGE_VAR);
 			}
 			const double kt=sqrt(par[0]),x=par[1];
+			if(x!=this->x){
+				//this->x=x;
+				printf("Error: x does not match\n");
+			}
 			double val = 0;
 
 //#if (LAPLACIAN==1||R_FORMULA==1)
@@ -312,7 +320,6 @@ class Laplacian_Sigma{
 		}
 };
 
-*/
 template <typename Sig> class Gluon_Integrand{
 		Sig *sigma;
 		char mode='l';//l or s

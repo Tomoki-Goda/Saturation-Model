@@ -138,7 +138,6 @@ template<typename INTEG>class Dipole_Gluon{
 		//Laplacian_Sigma integrand;
 		INTEG *integrand;
 		CCIntegral cc=CCprepare(64,"dipole",1,4);
-		//double x;	
 
 	public: 
 		//Dipole_Gluon(const Dipole_Gluon&rhs ){
@@ -163,13 +162,17 @@ template<typename INTEG>class Dipole_Gluon{
 //			integrand.init(par,'s');
 //#endif	
 		}
-		//void set_x(double x){
-			//this->x=x;
-		//	integrand->set_kinem(x);
-			//integrand.approximate_thread(x);
-		//}
-		double operator()(const double x,const double kt2,const double mu2)const{
-			
+		void set_x(double x){
+			integrand->set_kinem(x);
+		}
+		double operator()(const double x,const double kt2,const double mu2){
+/*#if SIGMA_APPROX==1||SIGMA_APPROX==-2
+			if(this->x!=x){
+				this->x=x;
+				integrand->set_kinem(x);
+				printf("set x");
+			}
+#endif*/
 			Kahn accum=Kahn_init(3);
 			const std::vector<double> par{kt2,x};
 			double rmax=R_MAX,rmin=R_MIN;

@@ -45,7 +45,7 @@ template<typename TYPE > class Integrand_kt{
 	public:
 		double  x=0,Q2=0,mf2=0;
 		double  betamin=0,betamax=0, k2max=0,kappamax=0;
-		
+		double 	k2min=1.0e-6;
 		Integrand_kt& operator=(const Integrand_kt& rhs){
 			x=rhs.x;
 			Q2=rhs.Q2;
@@ -117,7 +117,7 @@ template<typename TYPE > class Integrand_kt{
 				return 0;
 			}
 			change_var(beta,jac3,betamin,betamax,1);
-			change_var(kappa2,jac2,1.0e-10,kappamax,1+kappamax/pow(1+Q2,0.5));
+			change_var(kappa2,jac2,k2min,kappamax,1+kappamax/pow(1+Q2,0.5));
 
 			k2max=(1-x)/x*Q2-(kappa2+mf2)/(beta*(1-beta));
 			if(k2max<=0.0){
@@ -127,7 +127,7 @@ template<typename TYPE > class Integrand_kt{
 			double val=0;
 			if(kappa2<k2max){
 				k2=1-x1*x1;
-				change_var(k2,jac1,1.0e-10,kappa2,1+kappa2/pow(1+Q2,0.25));
+				change_var(k2,jac1,k2min,kappa2,1+kappa2/pow(1+Q2,0.25));
 				val+=jac1*integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
 				
 				k2=x1*x1;
@@ -136,7 +136,7 @@ template<typename TYPE > class Integrand_kt{
 				
 				val*=2*x1*jac2*jac3;
 			}else{
-				change_var(k2,jac1,1.0e-10,k2max,1+k2max/pow(1+Q2,0.25));
+				change_var(k2,jac1,k2min,k2max,1+k2max/pow(1+Q2,0.25));
 				val=integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
 				val*=jac1*jac2*jac3;
 			}

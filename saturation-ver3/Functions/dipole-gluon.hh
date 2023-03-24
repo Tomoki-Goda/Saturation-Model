@@ -165,7 +165,7 @@ template<typename INTEG>class Dipole_Gluon{
 		}
 		void set_x(const double &x){
 			//this->x=x;
-			integrand->set_kinem(x);
+			integrand->set_x(x);
 		}
 		double operator()(const double x,const double kt2,const double mu2){
 			//if(x!=this->x){
@@ -233,17 +233,17 @@ template<typename INTEG>class Dipole_Gluon{
 			val=Kahn_total(accum);
 #endif
 			double diff=0;
-//#if (IBP>=1&&ADD_END!=0)			
-#if (IBP>=1)			
+#if (IBP>=1&&ADD_END!=0)			
+//#if (IBP>=1)			
 			diff+=integrand->constant(imax,par);
 			//diff-=integrand.constant(rmin,par);
 			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
 				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
 				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
 			}
-#if ADD_END!=0
+//#if ADD_END!=0
 			val+=diff;
-#endif//ADD_END
+//#endif//ADD_END
 #endif//IBP
 			Kahn_free(accum);
 //Threshold 1-x^7 is in dipole sigma. 

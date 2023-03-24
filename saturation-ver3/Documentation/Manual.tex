@@ -1,0 +1,237 @@
+\documentclass[12pt]{article}
+\usepackage[a4paper,left=1in,right=1in]{geometry}
+%\usepackage{merriweather}
+\usepackage{hyperref}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\title{Saturation Model Fitter\\ (ver.~3)\\User's Guide}
+\author{Tomoki Goda}
+
+%\newenvironment{entry}[1]{\textbf{\large #1:}\vspace{1pt}\hrule\begin{center}}{\end{center}\vspace{2mm}}
+\newenvironment{entry}[1]{\textbf{\large #1:  }}{\\\vspace{3mm}\\}
+
+\begin{document}
+	\maketitle
+%\section{Intro.}
+
+%\section{Functions}
+\section{gluons.hh}
+\subsection{\texttt{class} Collinear\_Gluon }\label{CollinearGluon}
+
+\begin{entry}{Description}
+computes $xg(x,Q^2)$.\\
+$xg(x,Q_0^2)=A_g x^\lambda_g(1-x)^{5.6}$
+\end{entry} 
+\begin{entry}{Constructor}
+	Collinear\_Gluon()
+\end{entry} 
+\begin{entry}{Main function}
+	\textbf{operator}()($x$,$Q^2$,$A_g$,$\lambda_g$)
+\end{entry} 
+\begin{entry}{Dependence}
+polygamma.h, clenshaw.hh
+\end{entry}	
+
+
+\subsection{\texttt{class} Chebyshev\_Collinear\_Gluon}\label{ChebyshevCollinearGluon}
+\begin{entry}{Description}
+	Approximate $xg(x,Q^2)$ with 2D Chebyshev polynomials. 
+\end{entry}
+\begin{entry}{Constructor}
+	Chebyshev\_Collinear\_Gluon()\\
+	Global variable or Macro \texttt{N\_CHEB} is required to specify order of polynomials.
+\end{entry}
+\begin{entry}{Initialization}
+	init($x_{\mathrm{min}}$, $x_{\mathrm{max}}$, $Q^2_{\mathrm{min}}$, $Q^2_{\mathrm{max}}$,$A_g$, $\lambda_g$ )\\
+	Computes coefficients.\\
+	set\_x($x$)\\
+	Reduce 2D polynomial to 1D at specified $x$. 
+\end{entry}
+\begin{entry}{Main function}
+	\textbf{operator}()($x$,$Q^2$)
+	compute $xg(x,Q^2)$ from 2D polynomial or 1D if set\_x($x$) was run previously.(it can be reset by running set\_x($x$) with negative value. ) 
+\end{entry}
+\begin{entry}{Dependence}
+	chebyseh.hh, Collinear\_Gluon~(\ref{CollinearGluon})
+\end{entry}
+
+\subsection{\texttt{class} Chebyshev1D\_Collinear\_Gluon}\label{Chebyshev1DCollinearGluon}
+\begin{entry}{Description}
+	Approximate $xg(x,Q^2)$ with 1D Chebyshev polynomials at fixed $x$. 
+\end{entry}
+\begin{entry}{Constructor}
+	Chebyshev1D\_Collinear\_Gluon()\\
+	Global variable or Macro \texttt{N\_CHEB} is required to specify order of polynomials.
+\end{entry}
+\begin{entry}{Initialization}
+	init($x_{\mathrm{min}}$, $x_{\mathrm{max}}$, $Q^2_{\mathrm{min}}$, $Q^2_{\mathrm{max}}$,$A_g$, $\lambda_g$ )\\
+	Computes coefficients.\\
+	set\_x($x$)\\
+	Record the value of $x$ and compute coefficients.
+\end{entry}
+\begin{entry}{Main function}
+	\textbf{operator}()($x$,$Q^2$)\\
+	compute $xg(x,Q^2)$ from 1D polynomial. If passed $x$ differs from the value at which approximation is done, it will print error.
+\end{entry}
+\begin{entry}{Dependence}
+	chebyseh.hh, Collinear\_Gluon~(\ref{CollinearGluon})
+\end{entry}
+\subsubsection{\texttt{class} Interpolate\_Collinear\_Gluon}
+No longer supported.
+
+\section{r-formula.hh}
+\subsection{Sigma}\label{Sigma}
+\begin{entry}{Description}
+	$\sigma_{\mathrm{dipole}}(x,r)$.
+\end{entry}
+\begin{entry}{Constructor}
+	controlled by macro \texttt{MODEL}\\
+	if MODEL == 1 (BGK)\\
+		Sigma$<$cg$>$()\\
+		where cg = is appropriate collinear gluon\\
+		Collinear\_Gluon~(\ref{CollinearGluon}), Chebyshev\_Collinear\_Gluon~(\ref{ChebyshevCollinearGluon}),  Chebyshev1D\_Collinear\_Gluon~(\ref{Chebyshev1DCollinearGluon})
+	else \\
+		Sigma()\\
+\end{entry}
+\begin{entry}{Initialization}
+	init(\textbf{const double *const }parameters)\\
+	parameter array "parameters". see also Parameters.hh~(\ref{Parameters.hh}).\\
+
+	set\_x(x)\\
+	run cg.set\_x(x) for approx.ed collinear gluons (\texttt{SIGMA\_APPROX}$<$0).
+	note, for \texttt{FREEZE\_QS2}$!=$0, set\_x($x$) will modify $x$ accordingly at this point and pass it to collinear gluon.
+\end{entry}
+\begin{entry}{Main function}
+	\textbf{operator}()(x,r)\\
+	computes $\sigma_{\mathrm{dipole}}(x,r)$.
+\end{entry}
+\section{Interpolation-dipole.hh}\label{Interpolationdipole}
+
+\subsection{Laplacian\_Sigma}\label{LaplacianSigma}
+\begin{entry}{Description}
+	Approximates $\sigma_{\mathrm{dipole}}(x,r)$ at given $x$ with cubic spline. 
+	return value is controlled by macros and most importantly returns $rJ_0(rk)\nabla^2_r \sigma$ or $rkJ_1(rk)\frac{\partial \sigma}{\partial r}$.
+	Essentially a class to compute integrand for the Hankel transform;
+	\begin{equation}
+		\int^{r_{\mathrm{max}}}_{r_{\mathrm{min}}} dr r J_0(rk)\nabla^2_{r}\sigma_{\mathrm{dipole}}(x,r)
+	\end{equation}
+\end{entry}
+\begin{entry}{Constructor}
+	Laplacian\_Sigma$<$sigma$>$(sigma)
+	where sigma is the dipole cross section (\ref{Sigma})
+\end{entry}
+\begin{entry}{Initialization}
+	init(int N,const double * parameters, char mode)\\
+	\texttt{N} is the number of points to be taken for the 1D grid. (for cubic spline, it should be around 500?)
+	\texttt{parameters} is 1d array containing parameters for $\sigma$. \texttt{mode} is `l' or `s'.  (`l' stands for laplacian, and `s' for sigma (for when laplacian can be computed analytically )). \\
+	set\_x($x$) will set $x$ in the components ($\sigma$, $xg$ etc.) and compute 1D grid of dipole cross section.
+\end{entry}
+\begin{entry}{Main function}
+	\textbf{operator}()(\textbf{double} $\rho$, \textbf{std::vector$<$double$>$} arg)\\
+	$\rho$ is $r$ or $\frac{r}{1+r}$, use macro \texttt{R\_CHANGE\_VAR}.
+	arg = \{$k_t^2$,$x$\} 
+\end{entry}
+\begin{entry}{macro \texttt{IBP}}
+	Use \texttt{IBP} = 0,1,2 to control which of the following integrand you want; 
+	\begin{align}
+		\int^{r_{\mathrm{max}}}_{r_{\mathrm{min}}} dr r J_0(rk)\nabla^2_{r}\sigma_{\mathrm{dipole}}(x,r)\\
+		\left[ r J_0(rk)\frac{\partial\sigma_{\mathrm{dipole}}(x,r)}{\partial r}\right]^{r_{\mathrm{max}}}_{r_{\mathrm{min}}}
+		+k\int^{r_{\mathrm{max}}}_{r_{\mathrm{min}}} dr r J_1(rk)\frac{\partial\sigma_{\mathrm{dipole}}(x,r)}{\partial r}\\
+			\left[ r J_0(rk)\frac{\partial\sigma_{\mathrm{dipole}}(x,r)}{\partial r}+
+			rk J_1(rk)\sigma_{\mathrm{dipole}}(x,r)
+			 \right]^{r_{\mathrm{max}}}_{r_{\mathrm{min}}}
+			-k^2\int^{r_{\mathrm{max}}}_{r_{\mathrm{min}}} dr r J_0(rk)\sigma_{\mathrm{dipole}}(x,r)
+	\end{align}
+	use constant(double $r$, std::vector$<$double$>$ arg ) for the first term, arg is the same but $r$ is $r_{\mathrm{max}}$ or $r_{\mathrm{min}}$ (it is $r$ not $\rho$!!). 
+	also \texttt{NS}=1 will insert $\exp(-r^2/500)$ in the both first and second term, to suppress large $r$. 
+	for \texttt{NS}=2 exists (not well maintained), which is  equivalent to inserting that exponent in the integral before IBP.
+	\texttt{ADD\_END} will add or ignore $[...]^{r_{\mathrm{max}}}_{r_{\mathrm{min}}}$
+\end{entry}
+\subsection{\texttt{class} Gluon\_Integrand}\label{GluonIntegrand}
+\begin{entry}{Description}
+This usage is almost the same as Laplacian\_Sigma (\ref{LaplacianSigma}). 
+This does not involve with interpolation at dipole cross section level. Recommended to use at leaset Chebyshev approximation of $xg(x,Q^2)$.
+\end{entry}
+\begin{entry}{Constructor}
+ Gluon\_Integrand$<$sigma$>$(sigma)
+	where sigma is the dipole cross section (\ref{Sigma})
+\end{entry}
+\begin{entry}{Initialization}
+	init(const double* parameters, char mode)\\
+	\texttt{parameters} is 1d array containing parameters for $\sigma$. \texttt{mode} is `l' or `s'.  (`l' stands for laplacian, and `s' for sigma (for when laplacian can be computed analytically )). \\
+	set\_x($x$) will set $x$ in the components ($\sigma$, $xg$ etc.).
+\end{entry}
+\begin{entry}{Main function}
+	\textbf{operator}()(const double $\rho$, const std::vector$<$double$>$ par) and 
+	constant(const double $\rho$, const std::vector$<$double$>$ par)
+	are same as Laplacian\_Sigma (\ref{LaplacianSigma}).
+\end{entry}
+
+\subsubsection{\texttt{class} Chebyshev\_Laplacian\_Sigma}
+Under construction...
+
+
+\section{dipole-gluon.hh}
+\subsection{\texttt{class} Gluon\_GBW}
+\begin{entry}{Description}
+	Analytic form of GBW dipole gluon density.	
+\end{entry}
+\begin{entry}{Constructor}
+	Gluon\_GBW()
+\end{entry}
+\begin{entry}{Initialization}
+	init(cont double* parameters).
+	parameters are the same as those for Sigma (\ref{Sigma}).
+\end{entry}
+\begin{entry}{Main function}
+	\textbf{operator}()($x$,$k_t^2$,$\mu$) 
+	compute $\alpha_s\mathcal{F}$. 
+	use macro \texttt{ALPHA\_RUN}=1 to use $\alpha_s(\mu^2)$
+\end{entry}
+\subsection{\texttt{class} Dipole\_Gluon}\label{DipoleGluon}
+\begin{entry}{Description}
+	compute $\alpha_s\mathcal{F}$.
+\end{entry}
+
+\begin{entry}{Constructor}
+	Dipole\_Gluon$<$integ$>$(integ).
+	for integ  is appropriate integrand (Laplacian\_Sigma~\ref{LaplacianSigma}, Gluon\_Integrand~\ref{GluonIntegrand} etc)
+\end{entry}
+
+\begin{entry}{Initialization}
+	init(double * parameters)\\
+	set\_x(double $x$) 
+\end{entry}
+\begin{entry}{Main function}
+	\textbf{operator}()($x$,$k_t^2$,$\mu$) 
+	compute $\alpha_s\mathcal{F}$. 
+	use macro \texttt{ALPHA\_RUN}=1 to use $\alpha_s(\mu^2)$
+	note Threshold supression $(1-x)^7$ is not added here but already at the point of integrand (e.g. \ref{LaplacianSigma}). 
+\end{entry}
+
+
+\section{Interpolation-gluon.hh}
+\subsection{\texttt{class} Approx\_aF}
+\begin{entry}{Description}
+	Produce grid of $\alpha_s\mathcal{F}(x,k_t^2,0)$.
+\end{entry}
+\begin{entry}{Constructor}
+	Approx\_aF$<$gluon$>$(gluon). where gluon is appropriate gluon to approximated, e.g.~\ref{DipoleGluon}
+\end{entry}
+\begin{entry}{Initialization}
+	init(int n1,int n2, double * parameters).
+	n1 number of points for $x$
+	n2 number of points for $k_t$.
+	parameters to be passed down to $\sigma$.\\
+	set\_max(double $k^2_{t,\mathrm{max}}$)	may be replaced in the future. 
+	It will generate the grid for predefined limits $-8<\log_{10}(x)<0$, $10^{-6}<k_t^2$ and $k_t^2< k^2_{t,\mathrm{max}}$. 
+	In reality the grid is a little wider than specified limits.
+\end{entry}
+\begin{entry}{Main function}
+	\textbf{operator}()(double $x$,double $k^2$, double $\mu^2$)
+	computes $\alpha_s\mathcal{F}$
+\end{entry}
+
+
+\end{document}

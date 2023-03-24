@@ -13,7 +13,7 @@
 // ///////////////////////////////////////////////////// 
 
 //template<typename T, typename T2>double deriv(T & func,T2 par,double x,double h,int i) {
-template<typename T>double deriv5(T & func,double y, double x,double h,int i) {
+template<typename T>double deriv(T & func,double y, double x,double h,int i) {
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	//take ith numerical derivative with step h wrt the second argument "x" while the first arg 'y' is fixed 
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ template<typename T>double deriv5(T & func,double y, double x,double h,int i) {
 	val*=pow(h,-i);
 	return(val);	
 }
-template<typename T>double deriv(T & func,double y, double x,double h,int i) {
+template<typename T>double deriv2(T & func,double y, double x,double h,int i) {
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	//take ith numerical derivative with step h wrt the second argument "x" while the first arg 'y' is fixed 
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ template <typename Sig>  class Laplacian_Sigma{
 			free_approx();
 		}
 		//double max=R_MAX, min=R_MIN;
-		inline int set_kinem(const double& x){
+		inline int set_x(const double& x){
 			fixx=&x;
 			sigma->set_x(x);
 			approximate(x);
@@ -390,7 +390,7 @@ template <typename Sig>  class Chebyshev_Laplacian_Sigma{
 		}
 		~Chebyshev_Laplacian_Sigma(){
 		}
-		inline int set_kinem(const double & x){
+		inline int set_x(const double & x){
 			fixx=&x;
 			sigma->set_x(x);
 			approximate(x);
@@ -511,7 +511,7 @@ template <typename Sig> class Gluon_Integrand{
 			this->mode=mode;
 			//sigma->init(par);
 		}
-		inline int set_kinem(const double &x){
+		inline int set_x(const double &x){
 			sigma->set_x(x);
 			fixx=&x;
 			return 0;

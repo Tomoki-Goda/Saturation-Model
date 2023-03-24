@@ -15,7 +15,7 @@ template<typename GLU >class Approx_aF{
 		double *kt2_array=NULL,*x_array=NULL,*aF_array=NULL;
 		double mu02=0;
 		double sigma_0=0;
-		double kt2min=1.0e-15,kt2max=-1;
+		double kt2min=1.0e-6,kt2max=-1;
 		
 		int alloc_flag=0;
 		

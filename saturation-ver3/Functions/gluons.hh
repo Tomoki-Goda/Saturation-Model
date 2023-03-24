@@ -142,7 +142,8 @@ class Chebyshev_Collinear_Gluon{
 	  	cheby cheb[2];
 		double A_g=0,l_g=0;
 		double xmin,xmax,q2min,q2max;
-		const double *fixx;
+		const double *fixx=NULL;
+		
 	public:
 		Chebyshev_Collinear_Gluon(){
 			const unsigned deg[]={N_CHEB,N_CHEB};
@@ -170,7 +171,9 @@ class Chebyshev_Collinear_Gluon{
 		}
 		void set_x(const double &x){
 		 	fixx=&x;
-			chebyshev_reduce(cheb[0], cheb[1],change_var_compactify_log(xmin,xmax,x ), 0 );
+		 	if(x>0){
+				chebyshev_reduce(cheb[0], cheb[1],change_var_compactify_log(xmin,xmax,x ), 0 );
+			}
 		}
 		double operator()(const double x,const double Q2){
 			
@@ -187,27 +190,27 @@ class Chebyshev_Collinear_Gluon{
 				printf("Q2 too small: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
 			}
 			double res;
-#if GLUON_APPROX!=0	///////////////////////////////////////////////////////////////////		
+///////////////////////////////////////////////////////////////////////////////////////////		
 // This block should be removed if x varies often.
 // Only useful if x is fixed and Q changes rapidly.
 ///////////////////////////////////////////////////////////////////////////////////////////
-			if(x!=*fixx){
-				printf("Chebyshev1D_Collinear_Gluon:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
-			}
-			double arg[]={
-				change_var_compactify_log(q2min,q2max,Q2 )
-			};
-			res=chebyshev(cheb[1],arg);
-		
-#else
-			double arg[]={
-				change_var_compactify_log(xmin,xmax,x ),
-				change_var_compactify_log(q2min,q2max,Q2 )
-			};
-			res=chebyshev(cheb[0],arg);
-#endif
-			return(res);
+			if(fixx!=NULL&&*fixx>0){
+				if(x!=*fixx){
+					printf("Chebyshev1D_Collinear_Gluon:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
+				}
+				double arg[]={
+						change_var_compactify_log(q2min,q2max,Q2 )
+				};
+				res=chebyshev(cheb[1],arg);
 			
+			}else{
+				double arg[]={
+					change_var_compactify_log(xmin,xmax,x ),
+					change_var_compactify_log(q2min,q2max,Q2 )
+				};
+				res=chebyshev(cheb[0],arg);
+			}	
+				return(res);
 		}
 };
 class Chebyshev1D_Collinear_Gluon{

@@ -56,9 +56,9 @@ template<typename GLU >class Approx_aF{
 			for (int j = 0; j < x_npts; ++j){
 				double x=pow(10,-8+8*((double)j)/(x_npts-1));
 				x_array[j] = x;
-#if SIGMA_APPROX==-2||SIGMA_APPROX==1
+//#if SIGMA_APPROX==-2||SIGMA_APPROX==1
 				aF->set_x(x);	
-#endif
+///#endif
 				
 #pragma omp parallel 
 {

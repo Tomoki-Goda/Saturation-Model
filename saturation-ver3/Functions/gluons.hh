@@ -140,21 +140,14 @@ class Chebyshev_Collinear_Gluon{
 	private:
 		Collinear_Gluon xg;
 	  	cheby cheb[2];
-	  	
 		double A_g=0,l_g=0;
-		//int xlen=150,q2len=150;
-		//double *xarr=NULL,*q2arr=NULL,*xgarr=NULL;
 		double xmin,xmax,q2min,q2max;
-		
-		double x;
-		
+		const double *fixx;
 	public:
 		Chebyshev_Collinear_Gluon(){
-			//printf("PrepareChebyshev\n");
 			const unsigned deg[]={N_CHEB,N_CHEB};
 			cheb[0]=PrepareChebyshev(deg,2);
 			cheb[1]=PrepareChebyshev(deg[1],1);
-			//printf("PrepareChebyshev End\n");
 		}
 		~Chebyshev_Collinear_Gluon(){
 			FreeChebyshev(cheb[0]);
@@ -165,7 +158,6 @@ class Chebyshev_Collinear_Gluon{
 			double q2=change_var_revert_log(q2min,q2max, arg[1]);//q2min*pow(q2max/q2min,arg[1]);
 			return( xg(x,q2,A_g,l_g) );	
 		}
-		
 		int init(double xmin,double xmax,double q2min, double q2max, double A_g,double l_g ){
 			this->xmin=xmin;
 			this->xmax=xmax;
@@ -173,16 +165,13 @@ class Chebyshev_Collinear_Gluon{
 			this->q2max=q2max;
 			this->A_g=A_g;
 			this->l_g=l_g;
-			//printf("Chebyshev\n");
-			cheb_coeff<Chebyshev_Collinear_Gluon,const Collinear_Gluon>(cheb[0],*this,xg);
-			//printf("Chebyshev done\n");
+			cheb_coeff<Chebyshev_Collinear_Gluon,const Collinear_Gluon&>(cheb[0],*this,xg);
 			return 0;
 		}
-		
-		void set_x(double x){
+		void set_x(const double &x){
+		 	fixx=&x;
 			chebyshev_reduce(cheb[0], cheb[1],change_var_compactify_log(xmin,xmax,x ), 0 );
 		}
-		
 		double operator()(const double x,const double Q2){
 			
 			if(x>xmax){
@@ -202,25 +191,14 @@ class Chebyshev_Collinear_Gluon{
 // This block should be removed if x varies often.
 // Only useful if x is fixed and Q changes rapidly.
 ///////////////////////////////////////////////////////////////////////////////////////////
-			if(this->x!=x){
-				set_x(x);
-				this->x=x;	
+			if(x!=*fixx){
+				printf("Chebyshev1D_Collinear_Gluon:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
 			}
 			double arg[]={
 				change_var_compactify_log(q2min,q2max,Q2 )
 			};
 			res=chebyshev(cheb[1],arg);
-/*				
-			double arg2[]={
-				change_var_compactify_log(xmin,xmax,x ),
-				change_var_compactify_log(q2min,q2max,Q2 )
-			};
-			double res2=chebyshev(cheb[0],arg2);
-			if(fabs((res-res2)/(res+res2))>1.0e-10&&fabs((res-res2))>1.0e-12){
-				printf("%.3e %.3e diff =%.3e\n",res,res2,res-res2);
-			}
-
-*/			
+		
 #else
 			double arg[]={
 				change_var_compactify_log(xmin,xmax,x ),
@@ -236,27 +214,22 @@ class Chebyshev1D_Collinear_Gluon{
 	private:
 		Collinear_Gluon xg;
 	  	cheby cheb[1];
-	  	
 		double A_g=0,l_g=0;
-		//int xlen=150,q2len=150;
-		//double *xarr=NULL,*q2arr=NULL,*xgarr=NULL;
 		double xmin,xmax,q2min,q2max;
-		
-		double x;
+		const double *fixx;
 		
 	public:
 		Chebyshev1D_Collinear_Gluon(){
-			//printf("PrepareChebyshev\n");
 			const unsigned deg[]={N_CHEB};
 			cheb[0]=PrepareChebyshev(deg,1);
-			//printf("PrepareChebyshev End\n");
 		}
 		~Chebyshev1D_Collinear_Gluon(){
 			FreeChebyshev(cheb[0]);
 		}
 		double operator()(double *arg,const Collinear_Gluon& xg)const{
 			double q2=change_var_revert_log(q2min,q2max, arg[0]);//q2min*pow(q2max/q2min,arg[1]);
-			return( xg(x,q2,A_g,l_g) );	
+
+			return( xg(*fixx,q2,A_g,l_g) );	
 		}
 		
 		int init(double xmin,double xmax,double q2min, double q2max, double A_g,double l_g ){
@@ -266,21 +239,17 @@ class Chebyshev1D_Collinear_Gluon{
 			this->q2max=q2max;
 			this->A_g=A_g;
 			this->l_g=l_g;
-			//printf("Chebyshev\n");
-			
-			//printf("Chebyshev done\n");
 			return 0;
 		}
-		
-		void set_x(double x){
-			this->x=x;
-			//printf("Chebyshev\n");
-			cheb_coeff<Chebyshev1D_Collinear_Gluon,const Collinear_Gluon>(cheb[0],*this,xg);
-			//printf("Chebyshev done\n");
+		void set_x(const double &x){
+			fixx=&x;
+			cheb_coeff<Chebyshev1D_Collinear_Gluon,const Collinear_Gluon&>(cheb[0],*this,xg);
 		}
 		
 		double operator()(const double x,const double Q2){
-			
+			if(x!=*fixx){
+				printf("Chebyshev1D_Collinear_Gluon:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
+			}
 			if(x>xmax){
 				printf("x too large: %.3e < %.3e < %.3e\n",xmin,x,xmax );
 			}
@@ -294,18 +263,11 @@ class Chebyshev1D_Collinear_Gluon{
 				printf("Q2 too small: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
 			}
 			double res;
-
-			if(this->x!=x){
-				set_x(x);
-				this->x=x;	
-			}
 			double arg[]={
 				change_var_compactify_log(q2min,q2max,Q2 )
 			};
 			res=chebyshev(cheb[0],arg);
-
 			return(res);
-			
 		}
 };
 
@@ -320,11 +282,7 @@ class Interpolate_Collinear_Gluon{
 		double *xarr=NULL,*q2arr=NULL,*xgarr=NULL;
 		double xmin,xmax,q2min,q2max;
 	public:
-		//explicit Interpolate_Collinear_Gluon(int xlen,int q2len){
 		explicit Interpolate_Collinear_Gluon(){
-			//this->q2len=q2len;
-			//this->xlen=xlen;
-
 			xarr=(double*)malloc(xlen*sizeof(double));
 			q2arr=(double*)malloc(q2len*sizeof(double));
 			xgarr=(double*)malloc(xlen*q2len*sizeof(double));
@@ -341,8 +299,6 @@ class Interpolate_Collinear_Gluon{
 			free(xgarr);
 		}
 		int init(double xmin,double xmax,double q2min, double q2max, double A_g,double l_g ){
-			//this->A_g=A_g;
-			//this->l_g=l_g;
 #pragma omp parallel
 {
 //			double x,q2;

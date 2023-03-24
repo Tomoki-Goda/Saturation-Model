@@ -123,38 +123,46 @@ void chebyshevT(double x,unsigned degree, double * T ){
 void chebyshevT(double x,unsigned degree, double * T ){
 //iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
 //with kahn algorithm
-	*(T)=1;
-	*(T+1)=x;
-	double t, c, t0, t1;
-
-	/*for(unsigned i=2;i<(degree);i++){
-		t1=2*x*(*(T+i-1));
-		t0=-(*(T+i-2));
-
-		t=t1+t0;
-		if(fabs(t1)>fabs(t0)){
-			c=(t1-t)+t0;
-		}else{
-			c=(t0-t)+t1;
-		}
-		if(fabs(c)>1.0e-10){
-			printf("accum= %.3e %.3e \n",c,t);
-		}
-		*(T+i)=t+c;
-	}*/
+	T[0]=1;
+	T[1]=x;
+	Kahn accum[3]={Kahn_init(2),Kahn_init(2),Kahn_init(2)};
+	//double t, c, t0, t1;
+	accum[0]+=T[0];
+	accum[1]+=T[1];
+	
 	for(unsigned i=2;i<(degree);i++){
-		*(T+i)=cos(i*acos(x));
+		Kahn_clear(accum[i-3*(i/3)]);
+		accum[i-3*(i/3)]+=accum[i-1-3*((i-1)/3)];
+		accum[i-3*(i/3)]*=2*x;
+		accum[i-3*(i/3)]-=accum[i-2-3*((i-2)/3)];
+		T[i]=Kahn_total(accum[i-3*(i/3)]);
+		//T[i]=cos(i*acos(x));
 	}
+	for(int i=0;i<3;++i){
+		Kahn_free(accum[i]);
+	}
+	/*for(unsigned i=2;i<(degree);i++){
+		*(T+i)=cos(i*acos(x));
+	}*/
 }
 void chebyshevU(double x,unsigned degree, double * U ){
 //iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
 //with kahn algorithm
-	*(U)=1;
-	*(U+1)=2*x;
-	double t, c, t0, t1;
+	U[0]=1;
+	U[1]=2*x;
+	Kahn accum[3]={Kahn_init(2),Kahn_init(2),Kahn_init(2)};
+	//double t, c, t0, t1;
+	accum[0]+=U[0];
+	accum[1]+=U[1];
+	//double t, c, t0, t1;
 
 	for(unsigned i=2;i<(degree);i++){
-		t1=2*x*(*(U+i-1));
+		Kahn_clear(accum[i-3*(i/3)]);
+		accum[i-3*(i/3)]+=accum[i-1-3*((i-1)/3)];
+		accum[i-3*(i/3)]*=2*x;
+		accum[i-3*(i/3)]-=accum[i-2-3*((i-2)/3)];
+		U[i]=Kahn_total(accum[i-3*(i/3)]);
+		/*t1=2*x*(*(U+i-1));
 		t0=-(*(U+i-2));
 
 		t=t1+t0;
@@ -166,7 +174,11 @@ void chebyshevU(double x,unsigned degree, double * U ){
 		if(fabs(c)>1.0e-10){
 			printf("accum= %.3e %.3e \n",c,t);
 		}
-		*(U+i)=t+c;
+		*(U+i)=t+c;*/
+		
+	}
+	for(int i=0;i<3;++i){
+		Kahn_free(accum[i]);
 	}
 }
 
@@ -199,7 +211,7 @@ inline int kronecker(int i,int j){
 	return( ( (i==j)?1:0)  );
 } 
 
-template<typename T, typename T2>void sample(T & func, T2& par,  const unsigned * degree, const unsigned dim,  double* sample_arr){
+template<typename T, typename T2>void sample(T & func, T2 par,  const unsigned * degree, const unsigned dim,  double* sample_arr){
 ///////////////////precompute the function. i.e make the function descrete. /////////////////////////
 // degree is a list of how many term you want to go in each variable. dim is dimension( no. of variables). 
 //then sample_arr should have length = prod( degree[i] ).
@@ -245,7 +257,7 @@ double cheb_c_summand(const double * sample_arr,const unsigned* ind1, const unsi
 	double cosarg; 
 	double val;
 	
-	for(unsigned i=0;i<dim;i++){
+	for(unsigned i=0;i<dim;++i){
 		cosarg=PI*(ind2[i]+0.5)/( degree[i] );
 		factor*=cos(ind1[i] * cosarg );
 	}
@@ -332,7 +344,7 @@ int FreeChebyshev(cheby & cont){
 	return 0;
 }
 
-template<typename T, typename T2>void cheb_coeff(cheby & data, T& func, T2& par ){
+template<typename T, typename T2>void cheb_coeff(cheby & data, T& func, T2 par ){
 	unsigned ind1[data.dim];//={0};
 	unsigned len=1;
 	
@@ -358,70 +370,12 @@ template<typename T, typename T2>void cheb_coeff(cheby & data, T& func, T2& par 
 //////////////////////////////////// approximate function ////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double chebyshev(const cheby & data, const double* args ){
-	
-	const unsigned* degree=data.degree;
-	const unsigned& dim=data.dim;
-	const double *coeff=data.coeff;
-	
-	unsigned ind1[dim];
-	unsigned len=1;
-	unsigned lenT=0;
-	double res=0;
-	double val;
-	
-	
-	//double *Tlist[dim];
-	
-	for(unsigned i=0;i<dim;i++){
-		len*=degree[i] ;
-		lenT+=degree[i] ;
-		*(ind1+i)=0;//initialize indices
-	}
-	//evaluate chebyshev polynomials Ti(x)
-	double Tlist[lenT];
-	unsigned posit[10]={0};//max dim=10. This is a list containing where the index move to the next dimension.
-	
-	for(unsigned i=0;i<dim;i++){
-		
-		if(args[i]>1) {
-			printf("chebyshev:: arg too large %f at position %d\n",args[i], i);			
-		}
-		if(args[i]<-1) {
-			printf("chebyshev:: arg too small %f at position %d\n",args[i], i);			
-		}
-		//if(data.accel[i]!=args[i]){
-			chebyshevT(args[i], degree[i], Tlist+*(posit+i)); 
-			*(posit+i+1)=(*(posit+i)+(*(degree+i)) );
-		//}
-		//printf("%d/%d\n",*(posit+i+1),len);
-	}//Now Tlist is a concatenated list of T 
-	double arr[len];
-	for(unsigned j=0;j<len; j++ ){
-		//posit=0;//position to start counting in tlist since its joined list.
-		val=1;
-		for(unsigned i=0;i<dim;i++){
-			val *=( ((double)(2-kronecker(ind1[i],0)) )/2);
-			val *=Tlist[posit[i]+ind1[i]];
-		}
-		val*=(*(coeff+j));
-		
-		//res+=val;
-		arr[j]=val;	
-		ind_vec_increment(ind1,degree,dim);
-	}
-	res=Kahn_list_sum(arr,len);
-	for(unsigned i=0;i<dim;i++){
-		res*=(2.0/degree[i]);	
-	}
-	return res;
-}
 int chebyshev_reduce(const cheby & data,cheby & newcheb, const double arg,const int redpos ){
 	unsigned ind1[data.dim];
 	unsigned ind2[data.dim-1];
 	unsigned newdeg[data.dim-1];
 	int j=0;
-	for(unsigned i=0;i<data.dim;i++){
+	for(unsigned i=0;i<data.dim;++i){
 		ind1[i]=0;//initialize indices
 		if(i!=redpos){
 			ind2[j]=0;
@@ -437,8 +391,8 @@ int chebyshev_reduce(const cheby & data,cheby & newcheb, const double arg,const 
 	// Contract c[i,j,...] T[j](x)
 	////////////////////////////////
 	//double new[new.len]
-	Kahn sum=Kahn_init(3);
-	for(unsigned j=0;j<newcheb.len; j++ ){
+	Kahn sum=Kahn_init(2);
+	for(unsigned j=0;j<newcheb.len; ++j){
 		int k=0;
 		for(int i=0;i<data.dim;++i){
 			(i==redpos)?(ind1[i]=0):(ind1[i]=ind2[k++]);
@@ -455,13 +409,123 @@ int chebyshev_reduce(const cheby & data,cheby & newcheb, const double arg,const 
 		
 		ind_vec_increment(ind2,newcheb.degree,newcheb.dim);		
 	}
+	Kahn_free(sum);
 	return 0;
+}
+
+
+double chebyshev(const cheby & data, const double* args ){
+	
+	const unsigned* degree=data.degree;
+	const unsigned dim=data.dim;
+	const double *coeff=data.coeff;
+	const int len=data.len; 
+	unsigned ind1[dim];
+	unsigned lenT=0;
+	double res=0;
+	double val;
+	for(unsigned i=0;i<dim;++i){
+		lenT+=degree[i] ;
+		ind1[i]=0;//initialize indices
+	}
+	double Tlist[lenT];
+	unsigned posit[10]={0};//max dim=10. This is a list containing where the index move to the next dimension.
+/////////////////////Prepare T ////////////////////////////	
+	for(unsigned i=0;i<dim;++i){
+		if(args[i]>1||args[i]<-1) {
+			printf("chebyshev:: arg out of range. %f at position %d\n",args[i], i);			
+		}
+		chebyshevT(args[i], degree[i], Tlist+posit[i]); 
+		posit[i+1]=posit[i]+degree[i] ;
+	}//Now Tlist is a concatenated list of T 
+	//double arr[len];
+	Kahn sum=Kahn_init(2);
+///////////////////Compute//////////////////////////////
+	for(unsigned j=0;j<len; ++j ){
+		//posit=0;//position to start counting in tlist since its joined list.
+		val=1;
+		for(unsigned i=0;i<dim;++i){
+			//val *=( ((double)(2-kronecker(ind1[i],0)) )/2);
+			val *=((ind1[i]==0)?(0.5):(1))*Tlist[posit[i]+ind1[i]];
+		}
+		val*=coeff[j];
+		sum+=val;	
+		ind_vec_increment(ind1,degree,dim);
+	}
+///////////////////Sum///////////////////////////////
+	res=Kahn_total(sum);//Kahn_list_sum(arr,len);
+	for(unsigned i=0;i<dim;++i){
+		res*=(2.0/degree[i]);	
+	}
+	Kahn_free(sum);
+	return res;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////// derivative  /////////////////////////////////////////////////////////
 ///////////////////// del is a list n th derivative for args. [1,0,0] for first derivative wrt first arg of three arguments //////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double d_chebyshev(const unsigned *degree,unsigned dim,const double* coeff , double* args, int* del ){
+double d_chebyshev(const cheby & data, const double* args, int* del  ){
+	const int len=data.len; 
+	const unsigned* degree=data.degree;
+	const unsigned& dim=data.dim;
+	const double *coeff=data.coeff;
+	
+	unsigned ind1[dim];
+	unsigned lenT=0;
+	double res=0;
+	double val;
+	for(unsigned i=0;i<dim;i++){
+		lenT+=degree[i] ;
+		ind1[i]=0;//initialize indices
+	}
+	double Tlist[lenT];
+	unsigned posit[10]={0};//max dim=10. This is a list containing where the index move to the next dimension.
+/////////////////////Prepare T ////////////////////////////	
+	for(unsigned i=0;i<dim;i++){
+		if(args[i]>1||args[i]<-1) {
+			printf("chebyshev:: arg out of range. %f at position %d\n",args[i], i);			
+		}
+		if(del[i]==2){
+			chebyshev_2(args[i],degree[i],Tlist+posit[i]);
+		}else if(del[i]==1){
+			chebyshev_1(args[i],degree[i],Tlist+posit[i]);
+		}else{
+			chebyshevT(args[i], degree[i],Tlist+posit[i]);
+		}
+		posit[i+1]=posit[i]+degree[i] ;
+	}//Now Tlist is a concatenated list of T 
+	Kahn sum=Kahn_init(2);
+///////////////////Compute//////////////////////////////
+	for(unsigned j=0;j<len; ++j ){
+		//posit=0;//position to start counting in tlist since its joined list.
+		val=1;
+		for(unsigned i=0;i<dim;++i){
+			val *=((ind1[i]==0)?(0.5):(1))*Tlist[posit[i]+ind1[i]];
+		}
+		val*=coeff[j];
+		sum+=val;	
+		ind_vec_increment(ind1,degree,dim);
+	}
+///////////////////Sum///////////////////////////////
+	res=Kahn_total(sum);
+	//res=Kahn_list_sum(arr,len);
+	for(unsigned i=0;i<dim;i++){
+		res*=(2.0/degree[i]);	
+	}
+	Kahn_free(sum);
+	return res;
+}
+inline double d_chebyshev(const cheby & data, const double* args, int ord,int pos ){
+	int del[5]={0};
+	del[pos]=ord;
+	return (d_chebyshev(data, args,del));
+}
+/*
+double d_chebyshev(const cheby & data, const double* args, int* del  ){
+	
+	const unsigned* degree=data.degree;
+	const unsigned& dim=data.dim;
+	const double *coeff=data.coeff;
 	
 	unsigned ind1[dim];
 	unsigned len=1;
@@ -472,7 +536,7 @@ double d_chebyshev(const unsigned *degree,unsigned dim,const double* coeff , dou
 	//double *Tlist[dim];
 	
 	for(unsigned i=0;i<dim;i++){
-		len*=degree[i] ;
+		//len*=degree[i] ;
 		lenT+=degree[i] ;
 		*(ind1+i)=0;//initialize indices
 	}
@@ -524,4 +588,4 @@ double d_chebyshev(const unsigned *degree,unsigned dim,const double* coeff , dou
 	}
 	return res;
 }
-
+*/

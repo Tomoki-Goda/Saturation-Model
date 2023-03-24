@@ -19,12 +19,10 @@ class Sigma{
 		//Collinear_Gluon xgpdf;
 #if MODEL==1
 		ColG xgpdf;
+		double x2;
 #endif
-		//double x=0;
 		double sigma_0,lambda, x_0, A_g,lambda_g,C,mu02,mu102,thresh_power;
 		const double *par;
-		
-		//double Qs2(const double x,const double r,const double (&sigpar)[])const{
 		inline double alpha(double mu2 ){
 			static double b0= ((double)(33 -2*NF))/(12*PI);
 			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
@@ -73,24 +71,28 @@ class Sigma{
 #endif	//MODEL	
 			return qs2;		
 		}
-		
-		
 	public:
 		Sigma& operator=(const Sigma& rhs){
-		//	x=rhs.x;
 			init(rhs.par);
 			return *this;
 		} 
-		//explicit Sigma(const Sigma& rhs){
-			//xgpdf=rhs.xgpdf;
-		//	x=rhs.x;
-		//	init(rhs.par);
-		//}
 		explicit Sigma(void){ 
 		}
 		~Sigma(){
 		}
-		
+		void set_x(const double &x){
+
+#if FREEZE_QS2==1
+			x2=0.5*x/(0.5*(1-x)+x);
+#elif FREEZE_QS2==0
+			x2=x;
+#elif FREEZE_QS2==2
+			x2=((x>0.5)?0.5:x);
+#endif
+#if SIGMA_APPROX<0
+			xgpdf.set_x(x2);
+#endif
+		}
 		void init(const double * const &sigpar){
 			par=sigpar;
 			int i=0;
@@ -127,17 +129,16 @@ class Sigma{
 		//	return ((*this)(r,this->x));
 		//}
 		double operator()(const double x, const double r) {//,const double Q2,const double*sigpar)const {
-			//static double x0=0;
-			
-#if FREEZE_QS2==1
+#if FREEZE_QS2==1 ////Beware this transformation is also required in set_x()!!!!
 			double x1=0.5*x/(0.5*(1-x)+x);
 #elif FREEZE_QS2==0
 			double x1=x;
 #elif FREEZE_QS2==2
 			double x1=((x>0.5)?0.5:x);
-#endif
-			
-			//const double sigma_0=sigpar[0];
+#endif///////////////////////////////////////////////////////////////////////////
+			if(x1!=x2){
+				printf("Sigma:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x1,x2, x1-x2);
+			}
 			double qs2=Qs2(x1,r);
 #if IBP==2
 			double val=-sigma_0*exp(-pow(r,2)*qs2/4);

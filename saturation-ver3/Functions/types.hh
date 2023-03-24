@@ -31,6 +31,7 @@
 #elif ((SIGMA_APPROX>0)||(SIGMA_APPROX<-1))
 	//typedef Gluon_Integrand<SIGMA> DSIGMA;
 	typedef Laplacian_Sigma<SIGMA> DSIGMA;
+	//typedef Chebyshev_Laplacian_Sigma<SIGMA> DSIGMA;
 #endif
 
 #if ((GLUON_APPROX==0)&&(MODEL==0))

@@ -69,6 +69,9 @@ class Sigma{
 #endif
 
 #endif	//MODEL	
+#if ADJOINT==1	
+			qs2*=9.0/4.0;
+#endif
 			return qs2;		
 		}
 	public:
@@ -89,7 +92,6 @@ class Sigma{
 #elif FREEZE_QS2==2
 			x2=((x>0.5)?0.5:x);
 #endif
-
 			xgpdf.set_x(x2);
 #endif
 		}
@@ -136,9 +138,11 @@ class Sigma{
 #elif FREEZE_QS2==2
 			double x1=((x>0.5)?0.5:x);
 #endif///////////////////////////////////////////////////////////////////////////
+#if SIGMA_APPROX<0
 			if(x1!=x2){
 				printf("Sigma:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x1,x2, x1-x2);
 			}
+#endif
 			double qs2=Qs2(x1,r);
 #if IBP==2
 			double val=-sigma_0*exp(-pow(r,2)*qs2/4);

@@ -125,8 +125,15 @@ class Gluon_GBW{
 			return (sigma_0*val) ;
 		}
 };
-
-
+/*
+inline double min(double a,double b){
+	return((a>b)?(b):(a));
+}
+		
+inline double max(double a,double b){
+	return((a>b)?(b):(a));
+}
+*/
 /////////////////////////////////////////////////////////////////////
 //
 //Dipole gluon
@@ -186,13 +193,15 @@ template<typename INTEG>class Dipole_Gluon{
 
 			const double minmax=50;
 #if ADD_END>=0 //negative value is for testing purpose.
-			rmax=minmax;
+//			rmax=minmax;
 #if MODEL==1
-			rmax/=pow(1-x,4);
+			//rmax/=pow(1-x,4);
+			rmax=min(minmax/pow(1-x,4),R_MAX);
 #endif
-			if(rmax>R_MAX||!std::isfinite(rmax)){
-				rmax=R_MAX;
-			}
+			//if(rmax>R_MAX||!std::isfinite(rmax)){
+			//	rmax=R_MAX;
+			//}
+			
 			const double scale=(2*PI)/sqrt(kt2);
 			double imin=rmin;
 			int sectors=(int)(rmax/scale);
@@ -251,8 +260,12 @@ template<typename INTEG>class Dipole_Gluon{
 			if(!std::isfinite(val)){
 				val=0;
 			}
-			
-			return (3.0/(8*PI*PI)*val);
+#if WW==1
+			val*=2.0/(3.0*pow(PI,3));
+#else
+			val*=3.0/(8.0*pow(PI,2));
+#endif			
+			return (val);
 		}
 		
 		

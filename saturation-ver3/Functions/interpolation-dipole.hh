@@ -84,7 +84,13 @@ template<typename T>double deriv2(T & func,double y, double x,double h,int i) {
 	val*=pow(h,-i);
 	return(val);	
 }
-
+inline double min(double a,double b){
+	return((a>b)?(b):(a));
+}
+		
+inline double max(double a,double b){
+	return((a>b)?(b):(a));
+}
 
 //class Laplacian_Sigma;
 //typedef struct {int j; Laplacian_Sigma *ptr;} sigmaopt;
@@ -107,7 +113,7 @@ template <typename Sig>  class Laplacian_Sigma{
 		double sigma_0=0;
 		int alloc_flag=0;
 		double ns_pow=500;
-		
+		double rmax=R_MAX;
 		void free_approx(){
 			if(alloc_flag!=0){
 			gsl_spline_free (spline_ptr);
@@ -161,7 +167,17 @@ template <typename Sig>  class Laplacian_Sigma{
 			//test();
 			return(0);
 		}
-*/		int approximate(const double x){
+		
+*/		
+		
+		int approximate(const double x){
+			double r;
+			rmax=min(50/pow(1-x,4),R_MAX);
+			for (int j = 0; j < r_npts; j++){
+				r=((double)j)/(r_npts-1);
+				r=R_MIN*pow(2.0*rmax/R_MIN,r)/1.414;
+				r_array[j]=r;
+			}
 			
 #pragma omp parallel
 {
@@ -245,12 +261,12 @@ template <typename Sig>  class Laplacian_Sigma{
 			allocate(npts1);
 			//sigma.init(par);
 			
-			double r;
+			/*double r;
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
 				r=R_MIN*pow(2.0*R_MAX/R_MIN,r)/1.414;
 				r_array[j]=r;
-			}
+			}*/
 		}
 		double operator()(const double rho)const{
 			double var;
@@ -278,8 +294,8 @@ template <typename Sig>  class Laplacian_Sigma{
 #elif R_CHANGE_VAR==0
 			const double r =rho;
 #endif		
-			if(r>2*R_MAX){
-				printf("too large, out of range %.4e - %.4e = %.4e\n",R_MAX,r,R_MAX-r);
+			if(r>2*rmax){
+				printf("too large, out of range %.4e - %.4e = %.4e\n",rmax,r,rmax-r);
 			}
 			if(r<R_MIN/2){
 				printf("too small, out of range %.4e - %.4e = %.4e , rho=%.3e,%d\n",r,R_MIN,r-R_MIN,rho,R_CHANGE_VAR);
@@ -292,7 +308,7 @@ template <typename Sig>  class Laplacian_Sigma{
 
 //#if (LAPLACIAN==1||R_FORMULA==1)
 			switch(mode){
-				case 'l':
+				case 'l'://regular
 #if IBP==1
 					val=gsl_spline_eval_deriv(spline_ptr, r,r_accel_ptr);
 	#if NS==2
@@ -310,9 +326,13 @@ template <typename Sig>  class Laplacian_Sigma{
 					val*=r*std::cyl_bessel_j(0,r*kt);
 #endif			
 					break;
-				case 's':
+				case 's'://if grid is of laplacian sigma
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
 					val*=r*std::cyl_bessel_j(0,r*kt);
+					break;
+				case 'w'://for weizsacker-william 
+					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+					val*=std::cyl_bessel_j(0,r*kt)/r;
 					break;
 				default:
 					printf("unknown option in laplacian sigma\n");
@@ -454,6 +474,9 @@ template <typename Sig>  class Chebyshev_Laplacian_Sigma{
 					val=chebyshev(cheb[0],&rcheb);
 					val*=r*std::cyl_bessel_j(0,r*kt);
 					break;
+				case 'w'://for weizsacker-william 
+					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+					val*=std::cyl_bessel_j(0,r*kt)/r;
 				default:
 					printf("unknown option in laplacian sigma\n");
 			}

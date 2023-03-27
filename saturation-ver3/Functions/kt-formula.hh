@@ -45,7 +45,7 @@ template<typename TYPE > class Integrand_kt{
 	public:
 		double  x=0,Q2=0,mf2=0;
 		double  betamin=0,betamax=0, k2max=0,kappamax=0;
-		double 	k2min=1.0e-6;
+		double 	k2min=1.0e-8;
 		Integrand_kt& operator=(const Integrand_kt& rhs){
 			x=rhs.x;
 			Q2=rhs.Q2;

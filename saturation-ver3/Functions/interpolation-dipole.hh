@@ -107,6 +107,7 @@ template <typename Sig>  class Laplacian_Sigma{
 		double sigma_0=0;
 		int alloc_flag=0;
 		double ns_pow=500;
+		double rmax=R_MAX;
 		
 		void free_approx(){
 			if(alloc_flag!=0){
@@ -162,7 +163,23 @@ template <typename Sig>  class Laplacian_Sigma{
 			return(0);
 		}
 */		int approximate(const double x){
-			
+/*			double r;
+
+#if MODEL==1
+			rmax=R_MINMAX/pow(1-x,4);
+			if(rmax>R_MAX||!std::isfinite(rmax)){
+				rmax=R_MAX;
+			}
+#endif
+#if WW==0 		//for Weizsacker-Williams, upper lim of r should be determined by k not x.
+//see also init()
+			for (int j = 0; j < r_npts; j++){
+				r=((double)j)/(r_npts-1);
+				r=R_MIN*pow(2.0*rmax/R_MIN,r)/1.414;
+				r_array[j]=r;
+			}
+#endif
+	*/		
 #pragma omp parallel
 {
 #pragma omp for schedule(dynamic)
@@ -243,14 +260,14 @@ template <typename Sig>  class Laplacian_Sigma{
 				free_approx();
 			}
 			allocate(npts1);
-			//sigma.init(par);
-			
+//#if WW==1//for Weizsacker-Williams, upper lim of r should be determined by k not x.
 			double r;
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
 				r=R_MIN*pow(2.0*R_MAX/R_MIN,r)/1.414;
 				r_array[j]=r;
 			}
+//#endif
 		}
 		double operator()(const double rho)const{
 			double var;
@@ -278,8 +295,8 @@ template <typename Sig>  class Laplacian_Sigma{
 #elif R_CHANGE_VAR==0
 			const double r =rho;
 #endif		
-			if(r>2*R_MAX){
-				printf("too large, out of range %.4e - %.4e = %.4e\n",R_MAX,r,R_MAX-r);
+			if(r>2*rmax){
+				printf("too large, out of range %.4e - %.4e = %.4e\n",rmax,r,rmax-r);
 			}
 			if(r<R_MIN/2){
 				printf("too small, out of range %.4e - %.4e = %.4e , rho=%.3e,%d\n",r,R_MIN,r-R_MIN,rho,R_CHANGE_VAR);
@@ -314,8 +331,12 @@ template <typename Sig>  class Laplacian_Sigma{
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
 					val*=r*std::cyl_bessel_j(0,r*kt);
 					break;
+				case 'w':
+					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
+					val*=std::cyl_bessel_j(0,r*kt)/r;
+					break;
 				default:
-					printf("unknown option in laplacian sigma\n");
+					printf("unknown option in laplacian sigma %c\n",mode);
 			}
 			//printf("2: val=%.3e for r= %.3e\n",val,r);
 			if(not(std::isfinite(val))){
@@ -406,9 +427,9 @@ template <typename Sig>  class Chebyshev_Laplacian_Sigma{
 			flag=1;
 			
 		}
-		double operator()(const double rho)const{
+		//double operator()(const double rho)const{
 
-		}
+		//}
 		double operator()(const double rho, const std::vector<double> &par){
 #if R_CHANGE_VAR==1
 			const double r=rho/(1-rho);

@@ -172,7 +172,8 @@ template<typename GLU >class Approx_aF{
 		int export_grid(FILE*file)const{
 			for(int j=0;j< x_npts;j++){
 				for(int i=0;i<kt2_npts;i++){
-					fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]/sigma_0);
+					//fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]/sigma_0);
+					fprintf(file ,"%.10e\t%.10e\t%.10e\n",log10(x_array[j]),log10(kt2_array[i]), aF_array[i+j*kt2_npts] );
 				}
 			}	
 			return 0;

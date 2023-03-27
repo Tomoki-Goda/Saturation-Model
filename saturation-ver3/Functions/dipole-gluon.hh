@@ -184,12 +184,21 @@ template<typename INTEG>class Dipole_Gluon{
 			double val=0;
 			Kahn_clear(accum);
 
-			const double minmax=50;
+			const double minmax=R_MINMAX;
 #if ADD_END>=0 //negative value is for testing purpose.
 			rmax=minmax;
 #if MODEL==1
-			rmax/=pow(1-x,4);
+#if WW==1
+			rmax/=(sqrt(kt2));
+#else
+			rmax/=(pow(1-x,3)+sqrt(kt2));
 #endif
+#else
+			rmax/=(sqrt(kt2));
+#endif
+//#if WW==1
+//			rmax/=sqrt(kt2);
+//#endif
 			if(rmax>R_MAX||!std::isfinite(rmax)){
 				rmax=R_MAX;
 			}
@@ -233,7 +242,7 @@ template<typename INTEG>class Dipole_Gluon{
 			val=Kahn_total(accum);
 #endif
 			double diff=0;
-#if (IBP>=1&&ADD_END!=0)			
+#if (IBP>=1 && ADD_END!=0 && WW==0 )			
 //#if (IBP>=1)			
 			diff+=integrand->constant(imax,par);
 			//diff-=integrand.constant(rmin,par);
@@ -251,8 +260,12 @@ template<typename INTEG>class Dipole_Gluon{
 			if(!std::isfinite(val)){
 				val=0;
 			}
-			
-			return (3.0/(8*PI*PI)*val);
+#if WW==1
+			val*=2.0/(3.0*pow(PI,3));
+#else
+			val*=3.0/(8*PI*PI);
+#endif
+			return(val);
 		}
 		
 		

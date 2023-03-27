@@ -96,9 +96,9 @@ def main():
                      
                 if((x=="n") or (data[0]!=x)):
                     if rapidity:
-                        X.append(np.log(1/float(data[0])))
+                        X.append(np.log(1/pow(10,float(data[0]))))
                     else:
-                        X.append(np.log10(float(data[0])))
+                        X.append(float(data[0]))
                     if x!="n":
                         Z.append(z)
                         z=[]
@@ -110,7 +110,7 @@ def main():
                     
                 if(counter==0):
                     
-                    Y.append(np.log10(kt2))
+                    Y.append(kt2)
                 
 
             Z.append(z)
@@ -140,7 +140,7 @@ def main():
                 ax[gpos].set_ylabel('$\log_{10}(k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
             ax[gpos].set_xlabel('$\log_{10}x$',loc='right')
         #ax[gpos].set_xlim(0, 10)        
-        ax[gpos].set_ylim(-2, 2)        
+        #ax[gpos].set_ylim(-2, 2)        
 
         #cs=ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)), levels=10,colors="black",linewidths=0.5,linestyles=["solid","dashed"])
     #ax[len(grids)-1].set_xlabel('$x$',loc='right')

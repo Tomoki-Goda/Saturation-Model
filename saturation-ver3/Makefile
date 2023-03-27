@@ -56,6 +56,9 @@ plot: ${FUNCDIR}/plot-things.cc #${FUNCDIR}/gluons.o
 	${CXX} ${FUNCDIR}/plot-grid.cc -o ${DIR}/grid  ${OPT} ${INC} ${LIBS}
 	${CXX} ${FUNCDIR}/plot-grid-F2.cc -o ${DIR}/F2 ${OPT} ${INC} ${LIBS}
 
+ww:
+	${CXX} ${FUNCDIR}/plot-ww.cc -o ${DIR}/ww ${OPT} ${INC} ${LIBS}
+
 #	${CXX} ${FUNCDIR}/compare-GBW.cc -o ${DIR}/compare  ${OPT} ${INC} ${LIBS}
 #plot: dipole gluon
 

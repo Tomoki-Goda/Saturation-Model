@@ -79,7 +79,8 @@ int main(int argc, char** argv){
 	printf("ALPHA_RUN = %d, Hankel       = %d\n", ALPHA_RUN,  HANKEL);
 	printf("FREEZE_QS2= %d, ADD_END      = %d,             \t THRESHOLD    = %d\n",FREEZE_QS2,ADD_END,THRESHOLD);
 	printf("NS        = %d, IBP          = %d\n",NS,IBP);
-	printf("Directory = %s ,\t R  = [%.1e, %.1e]\n",(char*)argv[1],R_MIN,R_MAX);
+	printf("ADJOINT   = %d, WW           = %d\n",ADJOINT,WW);
+	printf("Directory = %s ,\t R  = [%.1e, %.1e, %.1e]\n",(char*)argv[1],R_MIN, R_MINMAX, R_MAX);
 	printf("SIGMA_APPROX = %d   N_CHEB   = %d              \t CHEB_D       = %d \n",SIGMA_APPROX,N_CHEB,CHEB_D);
 	printf("*******************************************************.\n");
 	

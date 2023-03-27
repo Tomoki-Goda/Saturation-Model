@@ -41,10 +41,14 @@
 #ifndef R_MAX
 	#define R_MAX 1e+5
 #endif
+#ifndef R_MINMAX //for x dependent r max, this is as low as rmax gets. see dipole-gluon.hh
+	#define R_MINMAX 1.0e+2
+#endif
 
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
 //////////////////////////////////////////////////////////////////
+<<<<<<< HEAD
 #ifndef WW
 	#define WW 0
 #endif
@@ -55,6 +59,19 @@
 		#define ADJOINT 0
 	#endif
 #endif
+=======
+#ifndef WW 
+	#define WW 0
+#endif 
+#ifndef ADJOINT 
+	#if WW==1
+		#define ADJOINT 1
+	#else 
+		#define ADJOINT 0
+	#endif
+#endif
+
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 #ifndef PRINT_PROGRESS
 	#define PRINT_PROGRESS 0
 #endif
@@ -142,7 +159,7 @@
 	#define R_FORMULA 0
 #endif
 #ifndef SIGMA_APPROX
-	#define SIGMA_APPROX -1
+	#define SIGMA_APPROX 1
 #endif
 
 #ifndef THRESHOLD//threshold factor (1-x)^a
@@ -156,10 +173,10 @@
 #endif
 
 #ifndef N_CHEB//variants of models. see r-formula.h
-	#define N_CHEB 50
+	#define N_CHEB 30
 #endif
 #ifndef CHEB_D//variants of models. see r-formula.h
-	#define CHEB_D 2
+	#define CHEB_D 1
 #endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////

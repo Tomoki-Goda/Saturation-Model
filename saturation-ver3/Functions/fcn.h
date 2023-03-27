@@ -116,27 +116,6 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			parameter(par,sigpar, sudpar);//Format
 //////////////////////////////////////////////////////////////////////////////////////////
 // Below is very messy
-// let 0=thread-safe 1=thread-un-safe
-// AS = Approx Sigma
-// AF = Approx Gluon
-// GBW
-// BGK
-// R = dipole fac
-// K = kt fac
-//
-//             | SIGMA  | Gluon |
-//       GBW R |   0    |   0   |
-//       BGK R |   0    |   0   |
-// AS    BGK R |   1    |   0   |
-//       GBW K |   0    |   0   |
-//    AF BGK K |   0    |   0   |
-// AS AF BGK K |   1    |   0   |
-//
-//
-//
-//
-//
-//
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -158,7 +137,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		dipole_gluon.init(sigpar);
 		Approx_aF<GLUON> gluon(dipole_gluon);
 		gluon.init(N_APPROX+100,N_APPROX+100,sigpar);
-		const double kt2max=7.0e+4;
+		const double kt2max=9.0e+4;
 		gluon.set_max(kt2max);
 	#else               //only GBW K
 		GLUON gluon();

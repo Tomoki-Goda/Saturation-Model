@@ -84,7 +84,6 @@ class Sigma{
 		~Sigma(){
 		}
 		void set_x(const double &x){
-#if SIGMA_APPROX<0
 #if FREEZE_QS2==1
 			x2=0.5*x/(0.5*(1-x)+x);
 #elif FREEZE_QS2==0
@@ -92,6 +91,8 @@ class Sigma{
 #elif FREEZE_QS2==2
 			x2=((x>0.5)?0.5:x);
 #endif
+
+#if SIGMA_APPROX<0
 			xgpdf.set_x(x2);
 #endif
 		}
@@ -144,6 +145,9 @@ class Sigma{
 			}
 #endif
 			double qs2=Qs2(x1,r);
+#if ADJOINT==1
+			qs2*=9.0/4.0;
+#endif
 #if IBP==2
 			double val=-sigma_0*exp(-pow(r,2)*qs2/4);
 #else

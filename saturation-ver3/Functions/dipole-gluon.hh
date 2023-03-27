@@ -34,7 +34,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 	var= ( (min==0.0)?(max*var):((max*var+c*min*(1-var)) ))/den;
 	//var= (max*var+min*c*(1-var))/den;
 	
-#if TEST==1	
+//#if TEST==1	
 	if(var>max) {
 		if(fabs((var-max)/max)>1.0e-15){
 			printf("value below limit %.3e -> %.3e [%.3e, %.3e] diff %.3e, c=%.3e\n",(1-den)/(1-c),var,min,max,var-max, c);
@@ -46,7 +46,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 		}
 		var=min;
 	}
-#endif
+//#endif
 	return var;
 }
 
@@ -191,10 +191,11 @@ template<typename INTEG>class Dipole_Gluon{
 			double val=0;
 			Kahn_clear(accum);
 
-			const double minmax=50;
+			const double minmax=R_MINMAX;
 #if ADD_END>=0 //negative value is for testing purpose.
 //			rmax=minmax;
 #if MODEL==1
+<<<<<<< HEAD
 			//rmax/=pow(1-x,4);
 			rmax=min(minmax/pow(1-x,4),R_MAX);
 #endif
@@ -202,6 +203,22 @@ template<typename INTEG>class Dipole_Gluon{
 			//	rmax=R_MAX;
 			//}
 			
+=======
+#if WW==1
+			rmax/=(sqrt(kt2));
+#else
+			rmax/=(pow(1-x,3)+sqrt(kt2));
+#endif
+#else
+			rmax/=(sqrt(kt2));
+#endif
+//#if WW==1
+//			rmax/=sqrt(kt2);
+//#endif
+			if(rmax>R_MAX||!std::isfinite(rmax)){
+				rmax=R_MAX;
+			}
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 			const double scale=(2*PI)/sqrt(kt2);
 			double imin=rmin;
 			int sectors=(int)(rmax/scale);
@@ -242,7 +259,7 @@ template<typename INTEG>class Dipole_Gluon{
 			val=Kahn_total(accum);
 #endif
 			double diff=0;
-#if (IBP>=1&&ADD_END!=0)			
+#if (IBP>=1 && ADD_END!=0 && WW==0 )			
 //#if (IBP>=1)			
 			diff+=integrand->constant(imax,par);
 			//diff-=integrand.constant(rmin,par);
@@ -263,9 +280,15 @@ template<typename INTEG>class Dipole_Gluon{
 #if WW==1
 			val*=2.0/(3.0*pow(PI,3));
 #else
+<<<<<<< HEAD
 			val*=3.0/(8.0*pow(PI,2));
 #endif			
 			return (val);
+=======
+			val*=3.0/(8*PI*PI);
+#endif
+			return(val);
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 		}
 		
 		

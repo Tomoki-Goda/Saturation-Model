@@ -114,6 +114,10 @@ template <typename Sig>  class Laplacian_Sigma{
 		int alloc_flag=0;
 		double ns_pow=500;
 		double rmax=R_MAX;
+<<<<<<< HEAD
+=======
+		
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 		void free_approx(){
 			if(alloc_flag!=0){
 			gsl_spline_free (spline_ptr);
@@ -167,18 +171,37 @@ template <typename Sig>  class Laplacian_Sigma{
 			//test();
 			return(0);
 		}
+<<<<<<< HEAD
 		
 */		
 		
 		int approximate(const double x){
 			double r;
 			rmax=min(50/pow(1-x,4),R_MAX);
+=======
+*/		int approximate(const double x){
+/*			double r;
+
+#if MODEL==1
+			rmax=R_MINMAX/pow(1-x,4);
+			if(rmax>R_MAX||!std::isfinite(rmax)){
+				rmax=R_MAX;
+			}
+#endif
+#if WW==0 		//for Weizsacker-Williams, upper lim of r should be determined by k not x.
+//see also init()
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
 				r=R_MIN*pow(2.0*rmax/R_MIN,r)/1.414;
 				r_array[j]=r;
 			}
+<<<<<<< HEAD
 			
+=======
+#endif
+	*/		
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 #pragma omp parallel
 {
 #pragma omp for schedule(dynamic)
@@ -259,14 +282,24 @@ template <typename Sig>  class Laplacian_Sigma{
 				free_approx();
 			}
 			allocate(npts1);
+<<<<<<< HEAD
 			//sigma.init(par);
 			
 			/*double r;
+=======
+//#if WW==1//for Weizsacker-Williams, upper lim of r should be determined by k not x.
+			double r;
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
 				r=R_MIN*pow(2.0*R_MAX/R_MIN,r)/1.414;
 				r_array[j]=r;
+<<<<<<< HEAD
 			}*/
+=======
+			}
+//#endif
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 		}
 		double operator()(const double rho)const{
 			double var;
@@ -330,12 +363,16 @@ template <typename Sig>  class Laplacian_Sigma{
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
 					val*=r*std::cyl_bessel_j(0,r*kt);
 					break;
+<<<<<<< HEAD
 				case 'w'://for weizsacker-william 
+=======
+				case 'w':
+>>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 					val=gsl_spline_eval(spline_ptr, r,r_accel_ptr);
 					val*=std::cyl_bessel_j(0,r*kt)/r;
 					break;
 				default:
-					printf("unknown option in laplacian sigma\n");
+					printf("unknown option in laplacian sigma %c\n",mode);
 			}
 			//printf("2: val=%.3e for r= %.3e\n",val,r);
 			if(not(std::isfinite(val))){
@@ -426,9 +463,9 @@ template <typename Sig>  class Chebyshev_Laplacian_Sigma{
 			flag=1;
 			
 		}
-		double operator()(const double rho)const{
+		//double operator()(const double rho)const{
 
-		}
+		//}
 		double operator()(const double rho, const std::vector<double> &par){
 #if R_CHANGE_VAR==1
 			const double r=rho/(1-rho);

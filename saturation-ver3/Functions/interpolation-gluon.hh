@@ -40,7 +40,8 @@ template<typename GLU >class Approx_aF{
 				aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
 				x_accel_ptr = gsl_interp_accel_alloc ();
 				kt2_accel_ptr = gsl_interp_accel_alloc ();
-				spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts);
+				//spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts);
+				spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bilinear,kt2_npts, x_npts);
 				alloc_flag=1;
 			}else{
 				printf("Approx_aF cannot allocate\n");
@@ -227,7 +228,11 @@ template<typename GLU >class Approx_aF{
 			mu02 = MU02;
 #endif
 		}
-		double operator()(const double x,const double kt2,const double mu2)const{			
+		double operator()(const double x,const double kt2,const double mu2)const{
+			if(kt2>kt2max){printf("kt2 too large kt2max= %.1e kt2= %.1e diff=%.1e\n",kt2max,kt2,kt2max-kt2);}
+			if(kt2<kt2min){printf("kt2 too small kt2min= %.1e kt2= %.1e diff=%.1e\n",kt2min,kt2,kt2min-kt2);}
+			if(x>1){printf("x too large xmax= %.1e x= %.1e diff=%.1e\n",1.0,x,1.0-x);}
+			if(x<1.0e-8){printf("x too small xmin= %.1e x= %.1e diff=%.1e\n",1.0e-8,x,x-1.0e-8);}			
 			double val = 0;
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
 #if ALPHA_RUN==1

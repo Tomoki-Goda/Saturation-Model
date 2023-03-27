@@ -34,7 +34,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 	var= ( (min==0.0)?(max*var):((max*var+c*min*(1-var)) ))/den;
 	//var= (max*var+min*c*(1-var))/den;
 	
-#if TEST==1	
+//#if TEST==1	
 	if(var>max) {
 		if(fabs((var-max)/max)>1.0e-15){
 			printf("value below limit %.3e -> %.3e [%.3e, %.3e] diff %.3e, c=%.3e\n",(1-den)/(1-c),var,min,max,var-max, c);
@@ -46,7 +46,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 		}
 		var=min;
 	}
-#endif
+//#endif
 	return var;
 }
 

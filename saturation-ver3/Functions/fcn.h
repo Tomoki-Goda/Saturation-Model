@@ -137,7 +137,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		dipole_gluon.init(sigpar);
 		Approx_aF<GLUON> gluon(dipole_gluon);
 		gluon.init(N_APPROX+100,N_APPROX+100,sigpar);
-		const double kt2max=7.0e+4;
+		const double kt2max=9.0e+4;
 		gluon.set_max(kt2max);
 	#else               //only GBW K
 		GLUON gluon();

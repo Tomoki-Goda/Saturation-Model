@@ -40,8 +40,8 @@ template<typename GLU >class Approx_aF{
 				aF_array=(double*)malloc(x_npts*kt2_npts*sizeof(double));
 				x_accel_ptr = gsl_interp_accel_alloc ();
 				kt2_accel_ptr = gsl_interp_accel_alloc ();
-				//spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts);
-				spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bilinear,kt2_npts, x_npts);
+				spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,kt2_npts, x_npts);
+				//spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bilinear,kt2_npts, x_npts);
 				alloc_flag=1;
 			}else{
 				printf("Approx_aF cannot allocate\n");

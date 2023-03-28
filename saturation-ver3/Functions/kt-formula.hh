@@ -120,7 +120,7 @@ template<typename TYPE > class Integrand_kt{
 			change_var(kappa2,jac2,k2min,kappamax,1+kappamax/pow(1+Q2,0.5));
 
 			k2max=(1-x)/x*Q2-(kappa2+mf2)/(beta*(1-beta));
-			if(k2max<=0.0){
+			if(k2max<=k2min){
 				return 0;
 			}
 

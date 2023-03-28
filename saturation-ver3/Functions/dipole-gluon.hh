@@ -193,17 +193,9 @@ template<typename INTEG>class Dipole_Gluon{
 
 			const double minmax=R_MINMAX;
 #if ADD_END>=0 //negative value is for testing purpose.
-//			rmax=minmax;
+			rmax=minmax;
 #if MODEL==1
-<<<<<<< HEAD
-			//rmax/=pow(1-x,4);
-			rmax=min(minmax/pow(1-x,4),R_MAX);
-#endif
-			//if(rmax>R_MAX||!std::isfinite(rmax)){
-			//	rmax=R_MAX;
-			//}
-			
-=======
+
 #if WW==1
 			rmax/=(sqrt(kt2));
 #else
@@ -218,12 +210,11 @@ template<typename INTEG>class Dipole_Gluon{
 			if(rmax>R_MAX||!std::isfinite(rmax)){
 				rmax=R_MAX;
 			}
->>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 			const double scale=(2*PI)/sqrt(kt2);
 			double imin=rmin;
 			int sectors=(int)(rmax/scale);
-			if(sectors<3){
-				sectors=3;
+			if(sectors<5){
+				sectors=5;
 			}
 			
 			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient 
@@ -280,15 +271,9 @@ template<typename INTEG>class Dipole_Gluon{
 #if WW==1
 			val*=2.0/(3.0*pow(PI,3));
 #else
-<<<<<<< HEAD
 			val*=3.0/(8.0*pow(PI,2));
 #endif			
 			return (val);
-=======
-			val*=3.0/(8*PI*PI);
-#endif
-			return(val);
->>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 		}
 		
 		

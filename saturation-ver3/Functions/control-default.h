@@ -48,18 +48,7 @@
 //////////////////////////////////////////////////////////////////
 /////////////////////  system control ////////////////////////////
 //////////////////////////////////////////////////////////////////
-<<<<<<< HEAD
-#ifndef WW
-	#define WW 0
-#endif
-#ifndef ADJOINT
-	#if WW==1
-		#define ADJOINT 1
-	#else
-		#define ADJOINT 0
-	#endif
-#endif
-=======
+
 #ifndef WW 
 	#define WW 0
 #endif 
@@ -71,7 +60,6 @@
 	#endif
 #endif
 
->>>>>>> c515e32c11141192cdaeb81fdb4f1e86a35d680d
 #ifndef PRINT_PROGRESS
 	#define PRINT_PROGRESS 0
 #endif

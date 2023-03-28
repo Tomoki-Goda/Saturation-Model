@@ -127,7 +127,7 @@ int main(int argc, char** argv){
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
 #else//USE_RESULT==1
-     	printf("USING PREVIOUS RESULT %d\n",USE_RESULT);
+		printf("USING PREVIOUS RESULT %d\n",USE_RESULT);
 	char resfile[100];
 	sprintf(resfile,"%s/result.txt",argv[1]);
 	
@@ -183,14 +183,21 @@ int main(int argc, char** argv){
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
 	
-	{  	
+	{	
 	  ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
 	  for(int i=0;i<(N_PAR-skip);i++ ){
-	 	migrad.RemoveLimits(i);
+		migrad.RemoveLimits(i);
 	  }
-	  min=migrad(10,10);
+#if MODEL==1
+		for(int i=0;i<N_PAR-skip;++i){
+			migrad.Fix(i);
+			min=migrad(50,25);
+			migrad.Release(i);
+		}
+#endif
+			min=migrad(20,25);
 	}
-   	goal=25;
+	goal=25;
 	for(int i=0;i<5;i++){
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
 		for(int j=0;j<i+2;j++){
@@ -229,7 +236,7 @@ int main(int argc, char** argv){
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
 	
-   	goal=10;
+	goal=10;
 	for(int i=0;i<5;i++){
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),1);
 

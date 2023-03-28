@@ -270,6 +270,7 @@ template <typename Sig>  class Laplacian_Sigma{
 			double r;
 			for (int j = 0; j < r_npts; j++){
 				r=((double)j)/(r_npts-1);
+				r=(1-cos(PI*r))/2;
 				r=R_MIN*pow(2.0*R_MAX/R_MIN,r)/1.414;
 				r_array[j]=r;
 			}
@@ -526,7 +527,7 @@ template <typename Sig>  class Chebyshev_Laplacian_Sigma{
 			return(val);
 		}
 };
-
+*/
 template <typename Sig> class Gluon_Integrand{
 		Sig *sigma;
 		char mode='l';//l or s
@@ -587,6 +588,10 @@ template <typename Sig> class Gluon_Integrand{
 					val=(*sigma)(x,r);
 					val*=r*std::cyl_bessel_j(0,r*kt);
 					break;
+				case 'w'://for weizsacker-william 
+					val=(*sigma)(x,r);
+					val*=std::cyl_bessel_j(0,r*kt)/r;
+					break;
 				default:
 					printf("unknown option in laplacian sigma\n");
 			}
@@ -638,7 +643,7 @@ template <typename Sig> class Gluon_Integrand{
 
 
 };
-*/
+
 
 /*
 double par[]={25.0, 0.3,3.0e-4};

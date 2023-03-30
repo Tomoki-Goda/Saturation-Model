@@ -15,7 +15,8 @@ template<typename GLU >class Approx_aF{
 		double *kt2_array=NULL,*x_array=NULL,*aF_array=NULL;
 		double mu02=0;
 		double sigma_0=0;
-		double kt2min=1.0e-9,kt2max=-1;
+		double kt2min=KT2_MIN/2 ,kt2max=-1;
+		double xmin=X_MIN;
 		
 		int alloc_flag=0;
 		
@@ -55,7 +56,9 @@ template<typename GLU >class Approx_aF{
 			//double kt2,x;
 
 			for (int j = 0; j < x_npts; ++j){
-				double x=pow(10,-8+8*((double)j)/(x_npts-1));
+				//double x=pow(10,-8+8*((double)j)/(x_npts-1));
+				double x=xmin*pow(X_MAX/xmin,((double)j)/(x_npts-1));
+				
 				x_array[j] = x;
 //#if SIGMA_APPROX==-2||SIGMA_APPROX==1
 				aF->set_x(x);	
@@ -70,7 +73,11 @@ template<typename GLU >class Approx_aF{
 					double kt2=((double)i)/(kt2_npts-1);
 					kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;
 					kt2_array[i] = kt2;
+//#if WW==1
+//					aF_array[i+ j*kt2_npts] = (*aF)(x,kt2,0)*9.0/(4.0*PI)*log((2+kt2)/0.09);//alpha?
+//#else
 					aF_array[i+ j*kt2_npts] = (*aF)(x,kt2,0);
+//#endif
 					//printf("\033[2K\r");
 					//fflush(stdout);
 				}
@@ -231,7 +238,7 @@ template<typename GLU >class Approx_aF{
 		double operator()(const double x,const double kt2,const double mu2)const{
 			if(kt2>kt2max){printf("kt2 too large kt2max= %.1e kt2= %.1e diff=%.1e\n",kt2max,kt2,kt2max-kt2);}
 			if(kt2<kt2min){printf("kt2 too small kt2min= %.1e kt2= %.1e diff=%.1e\n",kt2min,kt2,kt2min-kt2);}
-			if(x>1){printf("x too large xmax= %.1e x= %.1e diff=%.1e\n",1.0,x,1.0-x);}
+			if(x>X_MAX){printf("x too large xmax= %.1e x= %.1e diff=%.1e\n",X_MAX,x,X_MAX-x);}
 			if(x<1.0e-8){printf("x too small xmin= %.1e x= %.1e diff=%.1e\n",1.0e-8,x,x-1.0e-8);}			
 			double val = 0;
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);

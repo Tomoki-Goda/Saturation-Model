@@ -19,8 +19,9 @@ class Sigma{
 		//Collinear_Gluon xgpdf;
 #if MODEL==1
 		ColG xgpdf;
-		double x2;
+		
 #endif
+		double x2;
 		double sigma_0,lambda, x_0, A_g,lambda_g,C,mu02,mu102,thresh_power;
 		const double *par;
 		inline double alpha(double mu2 ){
@@ -70,7 +71,7 @@ class Sigma{
 
 #endif	//MODEL	
 #if ADJOINT==1	
-			qs2*=9.0/4.0;
+			return (9.0/4.0 * qs2);
 #endif
 			return qs2;		
 		}
@@ -84,6 +85,7 @@ class Sigma{
 		~Sigma(){
 		}
 		void set_x(const double &x){
+#if SIGMA_APPROX<0&&MODEL==1
 #if FREEZE_QS2==1
 			x2=0.5*x/(0.5*(1-x)+x);
 #elif FREEZE_QS2==0
@@ -94,6 +96,7 @@ class Sigma{
 
 #if SIGMA_APPROX<0
 			xgpdf.set_x(x2);
+#endif
 #endif
 		}
 		void init(const double * const &sigpar){
@@ -116,7 +119,7 @@ class Sigma{
 			mu02=sigpar[i++];
 			//printf("C=%.3e, mu02=%.3e, R_MIN=%.3e -> %.3e \n",C,mu02,R_MIN,C/pow(R_MIN,2)+mu02);
 	#if SIGMA_APPROX<0
-			xgpdf.init(5.0e-9,1,mu02*0.5,2*(C/pow(R_MIN,2)+mu02),A_g,lambda_g);
+			xgpdf.init(X_MIN/2,1,mu02*0.5 , 2*(C/pow(R_MIN,2)+mu02),A_g,lambda_g);
 	#endif
 #endif
 
@@ -139,7 +142,7 @@ class Sigma{
 #elif FREEZE_QS2==2
 			double x1=((x>0.5)?0.5:x);
 #endif///////////////////////////////////////////////////////////////////////////
-#if SIGMA_APPROX<0
+#if SIGMA_APPROX<0&&MODEL==1
 			if(x1!=x2){
 				printf("Sigma:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x1,x2, x1-x2);
 			}
@@ -154,10 +157,16 @@ class Sigma{
 #if LAPLACIAN==0
 			double val;
 			val=pow(r,2)*qs2/4;
-			if(val<1.0e-7){
-				val*=sigma_0;
+			if(val<1.0e-4){
+				val*=(1-val/2+pow(val,2)/6-pow(val,3)/24);
 			}else{
-				val=sigma_0*(1-exp( -val));
+				val=(1-exp(-val));
+			}
+			val*=sigma_0;
+			
+			if(val<=0.0){
+				printf("dp negative\n");
+				val=0;
 			}
 #elif LAPLACIAN==1
 			double val=pow(r,2)*qs2/4;

@@ -181,7 +181,7 @@
 #endif
 
 #ifndef SECTOR_MAX
-	#define SECTOR_MAX 1500
+	#define SECTOR_MAX 500
 #endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////

@@ -18,7 +18,7 @@ int N;
 } CCIntegral;
 
 //template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax,double&valfull,double &valhalf, double*arr){
-template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax, Kahn &full, Kahn &half){
+template <typename TYPE,typename args_type>static double fixed_cc(const CCIntegral & data,TYPE &func,args_type par,const double smin,const double smax, Kahn &full, Kahn &half){
 	const double (&x16)[129]=data.x;
 	const double (&w16)[129]=data.wfull;
 	const double (&w8)[65]=data.whalf;
@@ -48,7 +48,7 @@ template <typename TYPE,typename args_type>static int fixed_cc(const CCIntegral 
 	half+=f[N]*w8[N/4];
 	full*=2*scale/N;
 	half*=4*scale/N;
-	return 0;
+	return Kahn_total(full);
 }
 
 template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegral &data,TYPE &func, args_type par , const double a, const double b, const double eps, const double Aeps){

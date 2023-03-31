@@ -16,6 +16,10 @@
 //#else
 //	typedef Laplacian_Sigma Integrand;				
 //#endif
+//#include"series_sum.hh"
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_sum.h>
+
 
 inline double  modx(const double  x, const double  Q2, const  double  mf2){
 #if MODX==1
@@ -139,8 +143,9 @@ inline double max(double a,double b){
 //Dipole gluon
 //
 /////////////////////////////////////////////////////////////////////
-//template <typename LSigma>class Dipole_Gluon{
-double eps(int n, int m, const double (&list)[SECTOR_MAX]){ 
+/*//template <typename LSigma>class Dipole_Gluon{
+//double eps(int n, int m, const double (&list)[SECTOR_MAX]){ 
+double eps(int n, int m, const double *list){ 
 //epsilon series convergence algorithm??
 // I don't know the name but Seki-Aitken's generalization.
 	//if(2*(m/2)!=m){
@@ -154,12 +159,14 @@ double eps(int n, int m, const double (&list)[SECTOR_MAX]){
 	  	return(list[n]);
 	};
 	return(eps(n + 1, m - 2,list) + 1/(eps(n + 1, m - 1,list) - eps(n, m - 1,list)));
-}
+}*/
 template<typename INTEG>class Dipole_Gluon{
 		const double *par;
 		//Laplacian_Sigma integrand;
 		INTEG *integrand;
-		CCIntegral cc=CCprepare(32,"dipole",4,5);
+		CCIntegral cc=CCprepare(32,"dipole",1,5);
+		
+		
 		//double fixx;
 
 	public: 
@@ -190,63 +197,34 @@ template<typename INTEG>class Dipole_Gluon{
 			integrand->set_x(x);
 		}
 		double operator()(const double x,const double kt2,const double mu2){
-			//if(x!=this->x){
-			//	set_x(x);	
-			//}
-/*#if SIGMA_APPROX==1||SIGMA_APPROX==-2
-			if(this->x!=x){
-				this->x=x;
-				integrand->set_kinem(x);
-				printf("set x");
-			}
-#endif*/
+			//Series_Sum ss(2);
+			double sum_accel, err;
+			double arr[SECTOR_MAX];
+			double sum = 0;
+			int n;
+			gsl_sum_levin_u_workspace * w = gsl_sum_levin_u_alloc (SECTOR_MAX);
 			Kahn accum=Kahn_init(3);
 			const std::vector<double> par{kt2,x};
 			double rmax=R_MAX,rmin=R_MIN;
 			double val=0;
 			Kahn_clear(accum);
-/*
-			const double minmax=R_MINMAX;
-//#if ADD_END>=0 //negative value is for testing purpose.
-			rmax=minmax;
-#if MODEL==1
-
-#if WW==1
-			rmax+=minmax/(sqrt(kt2));
-#else
-			//rmax+=minmax/(pow(1-x,3));
-			//rmax+=minmax/(sqrt(kt2));
-			rmax/=sqrt(kt2)*(pow(1-x,3));
 			
-#endif
-#else
-			rmax+=minmax/(sqrt(kt2));
-#endif
-//#if WW==1
-//			rmax/=sqrt(kt2);
-//#endif
-*/
-//			if(rmax>R_MAX||!std::isfinite(rmax)){
-//				rmax=R_MAX;
-//			}
-			//const 
 			double scale=(2*PI)/sqrt(kt2);
 			double imin=rmin;
 			int sectors=(int)(rmax/scale);
 			if(sectors>SECTOR_MAX||sectors<1||!std::isfinite(sectors)){
 				sectors=SECTOR_MAX;
 			}
-			if(sectors>5){
-				scale*=2;//doing four sectors in one go seems ok...
-			}
-			
+			//if(sectors>10){
+				//scale*=8;
+			//}
+
 			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 			int flag=0;
-			//double val_prev=0;
-			double arr[SECTOR_MAX];
-			double ser1=0,ser2=0;
+			
 			for(int i=0;i<sectors;++i){
-				imax+=scale;
+				imax=(2*PI)/sqrt(kt2)+(i+1)*scale;
+				
 				if(imax>rmax){
 					if(i>0){
 						imax-=scale;
@@ -256,63 +234,52 @@ template<typename INTEG>class Dipole_Gluon{
 						imax=rmax;
 					}
 				};
+				
 #if R_CHANGE_VAR==1
 				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),pow(INT_PREC,2),10e-15);
 #elif R_CHANGE_VAR==0
 				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-15);
 #endif
-				/*
-				if(fabs(val)<1.0e-20 ){
-					++flag;
-					if(flag>10){//if consecutively small 5 times
-						break;//it is likely beyond this will be trivial
-					}
-				}else{
-					flag=0;
+				/*printf(" scale= %.3e imin=%.3e imax= %.3e sector=%d/%d val=%.3e\n",scale,imin,imax,i,sectors,val);
+				flag=ss.append(val);
+				//if(flag>=15){
+				if(flag>=10&&fabs(val)<fabs(Kahn_total(accum)*1.0e-6)){
+					break;
 				}
-				*/
-				//printf("%.3e\n",val);
+				
 				accum+=val;
+				
+				*/
 				imin=imax;
-				
-				arr[i]=Kahn_total(accum);
-				
-				if(i>4){
-					ser1=eps(i-4,4,arr);
-					if(i>5){
-						//printf("val=%.3e,diff=%.3e, ser1=%.3e,ser2=%.3e diff=%.3e \n",arr[i],arr[i]-arr[i-1],ser1,ser2,ser1-ser2);
-						if(fabs((ser1-ser2)/(ser1+ser2))<10e-12){
-							printf("val=%.3e,diff=%.3e, ser1=%.3e,ser2=%.3e diff=%.3e \n",arr[i],arr[i]-arr[i-1],ser1,ser2,ser1-ser2);
-							flag=1;
-							sectors=i;
-							break;
-						}
-						ser2=ser1;
-						
-					}
-					
-										
-				}
-				if(i>3){
-					if(fabs((arr[i]-arr[i-1])/(arr[i]+arr[i-1]))<10e-12){
-						sectors=i;
-						break;
-					}
+				sum+=val;
+				arr[i]=val;
+				if(fabs(val/sum)<1.0e-8){
+					sectors=i;
+					break;
 				}
 			}
-			
-			if(fabs(val/Kahn_total(accum))> INT_PREC && fabs(val)> pow(INT_PREC,2)){
-				printf("sectors= %d inaccuracy from rmax\n imax=%.3e rmax=%.3e kt2=%.3e x=%.3e val=%.3e /%.3e\n",sectors,imax,rmax, kt2,x,val, Kahn_total(accum));
+			gsl_sum_levin_u_accel (arr+(sectors/2), sectors/2, w, &sum_accel, &err);
+			sum=0;
+			for(int i=0;i<sectors/2;i++){
+				sum+=arr[i];
 			}
-			//val=eps(sectors-4,4,arr);
-			if(sectors>=4){
-				//val=ser1;
-				val=eps(sectors-4,4,arr);
+			/*
+			if(flag>=10){
+				val=ss.extrapolate(flag);
 			}else{
+				if(sectors>flag){
+					printf("failed to get convergence,%d\n",sectors);
+					
+				}
 				val=Kahn_total(accum);
-			}
-			//printf("2:%d %.2e rmax imax=%.3e rmax=%.3e kt2=%.3e x=%.3e  /%.3e  ,%.3e->%d \n",sectors ,val,imax,rmax, kt2,x,val,rmax/scale,(int)(rmax/scale));
-
+			}*/
+			//printf("%.3e+- %.3e vs %.3e +- %.3e\n",sum_accel,err,sum,val );
+			printf("%.3e+- %.3e \n",sum_accel+sum,err);
+			/*if(val<0){
+				printf("sectors= %d imax=%.3e rmax=%.3e kt2=%.3e x=%.3e val=%.3e /%.3e\n",sectors,imax,rmax, kt2,x,val, Kahn_total(accum));
+				getchar();
+			}*/
+			
 //#endif
 			double diff=0;
 #if (IBP>=1 && ADD_END!=0 && WW==0 )			

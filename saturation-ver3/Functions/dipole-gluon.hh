@@ -209,14 +209,19 @@ template<typename INTEG>class Dipole_Gluon{
 			double val=0;
 			Kahn_clear(accum);
 			
-			double scale=(2*PI)/sqrt(kt2);
+			//double scale=((int)log(kt2))*(2*PI)/sqrt(kt2);
+			double scale=((int)pow(kt2,0.25)+1)*(2*PI)/sqrt(kt2);
+			//double scale=(2*PI)/sqrt(kt2);
+			
+			
 			double imin=rmin;
 			int sectors=(int)(rmax/scale);
+			//printf("sclae= %.3e cycle=%d sectors=%d\n",scale ,((int)pow(kt2,0.25)) ,sectors);
 			if(sectors>SECTOR_MAX||sectors<1||!std::isfinite(sectors)){
 				sectors=SECTOR_MAX;
 			}
 			//if(sectors>10){
-				//scale*=8;
+			//	scale*=20;
 			//}
 
 			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
@@ -238,7 +243,7 @@ template<typename INTEG>class Dipole_Gluon{
 #if R_CHANGE_VAR==1
 				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),pow(INT_PREC,2),10e-15);
 #elif R_CHANGE_VAR==0
-				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-15);
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),pow(INT_PREC,2));
 #endif
 				/*printf(" scale= %.3e imin=%.3e imax= %.3e sector=%d/%d val=%.3e\n",scale,imin,imax,i,sectors,val);
 				flag=ss.append(val);
@@ -258,9 +263,9 @@ template<typename INTEG>class Dipole_Gluon{
 					break;
 				}
 			}
-			gsl_sum_levin_u_accel (arr+(sectors/2), sectors/2, w, &sum_accel, &err);
+			gsl_sum_levin_u_accel (arr, sectors, w, &sum_accel, &err);
 			sum=0;
-			for(int i=0;i<sectors/2;i++){
+			for(int i=0;i<sectors;i++){
 				sum+=arr[i];
 			}
 			/*
@@ -274,12 +279,12 @@ template<typename INTEG>class Dipole_Gluon{
 				val=Kahn_total(accum);
 			}*/
 			//printf("%.3e+- %.3e vs %.3e +- %.3e\n",sum_accel,err,sum,val );
-			printf("%.3e+- %.3e \n",sum_accel+sum,err);
+			printf("%.3e %.3e+- %.3e %d\n",sum,sum_accel,err,sectors);
 			/*if(val<0){
 				printf("sectors= %d imax=%.3e rmax=%.3e kt2=%.3e x=%.3e val=%.3e /%.3e\n",sectors,imax,rmax, kt2,x,val, Kahn_total(accum));
 				getchar();
 			}*/
-			
+			val=sum_accel;
 //#endif
 			double diff=0;
 #if (IBP>=1 && ADD_END!=0 && WW==0 )			

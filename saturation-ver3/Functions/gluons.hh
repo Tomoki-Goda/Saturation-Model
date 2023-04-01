@@ -221,6 +221,7 @@ class Chebyshev1D_Collinear_Gluon{
 		double xmin,xmax,q2min,q2max;
 		const double *fixx;
 		
+		
 	public:
 		Chebyshev1D_Collinear_Gluon(){
 			const unsigned deg[]={N_CHEB};

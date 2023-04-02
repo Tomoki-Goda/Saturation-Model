@@ -5,6 +5,7 @@
 #include<fstream>
 #include<vector>
 #include<chrono>
+#include<cuba.h>
 #include <gsl/gsl_errno.h> 
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_interp2d.h>
@@ -21,6 +22,43 @@
 #include"Functions/clenshaw.hh"
 #include"Functions/control-default.h"
 #include"Functions/constants.h"
+
+
+class testfunc_cuba{
+		double k=0;
+		double x=0;
+		double rmin=0,rmax=0;
+	
+	public:
+		int set_var(double k,double x, double rmin, double rmax){
+			this->k=k;
+			this->x=x;
+			this->rmin=rmin;
+			this->rmax=rmax;
+			return 0;
+		}
+		double operator()(double r){
+			r=rmin+rmax*r;
+
+			double qs2=pow(2.0e-4/x,0.2); 
+			
+			return(std::cyl_bessel_j(0,r*k )* (1-exp(-r*r *qs2/4))/r);
+		}
+
+};
+
+template <typename T>int integrand_cuba(const int *__restrict ndim, const double  *__restrict intv,const int *__restrict ncomp,double *__restrict  f, void* __restrict p){
+	printf("Integrand\n");
+	T *integrand=(T*)p;
+	double  r=intv[0];
+	printf("%.3e\n",r);
+	getchar();
+	double  res=0;
+	res+=integrand[0](r);
+	*f=res;
+	printf("%.3e\n",res);
+	return 0;
+}
 
 class testfunc0{
 	
@@ -95,10 +133,41 @@ int main(int argc, char** argv ){
 	testfunc0 func3;
 	
 	
+	double INT_PREC= 1.0e-8;
+	int ndim =1;
+	//const long long 
+	int mineval=1000, maxeval=100000;
+	//const long long 
+	int nstart=1.0e+2,nincrease=1.0e+2;
+	const int flag= 2+4*0+8*0+16*0+32*0;
+	int key =9;
+	
+	//long long 
+	int neval=0;
+	int nregions=0,fail=0;
+	double  integral,error,prob;
+	char statefile[100]="";
+	double  result=0;
+	
+	int cub=0;
+	cubacores(&cub,&cub);
+	testfunc_cuba func[1];
+	func[0].set_var(par[0],par[1],1.0e-8,1.0e+4);
+
+
+	Cuhre(ndim, 1,
+		&(integrand_cuba<testfunc_cuba>),
+		(void*)func,
+		1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,NULL,NULL, &nregions, &neval,  &fail, &integral, &error, &prob
+	);
+
+	printf("%.3e,%.3e %.3e\n" ,integral,error,prob );
+
 	Kahn_clear(acc);
 	sum=0;
 	imin=1.0e-8;
 	imax=10*PI/(4*par[0]);
+	
 	
 	printf("\n***************************\nGBW\n****************************\n");
 	for (int i=0;i<10;++i){

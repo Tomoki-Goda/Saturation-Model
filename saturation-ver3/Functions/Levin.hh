@@ -17,6 +17,11 @@ class Levin{
 		}
 		Kahn accum;
 	public:
+		int reset(){
+			position=0;
+			Kahn_clear(accum);
+			return 0;
+		}
 		int add_term(double term){
 			
 			if(position>len){
@@ -72,9 +77,9 @@ class Levin{
 			num=Kahn_total(nu);
 			Kahn_free(de);
 			Kahn_free(nu);
-		    //if(den==0.0||!std::isfinite(num)||!std::isfinite(den)){
+		    if(den==0.0||!std::isfinite(num)||!std::isfinite(den)){
 				printf("denominator=%.3e, numerator=%.3e\n",den,num );
-			//}	
+			}	
 			return(num/den);	
 		}
 		

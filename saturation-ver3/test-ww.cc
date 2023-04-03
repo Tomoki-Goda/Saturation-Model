@@ -22,8 +22,13 @@
 #include"Functions/clenshaw.hh"
 #include"Functions/control-default.h"
 #include"Functions/constants.h"
+#include"Functions/Levin.hh"
 
 
+///////////////////////////////////////////////////////
+//CUBA
+/////////////////////////////////////////////////////
+/*
 class testfunc_cuba{
 		double k=0;
 		double x=0;
@@ -59,6 +64,11 @@ template <typename T>int integrand_cuba(const int *__restrict ndim, const double
 	printf("%.3e\n",res);
 	return 0;
 }
+*/
+
+/////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////
 
 class testfunc0{
 	
@@ -70,7 +80,7 @@ class testfunc0{
 		}
 
 };
-
+////////////////////////////////////////////////////
 class testfunc{
 	Collinear_Gluon xg;
 	inline double alpha(double mu2 ){
@@ -89,8 +99,7 @@ class testfunc{
 		}
 
 };
-
-
+////////////////////////////////////////////////////////
 class testfunc_cheb{
 	Chebyshev1D_Collinear_Gluon *xg;
 	
@@ -113,7 +122,9 @@ class testfunc_cheb{
 		}
 
 };
-
+////////////////////////////////////////////////////////////
+// Main
+//////////////////////////////////////////////////////////
 int main(int argc, char** argv ){
 	double par[10]={0};
 	CCIntegral cc=CCprepare(64,"dipole",1,5);
@@ -123,7 +134,7 @@ int main(int argc, char** argv ){
 	double imin,imax;
 	Kahn acc=Kahn_init(3);
 	double val=0,sum=0;
-	double scale=1*(2*PI)/sqrt(par[0]);
+	double scale=5*(2*PI)/sqrt(par[0]);
 	
 	double total=0;
 	Chebyshev1D_Collinear_Gluon xg;
@@ -131,46 +142,14 @@ int main(int argc, char** argv ){
 	testfunc_cheb func1(xg);
 	testfunc func2;
 	testfunc0 func3;
-	
-	
-	double INT_PREC= 1.0e-8;
-	int ndim =1;
-	//const long long 
-	int mineval=1000, maxeval=100000;
-	//const long long 
-	int nstart=1.0e+2,nincrease=1.0e+2;
-	const int flag= 2+4*0+8*0+16*0+32*0;
-	int key =9;
-	
-	//long long 
-	int neval=0;
-	int nregions=0,fail=0;
-	double  integral,error,prob;
-	char statefile[100]="";
-	double  result=0;
-	
-	int cub=0;
-	cubacores(&cub,&cub);
-	testfunc_cuba func[1];
-	func[0].set_var(par[0],par[1],1.0e-8,1.0e+4);
 
-
-	Cuhre(ndim, 1,
-		&(integrand_cuba<testfunc_cuba>),
-		(void*)func,
-		1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,NULL,NULL, &nregions, &neval,  &fail, &integral, &error, &prob
-	);
-
-	printf("%.3e,%.3e %.3e\n" ,integral,error,prob );
 
 	Kahn_clear(acc);
 	sum=0;
 	imin=1.0e-8;
-	imax=10*PI/(4*par[0]);
-	
-	
-	printf("\n***************************\nGBW\n****************************\n");
-	for (int i=0;i<10;++i){
+	imax=PI/(4*par[0]);
+		printf("\n***************************\nGBW\n****************************\n");
+	for (int i=0;i<25;++i){
 		imax+=scale;
 		val=dclenshaw<testfunc0,double*>(cc, func3, par,imin,imax,1.0e-10,1.0e-10);
 		sum+=val;
@@ -179,8 +158,28 @@ int main(int argc, char** argv ){
 		printf("[%.3e %.3e ] kt2= %.3e x= %.3e value= %.3e \tsum=%.3e,%.3e %.3e\n" , imin,imax,pow(par[0],2),par[1], val,sum,total,sum-total);
 		imin=imax;
 	}
+
 	
+	sum=0;
+	imin=1.0e-8;
+	imax=PI/(4*par[0]);
+	Levin lev(50);
+		printf("\n***************************\nLevin\n****************************\n");
+	for (int i=0;i<50;++i){
+		imax+=scale;
+		val=dclenshaw<testfunc0,double*>(cc, func3, par,imin,imax,1.0e-10,1.0e-10);
+		sum+=val;
+		lev.add_term(val);
+		
+		
+		if(i>40){
+			printf("[%.3e %.3e ] kt2= %.3e x= %.3e value= %.3e \tsum=%.3e\n" , imin,imax,pow(par[0],2),par[1], val,sum);
+			printf("levin= %.3e\n", lev.accel(i-1-5,5));
+		}
+		imin=imax;
+	}
 	
+	/*
 	Kahn_clear(acc);
 	sum=0;
 	imin=1.0e-8;
@@ -195,7 +194,8 @@ int main(int argc, char** argv ){
 		printf("[%.3e %.3e ] kt2= %.3e x= %.3e value= %.3e \tsum=%.3e,%.3e %.3e\n" , imin,imax,pow(par[0],2),par[1], val,sum,total,sum-total);
 		imin=imax;
 	}
-	/*
+	*/
+	lev.reset();
 	Kahn_clear(acc);
 	sum=0;
 	imin=1.0e-8;
@@ -203,16 +203,21 @@ int main(int argc, char** argv ){
 	xg.init(1.0e-8,1,0.9,pow(imin,-2)*2,1.0,0.2 );
 	xg.set_x(par[1]);
 	printf("\n***************************\nchebyshev\n****************************\n");
-	for (int i=0;i<10;++i){
+	for (int i=0;i<50;++i){
 		imax+=scale;
 		val=dclenshaw<testfunc_cheb,double*>(cc, func1, par,imin,imax,1.0e-10,1.0e-10);
 		sum+=val;
 		acc+=val;
 		total=Kahn_total(acc);
-		printf("[%.3e %.3e ] kt2= %.3e x= %.3e value= %.3e \tsum=%.3e,%.3e %.3e\n" , imin,imax,pow(par[0],2),par[1], val,sum,total,sum-total);
+		
+		lev.add_term(val);
+		if(i>40){
+			printf("[%.3e %.3e ] kt2= %.3e x= %.3e value= %.3e \tsum=%.3e,%.3e %.3e\n" , imin,imax,pow(par[0],2),par[1], val,sum,total,sum-total);
+			printf("levin= %.3e\n", lev.accel(i-1-10,10));
+		}
 		imin=imax;
 	}
-	*/
+	
 		
 	return 0;
 }

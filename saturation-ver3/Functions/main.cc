@@ -145,7 +145,7 @@ int main(int argc, char** argv){
 		ival=double_round(ival,USE_RESULT);
 #endif
 		printf("%s %le %le \n",name,ival,ierr*10);
-		upar.Add(name, ival,(fabs(ierr)<1.0e-5)?(ival/50):(ierr*10));
+		upar.Add(name, ival,(fabs(ierr)<fabs(ival/100))?(ival/50):(ierr*10));
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT
@@ -163,7 +163,7 @@ int main(int argc, char** argv){
 	
 	
 	INT_PREC=1.0e-3;
-	N_APPROX=N_CHEB_R/8;
+	N_APPROX=N_CHEB_R/3;
 	for(int i=0;i<2;++i){
 		prec.SetPrecision(INT_PREC*5);
 		printf("*****************************\n");
@@ -177,7 +177,7 @@ int main(int argc, char** argv){
 	
 	
 	INT_PREC=2.5e-4;
-	N_APPROX=N_CHEB_R/2;
+	N_APPROX=(2*N_CHEB_R)/3;
 	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
@@ -191,7 +191,7 @@ int main(int argc, char** argv){
 #if MODEL==1
 		for(int i=0;i<N_PAR-skip;++i){
 			migrad.Fix(i);
-			min=migrad(50,25);
+			min=migrad(20,25);
 			migrad.Release(i);
 		}
 #endif

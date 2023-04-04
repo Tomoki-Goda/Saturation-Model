@@ -19,7 +19,7 @@
 //#include"series_sum.hh"
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_sum.h>
-
+#include"Levin.hh"
 
 inline double  modx(const double  x, const double  Q2, const  double  mf2){
 #if MODX==1
@@ -202,7 +202,7 @@ template<typename INTEG>class Dipole_Gluon{
 			double arr[SECTOR_MAX];
 			double sum = 0;
 			int n;
-			gsl_sum_levin_u_workspace * w = gsl_sum_levin_u_alloc (SECTOR_MAX);
+			//gsl_sum_levin_u_workspace * w = gsl_sum_levin_u_alloc (SECTOR_MAX);
 			Kahn accum=Kahn_init(3);
 			const std::vector<double> par{kt2,x};
 			double rmax=R_MAX,rmin=R_MIN;
@@ -210,7 +210,7 @@ template<typename INTEG>class Dipole_Gluon{
 			Kahn_clear(accum);
 			
 			//double scale=((int)log(kt2))*(2*PI)/sqrt(kt2);
-			double scale=((int)pow(kt2,0.25)+1)*(2*PI)/sqrt(kt2);
+			double scale=4*(2*PI)/sqrt(kt2);
 			//double scale=(2*PI)/sqrt(kt2);
 			
 			
@@ -226,10 +226,10 @@ template<typename INTEG>class Dipole_Gluon{
 
 			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 			int flag=0;
-			
+			Levin lev(SECTOR_MAX);
 			for(int i=0;i<sectors;++i){
-				imax=(2*PI)/sqrt(kt2)+(i+1)*scale;
-				
+				//imax=(2*PI)/sqrt(kt2)+(i+1)*scale;
+				imax+=scale;
 				if(imax>rmax){
 					if(i>0){
 						imax-=scale;
@@ -257,16 +257,20 @@ template<typename INTEG>class Dipole_Gluon{
 				*/
 				imin=imax;
 				sum+=val;
-				arr[i]=val;
-				if(fabs(val/sum)<1.0e-8){
-					sectors=i;
-					break;
-				}
+				//arr[i]=val;
+				//if(fabs(val/sum)<1.0e-8){
+				//	sectors=i;
+				//	break;
+				//}
+				lev.add_term(val);
 			}
-			gsl_sum_levin_u_accel (arr, sectors, w, &sum_accel, &err);
-			sum=0;
-			for(int i=0;i<sectors;i++){
-				sum+=arr[i];
+			//gsl_sum_levin_u_accel (arr, sectors, w, &sum_accel, &err);
+			
+			if(sectors>=20){
+				val=lev.accel(sectors-9,8);
+				printf("sum=%.3e \t lev=%.3e %.3e\t %d x=%.3e kt2=%.3e\n",sum,val,lev.accel(sectors-10,8),sectors,x,kt2);
+			}else{
+				val=sum;
 			}
 			/*
 			if(flag>=10){
@@ -279,12 +283,12 @@ template<typename INTEG>class Dipole_Gluon{
 				val=Kahn_total(accum);
 			}*/
 			//printf("%.3e+- %.3e vs %.3e +- %.3e\n",sum_accel,err,sum,val );
-			printf("%.3e %.3e+- %.3e %d\n",sum,sum_accel,err,sectors);
+			
 			/*if(val<0){
 				printf("sectors= %d imax=%.3e rmax=%.3e kt2=%.3e x=%.3e val=%.3e /%.3e\n",sectors,imax,rmax, kt2,x,val, Kahn_total(accum));
 				getchar();
 			}*/
-			val=sum_accel;
+			//val=sum_accel;
 //#endif
 			double diff=0;
 #if (IBP>=1 && ADD_END!=0 && WW==0 )			

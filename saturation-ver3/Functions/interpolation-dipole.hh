@@ -572,7 +572,7 @@ template <typename Sig> class Gluon_Integrand{
 	#if NS==2
 					val*=( kt*r*std::cyl_bessel_j(1,r*kt) + 2*pow(r/ns_pow,2)*std::cyl_bessel_j(0,r*kt));
 	#else
-					val*= kt*r*std::cyl_bessel_j(1,r*kt);
+					val*= kt*r*std::cyl_bessel_j(0,r *kt );
 	#endif
 #elif IBP==2
 					val=(*sigma)(x,r);
@@ -590,7 +590,9 @@ template <typename Sig> class Gluon_Integrand{
 					break;
 				case 'w'://for weizsacker-william 
 					val=(*sigma)(x,r);
-					val*=std::cyl_bessel_j(0,r*kt)/r;
+					val*=std::cyl_bessel_j(0,r *kt );
+					//val*=(r*kt>10)?(sqrt(2.0/(PI*r*kt))*cos(r*kt-PI/4)):(std::cyl_bessel_j(0,r *kt ));
+					val/=r;
 					break;
 				default:
 					printf("unknown option in laplacian sigma\n");

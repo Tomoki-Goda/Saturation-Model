@@ -39,7 +39,7 @@
 //generally R_MAX should be larger than 1/sqrt(KT2_MIN) etc
 ////////////////////////////////////////
 #ifndef R_MIN 
-	#define R_MIN 1.0e-6
+	#define R_MIN 1.0e-8
 #endif
 #ifndef R_MAX
 	#define R_MAX 1e+6
@@ -181,7 +181,7 @@
 #endif
 
 #ifndef SECTOR_MAX
-	#define SECTOR_MAX 100
+	#define SECTOR_MAX 200
 #endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////

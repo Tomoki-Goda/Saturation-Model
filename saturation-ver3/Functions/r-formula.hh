@@ -70,9 +70,11 @@ class Sigma{
 #endif
 
 #endif	//MODEL	
-#if ADJOINT==1	
-			return (9.0/4.0 * qs2);
-#endif
+			if(qs2<1.0e-10){
+				printf("qs2=%.1e\n",qs2);
+				return 1.0e-10;
+			}
+
 			return qs2;		
 		}
 	public:

@@ -73,7 +73,7 @@ int main(int argc , char** argv){
 		GLUON dipole_gluon(dsigma);
 		dipole_gluon.init(sigpar);
 		Approx_aF<GLUON> gluon(dipole_gluon);
-		gluon.init(100,100,sigpar);
+		gluon.init(50,50,sigpar);
 		const double kt2max=1.0e+8;
 	 	printf("Initialized\n");
 		gluon.set_max(kt2max);

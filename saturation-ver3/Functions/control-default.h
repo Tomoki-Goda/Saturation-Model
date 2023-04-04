@@ -27,22 +27,35 @@
 	#define MASS_B2 21.16
 #endif
 //////////////SELECTION OF DATA////////////
-#ifndef X_MAX 
-	#define X_MAX 1.0e-2
+#ifndef X_DATA_MAX 
+	#define X_DATA_MAX 1.0e-2
 #endif
 #ifndef Q2_MAX 
 	#define Q2_MAX 1.0e+1
 #endif
 
 ////// upper and lower cut off of r ////////
-#ifndef R_MIN
-	#define R_MIN 1.0e-6
+//Keep in mind r and k limits can be related.  
+//generally R_MAX should be larger than 1/sqrt(KT2_MIN) etc
+////////////////////////////////////////
+#ifndef R_MIN 
+	#define R_MIN 1.0e-8
 #endif
 #ifndef R_MAX
-	#define R_MAX 1e+5
+	#define R_MAX 1e+6
 #endif
 #ifndef R_MINMAX //for x dependent r max, this is as low as rmax gets. see dipole-gluon.hh
 	#define R_MINMAX 1.0e+2
+#endif
+
+#ifndef X_MIN 
+	#define X_MIN 1.0e-8
+#endif
+#ifndef X_MAX 
+	#define X_MAX 1.0e+00
+#endif
+#ifndef KT2_MIN 
+	#define KT2_MIN 1.0e-8
 #endif
 
 //////////////////////////////////////////////////////////////////
@@ -165,6 +178,10 @@
 #endif
 #ifndef CHEB_D//variants of models. see r-formula.h
 	#define CHEB_D 1
+#endif
+
+#ifndef SECTOR_MAX
+	#define SECTOR_MAX 100
 #endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////

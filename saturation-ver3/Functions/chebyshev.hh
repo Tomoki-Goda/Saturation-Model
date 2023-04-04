@@ -23,6 +23,7 @@ double change_var_revert(double min,double max, double val){
 	//for val =[-1,1]  return value between min and max
 	if((val>1)||(val<-1)|| (min>max)){
 		printf("change_var_revert:: wrong input for change_var_revert\n val=%f\t [%f, %f] \n",val, min,max);
+		//return (0);
 	}
 	double res=((val+1)*max - (val-1)*min)/2; 
 
@@ -34,6 +35,7 @@ double change_var_compactify(double min,double max, double val){
 	//for val =[min,max]  return value between -1 and 1
 	if(min>max){
 		printf("change_var_compactify:: wrong input for change_var_compactify\n val=%f\t [%f, %f] \n",val, min,max);
+		return (0);
 	}
 	double res=2*((val-min)/(max-min)) -1;
 //	printf("%.6e \n",val-change_var_revert(min,max,res)); 
@@ -45,6 +47,7 @@ double change_var_revert_log(double min,double max, double val){
 	//for val =[-1,1]  return value between min and max
 	if((val>1)||(val<-1)|| (min>max)){
 		printf("change_var_revert_log:: wrong input for change_var_revert\n val=%f\t [%f, %f] \n",val, min,max);
+		//return (0);
 	}
 	return (min*pow((max/min),(1.0-val)/2) ) ;
 }
@@ -53,6 +56,7 @@ double change_var_compactify_log(double min,double max, double val){
 
 	if(min>max){
 		printf("change_var_compactify_log:: wrong input for change_var_compactify\n val=%f\t [%f, %f] \n",val, min,max);
+		return (0);
 	}
 	return (1-2*(log(val/min) /log(max/min)) );	
 }

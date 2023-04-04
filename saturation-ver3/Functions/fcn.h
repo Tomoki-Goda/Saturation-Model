@@ -62,7 +62,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			}
 			while((!feof(file))&&(j<597)){
 				fscanf(file,"%lf %lf %lf %lf %lf", (Q2_DATA+i),(X_DATA+i),&wdata,(CS_DATA+i),(ERR_DATA+i)); 
-				if((X_DATA[i]<=X_MAX)&&( Q2_DATA[i]<=Q2_MAX)){
+				if((X_DATA[i]<=X_DATA_MAX)&&( Q2_DATA[i]<=Q2_MAX)){
 					fac = pow(Q2_DATA[i],2)*(1-X_DATA[i])/ (4*pow(PI,2)*alpha*(Q2_DATA[i]+pow(2*X_DATA[i]*xmp0,2)));
 					fac*=units;	
 					CS_DATA[i] = fac*CS_DATA[i];

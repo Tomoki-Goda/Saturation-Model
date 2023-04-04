@@ -23,11 +23,11 @@
 //0 no approx
 //-1 only the xg --- default
 //-2 BOTH
-	#if MODEL==1
+	//#if MODEL==1
 		typedef Gluon_Integrand<SIGMA> DSIGMA;
-	#else 
-		typedef Gluon_Integrand DSIGMA;
-	#endif
+	//#else 
+	//	typedef Gluon_Integrand DSIGMA;
+	//#endif
 #elif ((SIGMA_APPROX>0)||(SIGMA_APPROX<-1))
 	//typedef Gluon_Integrand<SIGMA> DSIGMA;
 	typedef Laplacian_Sigma<SIGMA> DSIGMA;

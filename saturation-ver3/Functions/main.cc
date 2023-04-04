@@ -145,14 +145,17 @@ int main(int argc, char** argv){
 		ival=double_round(ival,USE_RESULT);
 #endif
 		printf("%s %le %le \n",name,ival,ierr*10);
-		upar.Add(name, ival,(fabs(ierr)<fabs(ival/100))?(ival/50):(ierr*10));
+		//upar.Add(name, ival,(fabs(ierr)<fabs(ival/100))?(ival/50):(ierr*10));
+		//upar.Add(name, ival,(fabs(ierr)<1.0e-5)?(ival/50):(ierr*10));
+		//upar.Add(name, ival, ival/50);
+		upar.Add(name, ival, ival*pow(10,-USE_RESULT));
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT
 	ROOT::Minuit2::MnMachinePrecision prec;
 	
-	INT_PREC=1.0e-4;
-	N_APPROX=N_CHEB_R;
+	INT_PREC=1.0e-3;
+	N_APPROX=N_CHEB_R/3;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
@@ -191,7 +194,8 @@ int main(int argc, char** argv){
 #if MODEL==1
 		for(int i=0;i<N_PAR-skip;++i){
 			migrad.Fix(i);
-			min=migrad(20,25);
+			min=migrad(50,25);
+			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			migrad.Release(i);
 		}
 #endif

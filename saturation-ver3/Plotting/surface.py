@@ -19,12 +19,14 @@ def main():
     run=False
     alpha=1
     rapidity=False
+    logz=False
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:], "Yrdmhs:g:q:c", ['Y','run','dipole','multiple','help',"save=","grid=","Q2=","contour"])
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "Yrdmhs:g:q:cl", ['Y','run','dipole','multiple','help',"save=","grid=","Q2=","contour","log"])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
     for opt, arg in opts:
+        print(opt," ")
         if opt in ["-s","--save"]:
             savefile=arg
         elif opt in ["-g","--grid"]:
@@ -46,6 +48,8 @@ def main():
             run=True
         elif opt in ['-Y','--Y']:
             rapidity=True
+        elif opt in ['-l', '--log']:
+            logz=True
     if grids=="N/A":
         grids=args[0]
 
@@ -89,7 +93,6 @@ def main():
                     elif printflag:
                         printflag=False
                         print("$Q^2$=",np.exp(float(data[2])));
-                        
                 kt2=float(data[1])
                 if run:
                     alpha=4*3.1415/(9*np.log((kt2+1)/0.09));
@@ -107,17 +110,26 @@ def main():
                     x=data[0];
                 else:            
                     z.append(alpha* float(data[len(data)-1]) )
-                    
                 if(counter==0):
-                    
                     Y.append(kt2)
-                
-
             Z.append(z)
         if len(Q2)>0:
             Q2=[np.log10(np.exp(float(i))) for i in list(Q2)]
             Q2.sort()
             print(Q2[0],"  ", Q2[len(Q2)-1]);
+            
+        if logz:
+        	Zn=[]
+        	for i, zi in enumerate(Z):
+        		zn=[]
+        		for j, zij in enumerate(zi):
+        			if zij>0:
+        				Z[i][j]=np.log10(zij)
+        				zn.append(-25)
+        			else:
+        				zn.append(np.log10(-zij))
+        				Z[i][j]=-25
+        		Zn.append(zn)
         print(X[0],"  ", X[len(X)-1]);
         print(Y[0],"  ", Y[len(Y)-1]);
         X, Y = np.meshgrid(X,Y )
@@ -132,6 +144,9 @@ def main():
         else:
             surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=6, ccount=0,color="r",ls="-." )
             surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=0, ccount=6,color="b",ls="-")
+            if logz:
+            	surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Zn)), rcount=6, ccount=0,color="g",ls="-." )
+            	surf = ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Zn)), rcount=0, ccount=6,color="y",ls="-")
             if dipole:
                 ax[gpos].view_init(28, -28)
                 ax[gpos].set_ylabel('$\log_{10}(r^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
@@ -140,7 +155,8 @@ def main():
                 ax[gpos].set_ylabel('$\log_{10}(k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
             ax[gpos].set_xlabel('$\log_{10}x$',loc='right')
         #ax[gpos].set_xlim(0, 10)        
-        #ax[gpos].set_ylim(-2, 2)        
+        #ax[gpos].set_ylim(-2, 2)  
+        #ax[gpos].set_zlim(-20, 20)         
 
         #cs=ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)), levels=10,colors="black",linewidths=0.5,linestyles=["solid","dashed"])
     #ax[len(grids)-1].set_xlabel('$x$',loc='right')

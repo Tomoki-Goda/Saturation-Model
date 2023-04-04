@@ -14,7 +14,7 @@ def import_array(name ):
 	#with open("./pwf.txt","r") as fi:
 		for line in fi:
 			#data=line.readline();
-			data=line.strip().split('\t')
+			data=line.strip().split()
 			#data=[math.log(float(j))/math.log(10) for j in data]
 			data=[float(j) for j in data]
 			dataarray.append(data)

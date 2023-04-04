@@ -16,6 +16,10 @@
 //#else
 //	typedef Laplacian_Sigma Integrand;				
 //#endif
+//#include"series_sum.hh"
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_sum.h>
+#include"Levin.hh"
 
 inline double  modx(const double  x, const double  Q2, const  double  mf2){
 #if MODX==1
@@ -139,12 +143,30 @@ inline double max(double a,double b){
 //Dipole gluon
 //
 /////////////////////////////////////////////////////////////////////
-//template <typename LSigma>class Dipole_Gluon{
+/*//template <typename LSigma>class Dipole_Gluon{
+//double eps(int n, int m, const double (&list)[SECTOR_MAX]){ 
+double eps(int n, int m, const double *list){ 
+//epsilon series convergence algorithm??
+// I don't know the name but Seki-Aitken's generalization.
+	//if(2*(m/2)!=m){
+	//	printf("eps use multiple of 2, m=%d\n",m);
+	//	m=2*((m+1)/2);
+	//}
+	if(m == -1){
+		return(0);
+	};
+	if(m == 0){
+	  	return(list[n]);
+	};
+	return(eps(n + 1, m - 2,list) + 1/(eps(n + 1, m - 1,list) - eps(n, m - 1,list)));
+}*/
 template<typename INTEG>class Dipole_Gluon{
 		const double *par;
 		//Laplacian_Sigma integrand;
 		INTEG *integrand;
-		CCIntegral cc=CCprepare(64,"dipole",1,4);
+		CCIntegral cc=CCprepare(32,"dipole",1,3);
+		
+		
 		//double fixx;
 
 	public: 
@@ -175,109 +197,120 @@ template<typename INTEG>class Dipole_Gluon{
 			integrand->set_x(x);
 		}
 		double operator()(const double x,const double kt2,const double mu2){
-			//if(x!=this->x){
-			//	set_x(x);	
-			//}
-/*#if SIGMA_APPROX==1||SIGMA_APPROX==-2
-			if(this->x!=x){
-				this->x=x;
-				integrand->set_kinem(x);
-				printf("set x");
-			}
-#endif*/
+			//Series_Sum ss(2);
+			double sum_accel, err;
+			double arr[SECTOR_MAX];
+			double sum = 0;
+			int n;
+			//gsl_sum_levin_u_workspace * w = gsl_sum_levin_u_alloc (SECTOR_MAX);
 			Kahn accum=Kahn_init(3);
 			const std::vector<double> par{kt2,x};
 			double rmax=R_MAX,rmin=R_MIN;
-			double val=0;
+			double val=0,val1=0,val2=0;
 			Kahn_clear(accum);
-
-			const double minmax=R_MINMAX;
-#if ADD_END>=0 //negative value is for testing purpose.
-			rmax=minmax;
-#if MODEL==1
-
-#if WW==1
-			rmax/=(sqrt(kt2));
-#else
-			rmax/=(pow(1-x,3)+sqrt(kt2));
-#endif
-#else
-			rmax/=(sqrt(kt2));
-#endif
-//#if WW==1
-//			rmax/=sqrt(kt2);
-//#endif
-			if(rmax>R_MAX||!std::isfinite(rmax)){
-				rmax=R_MAX;
-			}
-			const double scale=(2*PI)/sqrt(kt2);
+			
+			double scale=(2*PI)/sqrt(kt2);
 			double imin=rmin;
 			int sectors=(int)(rmax/scale);
-			if(sectors<5){
-				sectors=5;
-			}
 			
-			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient 
+			if(sectors>SECTOR_MAX||sectors<1||!std::isfinite(sectors)){
+				sectors=SECTOR_MAX;
+			}
+			if(sectors>3){
+				scale*=2;
+				sectors/=2;
+			}
+			//if(sectors>15){
+			//	scale*=2;
+				//sectors/=2;
+			//}
+			if(sectors>20){
+				scale*=2;
+				//sectors/=2;
+			}
+
+			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 			int flag=0;
-			//double val_prev=0;
+			Levin lev(SECTOR_MAX);
 			for(int i=0;i<sectors;++i){
 				imax+=scale;
 				if(imax>rmax){
 					if(i>0){
 						imax-=scale;
-						sectors=i-1;
+						sectors=i;
 						break;
 					}else{
 						imax=rmax;
 					}
 				};
+				
 #if R_CHANGE_VAR==1
-				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),pow(INT_PREC,2),10e-14);
 #elif R_CHANGE_VAR==0
-				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
 #endif
-				if(fabs(val+integrand->constant(imax,par))< pow(INT_PREC,2) ){
-					++flag;
-					if(flag>5&&imax>minmax){//if consecutively small 5 times
-						break;//it is likely beyond this will be trivial
-					}
-				}else{
-					flag=0;
+				//printf("%.3e\n",val);
+				//getchar();
+				if(val==0.0){
+					sectors=i;
+					break;
 				}
-				accum+=val;
 				imin=imax;
+				sum+=val;
+				lev.add_term(val);
+				if(i>=20&&5*(i/5)==i){
+					val1=lev.accel(i-6,6);
+					val2=lev.accel(i-7,6);
+					if(fabs(1-val2/val1)<INT_PREC||fabs(val1)<pow(INT_PREC,2) ){
+						sectors=i+1;
+						break;
+					}
+				}
 			}
-			val=Kahn_total(accum);
-#endif
+			--sectors;
+			
+			if(sectors>=20){
+				val1=lev.accel(sectors-6,6);
+				val2=lev.accel(sectors-7,6);
+				if(fabs(1-val2/val1)>INT_PREC&&fabs(val1)>pow(INT_PREC,2) ){
+					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.3e kt2=%.3e\n",sum,val1,val2,sectors,x,kt2);
+				}
+				val=val1;
+			}else{
+				val=sum;
+			}
+			
+			
+
 			double diff=0;
 #if (IBP>=1 && ADD_END!=0 && WW==0 )			
-//#if (IBP>=1)			
 			diff+=integrand->constant(imax,par);
-			//diff-=integrand.constant(rmin,par);
 			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
-				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
-				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
+				printf("Dipole_Gluon:: inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
+				printf("Dipole_Gluon::  x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
 			}
-//#if ADD_END!=0
 			val+=diff;
-//#endif//ADD_END
 #endif//IBP
 			Kahn_free(accum);
-//Threshold 1-x^7 is in dipole sigma. 
-			
 			if(!std::isfinite(val)){
+				printf("Dipole_Gluon:: % encountered 0 returned\n",val);
 				val=0;
 			}
 #if WW==1
 			val*=2.0/(3.0*pow(PI,3));
+			//val=((val<1.0e-5)?(1.0e-5):(val));
 #else
 			val*=3.0/(8.0*pow(PI,2));
 #endif			
+			//printf("3:% e\n",val);
 			return (val);
 		}
 		
 		
 };
+
+
+ 
 /////////////////////////////////////////////////////////////////////
 //
 //WW gluon

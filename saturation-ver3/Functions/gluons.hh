@@ -13,10 +13,10 @@
 #include<cmath>
 //#include "./complex.hh"
 //#include "cfortran.h"
-#include"./control-default.h"
-#include"./constants.h"
-#include "./clenshaw.hh"
-#include "./gauss.hh"
+#include"control-default.h"
+#include"constants.h"
+#include"clenshaw.hh"
+//#include"./gauss.hh"
 #include"polygamma.hh"
 #include<complex>
 #include<pthread.h>
@@ -247,6 +247,7 @@ class Chebyshev1D_Collinear_Gluon{
 		}
 		void set_x(const double &x){
 			fixx=&x;
+			//printf("Chebyshev1D_Collinear_Gluon x set to %.2e",x);
 			cheb_coeff<Chebyshev1D_Collinear_Gluon,const Collinear_Gluon&>(cheb[0],*this,xg);
 		}
 		
@@ -274,7 +275,7 @@ class Chebyshev1D_Collinear_Gluon{
 			return(res);
 		}
 };
-
+/*
 extern int N_APPROX;
 class Interpolate_Collinear_Gluon{
 	private:
@@ -347,5 +348,5 @@ class Interpolate_Collinear_Gluon{
 };
 //////////////////////////////////////////
 //////////////////////////////////////////
-
+*/
 #endif

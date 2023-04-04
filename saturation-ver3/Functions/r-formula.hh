@@ -1,3 +1,5 @@
+#ifndef R_FORMULA_HH
+#define R_FORMULA_HH 1
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   GBW / BGK dipoles
@@ -30,7 +32,7 @@ class Sigma{
 		}
 		double Qs2(const double x,const double r){
 			if(x>1){
-				printf("x is too large %.3e\n",x);
+				printf("Sigma:: x is too large %.3e\n",x);
 				getchar();
 			}
 #if MODEL==0//GBW
@@ -70,9 +72,9 @@ class Sigma{
 #endif
 
 #endif	//MODEL	
-			if(qs2<1.0e-10){
-				printf("qs2=%.1e\n",qs2);
-				return 1.0e-10;
+			if(qs2<1.0e-15){
+				printf("Sigma:: qs2=%.1e\n",qs2);
+				return 1.0e-15;
 			}
 
 			return qs2;		
@@ -96,9 +98,10 @@ class Sigma{
 			x2=((x>0.5)?0.5:x);
 #endif
 
-#if SIGMA_APPROX<0
+//#if SIGMA_APPROX<0
 			xgpdf.set_x(x2);
-#endif
+			//printf("x set to %.2e",x2);
+//#endif
 #endif
 		}
 		void init(const double * const &sigpar){
@@ -153,6 +156,7 @@ class Sigma{
 #if ADJOINT==1
 			qs2*=9.0/4.0;
 #endif
+
 #if IBP==2
 			double val=-sigma_0*exp(-pow(r,2)*qs2/4);
 #else
@@ -161,6 +165,7 @@ class Sigma{
 			val=pow(r,2)*qs2/4;
 			if(val<1.0e-4){
 				val*=(1-val/2+pow(val,2)/6-pow(val,3)/24);
+				//printf("%.4e %.4e %.4e\n",r,(1-exp(-val))/pow(r,2),val/pow(r,2));
 			}else{
 				val=(1-exp(-val));
 			}
@@ -182,6 +187,9 @@ class Sigma{
 			if(!std::isfinite(val)){
 				return(0);
 			}
+			//if(r<1.0e-7){
+			//	printf("%.4e %.4e\n",r,val);
+			//}
 			return val;
 		}
 
@@ -189,5 +197,5 @@ class Sigma{
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
-
+#endif
 

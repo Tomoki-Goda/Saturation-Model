@@ -554,10 +554,10 @@ template <typename Sig> class Gluon_Integrand{
 			const double r =rho;
 #endif		
 			if(r>1.42*R_MAX){
-				printf("too large, out of range %.4e - %.4e = %.4e\n",R_MAX,r,R_MAX-r);
+				printf("Gluon_Integrand:: too large, out of range %.4e - %.4e = %.4e\n",R_MAX,r,R_MAX-r);
 			}
 			if(r<R_MIN/1.41){
-				printf("too small, out of range %.4e - %.4e = %.4e , rho=%.3e,%d\n",r,R_MIN,r-R_MIN,rho,R_CHANGE_VAR);
+				printf("Gluon_Integrand:: too small, out of range %.4e - %.4e = %.4e , rho=%.3e,%d\n",r,R_MIN,r-R_MIN,rho,R_CHANGE_VAR);
 			}
 			const double kt=sqrt(par[0]),x=par[1];
 			double val = 0;
@@ -595,15 +595,15 @@ template <typename Sig> class Gluon_Integrand{
 					val/=r;
 					break;
 				default:
-					printf("unknown option in laplacian sigma\n");
+					printf("Gluon_Integrand:: unknown option in laplacian sigma\n");
 			}
 			//printf("2: val=%.3e for r= %.3e\n",val,r);
 			if(not(std::isfinite(val))){
-				printf("2: val=%.3e for r= %.3e\n",val,r);
+				printf("Gluon_Integrand:: 2: val=%.3e for r= %.3e\n",val,r);
 			}
 			
 			if(not(std::isfinite(val))){
-				printf("3: val=%.3e for r= %.3e\nparameter: ",val,r);
+				printf("Gluon_Integrand:: 3: val=%.3e for r= %.3e\nparameter: ",val,r);
 				for(int i=0;i<par.size();i++){
 					printf(" %.3e\t",par[i]);
 				}printf("\n");
@@ -618,6 +618,9 @@ template <typename Sig> class Gluon_Integrand{
 #endif
 		}
 		double constant(double r , const std::vector<double> &par) {
+#if WW==1
+	return 0;
+#endif
 			//const Sigma& sigma=&(this->sigma);
 			//const double r=rho/(1-rho);
 			const double kt=sqrt(par[0]),x=par[1];

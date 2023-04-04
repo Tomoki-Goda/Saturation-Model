@@ -1,6 +1,7 @@
 #include<iostream>
 #include<cmath>
 #include"Kahn.hh"
+
 class Levin{
 	private:
 		double *a,*s;
@@ -25,7 +26,7 @@ class Levin{
 		int add_term(double term){
 			
 			if(position>len){
-				printf("out of bound\n");
+				printf("Levin:: out of bound\n");
 				exit(1);
 			}
 			a[position]=term;
@@ -55,13 +56,13 @@ class Levin{
 		}
 		inline double sum(int n)const{
 			if(n>position-1){
-				printf("%d st/nd/th element undefined. current=%d\n",n,position-1);
+				printf("Levin:: %d st/nd/th element undefined. current=%d\n",n,position-1);
 			}
 			return(s[n]);
 		}
 		double accel(int n ,int j)const{
 			if(n+j>position-1){
-				printf("%d st/nd/th element undefined. current=%d\n",n+j+1,position-1);
+				printf("Levin:: %d st/nd/th element undefined. current=%d\n",n+j+1,position-1);
 			}
 			double num=0,den=0;
 			double val=0;
@@ -70,6 +71,10 @@ class Levin{
 			for(int i=0;i<=j;++i){
 				val=pow(-1,i)*fact[j]/(fact[j-i]*fact[i]);
 				val*=levin_c(b,i,j,n) /((b+n+i)*a[n+i]);//Levin type u.
+				if(!std::isfinite(val)){
+					printf("Levin:: %.3e encountered. a[%d]==%.3e?=0 ??\n",val,n+i,a[n+i]);
+					getchar();
+				}
 				de+=val;	
 				nu+=s[n+i]*val;	
 			}
@@ -78,7 +83,7 @@ class Levin{
 			Kahn_free(de);
 			Kahn_free(nu);
 		    if(den==0.0||!std::isfinite(num)||!std::isfinite(den)){
-				printf("denominator=%.3e, numerator=%.3e\n",den,num );
+				printf("Levin:: denominator=%.3e, numerator=%.3e\n",den,num );
 			}	
 			return(num/den);	
 		}

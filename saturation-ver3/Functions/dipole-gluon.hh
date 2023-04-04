@@ -164,7 +164,7 @@ template<typename INTEG>class Dipole_Gluon{
 		const double *par;
 		//Laplacian_Sigma integrand;
 		INTEG *integrand;
-		CCIntegral cc=CCprepare(32,"dipole",1,5);
+		CCIntegral cc=CCprepare(32,"dipole",1,3);
 		
 		
 		//double fixx;
@@ -206,34 +206,38 @@ template<typename INTEG>class Dipole_Gluon{
 			Kahn accum=Kahn_init(3);
 			const std::vector<double> par{kt2,x};
 			double rmax=R_MAX,rmin=R_MIN;
-			double val=0;
+			double val=0,val1=0,val2=0;
 			Kahn_clear(accum);
 			
-			//double scale=((int)log(kt2))*(2*PI)/sqrt(kt2);
-			double scale=4*(2*PI)/sqrt(kt2);
-			//double scale=(2*PI)/sqrt(kt2);
-			
-			
+			double scale=(2*PI)/sqrt(kt2);
 			double imin=rmin;
 			int sectors=(int)(rmax/scale);
-			//printf("sclae= %.3e cycle=%d sectors=%d\n",scale ,((int)pow(kt2,0.25)) ,sectors);
+			
 			if(sectors>SECTOR_MAX||sectors<1||!std::isfinite(sectors)){
 				sectors=SECTOR_MAX;
 			}
-			//if(sectors>10){
-			//	scale*=20;
+			if(sectors>3){
+				scale*=2;
+				sectors/=2;
+			}
+			//if(sectors>15){
+			//	scale*=2;
+				//sectors/=2;
 			//}
+			if(sectors>20){
+				scale*=2;
+				//sectors/=2;
+			}
 
 			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 			int flag=0;
 			Levin lev(SECTOR_MAX);
 			for(int i=0;i<sectors;++i){
-				//imax=(2*PI)/sqrt(kt2)+(i+1)*scale;
 				imax+=scale;
 				if(imax>rmax){
 					if(i>0){
 						imax-=scale;
-						sectors=i-1;
+						sectors=i;
 						break;
 					}else{
 						imax=rmax;
@@ -241,76 +245,57 @@ template<typename INTEG>class Dipole_Gluon{
 				};
 				
 #if R_CHANGE_VAR==1
-				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),pow(INT_PREC,2),10e-15);
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),pow(INT_PREC,2),10e-14);
 #elif R_CHANGE_VAR==0
-				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),pow(INT_PREC,2));
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
 #endif
-				/*printf(" scale= %.3e imin=%.3e imax= %.3e sector=%d/%d val=%.3e\n",scale,imin,imax,i,sectors,val);
-				flag=ss.append(val);
-				//if(flag>=15){
-				if(flag>=10&&fabs(val)<fabs(Kahn_total(accum)*1.0e-6)){
+				//printf("%.3e\n",val);
+				//getchar();
+				if(val==0.0){
+					sectors=i;
 					break;
 				}
-				
-				accum+=val;
-				
-				*/
 				imin=imax;
 				sum+=val;
-				//arr[i]=val;
-				//if(fabs(val/sum)<1.0e-8){
-				//	sectors=i;
-				//	break;
-				//}
 				lev.add_term(val);
+				if(i>=20&&5*(i/5)==i){
+					val1=lev.accel(i-6,6);
+					val2=lev.accel(i-7,6);
+					if(fabs(1-val2/val1)<INT_PREC||fabs(val1)<pow(INT_PREC,2) ){
+						sectors=i+1;
+						break;
+					}
+				}
 			}
-			//gsl_sum_levin_u_accel (arr, sectors, w, &sum_accel, &err);
+			--sectors;
 			
 			if(sectors>=20){
-				val=lev.accel(sectors-9,8);
-				printf("sum=%.3e \t lev=%.3e %.3e\t %d x=%.3e kt2=%.3e\n",sum,val,lev.accel(sectors-10,8),sectors,x,kt2);
+				val1=lev.accel(sectors-6,6);
+				val2=lev.accel(sectors-7,6);
+				if(fabs(1-val2/val1)>INT_PREC&&fabs(val1)>pow(INT_PREC,2) ){
+					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.3e kt2=%.3e\n",sum,val1,val2,sectors,x,kt2);
+				}
+				val=val1;
 			}else{
 				val=sum;
 			}
-			/*
-			if(flag>=10){
-				val=ss.extrapolate(flag);
-			}else{
-				if(sectors>flag){
-					printf("failed to get convergence,%d\n",sectors);
-					
-				}
-				val=Kahn_total(accum);
-			}*/
-			//printf("%.3e+- %.3e vs %.3e +- %.3e\n",sum_accel,err,sum,val );
 			
-			/*if(val<0){
-				printf("sectors= %d imax=%.3e rmax=%.3e kt2=%.3e x=%.3e val=%.3e /%.3e\n",sectors,imax,rmax, kt2,x,val, Kahn_total(accum));
-				getchar();
-			}*/
-			//val=sum_accel;
-//#endif
+			
+
 			double diff=0;
 #if (IBP>=1 && ADD_END!=0 && WW==0 )			
-//#if (IBP>=1)			
 			diff+=integrand->constant(imax,par);
-			//diff-=integrand.constant(rmin,par);
 			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
-				printf("inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
-				printf(" x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
+				printf("Dipole_Gluon:: inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
+				printf("Dipole_Gluon::  x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
 			}
-//#if ADD_END!=0
 			val+=diff;
-//#endif//ADD_END
 #endif//IBP
 			Kahn_free(accum);
-//Threshold 1-x^7 is in dipole sigma. 
-			
 			if(!std::isfinite(val)){
-				printf("% encountered 0 returned\n",val);
+				printf("Dipole_Gluon:: % encountered 0 returned\n",val);
 				val=0;
 			}
-			
 #if WW==1
 			val*=2.0/(3.0*pow(PI,3));
 			//val=((val<1.0e-5)?(1.0e-5):(val));

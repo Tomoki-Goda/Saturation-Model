@@ -16,12 +16,34 @@
 //#include"Functions/r-formula.h"
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_sum.h>
-#define N_CHEB 20
-#include"Functions/gluons.hh"
-#include"Functions/Kahn.hh"
-#include"Functions/clenshaw.hh"
+
+#define MASS_L2 0.0
+#define MASS_S2 0.0
+#define Q2_MAX 650.0
+#define MODEL 1 
+
+#define GLUON_APPROX 1 
+#define N_CHEB_R 100
+#define PRINT_PROGRESS 1
+#define ALPHA_RUN 0
+#define MODX 0
+#define IBP 1 
+#define USE_RESULT 4 
+#define SIGMA_APPROX -1
+#define N_CHEB 30
+#define CHEB_D 1
+
+#define WW 1
+#define X_MIN 1.0e-3
+#define X_MAX 1.0e-1
+#define R_MAX 10e+6
 #include"Functions/control-default.h"
 #include"Functions/constants.h"
+#include"Functions/gluons.hh"
+#include"r-formula.hh"
+#include"Functions/Kahn.hh"
+#include"Functions/clenshaw.hh"
+
 #include"Functions/Levin.hh"
 
 
@@ -129,6 +151,25 @@ class testfunc_cheb{
 		}
 
 };
+
+
+/////////////////////////////////////////////////////////////////////
+class testfunc_BGK{
+	//Chebyshev1D_Collinear_Gluon *xg;
+	Sigma<Chebyshev1D_Collinear_Gluon> *sig;
+	
+	
+	public:
+		testfunc_BGK(Sigma<Chebyshev1D_Collinear_Gluon>& s){
+			sig=&s;
+		}
+		double operator()(double r, const double* p)const {
+			//printf("x=%.2e kt2=%.2e\n",p[1],p[0]);
+			double val=(*sig)(p[1],r)*std::cyl_bessel_j(0,p[0]*r)/r;
+			return(val);
+		}
+
+};
 ////////////////////////////////////////////////////////////
 // Main
 //////////////////////////////////////////////////////////
@@ -136,19 +177,22 @@ int main(int argc, char** argv ){
 	double par[10]={0};
 	CCIntegral cc=CCprepare(64,"dipole",1,5);
 	
-	par[0]=atof(argv[1]);
+	par[0]=sqrt(atof(argv[1]));
 	par[1]=atof(argv[2]);
 	double imin,imax;
 	Kahn acc=Kahn_init(3);
 	double val=0,sum=0;
-	const double scale=25*(2*PI)/par[0];
+	const double scale=(PI)/par[0];
 	
 	double total=0;
 	Chebyshev1D_Collinear_Gluon xg;
-	
+	Sigma<Chebyshev1D_Collinear_Gluon> sigma;
+	double sigpar[]={89.13,1.048,0.2205,0.2391,0.9954};
+	sigma.init(sigpar);
 	testfunc_cheb func1(xg);
 	testfunc func2;
 	testfunc0 func3;
+	testfunc_BGK funcbgk(sigma);
 
 /*
 	Kahn_clear(acc);
@@ -202,6 +246,7 @@ int main(int argc, char** argv ){
 		imin=imax;
 	}
 	*/
+	/*
 	Levin lev(1500);
 	//lev.reset();
 	Kahn_clear(acc);
@@ -225,6 +270,42 @@ int main(int argc, char** argv ){
 		lev.add_term(val);
 		if(5*(i/5)==i&&i>15){
 			printf("%.3e, %.3e\n",func1((imax+imin)/2,par),func1(imin+(imax-imin)/4,par) );
+			printf("[%.3e %.3e ] kt2= %.3e x= %.3e value= %.3e \tsum=%.3e,%.3e %.3e\n" , imin,imax,pow(par[0],2),par[1], val,sum,total,sum-total);
+			printf("levin= %.3e\n", lev.accel(i-1-5,5));
+		}
+		fprintf(file2,"%d %.3e %.3e\n",i,val,sum);
+		//if(i>=10){
+			//for(int j=0;j<1000;++j){
+				//fprintf(file,"%.3e %.3e\n",imin+j*(imax-imin)/999,func1(imin+j*(imax-imin)/999,par) );
+			//}
+		//	
+		//}
+		imin=imax;
+	}
+	//fclose(file);
+	//fclose(file2);
+	*/
+	Levin lev(1500);
+	//lev.reset();
+	Kahn_clear(acc);
+	sum=0;
+	imin=1.0e-8;
+	imax=PI/(4*par[0]);
+	sigma.set_x(par[1]);
+	
+	printf("\n***************************\nBGK-levin\n****************************\n");
+	//FILE* file=fopen("plot.txt","w");
+	FILE* file2=fopen("plot2.txt","w");
+	for (int i=0;i<50;++i){
+		imax+=scale;
+		val=dclenshaw<testfunc_BGK,const double*>(cc, funcbgk, par,imin,imax,1.0e-15,1.0e-15);
+		//val*=2.0/(3.0*pow(PI,3));
+		sum+=val;
+		acc+=val;
+		total=Kahn_total(acc);
+		lev.add_term(val);
+		if(5*(i/5)==i&&i>15){
+			//printf("%.3e, %.3e\n",funcbgk((imax+imin)/2,par),func1(imin+(imax-imin)/4,par) );
 			printf("[%.3e %.3e ] kt2= %.3e x= %.3e value= %.3e \tsum=%.3e,%.3e %.3e\n" , imin,imax,pow(par[0],2),par[1], val,sum,total,sum-total);
 			printf("levin= %.3e\n", lev.accel(i-1-5,5));
 		}

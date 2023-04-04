@@ -62,7 +62,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			}
 			while((!feof(file))&&(j<597)){
 				fscanf(file,"%lf %lf %lf %lf %lf", (Q2_DATA+i),(X_DATA+i),&wdata,(CS_DATA+i),(ERR_DATA+i)); 
-				if((X_DATA[i]<=X_MAX)&&( Q2_DATA[i]<=Q2_MAX)){
+				if((X_DATA[i]<=X_DATA_MAX)&&( Q2_DATA[i]<=Q2_MAX)){
 					fac = pow(Q2_DATA[i],2)*(1-X_DATA[i])/ (4*pow(PI,2)*alpha*(Q2_DATA[i]+pow(2*X_DATA[i]*xmp0,2)));
 					fac*=units;	
 					CS_DATA[i] = fac*CS_DATA[i];
@@ -115,26 +115,36 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			double sigpar[10]={0},sudpar[10]={0};
 			parameter(par,sigpar, sudpar);//Format
 //////////////////////////////////////////////////////////////////////////////////////////
-#if R_FORMULA==1
-	#if GLUON_APPROX==0
-			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
-			sigma[0].init(sigpar);
-			sigma[1].init(sigpar);
-			sigma[2].init(sigpar);
-	#endif
-#else//R_FORMULA///////////////////////////////////////////////////////////////////////
-			Gluon gluon;//gluon has no flavour dep.
+// Below is very messy
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+#if R_FORMULA==0///////////////////////////////////////////////////////////////////////
 	#if GLUON_APPROX==1
-			gluon.init(N_APPROX+100,N_APPROX+100,N_APPROX+250,sigpar);
-			const double kt2max=7.0e+4;
-			gluon.set_max(kt2max);
-	#else
-			gluon.init(sigpar);
+		#if SIGMA_APPROX==-1||SIGMA_APPROX==0//if sigma is not in 1d grid
+			SIGMA sigma;
+			sigma.init(sigpar);
+			DSIGMA dsigma(sigma);
+			dsigma.init(sigpar,'l');
+ 		#else //-2 and 1  
+ 			SIGMA sigma;
+			sigma.init(sigpar);
+			DSIGMA dsigma(sigma);
+			dsigma.init(N_APPROX+250,sigpar,'l');
+		#endif
+		
+		GLUON dipole_gluon(dsigma);
+		dipole_gluon.init(sigpar);
+		Approx_aF<GLUON> gluon(dipole_gluon);
+		gluon.init(N_APPROX+100,N_APPROX+100,sigpar);
+		const double kt2max=9.0e+4;
+		gluon.set_max(kt2max);
+	#else               //only GBW K
+		GLUON gluon();
+		gluon.init(sigpar);
 	#endif//GLUON_APPROX==1	
 #endif//R_FORMULA
 ///////////////////////////////////////////////////////////////////////////////////////////		
-			
-			
 			double arr[MAX_N];
 			double *arr1,*arr2;
 			if(flag==1){
@@ -143,38 +153,44 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			}			
 #pragma omp parallel 
 { 
-#if GLUON_APPROX==0	
-	#if R_FORMULA==1///////////////////////////////////////////////////////////////////////
-			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
-			sigma[0].init(sigpar);
-			sigma[1].init(sigpar);
-			sigma[2].init(sigpar);
-	#else//R_FORMULA//////////////////////////////////////////////////////////////////////
-			Gluon gluon;//gluon has no flavour dep.
-			gluon.init(sigpar);
-	#endif//R_FORMULA//////////////////////////////////////////////////////////////////////
-#endif //GLUON_APPROX==0
-#if R_FORMULA==1		
-	#if GLUON_APPROX==1
-			SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
-			sigma[0].init(N_APPROX+250,sigpar,'s');
-			sigma[1].init(N_APPROX+250,sigpar,'s');
-			sigma[2].init(N_APPROX+250,sigpar,'s');
-	#endif
-			Integrand_r integrands[3]={
-				Integrand_r(sigma[0]) ,
-				Integrand_r(sigma[1]) ,
-				Integrand_r(sigma[2])
+
+//////////////////////////////////////////////////////////////////////////////////////////
+#if R_FORMULA==1	
+	SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
+		sigma[0].init(sigpar);
+		sigma[1].init(sigpar);
+		sigma[2].init(sigpar);	
+
+	#if SIGMA_APPROX==-2||SIGMA_APPROX==1 // AS GBW/BGK K   This require instance per thread
+			DSIGMA dsigma[3]={DSIGMA(sigma[0]) ,DSIGMA(sigma[1]) ,DSIGMA(sigma[2]) };
+			dsigma[0].init(N_APPROX+250,sigpar,'s');
+			dsigma[1].init(N_APPROX+250,sigpar,'s');
+			dsigma[2].init(N_APPROX+250,sigpar,'s');
+			
+			Integrand_r<DSIGMA> integrands[3]={
+				Integrand_r<DSIGMA>(dsigma[0]) ,
+				Integrand_r<DSIGMA>(dsigma[1]) ,
+				Integrand_r<DSIGMA>(dsigma[2])
 			};
-			F2_kt<Integrand_r> F2(integrands);
-#else
-			Integrand_kt<Gluon> integrands[3]={
-				Integrand_kt( gluon),
-				Integrand_kt( gluon),
-				Integrand_kt( gluon)
+			F2_kt<Integrand_r<DSIGMA>> F2(integrands);
+	#elif SIGMA_APPROX==0||SIGMA_APPROX==-1
+		SIGMA (&dsigma)[3]=sigma;
+			Integrand_r<SIGMA> integrands[3]={
+				Integrand_r<SIGMA>(dsigma[0]) ,
+				Integrand_r<SIGMA>(dsigma[1]) ,
+				Integrand_r<SIGMA>(dsigma[2])
 			};
-			F2_kt<Integrand_kt<Gluon>> F2(integrands);
-#endif
+			F2_kt<Integrand_r<SIGMA>> F2(integrands);
+	#endif///////////////////////////////////////////////////////////////////////////////////
+
+#else//R_FORMULA==0
+			Integrand_kt<Approx_aF<GLUON>> integrands[3]={
+				Integrand_kt<Approx_aF<GLUON>>( gluon),
+				Integrand_kt<Approx_aF<GLUON>>( gluon),
+				Integrand_kt<Approx_aF<GLUON>>( gluon)
+			};
+			F2_kt<Integrand_kt<Approx_aF<GLUON>>> F2(integrands);
+#endif//R_FORMULA
 
 #pragma omp for schedule(dynamic)
 			for(int i=0;i<MAX_N;++i){

@@ -6,6 +6,9 @@
 //}
 //#include<cassert>
 typedef struct Kahn{double accum[5]; int N=0;} Kahn;
+#ifndef KAHN_PREC 
+	#define KAHN_PREC 1.0e-12
+#endif
 
 static void Kahn_clear(Kahn& kahn){
 	for(int i=0;i<kahn.N;i++){
@@ -40,25 +43,26 @@ static void Kahn_show(Kahn kahn){
 	}printf(" }\n");
 }
 
-static int plus(double *a,double *b){
+static int plus(double &a,double &b){
 	double c;
 	double	sum,large, small;//=*a+*b;
 	
-	if(fabs(*a)>fabs(*b)){
-		large=*a;
-		small=*b;
+	if(fabs(a)>fabs(b)){
+		large=a;
+		small=b;
 	}else{
-		large=*b;
-		small=*a;
+		large=b;
+		small=a;
 	}
 	sum=large+small;
 	c=sum-large;
 	c=small-c;
-	*a=sum;
-	*b=c;
+	a=sum;
+	b=c;
 	return 0;
 }
-static int accum_sort(double *accum,int len){
+
+/*static int accum_sort(double (&accum)[5],int len){
 	if(len==1){return 0;};
 	int pos=0;
 #if KAHN==1
@@ -87,7 +91,7 @@ static int accum_sort(double *accum,int len){
 			//continue;
 		}else{
 			//printf("sort %.2e %.2e %.3e\n", accum[pos],accum[pos+1], (accum[pos]+accum[pos+1])-accum[pos]);
-			plus(accum+pos,accum+pos+1);
+			plus(accum[pos],accum[pos+1]);
 			
 			(pos==0)?(++pos):(--pos);
 			continue;
@@ -97,44 +101,52 @@ static int accum_sort(double *accum,int len){
 		}
 	}
 	return 0;
+}*/
+int orderedQ(double a, double b){
+	//if a is much larger than b in magnitude, return 1
+	int val;
+	val=(fabs(b/a)<KAHN_PREC)?(1):(0);
+	//val=(fabs(a+b)==fabs(a))?(1):(0);
+	return val;
+}
+static int accum_sort(double (&accum)[5],int len){
+	if(len==1){return 0;};
+	int pos=0;
+	for(int i=0;i<100;++i){
+		if(orderedQ(accum[pos],accum[pos+1])!=1){
+			if(i>3){printf("order : %.3e %.3e -> ",accum[pos],accum[pos+1]);}
+			plus(accum[pos],accum[pos+1]);
+			if(i>3){printf(" %.3e %.3e  \n",accum[pos],accum[pos+1]);}
+			(pos==0)?(pos++):(pos--);			
+		}else{
+			++pos;
+		}
+		if(pos==len-1){
+			break;
+		}
+		
+	}
+	return 0;
 }
 static int Kahn_Sum(Kahn& kahn, const double b){
-
 	int flag=1;
-	double * accum=kahn.accum,accum_tmp=b;
+	int N=kahn.N;
+	double (&accum)[5]=kahn.accum;
+	double accum_tmp=b;
 	//accum[0]+=b;
 	//return 0;
-	int N=kahn.N;
-#if KAHN==1
-	if(not(std::isfinite(b))){
-		printf("Kahn_Sum  ");
-		printf("%.3e\n",b);
-		Kahn_show(kahn);
-		return 1;
-		//return(a+b);
-	}	
-#endif
-#if KAHN==1
+	
 	unsigned int counter=0;
-#endif
 	while(flag){
 		for(int i=0;i<N;i++){
-#if KAHN==1
 			if(++counter>10){printf("Kahn_Sum::Loop Error \n");return 1;}
-#endif
-			plus(accum+i, &accum_tmp);
+			plus(accum[i], accum_tmp);
 			if(accum_tmp==0.0){
 				flag=0;	
 				break;
 			}
-			if(i+1==N){
-				if(flag==0){
-				//	printf("Kahn, lost accuracy : ");
-				//	for(int j=0;j<N;j++){
-				//		printf("%.3e ",accum[j]);
-				//	}
-				//	printf(" : %.3e\n",accum_tmp);
-				}else if(flag==1){
+			if(i==N-1){
+				if(flag==1){
 					accum_sort(accum,N);
 					i=0;
 					flag=0;	
@@ -156,10 +168,17 @@ static double Kahn_list_sum(double* list, int len){
 }
 
 */
+
 Kahn& operator+=(Kahn& sum,const double a){
 	Kahn_Sum(sum ,a);	
 	return sum;
 }
+Kahn& operator-=(Kahn& sum,const double a){
+	Kahn_Sum(sum ,-a);	
+	return sum;
+}
+
+
 
 static void Kahn_accum_sum(const Kahn& kahn1,Kahn& kahn2){
 	if(kahn1.N!=kahn2.N){
@@ -170,6 +189,15 @@ static void Kahn_accum_sum(const Kahn& kahn1,Kahn& kahn2){
 		kahn2+=kahn1.accum[i];
 	}
 }
+static void Kahn_accum_diff(const Kahn& kahn1,Kahn& kahn2){
+	if(kahn1.N!=kahn2.N){
+		printf("incompatible accumulators. %d  %d \n ",kahn1.N,kahn2.N);
+	}
+	
+	for(int i=0;i<kahn1.N;i++){
+		kahn2-=kahn1.accum[i];
+	}
+}
 
 
 static void Kahn_accum_times(const double a,Kahn& kahn2){
@@ -178,13 +206,25 @@ static void Kahn_accum_times(const double a,Kahn& kahn2){
 	}
 }
 
-Kahn& operator+=(Kahn& sum2,Kahn& sum){
+static Kahn& operator+=(Kahn& sum2,Kahn& sum){
 	Kahn_accum_sum(sum ,sum2);	
 	return sum2;
 }
+static Kahn& operator-=(Kahn& sum2,Kahn& sum){
+	Kahn_accum_diff(sum ,sum2);	
+	return sum2;
+}
 
-Kahn& operator*=(Kahn& sum2,const double a){
+static Kahn& operator*=(Kahn& sum2,const double a){
 	Kahn_accum_times(a,sum2);	
 	return sum2;
+}
+
+static double Kahn_list_sum(double* list, int len){
+	Kahn acc=Kahn_init(3);
+	for(int i=0;i<len;i++){
+		acc+=list[i];
+	}
+	return(Kahn_total(acc));
 }
 #endif

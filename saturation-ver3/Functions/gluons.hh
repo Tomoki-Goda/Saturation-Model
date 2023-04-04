@@ -1,10 +1,11 @@
-/*  
- *  Claculating of xgpdf(x,Q^2) by DGLAP evolution of initial condition 
- *  xgpdf(x,Q^2_0)
- * 
- * Originally written by S. Sapeta 
- * Modified by T. Goda
- */
+  
+//  Claculating of xgpdf(x,Q^2) by DGLAP evolution of initial condition 
+//  xgpdf(x,Q^2_0) 
+// Originally written by S. Sapeta 
+// Modified by T. Goda
+// 
+// COLGLU Defined at the end
+ 
 #ifndef GLUONS_HH
 #define GLUONS_HH
 //#include "main.h"
@@ -12,14 +13,15 @@
 #include<cmath>
 //#include "./complex.hh"
 //#include "cfortran.h"
-#include"./control-default.h"
-#include"./constants.h"
-#include "./clenshaw.hh"
-#include "./gauss.hh"
+#include"control-default.h"
+#include"constants.h"
+#include"clenshaw.hh"
+//#include"./gauss.hh"
 #include"polygamma.hh"
 #include<complex>
 #include<pthread.h>
 #include<gsl/gsl_sf_gamma.h>
+#include"chebyshev.hh"
 /* CERNLIB functions*/
 //extern "C" doublecomplex wgamma_(const doublecomplex*);
 //extern "C" doublecomplex wpsipg_(const doublecomplex*,int*);
@@ -98,7 +100,7 @@ class Collinear_Gluon{
 		    	}
 			return val;
 		}
-
+		
 		/*******************************************************************************
 		* Gluons pdf  function
 		*******************************************************************************/
@@ -131,5 +133,220 @@ class Collinear_Gluon{
 		}
 
 };
-#endif
 
+
+//extern int N_APPROX;
+class Chebyshev_Collinear_Gluon{
+	private:
+		Collinear_Gluon xg;
+	  	cheby cheb[2];
+		double A_g=0,l_g=0;
+		double xmin,xmax,q2min,q2max;
+		const double *fixx=NULL;
+		
+	public:
+		Chebyshev_Collinear_Gluon(){
+			const unsigned deg[]={N_CHEB,N_CHEB};
+			cheb[0]=PrepareChebyshev(deg,2);
+			cheb[1]=PrepareChebyshev(deg[1],1);
+		}
+		~Chebyshev_Collinear_Gluon(){
+			FreeChebyshev(cheb[0]);
+			FreeChebyshev(cheb[1]);
+		}
+		double operator()(double *arg,const Collinear_Gluon& xg)const{
+			double x=change_var_revert_log(xmin,xmax, arg[0]);//xmin*pow(xmax/xmin,arg[0]);
+			double q2=change_var_revert_log(q2min,q2max, arg[1]);//q2min*pow(q2max/q2min,arg[1]);
+			return( xg(x,q2,A_g,l_g) );	
+		}
+		int init(double xmin,double xmax,double q2min, double q2max, double A_g,double l_g ){
+			this->xmin=xmin;
+			this->xmax=xmax;
+			this->q2min=q2min;
+			this->q2max=q2max;
+			this->A_g=A_g;
+			this->l_g=l_g;
+			cheb_coeff<Chebyshev_Collinear_Gluon,const Collinear_Gluon&>(cheb[0],*this,xg);
+			return 0;
+		}
+		void set_x(const double &x){
+		 	fixx=&x;
+		 	if(x>0){
+				chebyshev_reduce(cheb[0], cheb[1],change_var_compactify_log(xmin,xmax,x ), 0 );
+			}
+		}
+		double operator()(const double x,const double Q2){
+			
+			if(x>xmax){
+				printf("x too large: %.3e < %.3e < %.3e\n",xmin,x,xmax );
+			}
+			if(x<xmin){
+				printf("x too small: %.3e < %.3e < %.3e\n",xmin,x,xmax );
+			}
+			if(Q2>q2max){
+				printf("Q2 too large: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
+			}
+			if(Q2<q2min){
+				printf("Q2 too small: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
+			}
+			double res;
+///////////////////////////////////////////////////////////////////////////////////////////		
+// This block should be removed if x varies often.
+// Only useful if x is fixed and Q changes rapidly.
+///////////////////////////////////////////////////////////////////////////////////////////
+			if(fixx!=NULL&&*fixx>0){
+				if(x!=*fixx){
+					printf("Chebyshev1D_Collinear_Gluon:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
+				}
+				double arg[]={
+						change_var_compactify_log(q2min,q2max,Q2 )
+				};
+				res=chebyshev(cheb[1],arg);
+			
+			}else{
+				double arg[]={
+					change_var_compactify_log(xmin,xmax,x ),
+					change_var_compactify_log(q2min,q2max,Q2 )
+				};
+				res=chebyshev(cheb[0],arg);
+			}	
+				return(res);
+		}
+};
+class Chebyshev1D_Collinear_Gluon{
+	private:
+		Collinear_Gluon xg;
+	  	cheby cheb[1];
+		double A_g=0,l_g=0;
+		double xmin,xmax,q2min,q2max;
+		const double *fixx;
+		
+		
+	public:
+		Chebyshev1D_Collinear_Gluon(){
+			const unsigned deg[]={N_CHEB};
+			cheb[0]=PrepareChebyshev(deg,1);
+		}
+		~Chebyshev1D_Collinear_Gluon(){
+			FreeChebyshev(cheb[0]);
+		}
+		double operator()(double *arg,const Collinear_Gluon& xg)const{
+			double q2=change_var_revert_log(q2min,q2max, arg[0]);//q2min*pow(q2max/q2min,arg[1]);
+
+			return( xg(*fixx,q2,A_g,l_g) );	
+		}
+		
+		int init(double xmin,double xmax,double q2min, double q2max, double A_g,double l_g ){
+			this->xmin=xmin;
+			this->xmax=xmax;
+			this->q2min=q2min;
+			this->q2max=q2max;
+			this->A_g=A_g;
+			this->l_g=l_g;
+			return 0;
+		}
+		void set_x(const double &x){
+			fixx=&x;
+			//printf("Chebyshev1D_Collinear_Gluon x set to %.2e",x);
+			cheb_coeff<Chebyshev1D_Collinear_Gluon,const Collinear_Gluon&>(cheb[0],*this,xg);
+		}
+		
+		double operator()(const double x,const double Q2){
+			if(x!=*fixx){
+				printf("Chebyshev1D_Collinear_Gluon:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
+			}
+			if(x>xmax){
+				printf("x too large: %.3e < %.3e < %.3e\n",xmin,x,xmax );
+			}
+			if(x<xmin){
+				printf("x too small: %.3e < %.3e < %.3e\n",xmin,x,xmax );
+			}
+			if(Q2>q2max){
+				printf("Q2 too large: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
+			}
+			if(Q2<q2min){
+				printf("Q2 too small: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
+			}
+			double res;
+			double arg[]={
+				change_var_compactify_log(q2min,q2max,Q2 )
+			};
+			res=chebyshev(cheb[0],arg);
+			return(res);
+		}
+};
+/*
+extern int N_APPROX;
+class Interpolate_Collinear_Gluon{
+	private:
+		Collinear_Gluon xg;
+		gsl_interp_accel *x_accel_ptr=NULL, *q2_accel_ptr=NULL;
+		gsl_spline2d *  spline_ptr=NULL;
+		double A_g=0,l_g=0;
+		int xlen=150,q2len=150;
+		double *xarr=NULL,*q2arr=NULL,*xgarr=NULL;
+		double xmin,xmax,q2min,q2max;
+	public:
+		explicit Interpolate_Collinear_Gluon(){
+			xarr=(double*)malloc(xlen*sizeof(double));
+			q2arr=(double*)malloc(q2len*sizeof(double));
+			xgarr=(double*)malloc(xlen*q2len*sizeof(double));
+			x_accel_ptr = gsl_interp_accel_alloc ();
+			q2_accel_ptr = gsl_interp_accel_alloc ();
+			spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,q2len,xlen);
+		}
+		~Interpolate_Collinear_Gluon(){
+			gsl_spline2d_free (spline_ptr);
+			gsl_interp_accel_free (x_accel_ptr);
+			gsl_interp_accel_free (q2_accel_ptr);
+			free(xarr);
+			free(q2arr);
+			free(xgarr);
+		}
+		int init(double xmin,double xmax,double q2min, double q2max, double A_g,double l_g ){
+#pragma omp parallel
+{
+//			double x,q2;
+#pragma omp for schedule(dynamic)
+			for( int i=0;i<xlen;++i){
+				double x=xmin*pow(xmax/xmin,((double)i)/(xlen-1));
+				xarr[i]=x;
+				for(int j=0;j<q2len;++j){
+					double q2=q2min*pow(q2max/q2min,((double)j)/(q2len-1));
+					if(i==0){
+						q2arr[j]=q2;
+					}
+					xgarr[i*q2len+j]=xg(x,q2,A_g,l_g);
+				}
+			}
+}
+			this->xmin=xmin;
+			this->xmax=xmax;
+			this->q2min=q2min;
+			this->q2max=q2max;
+
+			gsl_spline2d_init (spline_ptr,q2arr, xarr, xgarr, q2len, xlen);
+			//printf("gluon approxed \n");
+			return 0;
+		}
+		double operator()(const double x,const double Q2)const{
+			if(x>xmax){
+				printf("x too large: %.3e < %.3e < %.3e\n",xmin,x,xmax );
+			}
+			if(x<xmin){
+				printf("x too small: %.3e < %.3e < %.3e\n",xmin,x,xmax );
+			}
+			if(Q2>q2max){
+				printf("Q2 too large: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
+			}
+			if(Q2<q2min){
+				printf("Q2 too small: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
+			}
+			return(gsl_spline2d_eval(spline_ptr,Q2, x,q2_accel_ptr, x_accel_ptr));
+		}
+
+};
+//////////////////////////////////////////
+//////////////////////////////////////////
+*/
+#endif

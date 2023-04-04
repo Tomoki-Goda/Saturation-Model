@@ -14,7 +14,7 @@ def import_array(name ):
 	#with open("./pwf.txt","r") as fi:
 		for line in fi:
 			#data=line.readline();
-			data=line.strip().split('\t')
+			data=line.strip().split()
 			#data=[math.log(float(j))/math.log(10) for j in data]
 			data=[float(j) for j in data]
 			dataarray.append(data)
@@ -102,10 +102,13 @@ def main():
     ax.set(title=plottitle,  ylabel=axes[1],    xlabel=axes[0],  xscale= xs ,   yscale=ys )
     if(xlim[0]!=xlim[1]):
         ax.set_xlim(xlim[0],xlim[1])
+        ax.set_ylim()
     
     if(ylim[0]!=ylim[1]):
         ax.set_ylim(ylim[0],ylim[1])
-    	
+    
+
+    
     ax.grid("true")
     ax.legend()
    

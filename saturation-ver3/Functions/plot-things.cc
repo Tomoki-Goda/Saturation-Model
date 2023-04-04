@@ -40,8 +40,30 @@ extern double  INT_PREC;
 //#else
 //	#include"./gluon-gbw.hh"
 //	typedef Gluon_GBW Gluon ;
-	typedef Dipole_Gluon Gluon;
-	typedef Sigma SIGMA;
+#if SIGMA_APPROX<0
+	#if CHEB_D==2
+		typedef Chebyshev_Collinear_Gluon COLGLU;
+	#elif CHEB_D==1
+		typedef Chebyshev1D_Collinear_Gluon COLGLU;
+	#endif
+#else 	
+		typedef Collinear_Gluon COLGLU;
+#endif
+
+#if MODEL==1
+	typedef Sigma<COLGLU> SIGMA ;
+#else 
+	typedef Sigma SIGMA ;
+#endif
+
+#if ((SIGMA_APPROX==0)||(SIGMA_APPROX==-1))//negative means xg is approximated.
+		typedef Gluon_Integrand<SIGMA> DSIGMA;
+#elif ((SIGMA_APPROX>0)||(SIGMA_APPROX<-1))
+	typedef Laplacian_Sigma<SIGMA> DSIGMA;
+#endif
+
+
+typedef Dipole_Gluon<DSIGMA> GLUON;
 
 //#endif
 //#include"./clenshaw.h"
@@ -80,13 +102,13 @@ int main(int argc , char** argv){
 	options opt=read_options(argc, argv);
 	std::vector<double> param(10,0);
 
-	char filenames[500];
+	char outfilenames[500], infilenames[500];
 	if(opt.path==""){
 		opt.path=getenv("DIR");
 	}	
-	sprintf(filenames,"%s/%s",opt.path.c_str(),opt.input_file_name.c_str());
+	sprintf(infilenames,"%s/%s",opt.path.c_str(),opt.input_file_name.c_str());
 
-	FILE* infile=fopen(filenames,"r");
+	FILE* infile=fopen(infilenames,"r");
 	read_parameters(infile,param);
 	fclose(infile);
 	double sigpar[10],sudpar[10];
@@ -94,48 +116,36 @@ int main(int argc , char** argv){
 
 	parameter(param,sigpar,sudpar);
 
-	SIGMA sigma;
-	sigma.init(sigpar);
-	
-	printf("x= %.3e Q2=%.3e\n",opt.x,opt.Q2);	
-	sigma.set_kinem(opt.x);
-	
-	sprintf(filenames,"%s/%s-%.0lf-%.0lf.txt",opt.path.c_str(),"dipole",-log10(opt.x),opt.Q2);
-	FILE* outfile=fopen(filenames,"w");
-	if(outfile==NULL){
-		printf("can't open");
-	}else{
-		printf("OK: %s\n",filenames);
-	}
-	double r;
-	for(int i =0;i<=100;++i){
-		//r=R_MIN*pow(R_MAX/R_MIN, ((double)i)/(100-1));
-		r=1.0e-4*pow(10/1.0e-4, ((double)i)/(100-1));
-		fprintf(outfile,"%.5e\t%.5e\n",r,sigma(r)/sigpar[0]);
-
-	}
-	fclose(outfile);
-	
-	//printf("\033[1A\033[2K\r");
-	sprintf(filenames,"%s/%s-%.0lf-%.0lf.txt",opt.path.c_str(),"gluon", -log10(opt.x),opt.Q2);
-	
-	outfile=fopen(filenames,"w");
-	if(outfile==NULL){
-		printf("can't open");
-	}else{
-		printf("OK: %s\n",filenames);
-	}
-	Gluon gluon;
-	gluon.init(N_APPROX+250,sigpar);
-	gluon.set_x(opt.x);
-	double k2;
-	for(int i =0;i<=100;++i){
-		k2=1.0e-4*pow(1.0e+7, ((double)i)/(100-1));
-		fprintf(outfile,"%.5e\t%.5e\n",k2,gluon(k2,opt.Q2)/sigpar[0]);
-
-	}
-	fclose(outfile);
-
+		#if SIGMA_APPROX==-1||SIGMA_APPROX==0//if sigma is not in 1d grid
+			SIGMA sigma;
+			sigma.init(sigpar);
+			DSIGMA dsigma(sigma);
+			dsigma.init(sigpar,'l');
+ 		#else //-2 and 1  
+ 			SIGMA sigma;
+			sigma.init(sigpar);
+			DSIGMA dsigma(sigma);
+			dsigma.init(N_APPROX+250,sigpar,'l');
+		#endif
+		
+		GLUON dipole_gluon(dsigma);
+		dipole_gluon.init(sigpar);
+		Approx_aF<GLUON> gluon(dipole_gluon);
+		gluon.init(50,50,sigpar);
+		const double kt2max=1.0e+8;
+	 	printf("Initialized\n");
+		gluon.set_max(kt2max);
+		printf("Export\n");	
+        if(opt.output_file_name!="out.txt"){
+            sprintf(outfilenames,"%s",opt.output_file_name.c_str());
+        }else{
+		    sprintf(outfilenames,"%s/ww.txt",opt.path.c_str());
+		}
+		printf("%s\n",outfilenames);
+  		FILE *outfile=fopen(outfilenames,"w");
+		gluon.export_grid(outfile);
+		printf("Gluon end\n");
+	 	fclose(outfile);
 	return 0;
 	
 }

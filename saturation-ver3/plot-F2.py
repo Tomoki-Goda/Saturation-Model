@@ -7,7 +7,7 @@ import os
 
 def main():
     try:
-        opts, args=getopt.gnu_getopt(sys.argv[1:],"l:p:c:h",["label","plot-style","color",'help'])
+        opts, args=getopt.gnu_getopt(sys.argv[1:],"Ll:p:c:h",['Limit',"label","plot-style","color",'help'])
     except getopt.GetoptError as err:
         print("error")
 
@@ -15,6 +15,7 @@ def main():
     label=["" for i in range(len(args))] 
     color=['b','r','g']
     ls=['-.','-.','-.']
+    limit=False
     for opt,arg in opts:
         if opt in ["-l","-label"]:
             label=arg.split(":")
@@ -22,6 +23,8 @@ def main():
             color=arg.split(":")
         elif opt in ["-p","-plot-style"]:
             ls=arg.split(" ")
+        elif opt in ['-L','--Limit']:
+            limit=True
         elif opt in ['-h','--help']:
             print("-l label (: separated)\n-c color (: separated)\n-p plot-style (space separated)\n args=F2_exp_data plot_grids_to_follow\n ")
             exit(0)
@@ -33,6 +36,7 @@ def main():
             row=line.strip().split("\t")
             data.append(row)
     data=pd.DataFrame(data,columns=["x","Q2","data","err","val"])
+    #data=pd.DataFrame(data,columns=["val","data","err","x","Q2"])
     comp=[]
     
     for i in range(1,len(args)):
@@ -42,12 +46,20 @@ def main():
                 row=line.strip().split("\t")
                 data2.append(row)
         comp.append(pd.DataFrame(data2,columns=["x","Q2","val"]))
-    
-    Q2set=data['Q2'].values
-    Q2set=set(Q2set)
-    Q2set=sorted(list(Q2set),key=float)
+        #comp.append(pd.DataFrame(data2,columns=["x","val","Q2"]))
+    if limit:
+        Q2set=["1.10000e-01","5.00000e-01", "6.50000e+00","1.80000e+01","4.50000e+01","1.20000e+02","5.00000e+02"]
+    else:
+        Q2set=data['Q2'].values
+        Q2set=set(Q2set)
+        Q2set=sorted(list(Q2set),key=float)
     length=len(Q2set)
-    col=3
+    if limit:
+        div=2
+        col=2
+    else:
+        div=2
+        col=3
     row=length//(2*col)
     if row*2*col<length:
         row+=1
@@ -108,10 +120,10 @@ def main():
     ax2[row-1][col-1].legend(np.transpose(leg)[0],label)
     fig1.get_layout_engine().set(hspace=None, wspace=None)
     fig2.get_layout_engine().set(hspace=None, wspace=None)
-    fig1.set_figheight(9.5)
-    fig1.set_figwidth(4.75)
-    fig2.set_figheight(9.5)
-    fig2.set_figwidth(4.75)
+    fig1.set_figheight(2.5*row)
+    fig1.set_figwidth(2.5*col)
+    fig2.set_figheight(2.5*row)
+    fig2.set_figwidth(2.5*col)
     fig1.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.98,fontsize=13)
     fig2.supylabel("$F_2$",rotation="horizontal",x=0.02,y=0.98,fontsize=13)
     

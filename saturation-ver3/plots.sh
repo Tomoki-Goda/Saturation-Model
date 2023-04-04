@@ -22,8 +22,8 @@ for i in  ./Run3/fixa-bjorx-BGK \
 do
 	export DIR=${i}
 	#make plot
-	${DIR}/F2
-	${DIR}/grid
+#	${DIR}/F2
+#	${DIR}/grid
 	${DIR}/plot -Q2 100 -x 6
 	${DIR}/plot -Q2 100 -x 2
 done

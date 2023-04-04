@@ -1,4 +1,25 @@
+/////////////////////////////////////////////////////////////////////
+// Gluon_GBW af
+// af.init(par) //double* par sigma parameters 
+// af(x,kt2,mu2) // 
+//
+// Dipole gluon
+// Dipole_Gluon af
+// af.init(par,integ) //Integrand integ; see below
+// af(x,kt2,mu2)
+//
+//WW_Gluon
+////////////////////////////////////////////////////////////////////
 
+//#if SIGMA_APPROX<2
+//	typedef Gluon_Integrand Integrand;				
+//#else
+//	typedef Laplacian_Sigma Integrand;				
+//#endif
+//#include"series_sum.hh"
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_sum.h>
+#include"Levin.hh"
 
 inline double  modx(const double  x, const double  Q2, const  double  mf2){
 #if MODX==1
@@ -17,7 +38,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 	var= ( (min==0.0)?(max*var):((max*var+c*min*(1-var)) ))/den;
 	//var= (max*var+min*c*(1-var))/den;
 	
-#if TEST==1	
+//#if TEST==1	
 	if(var>max) {
 		if(fabs((var-max)/max)>1.0e-15){
 			printf("value below limit %.3e -> %.3e [%.3e, %.3e] diff %.3e, c=%.3e\n",(1-den)/(1-c),var,min,max,var-max, c);
@@ -29,7 +50,7 @@ double change_var(double & var,double &  jac,const double min, const double max,
 		}
 		var=min;
 	}
-#endif
+//#endif
 	return var;
 }
 
@@ -46,11 +67,11 @@ class Gluon_GBW{
 
 	
 	public:
-		explicit Gluon_GBW(const Gluon_GBW& rhs){
-			sigpar=rhs.sigpar;
-			init(sigpar);
-			x=rhs.x;			
-		}
+		//explicit Gluon_GBW(const Gluon_GBW& rhs){
+		//	sigpar=rhs.sigpar;
+		//	init(sigpar);
+		//	x=rhs.x;			
+		//}
 		
 		explicit Gluon_GBW(){
 		}
@@ -75,14 +96,14 @@ class Gluon_GBW{
 		~Gluon_GBW(){}
 		
 	public:
-		inline double operator()(const double x,const double k2,double mu2){
-			set_x(x);
-			return((*this)(k2,mu2));
-		}
-		void set_x(double x){
-			this->x=x;
-		}
-		double operator()(const double k2,double mu2){
+		//inline double operator()(const double x,const double k2,double mu2){
+		//	set_x(x);
+		//	return((*this)(k2,mu2));
+		//}
+		//void set_x(double x){
+		//	this->x=x;
+		//}
+		double operator()(const double  x,const double k2,double mu2){
 			if(x_0<1.0e-5||x_0>1.0e-3){
 				return 0;
 			}
@@ -108,29 +129,209 @@ class Gluon_GBW{
 			return (sigma_0*val) ;
 		}
 };
-
-
+/*
+inline double min(double a,double b){
+	return((a>b)?(b):(a));
+}
+		
+inline double max(double a,double b){
+	return((a>b)?(b):(a));
+}
+*/
 /////////////////////////////////////////////////////////////////////
 //
 //Dipole gluon
 //
 /////////////////////////////////////////////////////////////////////
-//template <typename LSigma>class Dipole_Gluon{
-class Dipole_Gluon{
+/*//template <typename LSigma>class Dipole_Gluon{
+//double eps(int n, int m, const double (&list)[SECTOR_MAX]){ 
+double eps(int n, int m, const double *list){ 
+//epsilon series convergence algorithm??
+// I don't know the name but Seki-Aitken's generalization.
+	//if(2*(m/2)!=m){
+	//	printf("eps use multiple of 2, m=%d\n",m);
+	//	m=2*((m+1)/2);
+	//}
+	if(m == -1){
+		return(0);
+	};
+	if(m == 0){
+	  	return(list[n]);
+	};
+	return(eps(n + 1, m - 2,list) + 1/(eps(n + 1, m - 1,list) - eps(n, m - 1,list)));
+}*/
+template<typename INTEG>class Dipole_Gluon{
 		const double *par;
-		Laplacian_Sigma integrand;
+		//Laplacian_Sigma integrand;
+		INTEG *integrand;
+		CCIntegral cc=CCprepare(64,"dipole",1,4);
+		
+		
+		//double fixx;
+
+	public: 
+		//Dipole_Gluon(const Dipole_Gluon&rhs ){
+		//	par=rhs.par;
+		//	integrand=rhs.integrand;
+		//	x=rhs.x;
+		//}
+		Dipole_Gluon(INTEG& integ){
+			integrand =& integ;
+		}
+		~Dipole_Gluon(){
+			
+		}
+		inline void init(const double * const &par ){
+			
+			this->par=par;
+			
+			//init(n,par) if Laplacian_Sigma is used
+//#if LAPLACIAN==0
+//			integrand.init(par,'l');	
+//#elif LAPLACIAN==1
+//			integrand.init(par,'s');
+//#endif	
+		}
+		void set_x(const double &x){
+			//this->x=x;
+			integrand->set_x(x);
+		}
+		double operator()(const double x,const double kt2,const double mu2){
+			//Series_Sum ss(2);
+			double sum_accel, err;
+			double arr[SECTOR_MAX];
+			double sum = 0;
+			int n;
+			//gsl_sum_levin_u_workspace * w = gsl_sum_levin_u_alloc (SECTOR_MAX);
+			Kahn accum=Kahn_init(3);
+			const std::vector<double> par{kt2,x};
+			double rmax=R_MAX,rmin=R_MIN;
+			double val=0,val1=0,val2=0;
+			Kahn_clear(accum);
+			
+			double scale=(2*PI)/sqrt(kt2);
+			double imin=rmin;
+			int sectors=(int)(rmax/scale);
+			
+			if(sectors>SECTOR_MAX||sectors<1||!std::isfinite(sectors)){
+				sectors=SECTOR_MAX;
+			}
+			if(sectors>3){
+				scale*=2;
+			}
+			if(sectors>20){
+				scale*=2;
+			}
+#if IBP==1
+			double imax=3*PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
+#else
+			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
+#endif						      
+						  
+			int flag=0;
+			Levin lev(SECTOR_MAX);
+			for(int i=0;i<sectors;++i){
+				imax+=scale;
+				if(imax>rmax){
+					if(i>0){
+						imax-=scale;
+						sectors=i;
+						break;
+					}else{
+						imax=rmax;
+					}
+				};
+				
+#if R_CHANGE_VAR==1
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),pow(INT_PREC,2),10e-14);
+#elif R_CHANGE_VAR==0
+				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
+#endif
+				//printf("%.3e\n",val);
+				//getchar();
+				if(val==0.0){
+					sectors=i;
+					break;
+				}
+				imin=imax;
+				sum+=val;
+				lev.add_term(val);
+				if(i>=20&&5*(i/5)==i){
+					val1=lev.accel(i-5,5);
+					val2=lev.accel(i-6,5);
+					if(fabs(1-val2/val1)<INT_PREC/5||fabs(val2-val1)<pow(INT_PREC/5,2) ){
+						sectors=i+1;
+						break;
+					}
+				}
+			}
+			--sectors;
+			
+			if(sectors>=20){
+				val1=lev.accel(sectors-5,5);
+				val2=lev.accel(sectors-6,5);
+				if(fabs(1-val2/val1)>INT_PREC&&fabs(val2-val1)>pow(INT_PREC,2) ){
+					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,sectors,x,kt2,val);
+				}
+				if(fabs((val1-sum)/(val1+sum))>0.5&& fabs(val1)>1.0e-3 ){
+					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,sectors,x,kt2,val);
+				}
+				val=val1;
+			}else{
+				val=sum;
+			}
+			
+			
+
+			double diff=0;
+#if (IBP>=1 && ADD_END!=0 && WW==0 )			
+			diff+=integrand->constant(imax,par);
+			if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
+				printf("Dipole_Gluon:: inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
+				printf("Dipole_Gluon::  x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
+			}
+			val+=diff;
+#endif//IBP
+			Kahn_free(accum);
+			if(!std::isfinite(val)){
+				printf("Dipole_Gluon:: % encountered 0 returned\n",val);
+				val=0;
+			}
+#if WW==1
+			val*=2.0/(3.0*pow(PI,3));
+			//val=((val<1.0e-5)?(1.0e-5):(val));
+#else
+			val*=3.0/(8.0*pow(PI,2));
+#endif			
+			//printf("3:% e\n",val);
+			return (val);
+		}
+		
+		
+};
+
+
+ 
+/////////////////////////////////////////////////////////////////////
+//
+//WW gluon
+//
+/////////////////////////////////////////////////////////////////////
+/*class WW_Gluon{
+		const double *par;
+		Integrand integrand;
 		CCIntegral cc=CCprepare(64,"dipole",1,4);
 		double x;	
 
 	public: 
-		Dipole_Gluon(const Dipole_Gluon&rhs ){
+		WW_Gluon(const WW_Gluon&rhs ){
 			par=rhs.par;
 			integrand=rhs.integrand;
 			x=rhs.x;
 		}
-		Dipole_Gluon(){
+		WW_Gluon(){
 		}
-		~Dipole_Gluon(){
+		~WW_Gluon(){
 			
 		}
 		inline void init(const int n,const double * const &par ){
@@ -184,9 +385,9 @@ class Dipole_Gluon{
 					}
 				};
 #if R_CHANGE_VAR==1
-				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<const Integrand,const std::vector<double>&>(cc,integrand,par,imin/(1+imin),imax/(1+imax),INT_PREC/(10*sectors),pow(INT_PREC,2));
 #elif R_CHANGE_VAR==0
-				val=dclenshaw<const Laplacian_Sigma,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
+				val=dclenshaw<const Integrand,const std::vector<double>&>(cc,integrand,par,imin,imax,INT_PREC/(10*sectors),pow(INT_PREC,2));
 #endif
 				if(fabs(val+integrand.constant(imax,par))< pow(INT_PREC,2) ){
 					++flag;
@@ -226,3 +427,5 @@ class Dipole_Gluon{
 		
 };
 
+
+*/

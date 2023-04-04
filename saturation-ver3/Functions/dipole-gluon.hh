@@ -164,7 +164,7 @@ template<typename INTEG>class Dipole_Gluon{
 		const double *par;
 		//Laplacian_Sigma integrand;
 		INTEG *integrand;
-		CCIntegral cc=CCprepare(32,"dipole",1,3);
+		CCIntegral cc=CCprepare(64,"dipole",1,4);
 		
 		
 		//double fixx;
@@ -218,18 +218,16 @@ template<typename INTEG>class Dipole_Gluon{
 			}
 			if(sectors>3){
 				scale*=2;
-				sectors/=2;
 			}
-			//if(sectors>15){
-			//	scale*=2;
-				//sectors/=2;
-			//}
 			if(sectors>20){
 				scale*=2;
-				//sectors/=2;
 			}
-
+#if IBP==1
+			double imax=3*PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
+#else
 			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
+#endif						      
+						  
 			int flag=0;
 			Levin lev(SECTOR_MAX);
 			for(int i=0;i<sectors;++i){
@@ -259,9 +257,9 @@ template<typename INTEG>class Dipole_Gluon{
 				sum+=val;
 				lev.add_term(val);
 				if(i>=20&&5*(i/5)==i){
-					val1=lev.accel(i-6,6);
-					val2=lev.accel(i-7,6);
-					if(fabs(1-val2/val1)<INT_PREC||fabs(val1)<pow(INT_PREC,2) ){
+					val1=lev.accel(i-5,5);
+					val2=lev.accel(i-6,5);
+					if(fabs(1-val2/val1)<INT_PREC/5||fabs(val2-val1)<pow(INT_PREC/5,2) ){
 						sectors=i+1;
 						break;
 					}
@@ -270,10 +268,13 @@ template<typename INTEG>class Dipole_Gluon{
 			--sectors;
 			
 			if(sectors>=20){
-				val1=lev.accel(sectors-6,6);
-				val2=lev.accel(sectors-7,6);
-				if(fabs(1-val2/val1)>INT_PREC&&fabs(val1)>pow(INT_PREC,2) ){
-					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.3e kt2=%.3e\n",sum,val1,val2,sectors,x,kt2);
+				val1=lev.accel(sectors-5,5);
+				val2=lev.accel(sectors-6,5);
+				if(fabs(1-val2/val1)>INT_PREC&&fabs(val2-val1)>pow(INT_PREC,2) ){
+					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,sectors,x,kt2,val);
+				}
+				if(fabs((val1-sum)/(val1+sum))>0.5&& fabs(val1)>1.0e-3 ){
+					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,sectors,x,kt2,val);
 				}
 				val=val1;
 			}else{

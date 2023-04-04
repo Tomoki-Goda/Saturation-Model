@@ -572,7 +572,7 @@ template <typename Sig> class Gluon_Integrand{
 	#if NS==2
 					val*=( kt*r*std::cyl_bessel_j(1,r*kt) + 2*pow(r/ns_pow,2)*std::cyl_bessel_j(0,r*kt));
 	#else
-					val*= kt*r*std::cyl_bessel_j(0,r *kt );
+					val*= kt*r*std::cyl_bessel_j(1,r *kt );
 	#endif
 #elif IBP==2
 					val=(*sigma)(x,r);

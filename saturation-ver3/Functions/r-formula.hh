@@ -72,9 +72,11 @@ class Sigma{
 #endif
 
 #endif	//MODEL	
-			if(qs2<1.0e-15){
-				printf("Sigma:: qs2=%.1e\n",qs2);
-				return 1.0e-15;
+			if(qs2<1.0e-25){
+				//if(qs2<1.0e-12){
+				//	printf("Sigma:: qs2=%.1e\n",qs2);
+				//}
+				return 1.0e-25;
 			}
 
 			return qs2;		

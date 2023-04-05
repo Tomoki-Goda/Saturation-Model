@@ -39,7 +39,7 @@
 //generally R_MAX should be larger than 1/sqrt(KT2_MIN) etc
 ////////////////////////////////////////
 #ifndef R_MIN 
-	#define R_MIN 1.0e-8
+	#define R_MIN 1.0e-6
 #endif
 #ifndef R_MAX
 	#define R_MAX 1e+6

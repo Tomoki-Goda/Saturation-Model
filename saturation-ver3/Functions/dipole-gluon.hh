@@ -164,7 +164,7 @@ template<typename INTEG>class Dipole_Gluon{
 		const double *par;
 		//Laplacian_Sigma integrand;
 		INTEG *integrand;
-		CCIntegral cc=CCprepare(64,"dipole",1,4);
+		CCIntegral cc=CCprepare(64,"dipole",1,5);
 		
 		
 		//double fixx;
@@ -216,8 +216,12 @@ template<typename INTEG>class Dipole_Gluon{
 			if(sectors>SECTOR_MAX||sectors<1||!std::isfinite(sectors)){
 				sectors=SECTOR_MAX;
 			}
+			
 			if(sectors>3){
 				scale*=2;
+			}else{
+				scale/=8;
+				sectors*=8;
 			}
 			if(sectors>20){
 				scale*=2;
@@ -246,6 +250,7 @@ template<typename INTEG>class Dipole_Gluon{
 				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),pow(INT_PREC,2),10e-14);
 #elif R_CHANGE_VAR==0
 				val=dclenshaw<INTEG,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
+				//val=dgauss<INTEG,const std::vector<double>&>(*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
 #endif
 				//printf("%.3e\n",val);
 				//getchar();

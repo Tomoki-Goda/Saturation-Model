@@ -127,7 +127,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 			smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 		}else{
 			//IMPROVE
-			smax=smin+(scale/(1+pow(counter,2)*pow(error_ratio, 0.25 )));
+			smax=smin+(scale/(1+pow(2*counter,2)*pow(error_ratio, 0.25 )));
 			//smax=smin+(scale/2);
 		}
 

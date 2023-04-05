@@ -262,11 +262,11 @@ template<typename INTEG>class Dipole_Gluon{
 				sum+=val;
 				lev.add_term(val);
 				
-				if(i>=15&& (flag>=1||5*(i/5)==i)){
+				if(i>=25&&(flag>0 || (3*(i/3))==i )){
 					//flag=0 untested
 					//flag=1 tested without pass
 					//flag>1 passed flag-1 times consecutively
-					val1=lev.accel(i-5,5);
+					val1=lev.accel(i-6,6);
 					if(flag>=1){
 						if(fabs(1-val2/val1)<INT_PREC/5||fabs(val2-val1)<pow(INT_PREC/5,2) ){
 							++flag;
@@ -274,21 +274,21 @@ template<typename INTEG>class Dipole_Gluon{
 							flag=1;//reset
 						}
 
-						if(flag>3){
-							sectors=i+1;
-							break;
-						}
 					}else if(flag==0){
 						flag=1;
+					}
+					if(flag>3){
+						sectors=i+1;
+						break;
 					}
 					val2=val1;
 				}
 			}
 			--sectors;
 			
-			if(sectors>=20){
-				val1=lev.accel(sectors-5,5);
-				val2=lev.accel(sectors-6,5);
+			if(sectors>=25){
+				val1=lev.accel(sectors-6,6);
+				val2=lev.accel(sectors-7,6);
 				/*if(fabs(1-val2/val1)>INT_PREC&&fabs(val2-val1)>pow(INT_PREC,2) ){
 					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,sectors,x,kt2,val);
 				}

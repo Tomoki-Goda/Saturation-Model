@@ -256,19 +256,25 @@ template<typename INTEG>class Dipole_Gluon{
 				imin=imax;
 				sum+=val;
 				lev.add_term(val);
-				if(i>=20&& (flag>=1||5*(i/5)==i)){
+				
+				if(i>=15&& (flag>=1||5*(i/5)==i)){
+					//flag=0 untested
+					//flag=1 tested without pass
+					//flag>1 passed flag-1 times consecutively
 					val1=lev.accel(i-5,5);
-					//val2=lev.accel(i-6,5);
-					if(val2!=0.0){
+					if(flag>=1){
 						if(fabs(1-val2/val1)<INT_PREC/5||fabs(val2-val1)<pow(INT_PREC/5,2) ){
-						//	sectors=i+1;
-						//	break;
 							++flag;
+						}else{
+							flag=1//reset
 						}
-						if(flag>=3){
+
+						if(flag>3){
 							sectors=i+1;
 							break;
 						}
+					}else if(flag==0){
+						flag=1;
 					}
 					val2=val1;
 				}

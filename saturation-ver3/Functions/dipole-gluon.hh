@@ -266,7 +266,7 @@ template<typename INTEG>class Dipole_Gluon{
 						if(fabs(1-val2/val1)<INT_PREC/5||fabs(val2-val1)<pow(INT_PREC/5,2) ){
 							++flag;
 						}else{
-							flag=1//reset
+							flag=1;//reset
 						}
 
 						if(flag>3){

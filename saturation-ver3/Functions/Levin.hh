@@ -52,6 +52,7 @@ class Levin{
 		~Levin(){
 			free(a);
 			free(s);
+			free(fact);
 			Kahn_free(accum);
 		}
 		inline double sum(int n)const{

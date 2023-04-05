@@ -115,6 +115,7 @@ class Gluon_GBW{
 			Qs2*=pow(1-x,5);
 #endif		
 #if WW==1
+			Qs2*=9.0/4.0;
 			gsl_sf_result result;
 			gsl_sf_gamma_inc_e(0.0, k2/Qs2,&result);
 			double val=result.val;

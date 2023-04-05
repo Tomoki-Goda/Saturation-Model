@@ -125,10 +125,10 @@ def main():
         		for j, zij in enumerate(zi):
         			if zij>0:
         				Z[i][j]=np.log10(zij)
-        				zn.append(-25)
+        				zn.append(-50)
         			else:
         				zn.append(np.log10(-zij))
-        				Z[i][j]=-25
+        				Z[i][j]=-50
         		Zn.append(zn)
         print(X[0],"  ", X[len(X)-1]);
         print(Y[0],"  ", Y[len(Y)-1]);

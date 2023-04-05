@@ -17,8 +17,8 @@
 //	typedef Laplacian_Sigma Integrand;				
 //#endif
 //#include"series_sum.hh"
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_sum.h>
+#include <gsl/gsl_sf.h>
+
 #include"Levin.hh"
 
 inline double  modx(const double  x, const double  Q2, const  double  mf2){
@@ -113,8 +113,15 @@ class Gluon_GBW{
 			double Qs2=pow(x_0/x,lambda);
 #if THRESHOLD==-2
 			Qs2*=pow(1-x,5);
-#endif
+#endif		
+#if WW==1
+			gsl_sf_result result;
+			gsl_sf_gamma_inc_e(0.0, k2/Qs2,&result);
+			double val=result.val;
+			val/=(3*pow(PI,3));
+#else			
 			double val=3.0/(4*PI*PI)*k2/Qs2*exp(-k2/Qs2);
+#endif
 			if(std::isnan(val)==1){
 				return(0);
 			}
@@ -209,7 +216,7 @@ template<typename INTEG>class Dipole_Gluon{
 			double val=0,val1=0,val2=0;
 			Kahn_clear(accum);
 			
-			double scale=(2*PI)/sqrt(kt2);
+			double scale=(PI)/sqrt(kt2);
 			double imin=rmin;
 			int sectors=(int)(rmax/scale);
 			
@@ -217,22 +224,26 @@ template<typename INTEG>class Dipole_Gluon{
 				sectors=SECTOR_MAX;
 			}
 			
-			if(sectors>3){
+			/*if(sectors>10){
 				scale*=2;
 			}else{
 				scale/=8;
 				sectors*=8;
-			}
+			}*/
+			/*if(sectors>10){
+				scale*=2;
+			}*/
+			/*
 			if(sectors>20){
 				scale*=2;
-			}
-#if IBP==1
+			}*/
+#if IBP==1&&WW!=1
 			double imax=3*PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 #else
 			double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 #endif						      
 						  
-			int flag=0;
+			int flag=0,pass=4,accel_len=6;
 			Levin lev(SECTOR_MAX);
 			for(int i=0;i<sectors;++i){
 				imax+=scale;
@@ -259,25 +270,30 @@ template<typename INTEG>class Dipole_Gluon{
 					break;
 				}
 				imin=imax;
-				sum+=val;
-				lev.add_term(val);
 				
-				if(i>=25&&(flag>0 || (3*(i/3))==i )){
+				lev.add_term(val);
+				sum=lev.accel(i,0);
+				
+				if(i>=25&&(flag>1 || (3*(i/3))==i )){
 					//flag=0 untested
 					//flag=1 tested without pass
 					//flag>1 passed flag-1 times consecutively
-					val1=lev.accel(i-6,6);
+					val1=lev.accel(i-accel_len,accel_len);
 					if(flag>=1){
-						if(fabs(1-val2/val1)<INT_PREC/5||fabs(val2-val1)<pow(INT_PREC/5,2) ){
+						if(fabs((val1-val2)/(val1+val2))<INT_PREC/5||fabs(val2-val1)<pow(INT_PREC/5,2) ){
 							++flag;
 						}else{
+							if(flag>2){
+								//printf("reset\n");
+								//printf("0: sum=%.3e \t lev=%.1e %.1e %.3e\t %d rmax= %.2e x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,val1-val2,i,imax,x,kt2,val);
+							}
 							flag=1;//reset
 						}
 
 					}else if(flag==0){
 						flag=1;
 					}
-					if(flag>3){
+					if(flag==pass){
 						sectors=i+1;
 						break;
 					}
@@ -286,16 +302,17 @@ template<typename INTEG>class Dipole_Gluon{
 			}
 			--sectors;
 			
-			if(sectors>=25){
-				val1=lev.accel(sectors-6,6);
-				val2=lev.accel(sectors-7,6);
-				/*if(fabs(1-val2/val1)>INT_PREC&&fabs(val2-val1)>pow(INT_PREC,2) ){
-					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,sectors,x,kt2,val);
-				}
-				if(fabs((val1-sum)/(val1+sum))>0.5&& fabs(val1)>1.0e-3 ){
-					printf("Levin may be inaccurate sum=%.3e \t lev=%.3e %.3e\t %d x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,sectors,x,kt2,val);
-				}*/
+			//if(sectors>=25){
+			if(flag==pass){
+				val1=lev.accel(sectors-accel_len,accel_len);
+				val2=lev.accel(sectors-1-accel_len,accel_len);
 				val=val1;
+			}else if(sectors>=SECTOR_MAX/3&&sectors>accel_len){
+				val1=lev.accel(sectors-accel_len,accel_len);
+				val2=lev.accel(sectors-1-accel_len,accel_len);
+				if(fabs(1-val2/val1)>INT_PREC&&fabs(val2-val1)>pow(INT_PREC,2) ){
+					printf("2: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e\n",sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val);
+				}
 			}else{
 				val=sum;
 			}

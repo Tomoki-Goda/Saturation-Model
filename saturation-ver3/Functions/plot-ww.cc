@@ -102,26 +102,71 @@ int main(int argc , char** argv){
 		}
 		printf("%s\n",infilenames);
   		//FILE *outfile=fopen(filenames,"w");
-#if SUDAKOV>=1
+//#if SUDAKOV>=1
 		FILE *outfile=fopen(filenames,"w");
-		fclose(outfile);
-		double mu2;
-		for(int i=0;i<70;++i){
-			mu2=1.0e-1*pow(1.0e+5/1.0e-1,((double)i)/69);
-			gluon.set_max(kt2max,mu2);	
+		//fclose(outfile);
+		double val=0,x=0;
+		double k2,mu2;
+		double arr[7000]={0};
+		for(int k=0; k<100;++k){
+			x=X_MIN*pow(X_MAX/X_MIN,((double)k)/99);
+#if GLUON_APPROX==1
+			dipole_gluon.set_x(x);
+#endif
+			printf("x= %.2e\n",x);
 			
-			outfile=fopen(filenames,"a");
-			gluon.export_grid(outfile);
-			fclose(outfile);
-		}
-		printf("Gluon end\n");
+#pragma omp parallel private(k2,mu2)
+{
+			//double k2,mu2=0;
+#pragma omp for schedule(dynamic)
+			for(int j=0;j<100;++j){
+				k2=KT2_MIN*pow(kt2max/KT2_MIN,((double)j)/99);
+				printf("kt2= %.2e\n",k2);
+#if SUDAKOV>=1
+				for(int i=0;i<70;++i){
+					mu2=1.0e-1*pow(1.0e+5/1.0e-1,((double)i)/69);
+					arr[j*70+i]=dipole_gluon(x,k2,mu2);
+				}
 #else
-		gluon.set_max(kt2max);
-  		FILE *outfile=fopen(filenames,"w");
-		gluon.export_grid(outfile);
+				mu2=0;
+				arr[j]=dipole_gluon(x,k2,mu2);
+#endif
+				printf("\033[1A\033[2K\r");
+
+			}
+}
+			for(int j=0;j<100;++j){
+				k2=KT2_MIN*pow(kt2max/KT2_MIN,((double)j)/99);
+#if SUDAKOV>=1
+				for(int i=0;i<70;++i){
+					mu2=1.0e-1*pow(1.0e+5/1.0e-1,((double)i)/69);
+					val=arr[j*70+i];
+					fprintf(outfile ,"%.10e\t%.10e\t%.10e\t%.10e\n",log(x),log(k2),log(mu2), val );
+					//fprintf(outfile ,"%.10e\t%.10e\t%.10e\n",log(x),log(k2), val );
+				}
+#else	
+				val=arr[j];
+				fprintf(outfile ,"%.10e\t%.10e\t%.10e\n",log(x),log(k2),val );
+#endif
+				
+
+			}
+			printf("\033[1A\033[2K\r");
+			//gluon.set_max(kt2max,mu2);	
+			
+			//outfile=fopen(filenames,"a");
+			//gluon.export_grid(outfile);
+			//fclose(outfile);
+		}
+		fclose(outfile);
 		printf("Gluon end\n");
-	 	fclose(outfile);
-#endif		
+//#else
+//		gluon.set_max(kt2max);
+//  		FILE *outfile=fopen(filenames,"w");
+//		gluon.export_grid(outfile);
+//		printf("Gluon end\n");
+//	 	fclose(outfile);
+//#endif		
 
 	return 0;
 }

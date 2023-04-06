@@ -19,7 +19,7 @@ template<typename GLU >class Approx_aF{
 		double sigma_0=0;
 		double kt2min=KT2_MIN/2 ,kt2max=-1;
 		double xmin=X_MIN;
-		const double *mu2;
+		const double mu2[1]={0};
 		
 		int alloc_flag=0;
 		
@@ -181,13 +181,15 @@ template<typename GLU >class Approx_aF{
 #endif
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{
+#if SUDAKOV>=1
 			if(*(this->mu2)!=mu2){
 				printf("Approx_aF:: mu2 doesn't match. internal = %.3e, mu2=%.3e\n",*(this->mu2),mu2);
 			}
+#endif
 			if(kt2>kt2max){printf("Approx_aF:: kt2 too large kt2max= %.1e kt2= %.1e diff=%.1e\n",kt2max,kt2,kt2max-kt2);}
 			if(kt2<kt2min){printf("Approx_aF:: kt2 too small kt2min= %.1e kt2= %.1e diff=%.1e\n",kt2min,kt2,kt2min-kt2);}
 			if(x>X_MAX){printf("Approx_aF:: x too large xmax= %.1e x= %.1e diff=%.1e\n",X_MAX,x,X_MAX-x);}
-			if(x<1.0e-8){printf("Approx_aF:: x too small xmin= %.1e x= %.1e diff=%.1e\n",1.0e-8,x,x-1.0e-8);}			
+			if(x<X_MIN){printf("Approx_aF:: x too small xmin= %.1e x= %.1e diff=%.1e\n",1.0e-8,x,x-1.0e-8);}			
 			double val = 0;
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
 #if ALPHA_RUN==1

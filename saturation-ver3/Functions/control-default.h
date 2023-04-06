@@ -42,7 +42,7 @@
 	#define R_MIN 1.0e-6
 #endif
 #ifndef R_MAX
-	#define R_MAX 1e+4
+	#define R_MAX 1e+5
 #endif
 #ifndef R_MINMAX //for x dependent r max, this is as low as rmax gets. see dipole-gluon.hh
 	#define R_MINMAX 1.0e+2
@@ -141,7 +141,7 @@
 #endif
 
 #ifndef ADD_END
-	#define ADD_END 1
+	#define ADD_END 0
 #endif
 #ifndef GBW_APPROX
 	#define GBW_APPROX 0

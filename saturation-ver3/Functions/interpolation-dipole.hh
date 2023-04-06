@@ -11,8 +11,9 @@
 // DSIGMA define at the end
 //
 // ///////////////////////////////////////////////////// 
-
+#if SUDAKOV >=1
 #include"sudakov.hh"
+#endif
 //template<typename T, typename T2>double deriv(T & func,T2 par,double x,double h,int i) {
 template<typename T>double deriv(T & func,double y, double x,double h,int i) {
 	//////////////////////////////////////////////////////////////////////////////////////////////

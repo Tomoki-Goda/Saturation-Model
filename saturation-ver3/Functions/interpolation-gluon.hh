@@ -4,9 +4,11 @@
 /////////////////////////////////////////////////////
 // Approx_aF<gluon> af //gluon is Dipole_Gluon or Gluon_GBW
 // 
+
 template<typename GLU >class Approx_aF{
 	private:
 		GLU *aF;
+
 		double max_prev=0;
 		
 		int kt2_npts,x_npts;
@@ -17,6 +19,7 @@ template<typename GLU >class Approx_aF{
 		double sigma_0=0;
 		double kt2min=KT2_MIN/2 ,kt2max=-1;
 		double xmin=X_MIN;
+		const double *mu2;
 		
 		int alloc_flag=0;
 		
@@ -48,7 +51,17 @@ template<typename GLU >class Approx_aF{
 				printf("Approx_aF cannot allocate\n");
 			}
 		}
+		
+//#if SUDAKOV>=1
+//		int approximate(const double kt2max,const double mu2){
+//#else
 		int approximate(const double kt2max){
+		
+#if SUDAKOV>=1
+			const double &mu2=*(this->mu2);
+#else
+			const double mu2=0;
+#endif
 			this->kt2max=kt2max;
 			clock_t time=clock();
 			std::chrono::system_clock walltime;
@@ -68,25 +81,20 @@ template<typename GLU >class Approx_aF{
 {
 #pragma omp for schedule(dynamic)
 				for(int i=0;i<kt2_npts;++i){
-					//printf("%d\t/%d",i+1,kt2_npts);
-					//fflush(stdout);
+
 					double kt2=((double)i)/(kt2_npts-1);
 					kt2=kt2min*pow(4*kt2max/kt2min,kt2)/2;
 					kt2_array[i] = kt2;
-//#if WW==1
-//					aF_array[i+ j*kt2_npts] = (*aF)(x,kt2,0)*9.0/(4.0*PI)*log((2+kt2)/0.09);//alpha?
-//#else
-					aF_array[i+ j*kt2_npts] = (*aF)(x,kt2,0);
-//#endif
-					//printf("\033[2K\r");
-					//fflush(stdout);
+
+					aF_array[i+ j*kt2_npts] = (*aF)(x,kt2,mu2);
+
 				}
 }
 				//printf("\033[2K\r");
 				if(j!=0){
 					printf("\033[1A\033[2K\r");
 				}
-				printf("approxed x=%.2e\n", x);
+				printf("approxed x=%.2e mu2=%.2e\n", x,mu2);
 				fflush(stdout);
 			}
 			//printf("\033[1A\033[2K Grid done\n");
@@ -99,57 +107,7 @@ template<typename GLU >class Approx_aF{
 		//	printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
 			return(0);
 		}
-/*
-		static void* compute(void* par){
-			//printf("func\n");
-			parallel_arg* param=(parallel_arg*)par;
-			int i=param->i,j=param->j;
-			Approx_aF* to=param->ptr;
-			double kt2=((double)i)/(to->kt2_npts-1);
-			kt2=to->kt2min*pow(4*(to->kt2max)/(to->kt2min),kt2)/2;
-			(to->kt2_array)[i] = kt2;
-			(to->aF_array)[i+ j*(to->kt2_npts)] = (to->aF)(kt2,0);
-			return NULL;
-		}
-		int approximate_thread(const double kt2max){
-			this->kt2max=kt2max;
-			clock_t time=clock();
-			std::chrono::system_clock walltime;
-			std::chrono::time_point start= walltime.now();
-			double kt2,x;
-			pthread_t thread[kt2_npts];
-			parallel_arg args[kt2_npts];
-			int i1;//,i2,i3,i4;
-			for (int j = 0; j < x_npts; ++j){
-				x=pow(10,-8+8*((double)j)/(x_npts-1));
-				x_array[j] = x;
-				aF.set_x(x);	
-				if(j!=0){
-					printf("\033[1A\033[2K\r");
-				}
-				printf("[ ");
-				for(int i=0;i<kt2_npts;++i){
-					args[i].i=i;
-					args[i].j=j;
-					args[i].ptr=this;
-					i1=pthread_create(thread+i,NULL,compute,(void*)(args+i) );
-				}					
-				for(int i=0;i<kt2_npts;++i){
-					pthread_join(thread[i],NULL);
-				}
-				printf("\033[2K\r");
-				printf(" approxed x=%.2e\n", x);
-			}
-			printf("\033[1A\033[2K\r");
-			gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
-			time-=clock();
-			std::chrono::duration<double> wtime=walltime.now()-start;
-			std::cout<< -((double)time/CLOCKS_PER_SEC)<< " CPU seconds " <<wtime.count()<<" seconds to approx"<<std::endl;
-			//printf("%.2e sec to approx\n",-((double)time/CLOCKS_PER_SEC) );
-			return(0);
-		}
-			
-*/		
+	
 	public:
 		double saturation(double x,double kt2_start){
 			double val;
@@ -181,43 +139,28 @@ template<typename GLU >class Approx_aF{
 			for(int j=0;j< x_npts;j++){
 				for(int i=0;i<kt2_npts;i++){
 					//fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]/sigma_0);
-					fprintf(file ,"%.10e\t%.10e\t%.10e\n",log10(x_array[j]),log10(kt2_array[i]), aF_array[i+j*kt2_npts] );
+#if SUDAKOV>=1
+					fprintf(file ,"%.10e\t%.10e\t%.10e\t%.10e\n",log(x_array[j]),log(kt2_array[i]),log(*mu2), aF_array[i+j*kt2_npts] );
+#else
+					fprintf(file ,"%.10e\t%.10e\t%.10e\n",log(x_array[j]),log(kt2_array[i]), aF_array[i+j*kt2_npts] );
+#endif					
 				}
 			}	
 			return 0;
 		}
-	/*	Approx_aF(const Approx_aF& rhs){
-			aF=rhs.aF;
-			x_npts=rhs.x_npts;
-			kt2_npts=rhs.kt2_npts;
-			alloc(x_npts,kt2_npts);
-			sigma_0=rhs.sigma_0;
-			mu02=rhs.mu02;
-			
-			if(rhs.alloc_flag!=0){
-				for(int i=0;i<x_npts;++i){
-					x_array[i]=rhs.x_array[i];
-					
-					for(int j=0;j<kt2_npts;++j){
-							aF_array[j+kt2_npts*i]=	rhs.aF_array[j+kt2_npts*i];			
-					}
-				}
-				for(int j=0;j<kt2_npts;++j){
-					kt2_array[j]=rhs.kt2_array[j];			
-				}
-				gsl_spline2d_init (spline_ptr,kt2_array, x_array, aF_array, kt2_npts, x_npts);
-			}
-			
-			
-		}
-	 */
+
 		Approx_aF(GLU& g){
 			aF=&g;
 		}
 		~Approx_aF(){
 			free_approx();
 		}
+#if SUDAKOV>=1
+		void set_max(double kt2max,const double& mu2){
+			this->mu2=&mu2;
+#else
 		void set_max(double kt2max){
+#endif
 			this->kt2max=kt2max;
 			approximate(kt2max);
 			//approximate_thread(kt2max);
@@ -229,17 +172,22 @@ template<typename GLU >class Approx_aF{
 			alloc(x_npts,kt2_npts);
 			
 			sigma_0=par[0];
+#if ALPHA_RUN==1
 #if MU02==0
 			mu02 = par[3];
 #else 
 			mu02 = MU02;
 #endif
+#endif
 		}
 		double operator()(const double x,const double kt2,const double mu2)const{
-			if(kt2>kt2max){printf("kt2 too large kt2max= %.1e kt2= %.1e diff=%.1e\n",kt2max,kt2,kt2max-kt2);}
-			if(kt2<kt2min){printf("kt2 too small kt2min= %.1e kt2= %.1e diff=%.1e\n",kt2min,kt2,kt2min-kt2);}
-			if(x>X_MAX){printf("x too large xmax= %.1e x= %.1e diff=%.1e\n",X_MAX,x,X_MAX-x);}
-			if(x<1.0e-8){printf("x too small xmin= %.1e x= %.1e diff=%.1e\n",1.0e-8,x,x-1.0e-8);}			
+			if(*(this->mu2)!=mu2){
+				printf("Approx_aF:: mu2 doesn't match. internal = %.3e, mu2=%.3e\n",*(this->mu2),mu2);
+			}
+			if(kt2>kt2max){printf("Approx_aF:: kt2 too large kt2max= %.1e kt2= %.1e diff=%.1e\n",kt2max,kt2,kt2max-kt2);}
+			if(kt2<kt2min){printf("Approx_aF:: kt2 too small kt2min= %.1e kt2= %.1e diff=%.1e\n",kt2min,kt2,kt2min-kt2);}
+			if(x>X_MAX){printf("Approx_aF:: x too large xmax= %.1e x= %.1e diff=%.1e\n",X_MAX,x,X_MAX-x);}
+			if(x<1.0e-8){printf("Approx_aF:: x too small xmin= %.1e x= %.1e diff=%.1e\n",1.0e-8,x,x-1.0e-8);}			
 			double val = 0;
 			val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
 #if ALPHA_RUN==1

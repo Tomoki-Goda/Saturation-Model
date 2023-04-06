@@ -10,7 +10,7 @@
 	#define FLAVOUR 2
 #endif
 #ifndef SUDAKOV 
-	#define SUDAKOV 2
+	#define SUDAKOV 0
 #endif
 
 #ifndef MASS_L2
@@ -42,7 +42,7 @@
 	#define R_MIN 1.0e-6
 #endif
 #ifndef R_MAX
-	#define R_MAX 1e+6
+	#define R_MAX 1e+4
 #endif
 #ifndef R_MINMAX //for x dependent r max, this is as low as rmax gets. see dipole-gluon.hh
 	#define R_MINMAX 1.0e+2
@@ -55,7 +55,7 @@
 	#define X_MAX 1.0e+00
 #endif
 #ifndef KT2_MIN 
-	#define KT2_MIN 1.0e-8
+	#define KT2_MIN 1.0e-6
 #endif
 
 //////////////////////////////////////////////////////////////////

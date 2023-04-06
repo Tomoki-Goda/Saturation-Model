@@ -12,6 +12,7 @@
 //
 // ///////////////////////////////////////////////////// 
 
+#include"sudakov.hh"
 //template<typename T, typename T2>double deriv(T & func,T2 par,double x,double h,int i) {
 template<typename T>double deriv(T & func,double y, double x,double h,int i) {
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -530,13 +531,24 @@ template <typename Sig>  class Chebyshev_Laplacian_Sigma{
 */
 template <typename Sig> class Gluon_Integrand{
 		Sig *sigma;
+#if SUDAKOV>=1
+		Sudakov *sudakov;
+#endif
 		char mode='l';//l or s
 		double ns_pow=500;
 		const double *fixx;
 	public:
+#if SUDAKOV>=1
+		Gluon_Integrand(Sig& sig,Sudakov&sud){
+			sigma=&sig;
+			sudakov=&sud;
+		}
+#else
 		Gluon_Integrand(Sig& sig){
 			sigma=&sig;
 		}
+#endif
+
 		void init(const double * const &par ,char mode){
 			this->mode=mode;
 			//sigma->init(par);
@@ -560,6 +572,9 @@ template <typename Sig> class Gluon_Integrand{
 				printf("Gluon_Integrand:: too small, out of range %.4e - %.4e = %.4e , rho=%.3e,%d\n",r,R_MIN,r-R_MIN,rho,R_CHANGE_VAR);
 			}
 			const double kt=sqrt(par[0]),x=par[1];
+#if SUDAKOV>=1
+			const double q2=par[2];
+#endif
 			double val = 0;
 			if(x!=*fixx){
 				printf("Gluon_Integrand:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
@@ -591,6 +606,10 @@ template <typename Sig> class Gluon_Integrand{
 				case 'w'://for weizsacker-william 
 					val=(*sigma)(x,r);
 					val*=std::cyl_bessel_j(0,r *kt );
+#if SUDAKOV>=1		
+					//printf("sudakov");			
+					val/=exp((*sudakov)(r,q2));//exp(-S);	
+#endif
 					//val*=(r*kt>10)?(sqrt(2.0/(PI*r*kt))*cos(r*kt-PI/4)):(std::cyl_bessel_j(0,r *kt ));
 					val/=r;
 					break;

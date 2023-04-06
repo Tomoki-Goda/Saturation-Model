@@ -117,9 +117,10 @@ class Gluon_GBW{
 #if WW==1
 			Qs2*=9.0/4.0;
 			gsl_sf_result result;
-			gsl_sf_gamma_inc_e(0.0, k2/Qs2,&result);
+			gsl_sf_gamma_inc_e(1.0e-20, k2/Qs2,&result);
 			double val=result.val;
 			val/=(3*pow(PI,3));
+			val/=0.2;
 #else			
 			double val=3.0/(4*PI*PI)*k2/Qs2*exp(-k2/Qs2);
 #endif
@@ -212,7 +213,7 @@ template<typename INTEG>class Dipole_Gluon{
 			int n;
 			//gsl_sum_levin_u_workspace * w = gsl_sum_levin_u_alloc (SECTOR_MAX);
 			Kahn accum=Kahn_init(3);
-			const std::vector<double> par{kt2,x};
+			const std::vector<double> par{kt2,x,mu2};
 			double rmax=R_MAX,rmin=R_MIN;
 			double val=0,val1=0,val2=0;
 			Kahn_clear(accum);
@@ -336,6 +337,7 @@ template<typename INTEG>class Dipole_Gluon{
 			}
 #if WW==1
 			val*=2.0/(3.0*pow(PI,3));
+			val/=0.2;
 			//val=((val<1.0e-5)?(1.0e-5):(val));
 #else
 			val*=3.0/(8.0*pow(PI,2));

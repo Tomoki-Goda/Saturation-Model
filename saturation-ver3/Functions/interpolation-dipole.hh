@@ -11,9 +11,9 @@
 // DSIGMA define at the end
 //
 // ///////////////////////////////////////////////////// 
-#if SUDAKOV >=1
-#include"sudakov.hh"
-#endif
+//#if SUDAKOV >=1
+//#include"sudakov.hh"
+//#endif
 //template<typename T, typename T2>double deriv(T & func,T2 par,double x,double h,int i) {
 template<typename T>double deriv(T & func,double y, double x,double h,int i) {
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -532,23 +532,34 @@ template <typename Sig>  class Chebyshev_Laplacian_Sigma{
 */
 template <typename Sig> class Gluon_Integrand{
 		Sig *sigma;
-#if SUDAKOV>=1
-		Sudakov *sudakov;
-#endif
+//#if SUDAKOV>=1
+//		Sudakov *sudakov;
+//#endif
 		char mode='l';//l or s
 		double ns_pow=500;
 		const double *fixx;
+		
+		double sudakov(double r,double Q2,double k2){
+			if(Q2<=k2){
+				return 0;
+			}
+			double val=Q2*r*r/1.26095;
+			val=0.2*3.0/(4*PI)*pow(log(val),2);
+			return val;
+		}
 	public:
+/*
 #if SUDAKOV>=1
 		Gluon_Integrand(Sig& sig,Sudakov&sud){
 			sigma=&sig;
 			sudakov=&sud;
 		}
 #else
+*/
 		Gluon_Integrand(Sig& sig){
 			sigma=&sig;
 		}
-#endif
+//#endif
 
 		void init(const double * const &par ,char mode){
 			this->mode=mode;
@@ -609,7 +620,8 @@ template <typename Sig> class Gluon_Integrand{
 					val*=std::cyl_bessel_j(0,r *kt );
 #if SUDAKOV>=1		
 					//printf("sudakov");			
-					val/=exp((*sudakov)(r,q2));//exp(-S);	
+					//val/=exp((*sudakov)(r,q2));//exp(-S);	
+					val/=exp(sudakov(r,q2,kt*kt));//exp(-S);	
 #endif
 					//val*=(r*kt>10)?(sqrt(2.0/(PI*r*kt))*cos(r*kt-PI/4)):(std::cyl_bessel_j(0,r *kt ));
 					val/=r;

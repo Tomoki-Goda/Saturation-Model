@@ -274,7 +274,7 @@ template<typename INTEG>class Dipole_Gluon{
 				imin=imax;
 				
 				lev.add_term(val);
-				sum=lev.accel(i,0);
+				sum=lev.sum(i);
 				
 				if(i>=25&&(flag>1 || (3*(i/3))==i )){
 					//flag=0 untested

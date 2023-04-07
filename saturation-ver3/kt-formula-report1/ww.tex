@@ -1,0 +1,82 @@
+\documentclass{article}
+
+\usepackage[backend=bibtex]{biblatex}
+\addbibresource{ww.bib}
+
+
+\newcommand{\fww}[0]{\mathcal{F}^{\mathrm{WW}}}
+\newcommand{\fdp}[0]{\mathcal{F}^{\mathrm{dipole}}}
+\newcommand{\sdp}[0]{\sigma_{\mathrm{dipole}}}
+\newcommand{\sdpa}[0]{\sigma_{\mathrm{dipole\,Adj.}}}
+\begin{document}
+\section{Dijet process}
+In order to investigate less inclusive processes, we will study the electron-dijet correlation at EIC, following closely the method of Ref.~\cite{vanHameren:2021sqc}. 
+Dijet process is known to probe a type of unintegrated gluon density, called Weizs\"acker-Williams gluon density\cite{}.
+This UGD, $\fww(x,k^2)$, has an interpretation as a number density of gluons inside a proton. Under the Gaussian approximation and assuming $\theta$-like profile of the proton, one can write  
+\begin{equation}
+\fww(x,k^2)= \frac{C_F}{2\pi^3\alpha_s}\int^\infty_0\frac{dr}{r}J_0(r k) \sdpa(x,r),
+\end{equation} 	
+with the adjoint dipole cross section
+\begin{equation}
+\sdpa(x,r)=\sigma_0\left( 1-\left(1-\frac{\sdp(x,r)}{\sigma_0}\right)^{C_A/C_F}\right).
+\end{equation}
+Resummation of the Sudakov logarithms is achieved by the formula~\cite{}
+\begin{equation}
+	\fww(x,k^2,\mu^2)= \frac{C_F}{2\pi^3\alpha_s}\int^\infty_0\frac{dr}{r}J_0(r k) e^{-S(r,\mu^2)} \sdpa(x,r),
+\end{equation}
+where, we use the Sudakov form factor~\cite{},
+\begin{equation}
+	S(r,\mu^2)=\frac{\alpha_s N_c}{4\pi}\ln^2\left(\frac{\mu^2r^2}{4e^{-2\gamma_E}}\right),
+\end{equation}
+in which $\gamma_E$ is the Euler-Mascheroni constant, and we use $\alpha_s=0.2$. 
+
+
+
+	
+	
+	
+\appendix	
+\section{Computation of gluon densities}
+In order to obtain the WW gluon density, one needs to compute 
+\begin{equation}
+	\fww(x,k)= \frac{C_F}{2\pi^3\alpha_s}\int^\infty_0\frac{dr}{r}J_0(r k) \sdpa(x,r),
+\end{equation} 	
+where we use 
+\begin{equation}
+	\sdpa(x,r)=\sigma_0\left( 1-\left(1-\frac{\sdp(x,r)}{\sigma_0}\right)^{C_A/C_F}\right).
+\end{equation}
+
+The convergence of this integral may be slow due to high oscillation for large $k$.
+For such integration, one can employ a method summarized in Ref.~\cite{LYNESS1985109}. 
+Essentially, the integration is carried out between, anti-nodes of $J_0(rk)$. Then the total integral is written in the form of infinite sum
+\begin{equation}
+	I=\sum^\infty_{i=1} \int^{a_{i+1}}_{a_i} \frac{dr}{r}J_0(r k) \sdpa(x,r),
+\end{equation}
+where we use $a_{i}=\frac{\pi}{k}(i+1/4)$.
+This sum can be accelerated, with series transformation described in Ref.~\cite{doi:10.1080/00207167308803075,Weniger:1989rea,HOMEIER19951}.
+The remarkable power of the Levin's transformation is shown in Tab.~\ref{tab:levin}.
+This trick is also useful in the computation of dipole gluon density. 
+
+\begin{table}
+	\begin{center}
+	\begin{tabular}{|c||c|c|}
+		\hline
+		$n$&Levin&Sum\\\hline
+		9&	-5.751e-9&	-0.0004998\\\hline
+		12&	-1.5891e-9&	0.00025567\\\hline
+		15&	-3.803e-11&	-0.00015069\\\hline
+		18&	6.639e-13&	0.00009743\\\hline
+		21&	2.6728e-13&	-0.00006722\\\hline
+		24&	2.6744e-13&	0.00004866\\\hline
+		27&	2.6744e-13&	-0.00003655\\\hline
+	\end{tabular}
+	\end{center}
+	\caption{
+		Computing $\int \frac{dr}{r}J_0(r k)(1-e^{-r^2})$, with $k=10$ adding up to $n$ th term.
+		Levin-accelerated case reaches the true value of $\sim$2.674e-13 far more quickly, and shows superior stability.
+	}
+\label{tab:levin}
+\end{table}
+\printbibliography
+\end{document}
+

@@ -61,25 +61,26 @@ int main(int argc , char** argv){
 		#if SIGMA_APPROX==-1||SIGMA_APPROX==0//if sigma is not in 1d grid
 			SIGMA sigma;
 			sigma.init(sigpar);
-			
+		/*	
 #if SUDAKOV>=1
 			Sudakov sudakov;
 			sudakov.init(sudpar);
 			DSIGMA dsigma(sigma,sudakov);
-#else
+#else*/
 			DSIGMA dsigma(sigma);
-#endif
+//#endif
 			dsigma.init(sigpar,'w');
  		#else //-2 and 1  
  			SIGMA sigma;
 			sigma.init(sigpar);
+/*
 #if SUDAKOV>=1
 			Sudakov sudakov;
 			sudakov.init(sudpar);
 			DSIGMA dsigma(sigma,sudakov);
-#else
+#else*/
 			DSIGMA dsigma(sigma);
-#endif
+//#endif
 			dsigma.init(N_APPROX+250,sigpar,'w');
 		#endif
 		

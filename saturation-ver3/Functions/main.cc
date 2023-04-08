@@ -13,7 +13,7 @@
 double INT_PREC=1;
 int N_APPROX=N_CHEB_R;
 #include"kt-formula.hh"
-#include"./fcn.h"
+#include"fcn.h"
 
 double double_round(double val,int i){
 	int l=lrint(floor(log10(val)));

@@ -1,8 +1,4 @@
 #include<wstp.h>
-#include"clenshaw.hh"
-//#include"polygamma.hh"
-#include"Kahn.hh"
-#include<gsl/gsl_sf_gamma.h>
 #include"gluons.hh"
 Collinear_Gluon xgpdf;
 double xg(const double x, const double QQ,const double A_g,const double l_g){
@@ -15,7 +11,7 @@ int xg_cheb_init(const double Ag, const double lg,double xx){
 	static double x;
 	x=xx;
 	//Collinear_Gluon xgpdf;
-	xgpdf_cheb.init(1.0e-8,1,0.5,1.0e+10, Ag,lg);
+	xgpdf_cheb.init(0.5,1.0e+10, Ag,lg);
 	xgpdf_cheb.set_x(x);
 	return(0);
 }
@@ -48,14 +44,6 @@ int main(int argc,char** argv){
 :Arguments: {N[ag], N[lg], N[x]}
 :ArgumentTypes: {Real, Real,Real}
 :ReturnType: Integer
-:End:
-
-:Begin:
-:Function: xg_cheb
-:Pattern: XGluonCheb[x_?NumberQ, q2_?NumberQ]
-:Arguments: {N[x], N[q2]}
-:ArgumentTypes: {Real, Real}
-:ReturnType: Real
 :End:
 
 :Begin:

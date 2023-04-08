@@ -102,7 +102,7 @@ static int plus(double &a,double &b){
 	}
 	return 0;
 }*/
-int orderedQ(double a, double b){
+static int orderedQ(double a, double b){
 	//if a is much larger than b in magnitude, return 1
 	int val;
 	val=(fabs(b/a)<KAHN_PREC)?(1):(0);
@@ -169,11 +169,11 @@ static double Kahn_list_sum(double* list, int len){
 
 */
 
-Kahn& operator+=(Kahn& sum,const double a){
+static Kahn& operator+=(Kahn& sum,const double a){
 	Kahn_Sum(sum ,a);	
 	return sum;
 }
-Kahn& operator-=(Kahn& sum,const double a){
+static Kahn& operator-=(Kahn& sum,const double a){
 	Kahn_Sum(sum ,-a);	
 	return sum;
 }

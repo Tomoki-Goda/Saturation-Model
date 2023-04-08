@@ -140,7 +140,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		const double kt2max=9.0e+4;
 		gluon.set_max(kt2max);
 	#else               //only GBW K
-		GLUON gluon();
+		GLUON gluon;
 		gluon.init(sigpar);
 	#endif//GLUON_APPROX==1	
 #endif//R_FORMULA

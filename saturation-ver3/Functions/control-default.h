@@ -4,11 +4,9 @@
 //////////////     MODEL AND FIXED PARAMETERS             ////////
 //////////////////////////////////////////////////////////////////
 #ifndef MODEL 
-	#define MODEL 2
+	#define MODEL 0
 #endif
-#ifndef FLAVOUR 
-	#define FLAVOUR 2
-#endif
+
 #ifndef SUDAKOV 
 	#define SUDAKOV 0
 #endif

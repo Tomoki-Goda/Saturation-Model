@@ -21,7 +21,7 @@
 
 #include"gluons.hh"
 #include"r-formula.hh"
-#include"interpolation-dipole.hh"
+#include"gluon-integrand.hh"
 #include"dipole-gluon.hh"
 #include"interpolation-gluon.hh"
 #include"types.hh"
@@ -56,15 +56,6 @@ template<typename TYPE > class Integrand_kt{
 			gluptr=rhs.gluptr;
 			return *this;
 		}
-		/*explicit Integrand_kt(const Integrand_kt& rhs){
-			x=rhs.x;
-			Q2=rhs.Q2;
-			mf2=rhs.mf2;
-			betamax=rhs.betamin;
-			k2max=rhs.k2max;
-			kappamax=rhs.kappamax;
-			gluptr=rhs.gluptr;
-		}*/
 		
 		explicit Integrand_kt(TYPE & gluon){
 			gluptr=&gluon;
@@ -304,28 +295,11 @@ void llTest(const int ndim, const int ncomp,
   
   }
 template <typename T> class F2_kt{
-		//int newpar=1;
-	
-			//const double *par=NULL;
 			T *integrands;
 #if R_FORMULA==1
-			/*SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
-
-			Integrand_r integrands[3]={
-				Integrand_r(sigma[0]) ,
-				Integrand_r(sigma[1]) ,
-				Integrand_r(sigma[2])
-			};*/
 			const int key =13;
 			const int ndim=2;
 #else//R_FORMULA
-			/*Gluon gluon;//gluon has no flavour dep.
-			
-			Integrand_kt<Gluon> integrands[3]={
-				Integrand_kt( gluon),
-				Integrand_kt( gluon),
-				Integrand_kt( gluon)
-			};*/
 			const int key =11;
 			const int ndim=3;
 			const double kt2max=5.0e+4;

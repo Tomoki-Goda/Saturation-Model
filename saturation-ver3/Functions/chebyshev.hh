@@ -1,3 +1,5 @@
+#ifndef CHEBYSHEV_HH
+#define CHEBYSHEV_HH 1
 #include<math.h>
 #include<stdlib.h>
 #include<stdio.h>
@@ -19,7 +21,7 @@
 
 ///////////////////////////Change of variables to -1 1 ///////////////////////
 //double change_var_compactify(double min,double max, double val){
-double change_var_revert(double min,double max, double val){
+static double change_var_revert(double min,double max, double val){
 	//for val =[-1,1]  return value between min and max
 	if((val>1)||(val<-1)|| (min>max)){
 		printf("change_var_revert:: wrong input for change_var_revert\n val=%f\t [%f, %f] \n",val, min,max);
@@ -31,7 +33,7 @@ double change_var_revert(double min,double max, double val){
 	//return ( (val/2) *(max-min)+ (max+min)/2 );
 }
 //double change_var_revert(double min,double max, double val){
-double change_var_compactify(double min,double max, double val){
+static double change_var_compactify(double min,double max, double val){
 	//for val =[min,max]  return value between -1 and 1
 	if(min>max){
 		printf("change_var_compactify:: wrong input for change_var_compactify\n val=%f\t [%f, %f] \n",val, min,max);
@@ -43,7 +45,7 @@ double change_var_compactify(double min,double max, double val){
 	
 }
 ////////////////////////////////log version ////////////////////////////
-double change_var_revert_log(double min,double max, double val){
+static double change_var_revert_log(double min,double max, double val){
 	//for val =[-1,1]  return value between min and max
 	if((val>1)||(val<-1)|| (min>max)){
 		printf("change_var_revert_log:: wrong input for change_var_revert\n val=%f\t [%f, %f] \n",val, min,max);
@@ -52,7 +54,7 @@ double change_var_revert_log(double min,double max, double val){
 	return (min*pow((max/min),(1.0-val)/2) ) ;
 }
 //double change_var_revert(double min,double max, double val){
-double change_var_compactify_log(double min,double max, double val){
+static double change_var_compactify_log(double min,double max, double val){
 
 	if(min>max){
 		printf("change_var_compactify_log:: wrong input for change_var_compactify\n val=%f\t [%f, %f] \n",val, min,max);
@@ -63,7 +65,7 @@ double change_var_compactify_log(double min,double max, double val){
 ////////////////////////////Frac///////////////////////////////////
 //A little special version. 
 //use negative value for max to make the max infinity
-double change_var_revert_frac(double min, double max, double val){
+static double change_var_revert_frac(double min, double max, double val){
 	//for val =[-1,1]  return value between min and max
 
 	if((val>1)||(val<-1)){
@@ -76,7 +78,7 @@ double change_var_revert_frac(double min, double max, double val){
 	}
 }
 //double change_var_revert(double min,double max, double val){
-double change_var_compactify_frac(double min, double max, double val){
+static double change_var_compactify_frac(double min, double max, double val){
 	if(max<0){
 		return ((1+2*min-val)/(1+val) );	
 	}else{
@@ -85,7 +87,7 @@ double change_var_compactify_frac(double min, double max, double val){
 }
 ////////////////////////////////  indices //////////////////////////////////////////////////
 // chebyshev approximation is done in multi dimension but to treat in the same way, tensor are treated as list. 
-unsigned convert_index(const unsigned * index, const unsigned * max, const unsigned dim){
+static unsigned convert_index(const unsigned * index, const unsigned * max, const unsigned dim){
 	unsigned unit=1;
 	unsigned total=0;
 	for(unsigned i=0;i<dim;++i){
@@ -95,7 +97,7 @@ unsigned convert_index(const unsigned * index, const unsigned * max, const unsig
 	return(total);
 }
 /////////////
-void ind_vec_increment(unsigned * vec, const unsigned * max, const unsigned dim){
+static void ind_vec_increment(unsigned * vec, const unsigned * max, const unsigned dim){
 //increment the vec
 // like in the way increasing (hr,min,sec) second by second. 	
 // in the case of time vec should be int vec[3] max={24,60,60}, and dim=3. 
@@ -119,7 +121,7 @@ void chebyshevT(double x,unsigned degree, double * T ){
 	}
 }
 */
-void chebyshevT(const double x, const unsigned degree, double *T){
+static void chebyshevT(const double x, const unsigned degree, double *T){
 //iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
 //with kahn algorithm
 	T[0]=1;
@@ -144,7 +146,7 @@ void chebyshevT(const double x, const unsigned degree, double *T){
 		*(T+i)=cos(i*acos(x));
 	}*/
 }
-void chebyshevU(const double x, const unsigned degree, double * U ){
+static void chebyshevU(const double x, const unsigned degree, double * U ){
 //iterative  definition of chebyshev polynomial from $T_0(x)$ to $T_{degree-1}(x)$  . 
 //with kahn algorithm
 	U[0]=1;
@@ -181,7 +183,7 @@ void chebyshevU(const double x, const unsigned degree, double * U ){
 	}
 }
 
-void chebyshev_1(const double x, const unsigned degree, double *T1){
+static void chebyshev_1(const double x, const unsigned degree, double *T1){
 	double U[degree];
 	chebyshevU(x,degree,U);
 	T1[0]=0;
@@ -190,7 +192,7 @@ void chebyshev_1(const double x, const unsigned degree, double *T1){
 	}
 }
 
-void chebyshev_2(const double x,const unsigned degree, double *T2){
+static void chebyshev_2(const double x,const unsigned degree, double *T2){
 	double U[degree], T[degree];
 	chebyshevT(x,degree,T);
 	chebyshevU(x,degree,U);
@@ -210,7 +212,7 @@ inline int kronecker(const int i,const int j){
 	return( ( (i==j)?1:0)  );
 } 
 
-template<typename T, typename T2>void sample(T & func, T2 par,  const unsigned * degree, const unsigned dim,  double* sample_arr){
+template<typename T, typename T2>static void sample(T & func, T2 par,  const unsigned * degree, const unsigned dim,  double* sample_arr){
 ///////////////////precompute the function. i.e make the function descrete. /////////////////////////
 // degree is a list of how many term you want to go in each variable. dim is dimension( no. of variables). 
 //then sample_arr should have length = prod( degree[i] ).
@@ -249,7 +251,7 @@ template<typename T, typename T2>void sample(T & func, T2 par,  const unsigned *
 }
 
 
-double cheb_c_summand(const double * sample_arr,const unsigned* ind1, const unsigned* ind2,const unsigned *degree, const unsigned dim ){
+static double cheb_c_summand(const double * sample_arr,const unsigned* ind1, const unsigned* ind2,const unsigned *degree, const unsigned dim ){
 //vec, ind1, ind2, degree are vector of length dim.
 // sum over ind2 is the coefficients in the chebyshev
 	double factor=1;
@@ -265,7 +267,7 @@ double cheb_c_summand(const double * sample_arr,const unsigned* ind1, const unsi
 }
 
 
-double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *degree, const unsigned dim ){
+static double cheb_c(const double * sample_arr, const unsigned* ind1,const unsigned *degree, const unsigned dim ){
 // do the sum, produce coefficient c of chebyshev \sum c*T 
 // coefficient c for indices ind1[dim] 
 //vec, ind1,  degree are vector of length dim.
@@ -319,7 +321,7 @@ typedef struct{
 	int lenT;
 } cheby;
 
-cheby PrepareChebyshev(const unsigned *degree,const unsigned dim){
+static cheby PrepareChebyshev(const unsigned *degree,const unsigned dim){
 	cheby cont={NULL,NULL,1,1,1};
 	cont.degree=(unsigned*)calloc(dim,sizeof(unsigned));
 	//cont.index=(unsigned*)calloc(dim,sizeof(unsigned));
@@ -338,14 +340,14 @@ cheby PrepareChebyshev(const unsigned *degree,const unsigned dim){
 	//printf("dim= %d end\n",cont.dim);
 	return cont;
 }
-inline cheby PrepareChebyshev(const unsigned deg,const unsigned dim){
+static inline cheby PrepareChebyshev(const unsigned deg,const unsigned dim){
 	unsigned degree[dim];
 	for(int i =0;i<dim;++i){
 		degree[i]=deg;
 	}
 	return(PrepareChebyshev(degree,dim));
 }
-int FreeChebyshev(cheby & cont){
+static int FreeChebyshev(cheby & cont){
 	free(cont.coeff);
 	free(cont.degree);
 	//free(cont.index);
@@ -354,7 +356,7 @@ int FreeChebyshev(cheby & cont){
 	return 0;
 }
 
-template<typename T, typename T2>void cheb_coeff(cheby & data, T& func, T2 par ){
+template<typename T, typename T2>static void cheb_coeff(cheby & data, T& func, T2 par ){
 	unsigned ind[data.dim];
 	for(unsigned i=0;i<data.dim;i++){
 		ind[i]=0;//initialize indices
@@ -373,7 +375,7 @@ template<typename T, typename T2>void cheb_coeff(cheby & data, T& func, T2 par )
 //////////////////////////////////// approximate function ////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int chebyshev_reduce(const cheby & data,cheby & newcheb, const double arg,const int redpos ){
+static int chebyshev_reduce(const cheby & data,cheby & newcheb, const double arg,const int redpos ){
 	double Tlist[data.degree[redpos]];
 	unsigned ind1[data.dim], ind2[newcheb.dim];
 	int j=0;
@@ -409,7 +411,7 @@ int chebyshev_reduce(const cheby & data,cheby & newcheb, const double arg,const 
 }
 
 
-double chebyshev(const cheby & data, const double* args ){
+static double chebyshev(const cheby & data, const double* args ){
 	double T[data.lenT];
 	unsigned ind1[data.dim];
 	double res=0;
@@ -455,7 +457,7 @@ double chebyshev(const cheby & data, const double* args ){
 ////////////////////////////////////////////////////////////// derivative  /////////////////////////////////////////////////////////
 ///////////////////// del is a list n th derivative for args. [1,0,0] for first derivative wrt first arg of three arguments //////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double d_chebyshev(const cheby & data, const double* args, int* del  ){
+static double d_chebyshev(const cheby & data, const double* args, int* del  ){
 	double T[data.lenT];
 	unsigned ind1[data.dim];
 	double res=0;
@@ -573,3 +575,4 @@ double d_chebyshev(const cheby & data, const double* args, int* del  ){
 	return res;
 }
 */
+#endif

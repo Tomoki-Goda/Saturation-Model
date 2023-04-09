@@ -12,7 +12,7 @@
 //
 // ///////////////////////////////////////////////////// 
 #ifndef GLUON_INTEGRAND_HH
-#define GLUON_INTEGRAND_HH
+#define GLUON_INTEGRAND_HH 1
 
 #include<cmath>
 #include<iostream>
@@ -21,13 +21,21 @@
 #include<complex>
 #include<gsl/gsl_interp.h>
 #include<gsl/gsl_spline.h>
+#include"control.h"
 #include"control-default.h"
 #include"constants.h"
 #include"clenshaw.hh"
 #include"miscellaneous.hh"
 
-template <typename Sig> class Gluon_Integrand{
-		Sig *sigma;
+#include"r-formula.hh"
+#if MODEL==0
+typedef Sigma_GBW SIGMA;
+#else
+typedef Sigma_BGK SIGMA;
+#endif
+
+class Gluon_Integrand{
+		SIGMA *sigma;
 		char mode='l';//l or s
 		double ns_pow=500;
 		const double *fixx;
@@ -41,7 +49,7 @@ template <typename Sig> class Gluon_Integrand{
 			return val;
 		}
 	public:
-		Gluon_Integrand(Sig& sig){
+		Gluon_Integrand(SIGMA& sig){
 			sigma=&sig;
 		}
 		void init(const double * const &par ,char mode);
@@ -51,6 +59,7 @@ template <typename Sig> class Gluon_Integrand{
 		double constant(double r , const std::vector<double> &par);
 };
 
+#if GLUON_INTEGRAND_HH==2//no longer supported
 template <typename Sig>  class Laplacian_Sigma{
 	private:
 		Sig *sigma;
@@ -91,4 +100,5 @@ template <typename Sig>  class Laplacian_Sigma{
 		double operator()(const double rho, const std::vector<double> &par);
 		double constant(double r , const std::vector<double> &par)const ;
 };
+#endif
 #endif

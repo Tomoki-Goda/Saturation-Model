@@ -124,18 +124,18 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		#if SIGMA_APPROX==-1||SIGMA_APPROX==0//if sigma is not in 1d grid
 			SIGMA sigma;
 			sigma.init(sigpar);
-			DSIGMA dsigma(sigma);
+			INTEG dsigma(sigma);
 			dsigma.init(sigpar,'l');
  		#else //-2 and 1  
  			SIGMA sigma;
 			sigma.init(sigpar);
-			DSIGMA dsigma(sigma);
+			INTEG dsigma(sigma);
 			dsigma.init(N_APPROX+250,sigpar,'l');
 		#endif
 		
 		GLUON dipole_gluon(dsigma);
 		dipole_gluon.init(sigpar);
-		Approx_aF<GLUON> gluon(dipole_gluon);
+		Approx_aF gluon(dipole_gluon);
 		gluon.init(N_APPROX+100,N_APPROX+100,sigpar);
 		const double kt2max=9.0e+4;
 		gluon.set_max(kt2max);
@@ -162,7 +162,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		sigma[2].init(sigpar);	
 
 	#if SIGMA_APPROX==-2||SIGMA_APPROX==1 // AS GBW/BGK K   This require instance per thread
-			DSIGMA dsigma[3]={DSIGMA(sigma[0]) ,DSIGMA(sigma[1]) ,DSIGMA(sigma[2]) };
+			INTEG dsigma[3]={DSIGMA(sigma[0]) ,DSIGMA(sigma[1]) ,DSIGMA(sigma[2]) };
 			dsigma[0].init(N_APPROX+250,sigpar,'s');
 			dsigma[1].init(N_APPROX+250,sigpar,'s');
 			dsigma[2].init(N_APPROX+250,sigpar,'s');
@@ -184,12 +184,12 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 	#endif///////////////////////////////////////////////////////////////////////////////////
 
 #else//R_FORMULA==0
-			Integrand_kt<Approx_aF<GLUON>> integrands[3]={
-				Integrand_kt<Approx_aF<GLUON>>( gluon),
-				Integrand_kt<Approx_aF<GLUON>>( gluon),
-				Integrand_kt<Approx_aF<GLUON>>( gluon)
+			Integrand_kt<Approx_aF> integrands[3]={
+				Integrand_kt<Approx_aF>( gluon),
+				Integrand_kt<Approx_aF>( gluon),
+				Integrand_kt<Approx_aF>( gluon)
 			};
-			F2_kt<Integrand_kt<Approx_aF<GLUON>>> F2(integrands);
+			F2_kt<Integrand_kt<Approx_aF>> F2(integrands);
 #endif//R_FORMULA
 
 #pragma omp for schedule(dynamic)

@@ -24,7 +24,7 @@
 #include"gluon-integrand.hh"
 #include"dipole-gluon.hh"
 #include"interpolation-gluon.hh"
-#include"types.hh"
+//#include"types.hh"
 
 
 
@@ -362,7 +362,7 @@ template <typename T> class F2_kt{
 				&F2_integrand_B<SIGMA>,
 	#endif
 #else
-				&F2_integrand_A<Approx_aF<GLUON>>,
+				&F2_integrand_A<Approx_aF>,
 #endif  
 				(void*)integrands,
 				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,statefile,NULL, &nregions, &neval,  &fail, integral, error, prob

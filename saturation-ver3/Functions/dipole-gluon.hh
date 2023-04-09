@@ -21,12 +21,15 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include"control.h"
 #include"control-default.h"
 #include"constants.h"
 #include"clenshaw.hh"
 #include <gsl/gsl_sf.h>
 #include"Levin.hh"
 #include"gluon-integrand.hh"
+
+typedef Gluon_Integrand INTEG ;
 
 class Gluon_GBW{
 	const double *sigpar;
@@ -47,7 +50,7 @@ class Gluon_GBW{
 //Dipole gluon
 //
 /////////////////////////////////////////////////////////////////////
-template<typename INTEG>class Dipole_Gluon{
+class Dipole_Gluon{
 //class Dipole_Gluon{
 		const double *par;
 		INTEG *integrand;

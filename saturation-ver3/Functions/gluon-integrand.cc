@@ -1,22 +1,19 @@
-
-#include"control.h"
-#include"gluons.hh"
-#include"r-formula.hh"
 #include"gluon-integrand.hh"
-#include"miscellaneous.hh"
+
+
 /////////////////////////////////////////////////////////////////////
 //Gluon_Integrand
 ////////////////////////////////////////////////////////////////////
-template <typename Sig>void Gluon_Integrand<Sig>::init(const double * const &par ,char mode){
+void Gluon_Integrand::init(const double * const &par ,char mode){
 	this->mode=mode;
 	//sigma->init(par);
 }
-template <typename Sig>int Gluon_Integrand<Sig>::set_x(const double &x){
+int Gluon_Integrand::set_x(const double &x){
 	sigma->set_x(x);
 	fixx=&x;
 	return 0;
 }
-template <typename Sig>double Gluon_Integrand<Sig>::operator()(const double rho, const std::vector<double> &par) {
+double Gluon_Integrand::operator()(const double rho, const std::vector<double> &par) {
 #if R_CHANGE_VAR==1
 	const double r=rho/(1-rho);
 #elif R_CHANGE_VAR==0
@@ -40,7 +37,7 @@ template <typename Sig>double Gluon_Integrand<Sig>::operator()(const double rho,
 	switch(mode){
 		case 'l':
 #if IBP==1
-			val=deriv<Sig>(*sigma,x,r,h,1);
+			val=deriv<SIGMA>(*sigma,x,r,h,1);
 #if NS==2
 			val*=( kt*r*std::cyl_bessel_j(1,r*kt) + 2*pow(r/ns_pow,2)*std::cyl_bessel_j(0,r*kt));
 #else
@@ -51,8 +48,8 @@ template <typename Sig>double Gluon_Integrand<Sig>::operator()(const double rho,
 			val*=-kt*kt*r*std::cyl_bessel_j(0,r*kt);
 #else
 			//The following line is very inefficient!!
-			val=deriv<Sig>(*sigma,x,r,h,2);
-			val+=deriv<Sig>(*sigma,x,r,h,1)/r;
+			val=deriv<SIGMA>(*sigma,x,r,h,2);
+			val+=deriv<SIGMA>(*sigma,x,r,h,1)/r;
 			val*=r*std::cyl_bessel_j(0,r*kt);
 #endif			
 			break;
@@ -92,7 +89,7 @@ template <typename Sig>double Gluon_Integrand<Sig>::operator()(const double rho,
 #endif
 }
 
-template <typename Sig>double Gluon_Integrand<Sig>::constant(double r , const std::vector<double> &par) {
+double Gluon_Integrand::constant(double r , const std::vector<double> &par) {
 #if WW==1
 return 0;
 #endif
@@ -103,7 +100,7 @@ return 0;
 		printf("Gluon_Integrand:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
 	}
 #if IBP==1
-	val=deriv< Sig>(*sigma,x,r,h,1);
+	val=deriv< SIGMA>(*sigma,x,r,h,1);
 	val*=r*std::cyl_bessel_j(0,r*kt);
 #elif IBP==2
 	val=kt*std::cyl_bessel_j(1,r*kt)*(*sigma)(x,r);
@@ -117,7 +114,7 @@ return 0;
 }
 
 
-
+#if GLUON_INTEGRAND_HH==2
 ////////////////////////////////////////////////////////////////////
 //Laplacian_Sigma
 // This is kept only for the testing purpose, no-longer maintained
@@ -294,5 +291,5 @@ template <typename Sig>double Laplacian_Sigma<Sig>::constant(double r , const st
 #endif
 	return(val);
 }
-
+#endif
 

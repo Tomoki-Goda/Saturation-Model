@@ -18,13 +18,18 @@
 #include <gsl/gsl_spline2d.h>
 #include<gsl/gsl_dht.h>
 #include<gsl/gsl_deriv.h>
+#include"control.h"
 #include"control-default.h"
 #include"constants.h"
 #include"clenshaw.hh"
+#include"dipole-gluon.hh"
 
-template<typename GLU >class Approx_aF{
+typedef Dipole_Gluon GLUON;
+
+
+class Approx_aF{
 	private:
-		GLU *aF;
+		GLUON *aF;
 
 		double max_prev=0;
 		
@@ -48,7 +53,7 @@ template<typename GLU >class Approx_aF{
 		double saturation(double x,double kt2_start);
 		int export_grid(FILE*file)const;
 
-		Approx_aF(GLU& g){
+		Approx_aF(GLUON& g){
 			aF=&g;
 		}
 		~Approx_aF(){

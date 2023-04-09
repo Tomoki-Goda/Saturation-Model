@@ -4,9 +4,11 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include"control.h"
 #include"control-default.h"
 #include"constants.h"
 #include"clenshaw.hh"
+#include"gluons.hh"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   GBW / BGK dipoles
@@ -19,26 +21,23 @@
 //
 // SIGMA 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#if MODEL==1
-template <typename ColG> class Sigma{
-#else 
+typedef Chebyshev1D_Collinear_Gluon ColGlu;
+
+
 class Sigma{
-#endif
 // par and indivisual parameters are redundant. 
 		//Collinear_Gluon xgpdf;
-#if MODEL==1
-		ColG xgpdf;
-#endif
+	protected:
 		double x2;
-		double sigma_0,lambda, x_0, A_g,lambda_g,C,mu02,mu102,thresh_power;
+		double sigma_0,mu102,thresh_power;
 		const double *par;
 		inline double alpha(double mu2 ){
 			static double b0= ((double)(33 -2*NF))/(12*PI);
 			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 		}
-		double Qs2(const double x,const double r);
+		virtual double Qs2(const double x,const double r){printf("this function is not supposed to be used");return 0;};
 	public:
-
+		virtual void set_x(const double x){}
 		Sigma& operator=(const Sigma& rhs){
 			init(rhs.par);
 			return *this;
@@ -47,9 +46,40 @@ class Sigma{
 		}
 		~Sigma(){
 		}
-		void set_x(const double &x);
+		
 		void init(const double * const &sigpar);
 		double operator()(const double x, const double r) ;
+};
+class Sigma_GBW:public Sigma{
+		double Qs2(const double x,const double r);
+		double lambda, x_0;
+	public:
+		Sigma_GBW& operator=(const Sigma_GBW& rhs){
+			init(rhs.par);
+			return *this;
+		} 
+		explicit Sigma_GBW(void){ 
+		}
+		~Sigma_GBW(){
+		}
+		void init(const double * const &sigpar);
+};
+class Sigma_BGK:public  Sigma{
+		ColGlu xgpdf;
+		double Qs2(const double x,const double r);
+		double A_g,lambda_g,C,mu02;
+		
+	public:
+		Sigma_BGK& operator=(const Sigma_BGK& rhs){
+			init(rhs.par);
+			return *this;
+		} 
+		explicit Sigma_BGK(void){ 
+		}
+		~Sigma_BGK(){
+		}
+		void set_x(const double &x);
+		void init(const double * const &sigpar);
 };
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 #include"interpolation-gluon.hh"
 
 
-template<typename GLU >void Approx_aF<GLU>::free_approx(){
+void Approx_aF::free_approx(){
 	if(alloc_flag!=0){
 		gsl_spline2d_free (spline_ptr);
 		gsl_interp_accel_free (x_accel_ptr);
@@ -16,7 +16,7 @@ template<typename GLU >void Approx_aF<GLU>::free_approx(){
 	}
 	
 }
-template<typename GLU >void Approx_aF<GLU>::alloc(int x_npts,int kt2_npts){
+void Approx_aF::alloc(int x_npts,int kt2_npts){
 	if(alloc_flag!=1){
 		x_array=(double*)malloc(x_npts*sizeof(double));
 		kt2_array=(double*)malloc(kt2_npts*sizeof(double));
@@ -34,7 +34,7 @@ template<typename GLU >void Approx_aF<GLU>::alloc(int x_npts,int kt2_npts){
 //#if SUDAKOV>=1
 //		int approximate(const double kt2max,const double mu2){
 //#else
-template<typename GLU >int Approx_aF<GLU>::approximate(const double kt2max){
+int Approx_aF::approximate(const double kt2max){
 
 #if SUDAKOV>=1
 	const double &mu2=*(this->mu2);
@@ -87,7 +87,7 @@ template<typename GLU >int Approx_aF<GLU>::approximate(const double kt2max){
 	return(0);
 }
 
-template<typename GLU >double Approx_aF<GLU>::saturation(double x,double kt2_start){
+double Approx_aF::saturation(double x,double kt2_start){
 	double val;
 	double kt2=kt2_start;
 	double diff=1.0e-1;
@@ -114,7 +114,7 @@ template<typename GLU >double Approx_aF<GLU>::saturation(double x,double kt2_sta
 	return 0;
 }
 
-template<typename GLU >int  Approx_aF<GLU>::export_grid(FILE*file)const{
+int  Approx_aF::export_grid(FILE*file)const{
 	for(int j=0;j< x_npts;j++){
 		for(int i=0;i<kt2_npts;i++){
 			//fprintf(file ,"%.10e\t%.10e\t%.10e\n",x_array[j],kt2_array[i],aF_array[i+j*kt2_npts]/sigma_0);
@@ -130,17 +130,17 @@ template<typename GLU >int  Approx_aF<GLU>::export_grid(FILE*file)const{
 
 
 #if SUDAKOV>=1
-template<typename GLU >void Approx_aF<GLU>::set_max(double kt2max,const double& mu2){
+void Approx_aF::set_max(double kt2max,const double& mu2){
 	this->mu2=&mu2;
 #else
-template<typename GLU >void Approx_aF<GLU>::set_max(double kt2max){
+void Approx_aF::set_max(double kt2max){
 #endif
 	this->kt2max=kt2max;
 	approximate(kt2max);
 	//approximate_thread(kt2max);
 }
 
-template<typename GLU >void Approx_aF<GLU>::init(const int npts1, const int npts2, const double * const &par){
+void Approx_aF::init(const int npts1, const int npts2, const double * const &par){
 	//aF=&glu;
 	x_npts=npts1;
 	kt2_npts=npts2;
@@ -156,7 +156,7 @@ template<typename GLU >void Approx_aF<GLU>::init(const int npts1, const int npts
 #endif
 }
 
-template<typename GLU >double Approx_aF<GLU>::operator()(const double x,const double kt2,const double mu2)const{
+double Approx_aF::operator()(const double x,const double kt2,const double mu2)const{
 #if SUDAKOV>=1
 	if(*(this->mu2)!=mu2){
 		printf("Approx_aF:: mu2 doesn't match. internal = %.3e, mu2=%.3e\n",*(this->mu2),mu2);

@@ -1,4 +1,3 @@
-#include"control.h"
 #include"dipole-gluon.hh"
 extern int INT_PREC;
 void Gluon_GBW::init(const double *par){
@@ -57,13 +56,14 @@ void Gluon_GBW::init(const double *par){
 //
 //////////////////////////////////////////////////////////////////////
 
-template<typename INTEG>void Dipole_Gluon<INTEG>::init(const double * const &par ){
+void Dipole_Gluon::init(const double * const &par ){
 	this->par=par;
 }
-template<typename INTEG>void Dipole_Gluon<INTEG>::set_x(const double &x){
+void Dipole_Gluon::set_x(const double &x){
 	integrand->set_x(x);
 }
-template<typename INTEG>double Dipole_Gluon<INTEG>::operator()(const double x,const double kt2,const double mu2){
+
+double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2){
 	//Series_Sum ss(2);
 	double sum_accel, err;
 	double arr[SECTOR_MAX];
@@ -90,8 +90,8 @@ template<typename INTEG>double Dipole_Gluon<INTEG>::operator()(const double x,co
 	double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 	#endif						      
 				  
-	int flag=0,pass=4,accel_len=6;
-	Levin lev(SECTOR_MAX);
+	int flag=0,pass=5,accel_len=8;
+	Levin lev(10);
 	for(int i=0;i<sectors;++i){
 		imax+=scale;
 		if(imax>rmax){

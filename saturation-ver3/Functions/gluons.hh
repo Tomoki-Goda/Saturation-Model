@@ -9,6 +9,7 @@
 #ifndef GLUONS_HH
 #define GLUONS_HH
 #include<cmath>
+#include"control.h"
 #include"control-default.h"
 #include"constants.h"
 #include"clenshaw.hh"

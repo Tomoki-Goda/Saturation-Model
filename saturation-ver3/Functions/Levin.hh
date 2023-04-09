@@ -72,7 +72,11 @@ class Levin{
 				val*=levin_c(b,i,j,n) /((b+n+i)*a[cyc]);//Levin type u.
 				
 				if(!std::isfinite(val)){
-					printf("Levin:: %.3e encountered. a[%d]==%.3e?=0 ??\n",val,n+i,a[n+i-clen*((n+i)/clen)]);
+					printf("Levin:: %.3e encountered.\n",val);
+					for(int j=0;j<clen;++j){
+						printf(" a[%d]==%.3e \t s[%d]==%.3e ??\n",n+i-j,a[n+i-j-clen*((n+i-j)/clen)],n+i-j,s[n+i-j-clen*((n+i-j)/clen)]);
+					}
+					printf("\n");
 					getchar();
 				}
 				de+=val;	

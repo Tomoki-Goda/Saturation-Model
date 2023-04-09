@@ -1,5 +1,5 @@
 #include"dipole-gluon.hh"
-extern int INT_PREC;
+extern double INT_PREC;
 void Gluon_GBW::init(const double *par){
 	int count=0;
 	sigpar=par;
@@ -64,6 +64,7 @@ void Dipole_Gluon::set_x(const double &x){
 }
 
 double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2){
+	//printf("int_prec=%.2e\n\n",INT_PREC);
 	//Series_Sum ss(2);
 	double sum_accel, err;
 	double arr[SECTOR_MAX];
@@ -84,13 +85,13 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 		sectors=SECTOR_MAX;
 	}
 
-	#if IBP==1&&WW!=1
-	double imax=3*PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
-	#else
+	//#if IBP==1&&WW!=1
+	//double imax=3*PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
+	//#else
 	double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
-	#endif						      
+	//#endif						      
 				  
-	int flag=0,pass=5,accel_len=8;
+	int flag=0,pass=8,accel_len=8;
 	Levin lev(10);
 	for(int i=0;i<sectors;++i){
 		imax+=scale;
@@ -109,31 +110,28 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 	#elif R_CHANGE_VAR==0
 		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
 	#endif
+		
+		imin=imax;
 		if(val==0.0){
 			sectors=i;
 			break;
+			//i--;
+			//continue;
 		}
-		imin=imax;
-		
 		lev.add_term(val);
 		sum=lev.sum(i);
 		
-		if(i>=25&&(flag>1 || (3*(i/3))==i )){
+		if(i>=4*accel_len&&(flag>1 || (3*(i/3))==i )){
 			//flag=0 untested
 			//flag=1 tested without pass
 			//flag>1 passed flag-1 times consecutively
 			val1=lev.accel(i-accel_len,accel_len);
 			if(flag>=1){
-				if(fabs((val1-val2)/(val1+val2))<INT_PREC/5||fabs(val2-val1)<pow(INT_PREC/5,2) ){
+				if(fabs(2*(val1-val2)/(val1+val2))<INT_PREC/10||fabs(val2-val1)<pow(INT_PREC/5,2) ){
 					++flag;
 				}else{
-					if(flag>2){
-						//printf("reset\n");
-						//printf("0: sum=%.3e \t lev=%.1e %.1e %.3e\t %d rmax= %.2e x=%.2e kt2=%.2e last term=%.2e\n",sum,val1,val2,val1-val2,i,imax,x,kt2,val);
-					}
 					flag=1;//reset
 				}
-
 			}else if(flag==0){
 				flag=1;
 			}
@@ -151,11 +149,11 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 		val1=lev.accel(sectors-accel_len,accel_len);
 		val2=lev.accel(sectors-1-accel_len,accel_len);
 		val=val1;
-	}else if(sectors>=SECTOR_MAX/3&&sectors>accel_len){
+	}else if(sectors>=4*accel_len){
 		val1=lev.accel(sectors-accel_len,accel_len);
 		val2=lev.accel(sectors-1-accel_len,accel_len);
-		if(fabs(1-val2/val1)>INT_PREC&&fabs(val2-val1)>pow(INT_PREC,2) ){
-			printf("2: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e\n",sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val);
+		if(fabs(2*(val1-val2)/(val1+val2))>INT_PREC/2&&fabs(val2-val1)>2*pow(INT_PREC/5,2) ){
+			printf("2: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n",sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val,INT_PREC);
 		}
 	}else{
 		val=sum;

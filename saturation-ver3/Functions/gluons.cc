@@ -1,9 +1,8 @@
-#include"control.h"
 #include"gluons.hh"
 ///////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////
-std::complex<double> Collinear_Gluon_Integrand::gammatilde(const std::complex<double>& n)const{
+std::complex<double> Collinear_Gluon::gammatilde(const std::complex<double>& n)const{
 	std::complex<double> n1,n2,n3,l1,l2,t1,t2,t3,cx,value;
 	double m1,m2,rl;
 	int k=0;
@@ -28,7 +27,7 @@ std::complex<double> Collinear_Gluon_Integrand::gammatilde(const std::complex<do
 	return value;
 }
 //double Collinear_Gluon::integrand(const double y,const std::vector<double> &par)const {
-double Collinear_Gluon_Integrand::operator()(const double y,const std::vector<double>&par)const {
+double Collinear_Gluon::operator()(const double y,const std::vector<double>&par)const {
 	std::complex<double> n0,n1,n2,g1,g2,gt,ex,l;
 	double val;
 	double m;
@@ -70,7 +69,7 @@ double Collinear_Gluon::operator()(const double x, const double QQ,const double 
 		l_g
 	};
 	normalization = A_g*exp(n_0* par[0] )*dgammafbeta;
-	value=dclenshaw<const Collinear_Gluon_Integrand&,const std::vector<double>&>(cc,integrand,par,0,150,1.0e-10,1.0e-15);  
+	value=dclenshaw<const Collinear_Gluon&,const std::vector<double>&>(cc,*this,par,0,150,1.0e-10,1.0e-15);  
 	value=normalization*value;
 	if(!std::isfinite(value)||value<0){
 		return 0;

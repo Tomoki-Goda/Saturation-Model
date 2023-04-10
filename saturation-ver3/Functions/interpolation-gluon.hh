@@ -24,7 +24,11 @@
 #include"clenshaw.hh"
 #include"dipole-gluon.hh"
 
+#if GLUON_APPROX==1
 typedef Dipole_Gluon GLUON;
+#elif MODEL==0
+typedef Gluon_GBW GLUON;
+#endif
 
 
 class Approx_aF{

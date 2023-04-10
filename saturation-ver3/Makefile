@@ -24,14 +24,16 @@ OPT=-O3 -Wno-unused-result
 CXX=g++
 
 ########################################################################################################
-all: main
+all: clean main
 
-main: ${DIR}/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
-		${DIR}/interpolation-gluon.o ${DIR}/main.o
+main:${DIR}/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+		${DIR}/interpolation-gluon.o ${DIR}/main.o 
 	${CXX} $^ -o ${DIR}/main ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
-${DIR}/%.o : ${FUNCDIR}/%.cc 
-		echo $@
+#main.o: ${FUNCDIR}/main.cc ${FUNCDIR}/main.hh ${FUNCDIR}/kt-formula.hh ${FUNCDIR}/fcn.h ${DEPS}
+#	${CXX} -c -I${INCDIR} -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} ${FUNCDIR}/main.cc -o $@
+
+${DIR}/%.o : ${FUNCDIR}/%.cc ${FUNCDIR}/%.hh ${DEPS} 
 		${CXX} -c -I${INCDIR} -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
 #.cc.o:
 #	${CXX} -c -I${INCDIR} -I${FUNCDIR}  ${FUNCDIR}/$<

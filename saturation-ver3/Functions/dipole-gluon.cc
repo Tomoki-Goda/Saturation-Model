@@ -115,7 +115,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 	#endif
 		
 		imin=imax;
-		if(val==0.0){
+		if(val==0.0||sum+val==sum){
 			sectors=i;
 			break;
 			//i--;
@@ -123,6 +123,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 		}
 		lev.add_term(val);
 		sum=lev.sum(i);
+		
 		
 		if(i>=accel_min*accel_len&&(flag>1 || (3*(i/3))==i )){
 			
@@ -168,14 +169,17 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 
 
 	double diff=0;
+	/*
 	#if (IBP>=1 && ADD_END!=0 && WW==0 )			
 	diff+=integrand->constant(imax,par);
 	if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
 		printf("Dipole_Gluon:: inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
 		printf("Dipole_Gluon::  x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
 	}
+	
 	val+=diff;
 	#endif//IBP
+	*/
 	Kahn_free(accum);
 	if(!std::isfinite(val)){
 		printf("Dipole_Gluon:: % encountered 0 returned\n",val);

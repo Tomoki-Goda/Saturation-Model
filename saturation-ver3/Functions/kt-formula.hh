@@ -25,7 +25,11 @@
 #include"dipole-gluon.hh"
 #include"interpolation-gluon.hh"
 //#include"types.hh"
-
+#if GLUON_APPROX==1
+typedef Approx_aF aF;
+#elif MODEL==0
+typedef Gluon_GBW aF;
+#endif
 
 
 
@@ -225,7 +229,9 @@ template <typename Sig> class Integrand_r{
 			}
 			this->Q2=Q2;
 			this->mf2=mf2;
-		//	//sigma_ptr->set_kinem(this->x);
+			//if(typeof(*sigma_ptr)==typeof(Sigma_BGK)){
+				sigma_ptr->set_x(this->x);
+			//}
 			return 0;
 		}
 		double  operator()(double  z,  double  r)const{
@@ -362,7 +368,8 @@ template <typename T> class F2_kt{
 				&F2_integrand_B<SIGMA>,
 	#endif
 #else
-				&F2_integrand_A<Approx_aF>,
+
+				&F2_integrand_A<aF>,
 #endif  
 				(void*)integrands,
 				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,statefile,NULL, &nregions, &neval,  &fail, integral, error, prob

@@ -158,7 +158,7 @@
 	#define R_FORMULA 0
 #endif
 #ifndef SIGMA_APPROX
-	#define SIGMA_APPROX 1
+	#define SIGMA_APPROX -1
 #endif
 
 #ifndef THRESHOLD//threshold factor (1-x)^a
@@ -172,7 +172,7 @@
 #endif
 
 #ifndef N_CHEB//variants of models. see r-formula.h
-	#define N_CHEB 30
+	#define N_CHEB 25
 #endif
 #ifndef CHEB_D//variants of models. see r-formula.h
 	#define CHEB_D 1

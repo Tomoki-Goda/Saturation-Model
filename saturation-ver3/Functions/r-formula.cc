@@ -1,5 +1,3 @@
-
-
 #include"r-formula.hh"
 //double Sigma::Qs2(const double x,const double r){
 double Sigma_GBW::Qs2(const double x,const double r){
@@ -40,16 +38,16 @@ double Sigma_BGK::Qs2(const double x,const double r){
 
 //void Sigma::set_x(const double &x){
 void Sigma_BGK::set_x(const double &x){
-	#if SIGMA_APPROX<0
+#if SIGMA_APPROX<0
 	#if FREEZE_QS2==1
 	x2=0.5*x/(0.5*(1-x)+x);
-	#elif FREEZE_QS2==0
-	x2=x;
 	#elif FREEZE_QS2==2
 	x2=((x>0.5)?0.5:x);
+	#elif FREEZE_QS2==0
+	x2=x;
 	#endif
 	xgpdf.set_x(x2);
-	#endif
+#endif
 }
 
 //void Sigma::init(const double * const &sigpar){

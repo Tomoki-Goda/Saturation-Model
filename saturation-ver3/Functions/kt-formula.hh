@@ -225,7 +225,7 @@ template <typename Sig> class Integrand_r{
 			}
 			this->Q2=Q2;
 			this->mf2=mf2;
-		//	//sigma_ptr->set_kinem(this->x);
+			sigma_ptr->set_x(this->x);
 			return 0;
 		}
 		double  operator()(double  z,  double  r)const{

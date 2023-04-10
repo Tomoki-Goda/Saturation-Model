@@ -57,8 +57,9 @@ class Levin{
 			return(s[n-clen*(n/clen)]);
 		}
 		double accel(int n ,int j)const{
+			
 			if(n+j>position-1||n+clen<position){
-				printf("Levin::accel %d st/nd/th (%d to %d of %d) element undefined. current=%lu\n",n+j,n+j-clen*((n+j)/clen),n-clen*((n)/clen),clen, position-1);
+				printf("Levin::accel %d st/nd/th (%d elements from %d to %d of %d) element undefined. current=%lu\n",n+j,j,n+j-clen*((n+j)/clen),n-clen*((n)/clen),clen, position-1);
 				printf("%d %lu %d %lu \n",n+j,position-1,n,position-clen);
 				return -999;
 			}
@@ -66,8 +67,11 @@ class Levin{
 			double val=0;
 			Kahn de=Kahn_init(3),nu=Kahn_init(3);
 			int b=1,cyc=0;
+			
 			for(int i=0;i<=j;++i){
 				cyc=n+i-clen*((n+i)/clen);
+				//n+i th position corresponds to cyc th position in the record
+				
 				val=pow(-1,i)*fact[j]/(fact[j-i]*fact[i]);
 				val*=levin_c(b,i,j,n) /((b+n+i)*a[cyc]);//Levin type u.
 				

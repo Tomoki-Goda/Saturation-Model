@@ -35,7 +35,7 @@ class Sigma{
 			static double b0= ((double)(33 -2*NF))/(12*PI);
 			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 		}
-		virtual double Qs2(const double x,const double r){printf("this function is not supposed to be used");return 0;};
+		virtual double Qs2(const double x,const double r)=0;
 	public:
 		virtual void set_x(const double x){}
 		Sigma& operator=(const Sigma& rhs){

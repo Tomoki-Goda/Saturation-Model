@@ -64,16 +64,12 @@ void Dipole_Gluon::set_x(const double &x){
 }
 
 double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2){
-	//printf("int_prec=%.2e\n\n",INT_PREC);
-	//Series_Sum ss(2);
-	double sum_accel, err;
-	double arr[SECTOR_MAX];
-	double sum = 0;
-	int n;
-	//gsl_sum_levin_u_workspace * w = gsl_sum_levin_u_alloc (SECTOR_MAX);
+	
 	Kahn accum=Kahn_init(3);
 	const std::vector<double> par{kt2,x,mu2};
 	double rmax=R_MAX,rmin=R_MIN;
+	double sum_accel, err;
+	double sum = 0;
 	double val=0,val1=0,val2=0;
 	Kahn_clear(accum);
 
@@ -86,13 +82,20 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 	}
 
 	//#if IBP==1&&WW!=1
-	//double imax=3*PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
+	//double imax=3*PI/(sqrt(kt2)*4); //forJ1 integral, this is efficient
 	//#else
 	double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 	//#endif						      
 				  
-	int flag=0,pass=8,accel_len=8;
-	Levin lev(10);
+	int flag=0,pass=8,accel_len=8,accel_min=3;
+	//flag=0 untested
+	//flag=1 tested without pass
+	//flag>1 passed flag-1 times consecutivel
+	// at least accel_min terms to be computed to start using acceleration
+	// pass consecutive success to break;
+	// use accel_len terms in accelertation.
+	Levin lev(accel_len+2);
+	
 	for(int i=0;i<sectors;++i){
 		imax+=scale;
 		if(imax>rmax){
@@ -112,7 +115,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 	#endif
 		
 		imin=imax;
-		if(val==0.0){
+		if(val==0.0||sum+val==sum){
 			sectors=i;
 			break;
 			//i--;
@@ -121,24 +124,24 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 		lev.add_term(val);
 		sum=lev.sum(i);
 		
-		if(i>=4*accel_len&&(flag>1 || (3*(i/3))==i )){
-			//flag=0 untested
-			//flag=1 tested without pass
-			//flag>1 passed flag-1 times consecutively
+		
+		if(i>=accel_min*accel_len&&(flag>1 || (3*(i/3))==i )){
+			
 			val1=lev.accel(i-accel_len,accel_len);
 			if(flag>=1){
 				if(fabs(2*(val1-val2)/(val1+val2))<INT_PREC/10||fabs(val2-val1)<pow(INT_PREC/5,2) ){
-					++flag;
+					//++flag;
+					if(++flag==pass){
+						sectors=i+1;
+						break;
+					}
 				}else{
 					flag=1;//reset
 				}
 			}else if(flag==0){
 				flag=1;
 			}
-			if(flag==pass){
-				sectors=i+1;
-				break;
-			}
+			
 			val2=val1;
 		}
 	}
@@ -147,42 +150,49 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 	//if(sectors>=25){
 	if(flag==pass){
 		val1=lev.accel(sectors-accel_len,accel_len);
-		val2=lev.accel(sectors-1-accel_len,accel_len);
-		val=val1;
-	}else if(sectors>=4*accel_len){
+		val2=lev.accel(sectors-1-accel_len,accel_len);	
+		//val=val1;
+	}else if(sectors>=accel_min*accel_len){
 		val1=lev.accel(sectors-accel_len,accel_len);
 		val2=lev.accel(sectors-1-accel_len,accel_len);
 		if(fabs(2*(val1-val2)/(val1+val2))>INT_PREC/2&&fabs(val2-val1)>2*pow(INT_PREC/5,2) ){
-			printf("2: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n",sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val,INT_PREC);
+			printf("3: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n",
+			sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val,INT_PREC);
 		}
+		//val=val1;
 	}else{
-		val=sum;
+		val1=sum;
 	}
+	val=0;
+	val2=0;//just safety
 
 
 
 	double diff=0;
+	/*
 	#if (IBP>=1 && ADD_END!=0 && WW==0 )			
 	diff+=integrand->constant(imax,par);
 	if(fabs(diff)>fabs(val/1.0e-9)&&fabs(diff)>1.0e-9){
 		printf("Dipole_Gluon:: inaccurat IBP val=%.1e diff=%.1e imax=%.2e rmax=%.2e scale= %.1e\n",val,diff,imax,rmax, scale);
 		printf("Dipole_Gluon::  x= %.2e kt2=%.2e %.3e  %.3e\n",x,kt2, imax-(sectors*scale+3*PI/(sqrt(kt2)*4)) ,(imax*sqrt(kt2)-(PI/4))/PI);
 	}
+	
 	val+=diff;
 	#endif//IBP
+	*/
 	Kahn_free(accum);
 	if(!std::isfinite(val)){
 		printf("Dipole_Gluon:: % encountered 0 returned\n",val);
-		val=0;
+		val1=0;
 	}
 	#if WW==1
-	val*=2.0/(3.0*pow(PI,3));
-	val/=0.2;
+	val1*=2.0/(3.0*pow(PI,3));
+	val1/=0.2;
 	//val=((val<1.0e-5)?(1.0e-5):(val));
 	#else
-	val*=3.0/(8.0*pow(PI,2));
+	val1*=3.0/(8.0*pow(PI,2));
 	#endif			
 	//printf("3:% e\n",val);
-	return (val);
+	return (val1);
 }
 		

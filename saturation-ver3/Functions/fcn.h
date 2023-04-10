@@ -126,11 +126,12 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			sigma.init(sigpar);
 			INTEG dsigma(sigma);
 			dsigma.init(sigpar,'l');
- 		#else //-2 and 1  
+ 		/*#else //-2 and 1  
  			SIGMA sigma;
 			sigma.init(sigpar);
 			INTEG dsigma(sigma);
 			dsigma.init(N_APPROX+250,sigpar,'l');
+			*/
 		#endif
 		
 		GLUON dipole_gluon(dsigma);
@@ -139,7 +140,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		gluon.init(N_APPROX+100,N_APPROX+100,sigpar);
 		const double kt2max=9.0e+4;
 		gluon.set_max(kt2max);
-	#else               //only GBW K
+	#else //only GBW K
 		GLUON gluon;
 		gluon.init(sigpar);
 	#endif//GLUON_APPROX==1	
@@ -184,12 +185,13 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 	#endif///////////////////////////////////////////////////////////////////////////////////
 
 #else//R_FORMULA==0
-			Integrand_kt<Approx_aF> integrands[3]={
-				Integrand_kt<Approx_aF>( gluon),
-				Integrand_kt<Approx_aF>( gluon),
-				Integrand_kt<Approx_aF>( gluon)
+			Integrand_kt<aF> integrands[3]={
+				Integrand_kt<aF>( gluon),
+				Integrand_kt<aF>( gluon),
+				Integrand_kt<aF>( gluon)
 			};
-			F2_kt<Integrand_kt<Approx_aF>> F2(integrands);
+			F2_kt<Integrand_kt<aF>> F2(integrands);
+	
 #endif//R_FORMULA
 
 #pragma omp for schedule(dynamic)

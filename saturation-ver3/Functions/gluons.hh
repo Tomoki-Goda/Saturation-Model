@@ -1,4 +1,3 @@
-  
 //  Claculating of xgpdf(x,Q^2) by DGLAP evolution of initial condition 
 //  xgpdf(x,Q^2_0) 
 // Originally written by S. Sapeta 
@@ -17,12 +16,12 @@
 #include<complex>
 #include<gsl/gsl_sf_gamma.h>
 #include"chebyshev.hh"
-
+/*
 class Collinear_Gluon_Integrand{
 	private:
 		const double	beta = 6.6;
 		double 			dgammafbeta;
-		const double	n_0 = 0.5;       /* Maximal singluraity of integrand */
+		const double	n_0 = 0.5;       // Maximal singluraity of integrand 
 		
 		std::complex<double> gammatilde(const std::complex<double>& n)const;
 	public:
@@ -44,7 +43,7 @@ class Collinear_Gluon{
 	private:
 		const double	beta = 6.6;
 		double 			dgammafbeta;
-		const double	n_0 = 0.5;       /* Maximal singluraity of integrand */
+		const double	n_0 = 0.5;       /// Maximal singluraity of integrand 
 		
 	public:
 		explicit Collinear_Gluon(const Collinear_Gluon& init){
@@ -58,7 +57,29 @@ class Collinear_Gluon{
 		//MAIN FUNCTION
 		double operator()(const double x, const double QQ,const double A_g,const double l_g)const;
 };
+*/
 
+class Collinear_Gluon{
+	CCIntegral cc=CCprepare(256,"gluon",1,3);
+	private:
+		const double	beta = 6.6;
+		double 			dgammafbeta;
+		const double	n_0 = 0.5;       /// Maximal singluraity of integrand 
+		std::complex<double> gammatilde(const std::complex<double>& n)const;
+		
+	public:
+		explicit Collinear_Gluon(const Collinear_Gluon& init){
+			dgammafbeta=init.dgammafbeta;
+		}
+		explicit Collinear_Gluon(){
+			dgammafbeta=gsl_sf_gamma(beta)/PI;
+		}
+		~Collinear_Gluon(){
+		}
+		double operator()(const double y,const std::vector<double> &par)const;
+		//MAIN FUNCTION
+		double operator()(const double x, const double QQ,const double A_g,const double l_g)const;
+};
 ///////////////////////////////////////////////////////////////////////////
 class Chebyshev_Collinear_Gluon{
 	private:

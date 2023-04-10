@@ -21,7 +21,13 @@
 //
 // SIGMA 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if SIGMA_APPROX<0
 typedef Chebyshev1D_Collinear_Gluon ColGlu;
+#else 
+typedef Collinear_Gluon ColGlu;
+#endif
+
+
 
 
 class Sigma{
@@ -32,10 +38,10 @@ class Sigma{
 		double sigma_0,mu102,thresh_power;
 		const double *par;
 		inline double alpha(double mu2 ){
-			static double b0= ((double)(33 -2*NF))/(12*PI);
+			const double b0= ((double)(33 -2*NF))/(12*PI);
 			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 		}
-		virtual double Qs2(const double x,const double r){printf("this function is not supposed to be used");return 0;};
+		virtual double Qs2(const double x,const double r)=0;
 	public:
 		virtual void set_x(const double x){}
 		Sigma& operator=(const Sigma& rhs){

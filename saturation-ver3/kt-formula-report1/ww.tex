@@ -1,5 +1,9 @@
-\documentclass{article}
-
+\documentclass[a4,12pt]{article}
+\usepackage[a4paper]{geometry}
+\usepackage{graphics}
+\usepackage{pict2e}
+\usepackage{xcolor}
+\usepackage{subcaption}
 \usepackage[backend=bibtex]{biblatex}
 \addbibresource{ww.bib}
 
@@ -32,8 +36,73 @@ in which $\gamma_E$ is the Euler-Mascheroni constant, and we use $\alpha_s=0.2$.
 
 
 
+%\includegraphics{/home/tomoki/Tools/Katie/hameren-katie-a6f4c462b474/examples/dijet/plot1.png}
+\begin{figure}
+\begin{subfigure}{0.5\textwidth}
+	\include{plotGBW1.tex} 
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+	\include{plotBGK1.tex} 
+\end{subfigure}
+
+\begin{subfigure}{0.5\textwidth}
+	\include{plotGBW2.tex}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+	\include{plotGBW3.tex}
+\end{subfigure}
+
+\begin{subfigure}{0.5\textwidth}
+	\include{plotBGK2.tex}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+	\include{plotBGK3.tex}
+\end{subfigure}
+\end{figure}
+\begin{figure}
+	\begin{subfigure}{0.5\textwidth}
+		\include{plotGBW1Lab.tex} 
+	\end{subfigure}
+	\begin{subfigure}{0.5\textwidth}
+		\include{plotBGK1Lab.tex} 
+	\end{subfigure}
 	
+	\begin{subfigure}{0.5\textwidth}
+		\include{plotGBW2Lab.tex}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\include{plotGBW3Lab.tex}
+	\end{subfigure}
 	
+	\begin{subfigure}{0.5\textwidth}
+		\include{plotBGK2Lab.tex}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\include{plotBGK3Lab.tex}
+	\end{subfigure}
+\end{figure}
+\begin{figure}
+	\begin{subfigure}{0.5\textwidth}
+		\include{plotGBW1Jets.tex} 
+	\end{subfigure}
+	\begin{subfigure}{0.5\textwidth}
+		\include{plotBGK1Jets.tex} 
+	\end{subfigure}
+	
+	\begin{subfigure}{0.5\textwidth}
+		\include{plotGBW2Jets.tex}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\include{plotGBW3Jets.tex}
+	\end{subfigure}
+	
+	\begin{subfigure}{0.5\textwidth}
+		\include{plotBGK2Jets.tex}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\include{plotBGK3Jets.tex}
+	\end{subfigure}
+\end{figure}
 	
 \appendix	
 \section{Computation of gluon densities}

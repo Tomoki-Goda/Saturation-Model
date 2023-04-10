@@ -56,7 +56,7 @@ class Gluon_Integrand{
 		int set_x(const double &x);
 
 		double operator()(const double rho, const std::vector<double> &par);
-		double constant(double r , const std::vector<double> &par);
+		//double constant(double r , const std::vector<double> &par);
 };
 
 #if GLUON_INTEGRAND_HH==2//no longer supported
@@ -98,7 +98,7 @@ template <typename Sig>  class Laplacian_Sigma{
 		double operator()(const double rho)const;
 		int export_grid(FILE* file);
 		double operator()(const double rho, const std::vector<double> &par);
-		double constant(double r , const std::vector<double> &par)const ;
+		//double constant(double r , const std::vector<double> &par)const ;
 };
 #endif
 #endif

@@ -89,6 +89,7 @@ double Gluon_Integrand::operator()(const double rho, const std::vector<double> &
 #endif
 }
 
+/*
 double Gluon_Integrand::constant(double r , const std::vector<double> &par) {
 #if WW==1
 return 0;
@@ -112,7 +113,7 @@ return 0;
 #endif
 	return(val);
 }
-
+*/
 
 #if GLUON_INTEGRAND_HH==2
 ////////////////////////////////////////////////////////////////////
@@ -273,7 +274,7 @@ template <typename Sig>double Laplacian_Sigma<Sig>::operator()(const double rho,
 	return val;
 #endif
 }
-
+/*
 template <typename Sig>double Laplacian_Sigma<Sig>::constant(double r , const std::vector<double> &par)const {
 	//const double r=rho/(1-rho);
 	const double kt=sqrt(par[0]);
@@ -291,5 +292,6 @@ template <typename Sig>double Laplacian_Sigma<Sig>::constant(double r , const st
 #endif
 	return(val);
 }
+*/
 #endif
 

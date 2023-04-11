@@ -24,7 +24,7 @@
 #if SIGMA_APPROX<0
 typedef Chebyshev1D_Collinear_Gluon ColGlu;
 #else 
-typedef Collinear_Gluon ColGlu;
+//typedef Collinear_Gluon ColGlu;
 #endif
 
 
@@ -60,10 +60,7 @@ class Sigma_GBW:public Sigma{
 		double Qs2(const double x,const double r);
 		double lambda, x_0;
 	public:
-		Sigma_GBW& operator=(const Sigma_GBW& rhs){
-			init(rhs.par);
-			return *this;
-		} 
+
 		explicit Sigma_GBW(void){ 
 		}
 		~Sigma_GBW(){
@@ -76,11 +73,9 @@ class Sigma_BGK:public  Sigma{
 		double A_g,lambda_g,C,mu02;
 		
 	public:
-		Sigma_BGK& operator=(const Sigma_BGK& rhs){
-			init(rhs.par);
-			return *this;
-		} 
-		explicit Sigma_BGK(void){ 
+	
+		explicit Sigma_BGK(void):xgpdf(N_CHEB){ 
+			//xgpdf.init(N_CHEB);
 		}
 		~Sigma_BGK(){
 		}

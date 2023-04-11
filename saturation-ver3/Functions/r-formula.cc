@@ -23,14 +23,15 @@ double Sigma_BGK::Qs2(const double x,const double r){
 	#endif
 	const double rrmax=pow(r,2)/C;
 	const double mu2=(r>1.0e-5)?(mu02/((1.0-exp(-mu02*rrmax) ))):(1/rrmax) ;
+	//const double mu2=mu02/((1.0-exp(-mu02*rrmax) ));
 	const double al=alpha(mu2);
 	#if SIGMA_APPROX>=0
 	const double qs2=4*PI*PI*al*xgpdf(x,mu2,A_g,lambda_g)/(3*sigma_0); 
 	#elif SIGMA_APPROX<0
 	const double qs2=4*PI*PI*al*xgpdf(x,mu2)/(3*sigma_0); 
 	#endif
-	if(qs2<1.0e-25){
-		return 1.0e-25;
+	if(qs2<1.0e-50){
+		return 1.0e-50;
 	}
 	//printf("Qs2=%.2e\n",qs2);
 	return qs2;		
@@ -98,10 +99,10 @@ void Sigma_BGK::init(const double * const &sigpar){
 double Sigma::operator()(const double x, const double r) {//,const double Q2,const double*sigpar)const {
 	#if FREEZE_QS2==1 ////Beware this transformation is also required in set_x()!!!!
 	double x1=0.5*x/(0.5*(1-x)+x);
-	#elif FREEZE_QS2==0
-	double x1=x;
 	#elif FREEZE_QS2==2
 	double x1=((x>0.5)?0.5:x);
+	#elif FREEZE_QS2==0
+	double x1=x;
 	#endif///////////////////////////////////////////////////////////////////////////
 	
 	double qs2=Qs2(x1,r);

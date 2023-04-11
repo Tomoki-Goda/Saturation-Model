@@ -6,12 +6,12 @@ double xg(const double x, const double QQ,const double A_g,const double l_g){
 	return(xgpdf( x,  QQ, A_g,l_g));
 }
 
-Chebyshev1D_Collinear_Gluon xgpdf_cheb;
-int xg_cheb_init(const double Ag, const double lg,double xx){
+Chebyshev1D_Collinear_Gluon xgpdf_cheb(25);
+int xg_cheb_init(const double min, const double max,const double Ag, const double lg,double xx){
 	static double x;
 	x=xx;
 	//Collinear_Gluon xgpdf;
-	xgpdf_cheb.init(0.5,1.0e+10, Ag,lg);
+	xgpdf_cheb.init(min,max, Ag,lg);
 	xgpdf_cheb.set_x(x);
 	return(0);
 }
@@ -40,9 +40,9 @@ int main(int argc,char** argv){
 
 :Begin:
 :Function: xg_cheb_init
-:Pattern: XGluonChebInit[ag_?NumberQ, lg_?NumberQ,x_?NumberQ]
-:Arguments: {N[ag], N[lg], N[x]}
-:ArgumentTypes: {Real, Real,Real}
+:Pattern: XGluonChebInit[min_?NumberQ, max_?NumberQ,ag_?NumberQ, lg_?NumberQ,x_?NumberQ]
+:Arguments: {N[min], N[max],N[ag], N[lg], N[x]}
+:ArgumentTypes: {Real, Real,Real, Real,Real}
 :ReturnType: Integer
 :End:
 

@@ -8,14 +8,15 @@
 #ifndef GLUONS_HH
 #define GLUONS_HH
 #include<cmath>
-#include"control.h"
-#include"control-default.h"
+//#include"control.h"
+//#include"control-default.h"
 #include"constants.h"
 #include"clenshaw.hh"
 #include"polygamma.hh"
 #include<complex>
 #include<gsl/gsl_sf_gamma.h>
 #include"chebyshev.hh"
+//#define N_CHEB 25
 /*
 class Collinear_Gluon_Integrand{
 	private:
@@ -90,8 +91,8 @@ class Chebyshev_Collinear_Gluon{
 		const double *fixx=NULL;
 		
 	public:
-		Chebyshev_Collinear_Gluon(){
-			const unsigned deg[]={N_CHEB,N_CHEB};
+		Chebyshev_Collinear_Gluon(unsigned n){
+			const unsigned deg[2]={n,n};
 			cheb[0]=PrepareChebyshev(deg,2);
 			cheb[1]=PrepareChebyshev(deg[1],1);
 		}
@@ -113,13 +114,16 @@ class Chebyshev1D_Collinear_Gluon{
 		Collinear_Gluon xg;
 	  	cheby cheb[1];
 		double A_g=0,l_g=0;
-		double q2min,q2max;
-		const double *fixx;
+		double q2min=0,q2max=0;
+		const double *fixx=NULL;
+		unsigned deg[1]={0};
+		unsigned flag=0;
 	public:
-		Chebyshev1D_Collinear_Gluon(){
-			const unsigned deg[]={N_CHEB};
+		Chebyshev1D_Collinear_Gluon(unsigned n){
+			deg[0]=n;
 			cheb[0]=PrepareChebyshev(deg,1);
 		}
+		
 		~Chebyshev1D_Collinear_Gluon(){
 			FreeChebyshev(cheb[0]);
 		}

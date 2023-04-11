@@ -1,8 +1,7 @@
 #include<iostream>
 #include<complex>
 #include<vector>
-#include"control-default.h"
-#include"constants.h"
+
 typedef std::complex<double> dc;
 static dc digamma(const dc& z){
 	const double c[6]=

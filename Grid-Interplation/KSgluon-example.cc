@@ -38,7 +38,7 @@ int main(int argc ,char** argv){
 	FILE* file=fopen(argv[3],"w");
 	
 	double x=1.0e-3;
-	double mu2=17*17;
+	double mu2=pow(atof(argv[4]),2);
 	double k2=0;
 	for(int i=0;i<=100;++i){
 		k2=exp(8*((double)i)/99);

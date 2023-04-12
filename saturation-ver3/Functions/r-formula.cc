@@ -22,11 +22,13 @@ double Sigma_BGK::Qs2(const double x,const double r){
 	}
 	#endif
 	const double rrmax=pow(r,2)/C;
-	const double mu2=(r>1.0e-5)?(mu02/((1.0-exp(-mu02*rrmax) ))):(1/rrmax) ;
+	//const double mu2=(r>1.0e-5)?(mu02/((1.0-exp(-mu02*rrmax) ))):(1/rrmax) ;
+	const double mu2=C/pow(r,2)+mu02;
 	//const double mu2=mu02/((1.0-exp(-mu02*rrmax) ));
 	const double al=alpha(mu2);
 	#if SIGMA_APPROX>=0
 	const double qs2=4*PI*PI*al*xgpdf(x,mu2,A_g,lambda_g)/(3*sigma_0); 
+	//const double qs2=4*PI*PI*A_g*pow(x,-lambda_g)/(3*sigma_0); 
 	#elif SIGMA_APPROX<0
 	const double qs2=4*PI*PI*al*xgpdf(x,mu2)/(3*sigma_0); 
 	#endif
@@ -52,7 +54,7 @@ void Sigma_BGK::set_x(const double &x){
 }
 
 //void Sigma::init(const double * const &sigpar){
-void Sigma_GBW::init(const double * const &sigpar){
+inline void Sigma_GBW::init(const double * const &sigpar){
 	par=sigpar;
 	int i=0;
 	sigma_0=sigpar[i++];

@@ -59,6 +59,7 @@ int i=0,j=0,k=0;
 	sigpar[j++]=(par[i++]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
+#if SUDAKOV!=0
 #if (MODEL==0)
 	sudpar[k++]=(par[i++]);
 	sudpar[k++]=(par[i++]);
@@ -89,6 +90,7 @@ int i=0,j=0,k=0;
 	sudpar[k++]=(par[i++]);
 	sudpar[k++]=(par[i++]);
 	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
+#endif
 #endif
 #endif
 //	printf("\n");

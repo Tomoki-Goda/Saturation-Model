@@ -37,6 +37,16 @@ ${DIR}/%.o : ${FUNCDIR}/%.cc ${FUNCDIR}/%.hh ${DEPS}
 		${CXX} -c -I${INCDIR} -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
 #.cc.o:
 #	${CXX} -c -I${INCDIR} -I${FUNCDIR}  ${FUNCDIR}/$<
+
+gluonsf.o:${FUNCDIR}/gluons.f
+		gfortran -c -I${INCDIR} -I${FUNCDIR} -I${FUNCDIR}/fortran ${OPT} ${LIBS} $< -o $@
+gluonsc.o:${FUNCDIR}/gluons.cc
+		${CXX} -c -I${INCDIR} -I${FUNCDIR}  ${OPT} ${LIBS} $< -o $@
+
+test: gluonsf.o gluonsc.o
+	${CXX} -c test-gluons.cc -I${FUNCDIR}  -o test-gluons.o
+	${CXX} test-gluons.o -o test-gluons -I${INCDIR} -I${FUNCDIR} -I. -I${DIR} ${OPT} ${LIBS} $^ -lgfortran -lmathlib
+
 clean: 
 	rm -f ${DIR}/*.o
 	rm -f ${FUNCDIR}/*.o

@@ -4,6 +4,7 @@
 
 inline double  modx(const double  x, const double  Q2, const  double  mf2){
 #if MODX==1
+	//printf("m2=%.2e, x=%.2e xmod=%.2e \n",mf2,x,(x*(1+4*mf2/Q2)));
 	return( (x*(1+4*mf2/Q2)));
 #elif MODX==0 
 	return( x);

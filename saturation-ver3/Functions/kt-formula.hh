@@ -333,14 +333,14 @@ template <typename T> class F2_kt{
 		
 		double operator()(const double  x,const  double  Q2,const  double  mf2){
 			static unsigned int count;
-			printf("Start F2\t");
+			//printf("Start F2\t");
 			//getchar();
 			integrands[0].set_kinem(x,Q2,MASS_L2);
-			printf("L+S");
+			//printf("L+S");
 			integrands[1].set_kinem(x,Q2,MASS_C2);
-			printf("+C");
+			//printf("+C");
 			integrands[2].set_kinem(x,Q2,MASS_B2);
-			printf("+B\n");
+			//printf("+B\n");
 			//getchar();
 			
 			printf("%d: Cuhre x=%.2e Q2=%.2e\n",count++, x,Q2);
@@ -362,11 +362,11 @@ template <typename T> class F2_kt{
 			llCuhre(ndim, 1,
 			//llTest(ndim, 1,
 #if R_FORMULA==1
-	#if SIGMA_APPROX==-2||SIGMA_APPROX==1
-				&F2_integrand_B<DSIGMA>,
-	#else
+//	#if SIGMA_APPROX==-2||SIGMA_APPROX==1
+//				&F2_integrand_B<DSIGMA>,
+//	#else
 				&F2_integrand_B<SIGMA>,
-	#endif
+//	#endif
 #else
 
 				&F2_integrand_A<aF>,
@@ -374,7 +374,8 @@ template <typename T> class F2_kt{
 				(void*)integrands,
 				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,statefile,NULL, &nregions, &neval,  &fail, integral, error, prob
 			);
-			printf("\033[1A\033[2K\033[1A\033[2K\r");
+			//printf("\033[1A\033[2K\033[1A\033[2K\r");
+			printf("\033[1A\033[2K\r");
 			//cubawait(&spin);
 
 			result=Q2/(2*PI) *integral[0];

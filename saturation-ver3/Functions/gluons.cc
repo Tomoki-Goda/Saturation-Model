@@ -1,10 +1,8 @@
 #include"gluons.hh"
-//#ifndef N_CHEB 
-
-//#endif
 ///////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////
+
 std::complex<double> Collinear_Gluon::gammatilde(const std::complex<double>& n)const{
 	std::complex<double> n1,n2,n3,l1,l2,t1,t2,t3,cx,value;
 	double m1,m2,rl;
@@ -62,8 +60,7 @@ double Collinear_Gluon::operator()(const double y,const std::vector<double>&par)
 //
 /////////////////////////////////////////////////////////////////////
 double Collinear_Gluon::operator()(const double x, const double QQ,const double A_g,const double l_g)const  {
-	static int flag_nan=0;
-	double normalization;
+	
 	double value;
 	const double bprim = 33.0/6.0-NF/3.0;
 	const std::vector<double> par={
@@ -71,7 +68,7 @@ double Collinear_Gluon::operator()(const double x, const double QQ,const double 
 		(1/bprim)*log(log(QQ/LQCD2)/log(Q0/LQCD2)),
 		l_g
 	};
-	normalization = A_g*exp(n_0* par[0] )*dgammafbeta;
+	const double normalization=A_g*exp(n_0* par[0] )*dgammafbeta;
 	value=dclenshaw<const Collinear_Gluon&,const std::vector<double>&>(cc,*this,par,0,150,1.0e-10,1.0e-15);  
 	value=normalization*value;
 	if(!std::isfinite(value)||value<0){
@@ -100,7 +97,7 @@ void Chebyshev1D_Collinear_Gluon::set_x(const double &x){
 	cheb_coeff<Chebyshev1D_Collinear_Gluon,const Collinear_Gluon&>(cheb[0],*this,xg);
 }
 
-double Chebyshev1D_Collinear_Gluon::operator()(const double x,const double Q2){
+double Chebyshev1D_Collinear_Gluon::operator()(const double x,const double Q2, double A_g,double l_g )const{
 	if(x!=*fixx){
 		printf("Chebyshev1D_Collinear_Gluon:: Error: x does not match. input=%.3e internal x= %.3e diff = %.3e\n",x,*fixx, x-*fixx);
 	}
@@ -110,11 +107,16 @@ double Chebyshev1D_Collinear_Gluon::operator()(const double x,const double Q2){
 	if(Q2<q2min){
 		printf("Q2 too small: %.3e < %.3e < %.3e\n",q2min,Q2,q2max );
 	}
+	if((this->A_g!=A_g)||(this->l_g!=l_g)){
+		printf("Chebyshev1D_Collinear_Gluon:: Parameters don't match %.2e %.2e %.2e %.2e\n",this->A_g,A_g,this->l_g,l_g );
+	}
 	double res;
 	double arg[]={
 		change_var_compactify_log(q2min,q2max,Q2 )
 	};
+	
 	res=chebyshev(cheb[0],arg);
+	//res=A_g*pow(x,-l_g);
 	return(res);
 }
 

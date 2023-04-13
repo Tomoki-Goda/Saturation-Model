@@ -72,17 +72,8 @@ int i=0,j=0,k=0;
 
 ///////////////////////////////////////////////////////
 #elif (MODEL==1)
-	#if INDEPENDENT_C==1
 		sudpar[k++]=(par[i++]) ;
-	#else 
-		sudpar[k++]=(par[(i++)-2]);
-	#endif
-
-	#if INDEPENDENT_RMAX==1
 		sudpar[k++]=(par[i++]);
-	#else
-		sudpar[k++]=(par[(i++)-2]);//mu02 is shared
-	#endif
 	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);
 
 //////////////////////////////////////////////////////

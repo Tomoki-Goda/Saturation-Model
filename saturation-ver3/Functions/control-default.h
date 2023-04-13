@@ -42,9 +42,7 @@
 #ifndef R_MAX
 	#define R_MAX 1e+5
 #endif
-#ifndef R_MINMAX //for x dependent r max, this is as low as rmax gets. see dipole-gluon.hh
-	#define R_MINMAX 1.0e+2
-#endif
+
 
 #ifndef X_MIN 
 	#define X_MIN 1.0e-8
@@ -80,31 +78,7 @@
 	#define N_CHEB_R 250 
 #endif
 
-#ifndef STAR
-//star presctiption for r. 0 is Collins=Soper type, 1 is Golec-Biernat=Sapeta type
-	#define STAR 1
-#endif
 
-#ifndef R_FIX
-//treat r_max or mu02 as constant.
-	#define R_FIX 0
-#endif
-
-#ifndef INDEPENDENT_C
-//treat two C in model3 C/r independently
-	#define INDEPENDENT_C 1
-#endif
-
-#ifndef INDEPENDENT_RMAX
-//treat r_max or mu02 in model 3 independently
-	#define INDEPENDENT_RMAX 0
-#endif
-
-
-
-#ifndef LAPLACIAN
-	#define LAPLACIAN 0
-#endif
 #ifndef IBP
 	#define IBP 0
 #endif
@@ -119,9 +93,6 @@
 	#define PHI 0
 #endif
 
-#ifndef SCATTER
-	#define SCATTER 0
-#endif
 
 #ifndef MU02
 	#define MU02 1
@@ -131,9 +102,7 @@
 	#define GLUON_APPROX 1
 #endif
 
-#ifndef HANKEL
-	#define HANKEL 0
-#endif
+
 #ifndef FREEZE_QS2 
 	#define FREEZE_QS2 0
 #endif
@@ -141,9 +110,7 @@
 #ifndef ADD_END
 	#define ADD_END 0
 #endif
-#ifndef GBW_APPROX
-	#define GBW_APPROX 0
-#endif
+
 
 #ifndef R_CHANGE_VAR
 //use R=r/(1-r) for r integration. 

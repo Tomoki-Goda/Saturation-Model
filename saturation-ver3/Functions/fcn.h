@@ -156,6 +156,9 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 { 
 
 //////////////////////////////////////////////////////////////////////////////////////////
+#if SIGMA_APPROX==-2||SIGMA_APPROX==1
+printf("use with extra care\n");
+#endif
 #if R_FORMULA==1	
 	SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
 		sigma[0].init(sigpar);
@@ -163,6 +166,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		sigma[2].init(sigpar);	
 
 	#if SIGMA_APPROX==-2||SIGMA_APPROX==1 // AS GBW/BGK K   This require instance per thread
+		
 			INTEG dsigma[3]={DSIGMA(sigma[0]) ,DSIGMA(sigma[1]) ,DSIGMA(sigma[2]) };
 			dsigma[0].init(N_APPROX+250,sigpar,'s');
 			dsigma[1].init(N_APPROX+250,sigpar,'s');
@@ -175,6 +179,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			};
 			F2_kt<Integrand_r<DSIGMA>> F2(integrands);
 	#elif SIGMA_APPROX==0||SIGMA_APPROX==-1
+		//printf("BGK r\n");
 		SIGMA (&dsigma)[3]=sigma;
 			Integrand_r<SIGMA> integrands[3]={
 				Integrand_r<SIGMA>(dsigma[0]) ,

@@ -10,9 +10,13 @@ inline double  modx(const double  x, const double  Q2, const  double  mf2){
 	return( x);
 #endif
 }
-inline double alpha(const double mu2){
-	return 4.0/(9.0 *log( ((mu2>2*LQCD2)?(mu2):(2.0*LQCD2))/LQCD2));
+inline double alpha(double mu2 ){
+			const double b0= ((double)(33 -2*NF))/(12*PI);
+			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
 }
+/*inline double alpha(const double mu2){
+	return 4.0/(9.0 *log( ((mu2>2*LQCD2)?(mu2):(2.0*LQCD2))/LQCD2));
+}*/
 
 static double change_var(double & var,double &  jac,const double min, const double max,const double c){//This version is (in theory) regular at max->Inf
 	double den=( (c==1)?(1):(c+var*(1-c)) );

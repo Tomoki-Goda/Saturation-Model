@@ -6,7 +6,8 @@ extern "C" double xgpdf_(const double* x, const double* QQ,const double* A_g, co
 
 int main(){
 	Collinear_Gluon xg;
-	Chebyshev1D_Collinear_Gluon cxg(30);
+	Chebyshev1D_Collinear_Gluon cxg;
+	cxg.allocate(30);
 	double x,mu2;
 	double val1,val2,val3;
 	const double Ag=1.1,lg=0.08;

@@ -71,7 +71,7 @@ double Collinear_Gluon::operator()(const double x, const double QQ,const double 
 	const double normalization=A_g*exp(n_0* par[0] )*dgammafbeta;
 	value=dclenshaw<const Collinear_Gluon&,const std::vector<double>&>(cc,*this,par,0,150,1.0e-10,1.0e-15);  
 	value=normalization*value;
-	if(!std::isfinite(value)||value<0){
+	if(!std::isfinite(value)){
 		return 0;
 	}
 	return value ;
@@ -95,6 +95,20 @@ void Chebyshev1D_Collinear_Gluon::set_x(const double &x){
 	fixx=&x;
 	//printf("Chebyshev1D_Collinear_Gluon x set to %.2e",x);
 	cheb_coeff<Chebyshev1D_Collinear_Gluon,const Collinear_Gluon&>(cheb[0],*this,xg);
+	double val1, val2, mu2;
+	//printf("nf= %d\n", NF);
+	
+////////////////  TEST  ////////////
+ /*  	for(int i=0;i<5;++i){
+		mu2=2*q2min*pow(q2max/(4*q2min),((double)i)/4);
+		val1=xg(x,mu2,A_g,l_g);
+		val2=(*this)(x,mu2,A_g,l_g);
+		if(fabs((val1-val2)/(val1+val2))>1.0e-5&&fabs(val1-val2)>1.0e-7){
+			printf("Chebyshev1D_Collinear_Gluon:: val= %.2e %.2e, diff= %.2e, at x=%.2e Q2=%.2e, Ag=%.2e lg=%.2e\n",val1,val2,val1-val2,x,mu2,A_g, l_g );
+		}
+	}
+*/	
+///////////////////////////////////
 }
 
 double Chebyshev1D_Collinear_Gluon::operator()(const double x,const double Q2, double A_g,double l_g )const{

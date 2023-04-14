@@ -224,6 +224,7 @@ template <typename Sig> class Integrand_r{
 		//		getchar();
 		//	}
 			this->x=modx(x,Q2,mf2);
+			//this->x=x;
 			if(this->x>1){
 				printf("set_kinem:: x toolarge %.3e\n",x);
 			}
@@ -231,6 +232,7 @@ template <typename Sig> class Integrand_r{
 			this->mf2=mf2;
 			//if(typeof(*sigma_ptr)==typeof(Sigma_BGK)){
 				sigma_ptr->set_x(this->x);
+				//sigma_ptr->set_x(x);
 			//}
 			return 0;
 		}
@@ -239,7 +241,7 @@ template <typename Sig> class Integrand_r{
 			change_var(r,jacr,R_MIN,R_MAX,100);// 1+Q2);
 			double  jacz=0;
 			change_var(z,jacz,0,0.5,10);
-			double  val=(*sigma_ptr)(x,r)* psisq_f (z, r)/r;
+			double  val=(*sigma_ptr)(x,r)* psisq_f(z, r)/r;
 			return(jacr*jacz*2*val);//r^2 comes from photon wave function. just extracted... 2 pi r is angular integration 
 		}
 	private:
@@ -316,13 +318,13 @@ template <typename T> class F2_kt{
       ///////////////////////////////////////////
 			//const double*__restricted par;
 	public: 
-		explicit F2_kt(const F2_kt & init){
-			this->par=init.par;
-			this->integrands=init.integrands;
-			for(int i=0;i<3;i++){
-				(this->integrands)[i]=(init.integrands)[i];
-			}
-		}
+		//explicit F2_kt(const F2_kt & init){
+		//	this->par=init.par;
+		//	this->integrands=init.integrands;
+		//	for(int i=0;i<3;i++){
+		//		(this->integrands)[i]=(init.integrands)[i];
+		//	}
+		//}
 		
 		explicit F2_kt(T* integrands ){
 			this->integrands=integrands;
@@ -343,7 +345,7 @@ template <typename T> class F2_kt{
 			//printf("+B\n");
 			//getchar();
 			
-			printf("%d: Cuhre x=%.2e Q2=%.2e\n",count++, x,Q2);
+			//printf("%d: Cuhre x=%.2e Q2=%.2e\n",count++, x,Q2);
 			const long long int mineval=pow(15,ndim), maxeval=1/pow(INT_PREC /10,2);//use llChure if larger than ~1.0e+9
 			const long long int nstart=1.0e+2,nincrease=1.0e+2;
 			long long int neval=0;
@@ -372,10 +374,10 @@ template <typename T> class F2_kt{
 				&F2_integrand_A<aF>,
 #endif  
 				(void*)integrands,
-				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,statefile,NULL, &nregions, &neval,  &fail, integral, error, prob
+				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,NULL,NULL, &nregions, &neval,  &fail, integral, error, prob
 			);
 			//printf("\033[1A\033[2K\033[1A\033[2K\r");
-			printf("\033[1A\033[2K\r");
+			//printf("\033[1A\033[2K\r");
 			//cubawait(&spin);
 
 			result=Q2/(2*PI) *integral[0];

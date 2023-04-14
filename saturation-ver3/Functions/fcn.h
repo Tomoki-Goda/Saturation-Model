@@ -151,7 +151,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			if(flag==1){
 				arr1=(double*)malloc(MAX_N*sizeof(double));
 				arr2=(double*)malloc(MAX_N*sizeof(double));
-			}			
+			}
+			printf("\n");//for printing inside loop			
 #pragma omp parallel 
 { 
 
@@ -198,7 +199,7 @@ printf("use with extra care\n");
 			F2_kt<Integrand_kt<aF>> F2(integrands);
 	
 #endif//R_FORMULA
-
+			
 #pragma omp for schedule(dynamic)
 			for(int i=0;i<MAX_N;++i){
 				//F2_kt F2(sigpar);
@@ -207,16 +208,21 @@ printf("use with extra care\n");
 					arr1[i]=F2(X_DATA[i]*0.75,Q2_DATA[i],0);//don't forget to match fprintf below
 					arr2[i]=F2(X_DATA[i]*1.25,Q2_DATA[i],0);
 				}
-				if(i>0){
-					printf("\033[1A \033[2K");
-				}
+				fflush(stdout);
+				//if(i!=0){
+				printf("\033[1A\033[2K\r");
+				//}
 				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,arr[i],CS_DATA[i],pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
+				//printf("%.2e %.2e %.2e\n",pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
+				
 			}
 }
+			printf("\033[1A\033[2K\r");
 			chisq=0;
 			for(int i=0;i<MAX_N;++i){
 				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);
 			}
+			
 			if(flag==1){	
 				//FILE* file0=fopen((directory+"/aF.txt").c_str(),"w" );
 				FILE* file1=fopen((directory+"/data.txt").c_str(),"w" );
@@ -234,7 +240,7 @@ printf("use with extra care\n");
 				fclose(file2);
 				free(arr1);
 				free(arr2);
-			}else{
+			}/*}else{
 				//if(file==NULL){
 					FILE* file=fopen((directory+"/log.txt").c_str(),"a");
 				//}
@@ -244,9 +250,8 @@ printf("use with extra care\n");
 				fprintf(file,"%.5e\n",chisq);
 				fflush(file);
 				fclose(file);
-			}
-			printf("\033[1A \033[2K");
-			
+			}*/
+						
 			
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();

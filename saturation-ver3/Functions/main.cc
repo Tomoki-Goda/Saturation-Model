@@ -133,7 +133,7 @@ int main(int argc, char** argv){
 		//upar.Add(name, ival,(fabs(ierr)<fabs(ival/100))?(ival/50):(ierr*10));
 		//upar.Add(name, ival,(fabs(ierr)<1.0e-5)?(ival/50):(ierr*10));
 		//upar.Add(name, ival, ival/50);
-		upar.Add(name, ival, ival*pow(10,-USE_RESULT));
+		upar.Add(name, ival, ival*5*pow(10,-USE_RESULT));
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT

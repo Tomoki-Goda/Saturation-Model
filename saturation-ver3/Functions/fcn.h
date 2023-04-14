@@ -152,7 +152,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				arr1=(double*)malloc(MAX_N*sizeof(double));
 				arr2=(double*)malloc(MAX_N*sizeof(double));
 			}
-			printf("\n");//for printing inside loop			
+					
 #pragma omp parallel 
 { 
 
@@ -209,15 +209,11 @@ printf("use with extra care\n");
 					arr2[i]=F2(X_DATA[i]*1.25,Q2_DATA[i],0);
 				}
 				fflush(stdout);
-				//if(i!=0){
-				printf("\033[1A\033[2K\r");
-				//}
-				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,arr[i],CS_DATA[i],pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
-				//printf("%.2e %.2e %.2e\n",pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
+				printf("\033[2K\r%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e",i,arr[i],CS_DATA[i],pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
 				
 			}
 }
-			printf("\033[1A\033[2K\r");
+			printf("\033[2K\r");
 			chisq=0;
 			for(int i=0;i<MAX_N;++i){
 				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);

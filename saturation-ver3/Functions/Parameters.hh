@@ -59,7 +59,8 @@ int i=0,j=0,k=0;
 	sigpar[j++]=(par[i++]);
 #endif
 ////////////////////////////SUDPAR////////////////////////////////
-#if (MODEL==22||MODEL==2)
+#if SUDAKOV!=0
+#if (MODEL==0)
 	sudpar[k++]=(par[i++]);
 	sudpar[k++]=(par[i++]);
 	//printf("\tSUDAKOV: %.2e %.2e ",sudpar[0],sudpar[1]);	
@@ -70,18 +71,9 @@ int i=0,j=0,k=0;
 	#endif
 
 ///////////////////////////////////////////////////////
-#elif (MODEL==3)
-	#if INDEPENDENT_C==1
+#elif (MODEL==1)
 		sudpar[k++]=(par[i++]) ;
-	#else 
-		sudpar[k++]=(par[(i++)-2]);
-	#endif
-
-	#if INDEPENDENT_RMAX==1
 		sudpar[k++]=(par[i++]);
-	#else
-		sudpar[k++]=(par[(i++)-2]);//mu02 is shared
-	#endif
 	//printf("%.2e %.2e ",sudpar[0],sudpar[1]);
 
 //////////////////////////////////////////////////////
@@ -89,6 +81,7 @@ int i=0,j=0,k=0;
 	sudpar[k++]=(par[i++]);
 	sudpar[k++]=(par[i++]);
 	//printf("%.2e %.2e ",sudpar[2],sudpar[3]);
+#endif
 #endif
 #endif
 //	printf("\n");

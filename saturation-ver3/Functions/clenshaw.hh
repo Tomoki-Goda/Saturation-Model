@@ -127,7 +127,7 @@ template<typename TYPE,typename args_type>static double dclenshaw(const CCIntegr
 			smax=((max-(smin+increase)<(increase/2))?(max):(smin+increase));
 		}else{
 			//IMPROVE
-			smax=smin+(scale/(1+pow(counter,2)*pow(error_ratio, 0.25 )));
+			smax=smin+(scale/(1+pow(2*counter,2)*pow(error_ratio, 0.25 )));
 			//smax=smin+(scale/2);
 		}
 
@@ -175,7 +175,7 @@ inline int sign(int i){
 	return( (i==0)?(1): (i/abs(i)));
 }
 
-CCIntegral CCprepare(const int N){
+static CCIntegral CCprepare(const int N){
 	CCIntegral data={"no name",{0},{0},{0},5,1,16};
 	Kahn vec[N/4+1];
 	double t[N/4+1];
@@ -306,18 +306,18 @@ CCIntegral CCprepare(const int N){
 	//getchar();
 	return data;
 }
-CCIntegral CCprepare(const int N,const std::string &tag){
+static CCIntegral CCprepare(const int N,const std::string &tag){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
 	return data;
 }
-CCIntegral CCprepare(const int N,const std::string &tag,int d){
+static CCIntegral CCprepare(const int N,const std::string &tag,int d){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
 	data.InitDiv=d;
 	return data;
 }
-CCIntegral CCprepare(const int N,const std::string &tag,int d,int max){
+static CCIntegral CCprepare(const int N,const std::string &tag,int d,int max){
 	CCIntegral data=CCprepare(N);
 	data.tag=tag;
 	data.InitDiv=d;

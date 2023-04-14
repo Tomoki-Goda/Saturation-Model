@@ -21,11 +21,15 @@
 
 #include"gluons.hh"
 #include"r-formula.hh"
-#include"interpolation-dipole.hh"
+#include"gluon-integrand.hh"
 #include"dipole-gluon.hh"
 #include"interpolation-gluon.hh"
-#include"types.hh"
-
+//#include"types.hh"
+#if GLUON_APPROX==1
+typedef Approx_aF aF;
+#elif MODEL==0
+typedef Gluon_GBW aF;
+#endif
 
 
 
@@ -56,15 +60,6 @@ template<typename TYPE > class Integrand_kt{
 			gluptr=rhs.gluptr;
 			return *this;
 		}
-		/*explicit Integrand_kt(const Integrand_kt& rhs){
-			x=rhs.x;
-			Q2=rhs.Q2;
-			mf2=rhs.mf2;
-			betamax=rhs.betamin;
-			k2max=rhs.k2max;
-			kappamax=rhs.kappamax;
-			gluptr=rhs.gluptr;
-		}*/
 		
 		explicit Integrand_kt(TYPE & gluon){
 			gluptr=&gluon;
@@ -229,12 +224,16 @@ template <typename Sig> class Integrand_r{
 		//		getchar();
 		//	}
 			this->x=modx(x,Q2,mf2);
+			//this->x=x;
 			if(this->x>1){
 				printf("set_kinem:: x toolarge %.3e\n",x);
 			}
 			this->Q2=Q2;
 			this->mf2=mf2;
-		//	//sigma_ptr->set_kinem(this->x);
+			//if(typeof(*sigma_ptr)==typeof(Sigma_BGK)){
+				sigma_ptr->set_x(this->x);
+				//sigma_ptr->set_x(x);
+			//}
 			return 0;
 		}
 		double  operator()(double  z,  double  r)const{
@@ -242,7 +241,7 @@ template <typename Sig> class Integrand_r{
 			change_var(r,jacr,R_MIN,R_MAX,100);// 1+Q2);
 			double  jacz=0;
 			change_var(z,jacz,0,0.5,10);
-			double  val=(*sigma_ptr)(x,r)* psisq_f (z, r)/r;
+			double  val=(*sigma_ptr)(x,r)* psisq_f(z, r)/r;
 			return(jacr*jacz*2*val);//r^2 comes from photon wave function. just extracted... 2 pi r is angular integration 
 		}
 	private:
@@ -304,28 +303,11 @@ void llTest(const int ndim, const int ncomp,
   
   }
 template <typename T> class F2_kt{
-		//int newpar=1;
-	
-			//const double *par=NULL;
 			T *integrands;
 #if R_FORMULA==1
-			/*SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
-
-			Integrand_r integrands[3]={
-				Integrand_r(sigma[0]) ,
-				Integrand_r(sigma[1]) ,
-				Integrand_r(sigma[2])
-			};*/
 			const int key =13;
 			const int ndim=2;
 #else//R_FORMULA
-			/*Gluon gluon;//gluon has no flavour dep.
-			
-			Integrand_kt<Gluon> integrands[3]={
-				Integrand_kt( gluon),
-				Integrand_kt( gluon),
-				Integrand_kt( gluon)
-			};*/
 			const int key =11;
 			const int ndim=3;
 			const double kt2max=5.0e+4;
@@ -336,13 +318,13 @@ template <typename T> class F2_kt{
       ///////////////////////////////////////////
 			//const double*__restricted par;
 	public: 
-		explicit F2_kt(const F2_kt & init){
-			this->par=init.par;
-			this->integrands=init.integrands;
-			for(int i=0;i<3;i++){
-				(this->integrands)[i]=(init.integrands)[i];
-			}
-		}
+		//explicit F2_kt(const F2_kt & init){
+		//	this->par=init.par;
+		//	this->integrands=init.integrands;
+		//	for(int i=0;i<3;i++){
+		//		(this->integrands)[i]=(init.integrands)[i];
+		//	}
+		//}
 		
 		explicit F2_kt(T* integrands ){
 			this->integrands=integrands;
@@ -353,17 +335,17 @@ template <typename T> class F2_kt{
 		
 		double operator()(const double  x,const  double  Q2,const  double  mf2){
 			static unsigned int count;
-			printf("Start F2\t");
+			//printf("Start F2\t");
 			//getchar();
 			integrands[0].set_kinem(x,Q2,MASS_L2);
-			printf("L+S");
+			//printf("L+S");
 			integrands[1].set_kinem(x,Q2,MASS_C2);
-			printf("+C");
+			//printf("+C");
 			integrands[2].set_kinem(x,Q2,MASS_B2);
-			printf("+B\n");
+			//printf("+B\n");
 			//getchar();
 			
-			printf("%d: Cuhre x=%.2e Q2=%.2e\n",count++, x,Q2);
+			//printf("%d: Cuhre x=%.2e Q2=%.2e\n",count++, x,Q2);
 			const long long int mineval=pow(15,ndim), maxeval=1/pow(INT_PREC /10,2);//use llChure if larger than ~1.0e+9
 			const long long int nstart=1.0e+2,nincrease=1.0e+2;
 			long long int neval=0;
@@ -382,18 +364,20 @@ template <typename T> class F2_kt{
 			llCuhre(ndim, 1,
 			//llTest(ndim, 1,
 #if R_FORMULA==1
-	#if SIGMA_APPROX==-2||SIGMA_APPROX==1
-				&F2_integrand_B<DSIGMA>,
-	#else
+//	#if SIGMA_APPROX==-2||SIGMA_APPROX==1
+//				&F2_integrand_B<DSIGMA>,
+//	#else
 				&F2_integrand_B<SIGMA>,
-	#endif
+//	#endif
 #else
-				&F2_integrand_A<Approx_aF<GLUON>>,
+
+				&F2_integrand_A<aF>,
 #endif  
 				(void*)integrands,
-				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,statefile,NULL, &nregions, &neval,  &fail, integral, error, prob
+				 1,INT_PREC ,INT_PREC /10, flag, mineval,maxeval, key,NULL,NULL, &nregions, &neval,  &fail, integral, error, prob
 			);
-			printf("\033[1A\033[2K\033[1A\033[2K\r");
+			//printf("\033[1A\033[2K\033[1A\033[2K\r");
+			//printf("\033[1A\033[2K\r");
 			//cubawait(&spin);
 
 			result=Q2/(2*PI) *integral[0];

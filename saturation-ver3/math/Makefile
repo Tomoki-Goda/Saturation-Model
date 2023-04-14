@@ -18,13 +18,25 @@ WSPREP = ${CADDSDIR}/wsprep
 CXX=g++
 
 
-all : gluons-math 
+all : gluons-math levin
 
-gluons-math : gluons-math.o
-	${CXX} -I${INCDIR} gluons-math.o -L${LIBDIR} -l${WSTPLIB} -L/usr/lib/x86_64-linux-gnu ${EXTRALIBS} -o $@
+gluons-math : gluons-math.o gluons.o
+	${CXX} gluons.o -I${INCDIR} gluons-math.o -L${LIBDIR} -l${WSTPLIB} -L/usr/lib/x86_64-linux-gnu ${EXTRALIBS} -o $@
+
+gluons.o: ${FUNCDIR}/gluons.cc ${FUNCDIR}/gluons.hh
+	${CXX} -c ${FUNCDIR}/gluons.cc -o $@
+
+levin : levin.o 
+	${CXX} -I${INCDIR} levin.o -L${LIBDIR} -l${WSTPLIB} -L/usr/lib/x86_64-linux-gnu ${EXTRALIBS} -o $@
 
 .c.o :
 	${CXX} -c -I${INCDIR} -I${FUNCDIR}  $<
 
 gluons-math.c : gluons-math.tm
 	${WSPREP} $? -o $@
+
+levin.c : levin.tm
+	${WSPREP} $? -o $@
+
+clean: 
+	rm -f *.c *.o

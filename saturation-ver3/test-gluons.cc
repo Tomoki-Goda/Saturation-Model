@@ -1,71 +1,31 @@
-#define MODEL 0
-#include<cmath>
-#include "./Functions/complex.hh"
-//#include "cfortran.h"
-#include"./Functions/control-default.h"
-#include"./Functions/constants.h"
-//#include "./Functions/clenshaw.hh"
 #include<iostream>
-#include<pthread.h>
+#include"gluons.hh"
 
-//#include"./Functions/gluons.hh"
-
-
-//Collinear_Gluon xgpdf;
 extern "C" double xgpdf_(const double* x, const double* QQ,const double* A_g, const double* lambda_g );
-extern "C" double xgpdf_integrand_(const double* x, const double* QQ) ;
-void* compute(void* arg){
-	double *args=(double*)arg;
-	double j=1;
-	
-	//printf("%.3e %.3e %.3e %.3e \n",args[0],args[1],args[2],args[3] );
-	//getchar();
-	//args[4]=xgpdf(args[0],args[1],args[2],args[3] );
-	args[4]=xgpdf_(args,args+1,args+2,args+3);
-	//for(int i=0;i<30;i++){
-		//j=i;
-	//	args[4]=xgpdf_integrand_(&j,args) ;
-	//	(args[1]>2)?(printf("2\t\t")):(printf("1\t"));
-	//	printf("%.3e \n",args[4]);
-	//}
-	return NULL;	
-}
+
 
 int main(){
-	//pthread_t thread[3];
-	double args[5*200];
-	int i1;
-#pragma opm parallel
-{
-#pragma omp for
-	for(int j=0;j<200;j++){
-		args[5*j]=0.0001;//*(j+1);
-		args[5*j+1]=pow(10,2);
-		args[5*j+2]=1;
-		args[5*j+3]=0.01;
-		
-		//if(j>1) {pthread_join(thread[j-1],NULL); }
-		compute((void*)(args+5*j) );
-		printf(" %.3e \n", args[5*j+4]);
-		
-		
+	Collinear_Gluon xg;
+	Chebyshev1D_Collinear_Gluon cxg;
+	cxg.allocate(30);
+	double x,mu2;
+	double val1,val2,val3;
+	const double Ag=1.1,lg=0.08;
+	cxg.init(1,2.0e+8,Ag,lg);
+	for(int j=0;j<50; ++j){
+		x=1.0e-6*pow(1.0e+6,((double)j)/49);
+		cxg.set_x(x);
+	for(int i=0;i<50;++i){	
+		mu2=2*pow(1.0e+8/2,((double)i)/49);
+		val1=xgpdf_(&x,&mu2,&Ag,&lg);
+		val2=xg(x,mu2,Ag,lg);
+		val3=cxg(x,mu2,Ag,lg);
+		if(fabs((val1-val2)/(val1+val2))>1.0e-6||fabs((val1-val3)/(val1+val3))>1.0e-6){
+			printf("FORTRAN=%.2e\tdiff=%.2e,\t%.2e\n",val1,val1-val2,val1-val3);
+		}
 	}
-	printf(" loop end\n");
-}
-	
-/*	for(int j=0;j<2;j++){
-		args[5*j]=0.0001;//*(j+1);
-		args[5*j+1]=pow(10,j);
-		args[5*j+2]=1;
-		args[5*j+3]=0.01;
-		
-		//if(j>1) {pthread_join(thread[j-1],NULL); }
-		i1=pthread_create(thread+j,NULL,compute,(void*)(args+5*j) );
-		
 	}
-*/	for(int j=0;j<2;j++){
-		//pthread_join(thread[j],NULL);
-		printf(" %.3e \n", args[5*j+4]);
-	}
+		
+		
 	return 0;
 }

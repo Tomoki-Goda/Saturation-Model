@@ -124,23 +124,24 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		#if SIGMA_APPROX==-1||SIGMA_APPROX==0//if sigma is not in 1d grid
 			SIGMA sigma;
 			sigma.init(sigpar);
-			DSIGMA dsigma(sigma);
+			INTEG dsigma(sigma);
 			dsigma.init(sigpar,'l');
- 		#else //-2 and 1  
+ 		/*#else //-2 and 1  
  			SIGMA sigma;
 			sigma.init(sigpar);
-			DSIGMA dsigma(sigma);
+			INTEG dsigma(sigma);
 			dsigma.init(N_APPROX+250,sigpar,'l');
+			*/
 		#endif
 		
 		GLUON dipole_gluon(dsigma);
 		dipole_gluon.init(sigpar);
-		Approx_aF<GLUON> gluon(dipole_gluon);
+		Approx_aF gluon(dipole_gluon);
 		gluon.init(N_APPROX+100,N_APPROX+100,sigpar);
 		const double kt2max=9.0e+4;
 		gluon.set_max(kt2max);
-	#else               //only GBW K
-		GLUON gluon();
+	#else //only GBW K
+		GLUON gluon;
 		gluon.init(sigpar);
 	#endif//GLUON_APPROX==1	
 #endif//R_FORMULA
@@ -150,11 +151,15 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			if(flag==1){
 				arr1=(double*)malloc(MAX_N*sizeof(double));
 				arr2=(double*)malloc(MAX_N*sizeof(double));
-			}			
+			}
+					
 #pragma omp parallel 
 { 
 
 //////////////////////////////////////////////////////////////////////////////////////////
+#if SIGMA_APPROX==-2||SIGMA_APPROX==1
+printf("use with extra care\n");
+#endif
 #if R_FORMULA==1	
 	SIGMA sigma[3]={SIGMA() ,SIGMA() ,SIGMA() };
 		sigma[0].init(sigpar);
@@ -162,7 +167,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 		sigma[2].init(sigpar);	
 
 	#if SIGMA_APPROX==-2||SIGMA_APPROX==1 // AS GBW/BGK K   This require instance per thread
-			DSIGMA dsigma[3]={DSIGMA(sigma[0]) ,DSIGMA(sigma[1]) ,DSIGMA(sigma[2]) };
+		
+			INTEG dsigma[3]={DSIGMA(sigma[0]) ,DSIGMA(sigma[1]) ,DSIGMA(sigma[2]) };
 			dsigma[0].init(N_APPROX+250,sigpar,'s');
 			dsigma[1].init(N_APPROX+250,sigpar,'s');
 			dsigma[2].init(N_APPROX+250,sigpar,'s');
@@ -174,6 +180,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			};
 			F2_kt<Integrand_r<DSIGMA>> F2(integrands);
 	#elif SIGMA_APPROX==0||SIGMA_APPROX==-1
+		//printf("BGK r\n");
 		SIGMA (&dsigma)[3]=sigma;
 			Integrand_r<SIGMA> integrands[3]={
 				Integrand_r<SIGMA>(dsigma[0]) ,
@@ -184,14 +191,15 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 	#endif///////////////////////////////////////////////////////////////////////////////////
 
 #else//R_FORMULA==0
-			Integrand_kt<Approx_aF<GLUON>> integrands[3]={
-				Integrand_kt<Approx_aF<GLUON>>( gluon),
-				Integrand_kt<Approx_aF<GLUON>>( gluon),
-				Integrand_kt<Approx_aF<GLUON>>( gluon)
+			Integrand_kt<aF> integrands[3]={
+				Integrand_kt<aF>( gluon),
+				Integrand_kt<aF>( gluon),
+				Integrand_kt<aF>( gluon)
 			};
-			F2_kt<Integrand_kt<Approx_aF<GLUON>>> F2(integrands);
+			F2_kt<Integrand_kt<aF>> F2(integrands);
+	
 #endif//R_FORMULA
-
+			
 #pragma omp for schedule(dynamic)
 			for(int i=0;i<MAX_N;++i){
 				//F2_kt F2(sigpar);
@@ -200,16 +208,17 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 					arr1[i]=F2(X_DATA[i]*0.75,Q2_DATA[i],0);//don't forget to match fprintf below
 					arr2[i]=F2(X_DATA[i]*1.25,Q2_DATA[i],0);
 				}
-				if(i>0){
-					printf("\033[1A \033[2K");
-				}
-				printf("%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e\n",i,arr[i],CS_DATA[i],pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
+				fflush(stdout);
+				printf("\033[2K\r%d: val=%.2e data= %.2e chisq=%.2e x=%.2e Q2=%.2e",i,arr[i],CS_DATA[i],pow(fabs(arr[i]-CS_DATA[i])/ERR_DATA[i],2),X_DATA[i],Q2_DATA[i]);
+				
 			}
 }
+			printf("\033[2K\r");
 			chisq=0;
 			for(int i=0;i<MAX_N;++i){
 				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);
 			}
+			
 			if(flag==1){	
 				//FILE* file0=fopen((directory+"/aF.txt").c_str(),"w" );
 				FILE* file1=fopen((directory+"/data.txt").c_str(),"w" );
@@ -227,7 +236,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				fclose(file2);
 				free(arr1);
 				free(arr2);
-			}else{
+			}/*}else{
 				//if(file==NULL){
 					FILE* file=fopen((directory+"/log.txt").c_str(),"a");
 				//}
@@ -237,9 +246,8 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 				fprintf(file,"%.5e\n",chisq);
 				fflush(file);
 				fclose(file);
-			}
-			printf("\033[1A \033[2K");
-			
+			}*/
+						
 			
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();

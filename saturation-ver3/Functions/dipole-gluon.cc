@@ -87,7 +87,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 	double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 	//#endif						      
 				  
-	int flag=0,pass=8,accel_len=8,accel_min=3;
+	int flag=0,pass=5,accel_len=6,accel_min=3;
 	//flag=0 untested
 	//flag=1 tested without pass
 	//flag>1 passed flag-1 times consecutivel

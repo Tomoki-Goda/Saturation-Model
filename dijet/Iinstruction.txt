@@ -1,0 +1,3 @@
+this file is for KaTie program by A.v. Hameren.
+run.sh should be linked to the run.sh file in Katie directory. 
+usage should be expanied in katie README or manual.

@@ -1,0 +1,77 @@
+# Particles are encoded as follows:
+# ve   ve~   e-   e+   u u~ d d~
+# vmu  vmu~  mu-  mu+  c c~ s s~
+# vtau vtau~ tau- tau+ t t~ b b~
+# g H A Z W+ W-
+
+# Beam energies
+#EbeamNegRap = 27.6
+##EbeamPosRap = 920
+
+EbeamNegRap = 15
+EbeamPosRap = 135
+#Ecm = 90
+
+switch = withQCD Yes
+switch = withQED Yes
+switch = withWeak No
+switch = withHiggs No
+switch = withHG No
+
+pNonQCD = 2 0 0
+Nflavors = 5 
+
+# process = NegRap PosRap -> finst1 finst2 etc.
+process = DIS g  -> u~ u  , factor = 1
+process = DIS g  -> d~ d  , factor = 1
+process = DIS g  -> c~ c  , factor = 1
+process = DIS g  -> s~ s  , factor = 1
+process = DIS g  -> b~ b  , factor = 1
+
+offshell = 1
+
+lhaSet = CT10nlo
+
+# Read TMDs from grid files
+tmdTableDir = /home/tomoki/Saturation-Model/gluon-grids/
+tmdpdf = g  GBWSkt.dat
+
+# Phase space cuts. angle and theta are in degrees
+xAlimits = 0.0d0 0.01d0
+######################################################
+cut = {Qsquare} > 1
+cut = {Qsquare} < 500
+cut = {inelast} > 0.1
+cut = {inelast} < 0.85
+cut = {deltaRbreit|1,2|} > 1.0
+cut = {rapidity|1|} > -4.0
+cut = {rapidity|1|} < -1.0
+cut = {rapidity|2|} > -4.0
+cut = {rapidity|2|} < -1.0
+#cut = {rapidity|1|} > 4.0
+#cut = {rapidity|1|} < 1.0
+#cut = {rapidity|2|} > 4.0
+#cut = {rapidity|2|} < 1.0
+cut = {pTbreit|2|1,2} > 3.0
+cut = {pTbreit|1|1,2} < 50
+
+
+######################################################
+
+# Renormalization/factorization scale
+scale = (sqrt({Qsquare})+({pTbreit|1|}+{pTbreit|2|})/2.0)/2.0
+#scale = sqrt({Qsquare})
+
+# Masses and widths
+mass = Z   91.1882  2.4952
+mass = W   80.419   2.21
+mass = H  125.0     0.00429
+mass = t  173.5
+# Couplings. You can set either alphaEW or Gfermi
+coupling = Gfermi 1.16639d-5
+
+# Number of nonzero-weight phase space points to be spent on optimization.
+Noptim = 100,000
+
+# Treatment of helicities. Options are: sum, sampling, polarized.
+helicity = sampling

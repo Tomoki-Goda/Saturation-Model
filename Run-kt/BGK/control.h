@@ -1,0 +1,12 @@
+#define MASS_L2 0.0
+#define MASS_S2 0.0
+#define Q2_MAX 650.0
+#define MODEL 1 
+#define PRINT_PROGRESS 1
+#define ALPHA_RUN 0
+#define MODX 1 
+#define USE_RESULT 2 
+#define IBP 0
+#define GLUON_APPROX 1
+#define R_FORMULA 1
+#define SIGMA_APPROX -1

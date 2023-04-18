@@ -16,8 +16,8 @@ void Gluon_GBW::init(const double *par){
 	#else
 		thresh_power=THRESHOLD;
 	#endif
-	}
-	double Gluon_GBW::operator()(const double  x,const double k2,double mu2){
+}
+double Gluon_GBW::operator()(const double  x,const double k2,double mu2){
 	if(x_0<1.0e-5||x_0>1.0e-3){
 		return 0;
 	}

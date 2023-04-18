@@ -197,7 +197,7 @@ int main(int argc, char** argv){
 		file.close();
 		
 		if(lrint(result[j]["Cov"])!=3||lrint(result[j]["Flag"])!=1){
-			printf("Error Flags %f, %f, %f \n" ,result[j]["Flag"],result[j]["Error Flag"],result[j]["Cov"]);
+			printf(" Error Flags %f, %f, %f \n" ,result[j]["Flag"],result[j]["Error Flag"],result[j]["Cov"]);
 			fprintf(out,"\\color{gray} (%1ld, %1ld) ",lrint(result[j]["Cov"]),lrint(result[j]["Flag"]));
 		}
 		fprintf(out,"{\\footnotesize %s} ", labels[j].c_str() );

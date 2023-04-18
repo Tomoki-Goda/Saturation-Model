@@ -1,0 +1,13 @@
+**.log
+**.aux
+**.txt
+!result.txt
+**.bbl
+**.eps
+**.mxl
+**.o
+**.out
+**.synctex.gz
+**.pdf
+**.toc
+**.d

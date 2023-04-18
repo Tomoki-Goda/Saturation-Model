@@ -22,7 +22,7 @@ double Sigma_BGK::Qs2(const double x,const double r)const{
 	}
 	#endif
 	const double rrmax=pow(r,2)/C;
-	const double mu2=(r>1.0e-5)?(mu02/((1.0-exp(-mu02*rrmax) ))):(1/rrmax+mu02/2) ;
+	const double mu2=(rrmax>1.0e-5)?(mu02/((1.0-exp(-mu02*rrmax) ))):(1/rrmax+mu02/2) ;
 	const double al=alpha(mu2);
 	//const double al=0.2;
 	const double qs2=4*PI*PI*al*xgpdf(x,mu2,A_g,lambda_g)/(3*sigma_0); 

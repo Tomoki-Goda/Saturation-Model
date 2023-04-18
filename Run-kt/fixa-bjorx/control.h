@@ -7,4 +7,4 @@
 #define MODX 0
 #define USE_RESULT 1 
 #define IBP 1
-#define GLUON_APPROX 1
+#define GLUON_APPROX 0 

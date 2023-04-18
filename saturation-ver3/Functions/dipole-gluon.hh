@@ -34,7 +34,7 @@ typedef Gluon_Integrand INTEG ;
 class Gluon_GBW{
 	const double *sigpar;
 	double sigma_0=0,lambda=0,x_0=0,mu02=0,thresh_power=0;
-	double x=0;
+	//double x=0;
 	public:
 		explicit Gluon_GBW(){
 		}

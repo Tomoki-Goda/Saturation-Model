@@ -148,7 +148,7 @@ int main(int argc, char** argv){
 	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
 	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	
+	prec.SetPrecision(1.0e-6);
 	
 	INT_PREC=1.0e-3;
 	N_APPROX=N_CHEB_R/3;
@@ -166,7 +166,8 @@ int main(int argc, char** argv){
 	
 	INT_PREC=2.5e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
-	prec.SetPrecision(INT_PREC);
+	//prec.SetPrecision(INT_PREC);
+	
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
@@ -215,12 +216,13 @@ int main(int argc, char** argv){
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
 		min=simplex(25,goal);
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		//std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	}
 	
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
-	prec.SetPrecision(INT_PREC);
+	//prec.SetPrecision(INT_PREC);
+	prec.SetPrecision(1.0e-6);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");

@@ -1,3 +1,15 @@
 this file is for KaTie program by A.v. Hameren.
 run.sh should be linked to the run.sh file in Katie directory. 
 usage should be expanied in katie README or manual.
+
+how to run
+run "plot1.sh". 
+wait till optimization ends. check with 'top'
+
+when done, 
+run 'plot2.sh'.
+this will take some time.
+
+adjust plotting.txt if needed...
+then run 'plot3.sh'
+this will make plots in 'plots'

@@ -16,32 +16,32 @@ set linetype 4 lc rgbcolor '#FF0000'		lw 4	#red
 set linetype 5 lc rgbcolor '#FF0000' dt (2,2,3,2) lw 4	#red
 
 set xrange[0.0:3.1]
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW1.tex'
+set output './plots/plotGBW1.tex'
 plot './KS/Phi1.hst' u ($1+$2)/2:3 		w lines ls 1 t "\\scriptsize KS", \
 	'./GBW/Phi1.hst' u ($1+$2)/2:3 		w lines ls 4 t "\\scriptsize GBW $k_t$", \
      './GBWr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 2 t "\\scriptsize GBW $r$"
      
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW2.tex'
+set output './plots/plotGBW2.tex'
 plot './KS/Phi1.hst' u ($1+$2)/2:3 		w lines ls 1 t "\\scriptsize KS", \
 	'./GBW/Phi1.hst' u ($1+$2)/2:3 		w lines ls 5 t "\\scriptsize GBW $k_t$", \
      './GBWS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 4 t "\\scriptsize GBW $k_t$ Sud"
   
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW3.tex'
+set output './plots/plotGBW3.tex'
 plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
 	'./GBWr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 3 t "\\scriptsize GBW $r$", \
      './GBWSr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 2 t "\\scriptsize GBW $r$ Sud"
      
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK1.tex'
+set output './plots/plotBGK1.tex'
 plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
 	'./BGK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 4 t "\\scriptsize BGK $k_t$", \
      './BGKr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 2 t "\\scriptsize BGK $r$"
      
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK2.tex'
+set output './plots/plotBGK2.tex'
 plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
 	'./BGK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 5 t "\\scriptsize BGK $k_t$", \
      './BGKS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 4 t "\\scriptsize BGK $k_t$ Sud"
   
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK3.tex'
+set output './plots/plotBGK3.tex'
 plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
 	'./BGKr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 3 t "\\scriptsize BGK $r$", \
      './BGKSr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 2 t "\\scriptsize BGK $r$ Sud"
@@ -54,32 +54,32 @@ plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
 set xlabel '\scriptsize $\Delta \phi^{\mathrm{Lab}}(J_1+J_2,e^-)$'
 
 
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW1Lab.tex'
+set output './plots/plotGBW1Lab.tex'
 plot './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./GBW/Phi2.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize GBW $k_t$", \
      './GBWr/Phi2.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize GBW $r$"
 
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW2Lab.tex'
+set output './plots/plotGBW2Lab.tex'
 plot './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./GBW/Phi2.hst' u ($1+$2)/2:3 w lines ls 5 t "\\scriptsize GBW $k_t$", \
      './GBWS/Phi2.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize GBW $k_t$ Sud"
   
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW3Lab.tex'
+set output './plots/plotGBW3Lab.tex'
 plot  './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./GBWr/Phi2.hst' u ($1+$2)/2:3 w lines ls 3 t "\\scriptsize GBW $r$", \
      './GBWSr/Phi2.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize GBW $r$ Sud"
      
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK1Lab.tex'
+set output './plots/plotBGK1Lab.tex'
 plot  './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./BGK/Phi2.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize BGK $k_t$", \
      './BGKr/Phi2.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize BGK $r$"
      
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK2Lab.tex'
+set output './plots/plotBGK2Lab.tex'
 plot  './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./BGK/Phi2.hst' u ($1+$2)/2:3 w lines ls 5 t "\\scriptsize BGK $k_t$", \
      './BGKS/Phi2.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize BGK $k_t$ Sud"
   
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK3Lab.tex'
+set output './plots/plotBGK3Lab.tex'
 plot  './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./BGKr/Phi2.hst' u ($1+$2)/2:3 w lines ls 3 t "\\scriptsize BGK $r$", \
      './BGKSr/Phi2.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize BGK $r$ Sud"
@@ -92,32 +92,32 @@ set xrange[1.5:3.1]
 set xlabel '\scriptsize $\Delta \phi^{\mathrm{Breit}}(J_1,J_2)$'
 set yrange[0.0001:1]
 
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW1Jets.tex'
+set output './plots/plotGBW1Jets.tex'
 plot './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./GBW/Phi3.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize GBW $k_t$", \
      './GBWr/Phi3.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize GBW $r$"
 
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW2Jets.tex'
+set output './plots/plotGBW2Jets.tex'
 plot './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./GBW/Phi3.hst' u ($1+$2)/2:3 w lines ls 5 t "\\scriptsize GBW $k_t$", \
      './GBWS/Phi3.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize GBW $k_t$ Sud"
   
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotGBW3Jets.tex'
+set output './plots/plotGBW3Jets.tex'
 plot  './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./GBWr/Phi3.hst' u ($1+$2)/2:3 w lines ls 3 t "\\scriptsize GBW $r$", \
      './GBWSr/Phi3.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize GBW $r$ Sud"
      
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK1Jets.tex'
+set output './plots/plotBGK1Jets.tex'
 plot  './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./BGK/Phi3.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize BGK $k_t$", \
      './BGKr/Phi3.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize BGK $r$"
      
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK2Jets.tex'
+set output './plots/plotBGK2Jets.tex'
 plot  './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./BGK/Phi3.hst' u ($1+$2)/2:3 w lines ls 5 t "\\scriptsize BGK $k_t$", \
      './BGKS/Phi3.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize BGK $k_t$ Sud"
   
-set output '~/Saturation-Model/saturation-ver3/kt-formula-report1/gnuplot/plotBGK3Jets.tex'
+set output './plots/plotBGK3Jets.tex'
 plot  './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
 	'./BGKr/Phi3.hst' u ($1+$2)/2:3 w lines ls 3 t "\\scriptsize BGK $r$", \
      './BGKSr/Phi3.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize BGK $r$ Sud"

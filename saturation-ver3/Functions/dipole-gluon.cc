@@ -64,7 +64,6 @@ void Dipole_Gluon::set_x(const double &x){
 }
 
 double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2){
-	
 	Kahn accum=Kahn_init(3);
 	const std::vector<double> par{kt2,x,mu2};
 	double rmax=R_MAX,rmin=R_MIN;
@@ -81,11 +80,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 		sectors=SECTOR_MAX;
 	}
 
-	//#if IBP==1&&WW!=1
-	//double imax=3*PI/(sqrt(kt2)*4); //forJ1 integral, this is efficient
-	//#else
 	double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
-	//#endif						      
 				  
 	int flag=0,pass=5,accel_len=6,accel_min=3;
 	//flag=0 untested
@@ -108,11 +103,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 			}
 		};
 		
-	#if R_CHANGE_VAR==1
-		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin/(1+imin),imax/(1+imax),pow(INT_PREC,2),10e-14);
-	#elif R_CHANGE_VAR==0
 		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
-	#endif
 		
 		imin=imax;
 		if(val==0.0||sum+val==sum){
@@ -156,7 +147,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 		val1=lev.accel(sectors-accel_len,accel_len);
 		val2=lev.accel(sectors-1-accel_len,accel_len);
 		if(fabs(2*(val1-val2)/(val1+val2))>INT_PREC/2&&fabs(val2-val1)>2*pow(INT_PREC/5,2) ){
-			printf("3: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n",
+			printf("\n3: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n\n",
 			sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val,INT_PREC);
 		}
 		//val=val1;

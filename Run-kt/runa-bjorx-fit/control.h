@@ -3,8 +3,9 @@
 #define Q2_MAX 650.0
 #define MODEL 0 
 #define PRINT_PROGRESS 1
-#define ALPHA_RUN 0
+#define ALPHA_RUN 1 
 #define MODX 0
-#define USE_RESULT 1 
+#define USE_RESULT 0 
 #define IBP 1
 #define MU02 0
+#define GLUON_APPROX 0 

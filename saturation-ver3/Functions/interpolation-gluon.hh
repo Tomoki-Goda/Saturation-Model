@@ -45,7 +45,8 @@ class Approx_aF{
 		double sigma_0=0;
 		double kt2min=KT2_MIN/2 ,kt2max=-1;
 		double xmin=X_MIN;
-		const double mu2[1]={0};
+		//const double mu2[1]={0};
+		const double *mu2;
 		
 		int alloc_flag=0;
 		

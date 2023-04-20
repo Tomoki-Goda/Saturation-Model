@@ -8,8 +8,10 @@
 **.out
 **.synctex.gz
 **.pdf
+!./Paper/plots/*.pdf
 **.toc
 **.d
 **.xml
 **.blg
 **blx.bib
+**bcf

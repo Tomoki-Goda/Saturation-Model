@@ -10,3 +10,11 @@ default values of them can be found in the file "control-default.h"
 Makefile requires environmental variable DIR set to where the "control.h" is.
 
 Examples can be found in Run-kt.
+
+Generally, the following are necessary
+
+CUBA (T. Hahn)
+Gnu Scientific Library (GSL)
+ROOT::Minuit2
+
+KaTie (A.van Hameren,2016) is required for the contents of "dijet"

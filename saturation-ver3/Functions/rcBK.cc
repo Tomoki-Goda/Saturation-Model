@@ -50,8 +50,8 @@ class Sigma_rcBK_integrand{
 					fscanf(file,"%lf %lf %lf",&x,&r,&val);
 					sigma_array[(x_npts-j-1)*r_npts+i]=val;
 					if(j==0){
-						r_array[i]=r;
-						printf("r: %.3e\n",r);
+						r_array[i]=sqrt(r);
+						printf("r: %.3e\n",r_array[i]);
 					}
 					
 					if(i>0&&x0!=x){
@@ -62,7 +62,7 @@ class Sigma_rcBK_integrand{
 					}					
 				}
 				x_array[(x_npts-j-1)]=x;
-				printf("x: %.3e\n",x);
+				//printf("x: %.3e\n",x);
 			}
 			gsl_spline2d_init (spline_ptr,r_array, x_array, sigma_array, r_npts, x_npts);
 			return 0;
@@ -90,7 +90,7 @@ class rcBK_Gluon{
 		double operator()(double x,double kt2,double mu2){
 			Kahn accum=Kahn_init(3);
 			const std::vector<double> par{kt2,x,mu2};
-			double rmax=2.5e+3,rmin=2.0e-6;
+			double rmax=9.0e+1,rmin=2.0e-3;
 			double sum_accel, err;
 			double sum = 0;
 			double val=0,val1=0,val2=0;
@@ -108,9 +108,13 @@ class rcBK_Gluon{
 						  
 			int flag=0,pass=5,accel_len=6,accel_min=3;
 			Levin lev(accel_len+2);
+			while(imax+scale<imin){
+				imax+=scale;
+			}
 			
 			for(int i=0;i<sectors;++i){
 				imax+=scale;
+				
 				if(imax>rmax){
 					if(i>0){
 						imax-=scale;
@@ -216,15 +220,15 @@ int main(){
 			for(int j=0;j<100;++j){
 				k2=KT2_MIN*pow(kt2max/KT2_MIN,((double)j)/99);
 				printf("kt2= %.2e\n",k2);
-#if SUDAKOV>=1
+/*#if SUDAKOV>=1
 				for(int i=0;i<70;++i){
 					mu2=1.0e-1*pow(1.0e+5/1.0e-1,((double)i)/69);
-					arr[j*70+i]=dipole_gluon(x,k2,mu2);
+					arr[j*70+i]=gluon(x,k2,mu2);
 				}
-#else
+#else*/
 				mu2=0;
 				arr[j]=gluon(x,k2,mu2);
-#endif
+//#endif
 				printf("\033[1A\033[2K\r");
 
 			}

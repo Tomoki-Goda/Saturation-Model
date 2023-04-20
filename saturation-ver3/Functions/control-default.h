@@ -75,7 +75,7 @@
 
 #ifndef N_CHEB_R
 //number of sampling for R integration, points are N divisible by 8
-	#define N_CHEB_R 250 
+	#define N_CHEB_R 100 
 #endif
 
 
@@ -146,7 +146,7 @@
 #endif
 
 #ifndef SECTOR_MAX
-	#define SECTOR_MAX 100
+	#define SECTOR_MAX 200
 #endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////

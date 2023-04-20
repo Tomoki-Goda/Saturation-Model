@@ -9,40 +9,47 @@ set grid mytics xtics linecolor rgbcolor '#888888' lw 1 ,linecolor rgbcolor '#44
 set ylabel '\scriptsize $d\sigma/d\Delta \phi [\mathrm{nb}]$'
 set xlabel '\scriptsize $\Delta \phi^{\mathrm{Breit}}(J_1+J_2,e^-)$'
 set yrange[0.001:0.1]
-set linetype 1 lc rgbcolor '#008800' dt (3,2)	lw 4	#black
+set linetype 1 lc rgbcolor '#008800' dt (2,2)	lw 4	#green
 set linetype 2 lc rgbcolor '#0000FF' 		lw 4	#Blue
 set linetype 3 lc rgbcolor '#00FF' dt (2,2,3,2)	lw 4 #blue
 set linetype 4 lc rgbcolor '#FF0000'		lw 4	#red
 set linetype 5 lc rgbcolor '#FF0000' dt (2,2,3,2) lw 4	#red
+set linetype 6 lc rgbcolor '#008800' dt (6,1)	lw 4	#green
 
 set xrange[0.0:3.1]
 set output './plots/plotGBW1.tex'
 plot './KS/Phi1.hst' u ($1+$2)/2:3 		w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBW/Phi1.hst' u ($1+$2)/2:3 		w lines ls 4 t "\\scriptsize GBW $k_t$", \
      './GBWr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 2 t "\\scriptsize GBW $r$"
      
 set output './plots/plotGBW2.tex'
 plot './KS/Phi1.hst' u ($1+$2)/2:3 		w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBW/Phi1.hst' u ($1+$2)/2:3 		w lines ls 5 t "\\scriptsize GBW $k_t$", \
      './GBWS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 4 t "\\scriptsize GBW $k_t$ Sud"
   
 set output './plots/plotGBW3.tex'
 plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBWr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 3 t "\\scriptsize GBW $r$", \
      './GBWSr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 2 t "\\scriptsize GBW $r$ Sud"
      
 set output './plots/plotBGK1.tex'
 plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 4 t "\\scriptsize BGK $k_t$", \
      './BGKr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 2 t "\\scriptsize BGK $r$"
      
 set output './plots/plotBGK2.tex'
 plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 5 t "\\scriptsize BGK $k_t$", \
      './BGKS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 4 t "\\scriptsize BGK $k_t$ Sud"
   
 set output './plots/plotBGK3.tex'
 plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGKr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 3 t "\\scriptsize BGK $r$", \
      './BGKSr/Phi1.hst' u ($1+$2)/2:3 	w lines ls 2 t "\\scriptsize BGK $r$ Sud"
                 
@@ -56,31 +63,37 @@ set xlabel '\scriptsize $\Delta \phi^{\mathrm{Lab}}(J_1+J_2,e^-)$'
 
 set output './plots/plotGBW1Lab.tex'
 plot './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi2.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBW/Phi2.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize GBW $k_t$", \
      './GBWr/Phi2.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize GBW $r$"
 
 set output './plots/plotGBW2Lab.tex'
 plot './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi2.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBW/Phi2.hst' u ($1+$2)/2:3 w lines ls 5 t "\\scriptsize GBW $k_t$", \
      './GBWS/Phi2.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize GBW $k_t$ Sud"
   
 set output './plots/plotGBW3Lab.tex'
 plot  './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi2.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBWr/Phi2.hst' u ($1+$2)/2:3 w lines ls 3 t "\\scriptsize GBW $r$", \
      './GBWSr/Phi2.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize GBW $r$ Sud"
      
 set output './plots/plotBGK1Lab.tex'
 plot  './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi2.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGK/Phi2.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize BGK $k_t$", \
      './BGKr/Phi2.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize BGK $r$"
      
 set output './plots/plotBGK2Lab.tex'
 plot  './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi2.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGK/Phi2.hst' u ($1+$2)/2:3 w lines ls 5 t "\\scriptsize BGK $k_t$", \
      './BGKS/Phi2.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize BGK $k_t$ Sud"
   
 set output './plots/plotBGK3Lab.tex'
 plot  './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi2.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGKr/Phi2.hst' u ($1+$2)/2:3 w lines ls 3 t "\\scriptsize BGK $r$", \
      './BGKSr/Phi2.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize BGK $r$ Sud"
      
@@ -94,31 +107,37 @@ set yrange[0.0001:1]
 
 set output './plots/plotGBW1Jets.tex'
 plot './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi3.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBW/Phi3.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize GBW $k_t$", \
      './GBWr/Phi3.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize GBW $r$"
 
 set output './plots/plotGBW2Jets.tex'
 plot './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi3.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBW/Phi3.hst' u ($1+$2)/2:3 w lines ls 5 t "\\scriptsize GBW $k_t$", \
      './GBWS/Phi3.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize GBW $k_t$ Sud"
   
 set output './plots/plotGBW3Jets.tex'
 plot  './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi3.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBWr/Phi3.hst' u ($1+$2)/2:3 w lines ls 3 t "\\scriptsize GBW $r$", \
      './GBWSr/Phi3.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize GBW $r$ Sud"
      
 set output './plots/plotBGK1Jets.tex'
 plot  './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi3.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGK/Phi3.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize BGK $k_t$", \
      './BGKr/Phi3.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize BGK $r$"
      
 set output './plots/plotBGK2Jets.tex'
 plot  './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi3.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGK/Phi3.hst' u ($1+$2)/2:3 w lines ls 5 t "\\scriptsize BGK $k_t$", \
      './BGKS/Phi3.hst' u ($1+$2)/2:3 w lines ls 4 t "\\scriptsize BGK $k_t$ Sud"
   
 set output './plots/plotBGK3Jets.tex'
 plot  './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
+		 './rcBK/Phi3.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./BGKr/Phi3.hst' u ($1+$2)/2:3 w lines ls 3 t "\\scriptsize BGK $r$", \
      './BGKSr/Phi3.hst' u ($1+$2)/2:3 w lines ls 2 t "\\scriptsize BGK $r$ Sud"
      

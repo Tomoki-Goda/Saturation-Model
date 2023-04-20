@@ -157,7 +157,26 @@ int main(int argc, char** argv){
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 		printf("*****************************\n");
-		min=simplex1(100,pow(10,1-i));
+		//min=simplex1(100,pow(10,1-i));
+		for(int i=0;i<N_PAR-skip;++i){
+			min=simplex1(50,25);
+			simplex1.Fix(i);
+#if MODEL==1
+			for(int j=0;j<N_PAR-skip;++j){
+				if(i==j){
+					continue;
+				}
+				simplex1.Fix(j);
+				min=simplex1(100,pow(10,1-i));
+				std::cout<<"Parameters "<<min.UserState()<<std::endl;
+				simplex1.Release(j);
+			}
+#endif
+			min=simplex1(50,25);
+			std::cout<<"Parameters "<<min.UserState()<<std::endl;
+			simplex1.Release(i);
+		}
+		min=simplex1(50,25);
 		INT_PREC/=2;
 		N_APPROX=(int)(N_APPROX*2);
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
@@ -167,41 +186,39 @@ int main(int argc, char** argv){
 	INT_PREC=2.5e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
 	//prec.SetPrecision(INT_PREC);
-	
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
-	
-	{	
-	  ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
-	  for(int i=0;i<(N_PAR-skip);i++ ){
+{	
+	ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
+	for(int i=0;i<(N_PAR-skip);i++ ){
 		migrad.RemoveLimits(i);
-	  }
-#if MODEL==1
+	}
+	min=migrad(20,25);
+}
+	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+	goal=25;
+	for(int k=0;k<5;k++){
+		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
 		for(int i=0;i<N_PAR-skip;++i){
 			migrad.Fix(i);
+/*#if MODEL==1
+			for(int j=0;j<N_PAR-skip;++j){
+				if(i==j){
+					continue;
+				}
+				migrad.Fix(j);
+				min=migrad(50,25);
+				std::cout<<"Parameters "<<min.UserState()<<std::endl;
+				migrad.Release(j);
+			}
+#endif*/
 			min=migrad(50,25);
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			migrad.Release(i);
 		}
-#endif
-			min=migrad(20,25);
-	}
-	goal=25;
-	for(int i=0;i<5;i++){
-		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
-		for(int j=0;j<i+2;j++){
-			min=migrad(10*(j+1),goal);
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
-			printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
-			save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
-			if(min.IsValid()){
-				break;
-			}
-		}
-				
-		printf("EDM/FVal %.3e/%.3e = %.3e\n",min.UserState().Edm(),min.UserState().Fval(),((min.UserState().Edm())/(min.UserState().Fval())) );
+		min=migrad(100,goal);
+		
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
 		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
 		
@@ -214,6 +231,7 @@ int main(int argc, char** argv){
 		N_APPROX=((int)(1.4142*N_APPROX));
 		prec.SetPrecision(2*INT_PREC);
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		
 		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
 		min=simplex(25,goal);
 		//std::cout<<"Parameters "<<min.UserState()<<std::endl;
@@ -226,21 +244,30 @@ int main(int argc, char** argv){
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
-	
 	goal=10;
-	for(int i=0;i<5;i++){
+	for(int k=0;k<5;k++){
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),1);
-
-		for(int j=0;j<i+2;j++){
-			min=migrad(10*(j+1),goal);
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
-			printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
-			save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
-			if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
-				break;
+		for(int i=0;i<N_PAR-skip;++i){
+			migrad.Fix(i);
+/*#if MODEL==1
+			for(int j=0;j<N_PAR-skip;++j){
+				if(i==j){
+					continue;
+				}
+				migrad.Fix(j);
+				min=migrad(50,goal);
+				std::cout<<"Parameters "<<min.UserState()<<std::endl;
+				migrad.Release(j);
 			}
+#endif*/
+			min=migrad(50,goal);
+			std::cout<<"Parameters "<<min.UserState()<<std::endl;
+
+			migrad.Release(i);
 		}
+
+		min=migrad(100,goal);
+
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
@@ -250,10 +277,11 @@ int main(int argc, char** argv){
 		N_APPROX=((int)(1.41421356*N_APPROX));
 		prec.SetPrecision(2*INT_PREC);
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		
 		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
 		min=simplex(30,goal);	
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;	
 	}
+
 	
 	
 

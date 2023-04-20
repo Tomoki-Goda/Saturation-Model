@@ -2,7 +2,7 @@
 
 it is a folder for the project on the GBW/ BGK models.
 Written by Tomoki Goda
-Most functions are in Function dir..
+Most functions are in "Function".
 
 To use one needs to write "control.h", in which control macros are defined. 
 default values of them can be found in the file "control-default.h"
@@ -17,4 +17,8 @@ CUBA (T. Hahn)
 Gnu Scientific Library (GSL)
 ROOT::Minuit2
 
-KaTie (A.van Hameren,2016) is required for the contents of "dijet"
+KaTie (A.van Hameren,2016) is required for the contents of "dijet", and gluplot if one wants to run 
+
+$ gnuplot plotting.txt.
+
+Grid-Interpolation is just a copy of KS gluon.

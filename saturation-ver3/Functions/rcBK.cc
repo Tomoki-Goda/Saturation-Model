@@ -71,6 +71,7 @@ class Sigma_rcBK_integrand{
 			double kt=sqrt(par[0]),x=par[1];
 			double val;		
 			val=gsl_spline2d_eval(spline_ptr,r, x,r_accel_ptr, x_accel_ptr);
+			val=(1-pow(1-val,9/4));
 			val*=std::cyl_bessel_j(0,r *kt );
 			val/=r;
 			

@@ -86,31 +86,7 @@ class Sigma_BGK:public  Sigma{
 		void set_x(const double &x);
 		void init(const double * const &sigpar);
 };
-/*class Sigma_BGK{
-		ColGlu xgpdf;
-		double A_g,lambda_g,C,mu02;
-		double x2;
-		double sigma_0,mu102,thresh_power;
-		const double *par;
-		double alpha(double mu2 )const{
-			const double b0= ((double)(33 -2*NF))/(12*PI);
-			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
-		}
-		double Qs2(const double x,const double r)const;
-	public:
-		void set_x(const double &x);
-		double operator()(const double x, const double r) ;
-#if SIGMA_APPROX<0
-		explicit Sigma_BGK(void):xgpdf(N_CHEB){ 
-#else
-		explicit Sigma_BGK(void){ 
-#endif
-			//xgpdf.init(N_CHEB);
-		}
-		~Sigma_BGK(){
-		}
-		void init(const double * const &sigpar);
-};*/
+
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 

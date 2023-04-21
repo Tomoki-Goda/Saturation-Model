@@ -15,5 +15,5 @@
 **.blg
 **blx.bib
 **bcf
-**/data/*.dat
+**.dat
 !**/data/hera_tot.dat

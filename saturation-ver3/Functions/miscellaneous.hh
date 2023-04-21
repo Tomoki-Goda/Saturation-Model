@@ -117,4 +117,31 @@ inline double min(double a,double b){
 inline double max(double a,double b){
 	return((a>b)?(b):(a));
 }
+
+template <typename T>double saturation(T func,double x,double kt2_start){
+	double val;
+	double kt2=kt2_start;
+	double diff=1.0e-1;
+	double valprev=0;
+	int flag=0;
+	int counter=0;
+	double grad=0;
+	while(counter++<200){
+		val=deriv<T>(func,x,kt2,kt2/50,1);
+		if(fabs(val)<1.0e-5){
+			return kt2;
+		}else if(val>0&&flag==0){
+			kt2+=diff;
+			diff*=1.5;
+		}else{
+			flag=1;
+			grad=(val-valprev)/diff;
+			diff=-val/grad;
+			kt2+=diff;
+		}
+		valprev=val;
+	}
+	printf("FAILED to find peak derivative is %.3e at %.3e\n",val,kt2);
+	return 0;
+}
 #endif

@@ -30,7 +30,7 @@ main: $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipol
 		${DIR}/interpolation-gluon.o ${DIR}/main.o 
 	${CXX} $^ -o ${DIR}/main ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
-plot:ww sigma dp
+plot:ww sigma dp plot-things
 
 ww:  ${DIR}/plot-ww.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
 		${DIR}/interpolation-gluon.o 
@@ -44,6 +44,12 @@ sigma: ${DIR}/plot-sigma.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integ
 		${DIR}/interpolation-gluon.o 
 	${CXX} $^ -o ${DIR}/sigma ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
+plot-things: ${DIR}/plot-things.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+		${DIR}/interpolation-gluon.o 
+		${CXX} $^ -o ${DIR}/plot ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+
+$(DIR)/plot-things.o: ${FUNCDIR}/plot/plot-things.cc ${DEPS} 
+		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
 
 $(DIR)/plot-ww.o: ${FUNCDIR}/plot/plot-ww.cc ${DEPS} 
 		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@

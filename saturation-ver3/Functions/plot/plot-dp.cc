@@ -114,17 +114,17 @@ int main(int argc , char** argv){
 }
 			for(int j=0;j<100;++j){
 				k2=KT2_MIN*pow(kt2max/KT2_MIN,((double)j)/99);
-#if SUDAKOV>=1
+/*#if SUDAKOV>=1
 				for(int i=0;i<70;++i){
 					mu2=1.0e-1*pow(1.0e+5/1.0e-1,((double)i)/69);
 					val=arr[j*70+i];
 					fprintf(outfile ,"%.10e\t%.10e\t%.10e\t%.10e\n",log(x),log(k2),log(mu2), val );
 					//fprintf(outfile ,"%.10e\t%.10e\t%.10e\n",log(x),log(k2), val );
 				}
-#else	
+#else*/	
 				val=arr[j];
-				fprintf(outfile ,"%.10e\t%.10e\t%.10e\n",log(x),log(k2),val );
-#endif
+				fprintf(outfile ,"%.10e\t%.10e\t%.10e\n",log(x),log(k2),val/sigpar[0] );
+//#endif
 				
 
 			}

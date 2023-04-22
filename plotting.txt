@@ -23,19 +23,20 @@ set logscale y
 set format x "%T"
 set format y "%T"
 
-set output './plots/GBW-dipole.tex'
-plot './Run-kt/runa-bjorx-4/dipole-2-100.txt' w lines ls 4 t "\\scriptsize rc-GBW-$k_T$", \
-		 './Run-kt/fixa-bjorx/dipole-2-100.txt' w lines ls 5 t "\\scriptsize GBW-$k_T$", \
-		 './Run-kt/GBW/dipole-2-100.txt' w lines ls 3 t "\\scriptsize GBW-$r$", \
-		 './Run-kt/runa-bjorx-4/dipole-6-100.txt' w lines ls 4 notitle , \
-		 './Run-kt/fixa-bjorx/dipole-6-100.txt' w lines ls 5 notitle, \
-		 './Run-kt/GBW/dipole-6-100.txt' w lines ls 3  notitle
+#set output './plots/GBW-dipole.tex'
+#plot './Run-kt/runa-bjorx-4/dipole-2.txt' w lines ls 4 t "\\scriptsize rc-GBW-$k_T$", \
+#		 './Run-kt/fixa-bjorx/dipole-100-2.txt' w lines ls 5 t "\\scriptsize GBW-$k_T$", \
+#		 './Run-kt/GBW/dipole-100-2.txt' w lines ls 3 t "\\scriptsize GBW-$r$", \
+#		 './Run-kt/runa-bjorx-4/dipole-100-6.txt' w lines ls 4 notitle , \
+#		 './Run-kt/fixa-bjorx/dipole-100-6.txt' w lines ls 5 notitle, \
+#		 './Run-kt/GBW/dipole-100-6.txt' w lines ls 3  notitle
+#
 
-set output './plots/BGK-dipole.tex'
-plot './Run-kt/fixa-bjorx-BGK/dipole-2-100.txt' w lines ls 4 t "\\scriptsize BGK-$k_T$", \
-		 './Run-kt/BGK/dipole-2-100.txt' w lines ls 3 t "\\scriptsize BGK-$r$", \
-		 './Run-kt/fixa-bjorx-BGK/dipole-6-100.txt' w lines ls 4 notitle, \
-		 './Run-kt/BGK/dipole-6-100.txt' w lines ls 3 notitle 
+#set output './plots/BGK-dipole.tex'
+#plot './Run-kt/fixa-bjorx-BGK/dipole-100-2.txt' w lines ls 4 t "\\scriptsize BGK-$k_T$", \
+#		 './Run-kt/BGK/dipole-100-2.txt' w lines ls 3 t "\\scriptsize BGK-$r$", \
+#		 './Run-kt/fixa-bjorx-BGK/dipole-100-6.txt' w lines ls 4 notitle, \
+#		 './Run-kt/BGK/dipole-100-6.txt' w lines ls 3 notitle 
 
 unset logscale y
 set xrange[1.0e-2:1.0e+3]
@@ -49,18 +50,18 @@ set format x "%T"
 set format y "%.3f"
 
 set output './plots/GBW-gluon.tex'
-plot './Run-kt/runa-bjorx-4/gluon-2-100.txt' w lines ls 4 t "\\scriptsize rc-GBW-$k_T$", \
-		 './Run-kt/fixa-bjorx/gluon-2-100.txt' w lines ls 5 t "\\scriptsize GBW-$k_T$", \
-		 './Run-kt/GBW/gluon-2-100.txt' w lines ls 3 t "\\scriptsize GBW-$r$", \
-		 './Run-kt/runa-bjorx-4/gluon-6-100.txt' w lines ls 4 notitle , \
-		 './Run-kt/fixa-bjorx/gluon-6-100.txt' w lines ls 5 notitle, \
-		 './Run-kt/GBW/gluon-6-100.txt' w lines ls 3  notitle
+plot './Run-kt/runa-bjorx-4/gluon-2.txt' w lines ls 4 t "\\scriptsize rc-GBW-$k_T$", \
+		 './Run-kt/fixa-bjorx/gluon-2.txt' w lines ls 5 t "\\scriptsize GBW-$k_T$", \
+		 './Run-kt/GBW/gluon-2.txt' w lines ls 3 t "\\scriptsize GBW-$r$", \
+		 './Run-kt/runa-bjorx-4/gluon-6.txt' w lines ls 4 notitle , \
+		 './Run-kt/fixa-bjorx/gluon-6.txt' w lines ls 5 notitle, \
+		 './Run-kt/GBW/gluon-6.txt' w lines ls 3  notitle
 
 set output './plots/BGK-gluon.tex'
 plot './Run-kt/fixa-bjorx-BGK/gluon-2.txt' w lines ls 4 t "\\scriptsize BGK-$k_T$", \
-		 './Run-kt/BGK/gluon-2-100.txt' w lines ls 3 t "\\scriptsize BGK-$r$", \
+		 './Run-kt/BGK/gluon-2.txt' w lines ls 3 t "\\scriptsize BGK-$r$", \
 		 './Run-kt/fixa-bjorx-BGK/gluon-6.txt' w lines ls 4 notitle, \
-		 './Run-kt/BGK/gluon-6-100.txt' w lines ls 3 notitle 
+		 './Run-kt/BGK/gluon-6.txt' w lines ls 3 notitle 
 
 set xrange[1.0e-8:0.01]
 set yrange[0.2:50]

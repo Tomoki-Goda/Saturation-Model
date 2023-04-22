@@ -29,7 +29,7 @@ extern double  INT_PREC;
 #include"dipole-gluon.hh"
 #include"interpolation-gluon.hh"
 #include"options.h"
-#include"miscellaneous.h"
+#include"miscellaneous.hh"
 
 
 

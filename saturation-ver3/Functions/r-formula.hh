@@ -53,6 +53,7 @@ class Sigma{
 		
 		void init(const double * const &sigpar);
 		double operator()(const double x, const double r) ;
+		double S(const double x, const double r) ;
 };
 class Sigma_GBW:public Sigma{
 		double Qs2(const double x,const double r)const;

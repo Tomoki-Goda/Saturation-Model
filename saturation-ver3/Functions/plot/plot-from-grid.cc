@@ -58,14 +58,14 @@ int main(int c , char** argv){
 			}
 			//printf("x: %.3e\n",x_array[j]);
 		}
-		printf("grid shape %d %d\n",x_npts,k2_npts);
+		printf("Gluon grid shape %d %d\n",x_npts,k2_npts);
 		spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,k2_npts, x_npts);
 		gsl_spline2d_init (spline_ptr,k2_array, x_array, sigma_array, k2_npts, x_npts);
 		fclose(file);
-		
+		printf("GLUON\n");	
 		int xplot[2]={2,6};
 		for(int j=0;j<2;++j){
-			sprintf(filename,"%s/%s%d.txt",argv[2],"gluon-",xplot[j]);
+			sprintf(filename,"%s/%s%d.txt",argv[3],"gluon-",xplot[j]);
 			file=fopen(filename,"w");
 			x=pow(10,-xplot[j]);
 			for(int i=0;i<100;++i){
@@ -77,6 +77,7 @@ int main(int c , char** argv){
 		fclose(file);
 ///////////////////////////////////////////
 //
+		printf("SATURATION\n");
 //
 //
 //////////////////////////////////////////
@@ -85,7 +86,7 @@ int main(int c , char** argv){
 		int flag=0;
 		int counter=0;
 		double grad=0;
-		sprintf(filename,"%s/%s.txt",argv[2],"saturation");
+		sprintf(filename,"%s/%s.txt",argv[3],"saturation");
 		file=fopen(filename,"w");
 		for(int i=0;i<25;++i){
 			k2=0.01;
@@ -115,6 +116,64 @@ int main(int c , char** argv){
 		}
 		
 		fclose(file);
+/////////////////////////////////////////////////////////
+//
+		printf("SIGMA\n");
+//
+/////////////////////////////////////////////////////////		
+		
+		file=fopen(argv[2],"r");
+		
+		xprev=0.0;
+		double r;
+		for(int j=0;j<x_npts;++j){
+			for(int i=0;i<k2_npts;++i){
+				fscanf(file,"%lf %lf %lf",&x,&r,&val);
+				//printf("%lf %lf %lf %d\n",x,k2,val,feof(file));
+				if(i==0){
+					x_array[j]=exp(x);
+				}
+				if(j==0&&i==0){
+					xprev=x;
+				}
+				
+				if(x==xprev){
+					if(j==0){
+						k2_array[i]=exp(r);
+						printf("r: %.3e\n",k2_array[i]);
+					}
+				}else if(j==0){
+					k2_npts=i;
+				}
+				sigma_array[j*k2_npts+i]=val;		
+			}
+		
+			//printf("%d %d\n",x_npts,k2_npts);
+			if(feof(file)){
+				x_npts=j+1;
+				break;
+			}
+			printf("x: %.3e\n",x_array[j]);
+		}
+		printf("SIGMA grid shape %d %d\n",x_npts,k2_npts);
+		spline_ptr = gsl_spline2d_alloc(gsl_interp2d_bicubic,k2_npts, x_npts);
+		gsl_spline2d_init (spline_ptr,k2_array, x_array, sigma_array, k2_npts, x_npts);
+		fclose(file);
+		
+		//int xplot[2]={2,6};
+		for(int j=0;j<2;++j){
+			sprintf(filename,"%s/%s%d.txt",argv[3],"sigma-",xplot[j]);
+			file=fopen(filename,"w");
+			x=pow(10,-xplot[j]);
+			for(int i=0;i<100;++i){
+				r=1.0e-4*pow(5.0e+5,((double)i)/99);
+				val=gsl_spline2d_eval(spline_ptr,r,x,k2_accel_ptr, x_accel_ptr);
+				fprintf(file ," %.5e %.5e\n", r,val);
+			}
+		}	
+		fclose(file);
+		
+		
 		
 		gsl_spline2d_free (spline_ptr);
 		gsl_interp_accel_free (x_accel_ptr);

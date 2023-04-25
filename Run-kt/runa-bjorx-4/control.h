@@ -8,4 +8,4 @@
 #define USE_RESULT 1 
 #define IBP 1
 #define MU02 4
-#define GLUON_APPROX 0
+#define GLUON_APPROX 1

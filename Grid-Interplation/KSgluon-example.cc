@@ -37,7 +37,8 @@ int main(int argc ,char** argv){
 	UnintegratedGluon updf = UnintegratedGluon(gridfile,atoi(argv[2]),int_type);
 	FILE* file=fopen(argv[3],"w");
 	
-	double x=1.0e-3;
+	double x;
+	x=atof(argv[5]);
 	double mu2=pow(atof(argv[4]),2);
 	double k2=0;
 	for(int i=0;i<=100;++i){

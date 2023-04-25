@@ -114,23 +114,25 @@ from the large-$k_T$ behaviour of the models.
 \label{fig:gluon-kinem}
 \end{figure}
 Factorization has played central role in QCD, where long-distance effects can be isolated into an object called parton distribution functions (PDFs)~\cite{roberts_1990,collins_2011}. 
-The PDFs are not perturbatively calculable but they are process independent~\cite{collins_2011}. That is to say, that one needs to measure them in experiments, but the PDFs obtained in one experiment can be used as input in another. A type of experiments called deep inelastic scattering~(DIS), has been one of experiments which largely contributed to the study of the structure of the proton~\cite{roberts_1990,collins_2011}. 
+The PDFs are not perturbatively calculable but they are process independent~\cite{collins_2011}. That is to say, that one needs to measure them in experiments, but the PDFs obtained one experiment can be used as input in another. A type of experiments called deep inelastic scattering~(DIS), has been one of experiments which largely contributed to the study of the structure of the proton~\cite{roberts_1990,collins_2011}. 
 The election-ion collider (EIC)~\cite{NAP25171}, which is currently under construction, will be the next generation of the DIS experiments and expected to uncover more details about the structure.  
 As one increases the center of mass energy at a fixed value of the photon virtuality, $Q$, one is probing the region of the small Bjorken scaling variable, $x$.
-In the small-$x$ region of DIS process   
-\begin{equation}
+In the small-$x$ region of DIS % process   
+%\begin{equation}
   %\label{eq:}
-  e\, p\rightarrow \gamma^* (q)\, p(p)\rightarrow X\,,
-\end{equation}
+%  e\, p\rightarrow \gamma^* (q)\, p(p)\rightarrow X\,,
+%\end{equation}
 %
-where are $p$ and $q$ are, respectively, the momenta of the photon and the
-proton, the interactions are dominated by gluons\cite{Kovchegov:2012mbw}. As a photon does not interact directly with a gluon, it interact through a box of quarks as depicted in Fig.~\ref{fig:gluon-kinem}. 
+%where are $p$ and $q$ are, respectively, the momenta of the photon and the
+%proton, the
+interactions are dominated by gluons\cite{Kovchegov:2012mbw}. As a photon does not interact directly with a gluon, it interact through a box of quarks as depicted in Fig.~\ref{fig:gluon-kinem}. 
 An object, which is central to the description of this process is called dipole gluon density, $\mathcal{F}(x,k_T^2)$, which is a type of transverse momentum dependent PDFs (TMD PDF)~\cite{Dominguez:2010xd,Dominguez:2011wm,Xiao:2017yya}. This appears in the $k_T$-factorization formula~\cite{Dominguez:2010xd,Dominguez:2011wm,Xiao:2017yya}, which we will discuss later, and plays role similar to that of collinear parton distribution function in the collinear factorization.
-The dipole gluon density is also called unintegrated gluon density~(UGD) since it is related to the collinear (integrated) gluon density by
-\begin{equation}
-xg(x,Q^2)=\int^{Q^2}_0 dk_T^2 \mathcal{F}(x,k^2_t).
-\end{equation}
-Much effort has been made to study this object, notably the work of Balistky, Fadin, Kuraev and Lipatov (BFKL)~\cite{Balitsky:1978ic, Kuraev:1977fs} has predicted sharp rise of cross sections with $1/x$.  However, such rise violates unitarity and the Froissart bound~\cite{Kovchegov:2012mbw,Barone:1993sy}. The work of Balitsky and Kovchegov (BK)~\cite{Balitsky:1995ub,Kovchegov:1999yj} incorporated the gluon recombination, by including nonlinear term in the evolution, thus taming the growth. The phenomenon described by this nonlinear term is called saturation. The meaning of the Froissart bound is that, asymptotically, the cross section can not grow faster than the size of black-disk (proton with high gluon density) which expands like $\ln(s)$~\cite{Badelek:1992gs}.
+%The dipole gluon density is also called unintegrated gluon density~(UGD) since it is related to the collinear (integrated) gluon density by{\color{red} Do we need this? This relation is only true in DLL limit.}
+%\begin{equation}
+%xg(x,Q^2)=\int^{Q^2}_0 dk_T^2 \mathcal{F}(x,k^2_t).
+%\end{equation}}
+Much effort has been made to study this object, notably the work of Balistky, Fadin, Kuraev and Lipatov (BFKL)~\cite{Balitsky:1978ic, Kuraev:1977fs} has predicted sharp rise of cross sections with $1/x$.  However, such rise violates unitarity and the Froissart bound~\cite{Kovchegov:2012mbw,Barone:1993sy}. In \cite{Gribov:1983ivg} it has been recognized that gluon recombination can tame the growth of gluons \cite{Gribov:1983ivg}. The interplay of linear and nonlinear term leads to gluon saturation. \comment{a line mentioning BK is removed. Is there a particular reason not to mention BK or simply GLR replaced? }% The work of Balitsky and Kovchegov (BK)~\cite{Balitsky:1995ub,Kovchegov:1999yj} incorporated the gluon recombination, by including nonlinear term in the evolution, thus taming the growth. The phenomenon described by this nonlinear term is called saturation.
+ The meaning of the Froissart bound is that, asymptotically, the cross section can not grow faster than the size of black-disk (proton with high gluon density) which expands like $\ln(s)$~\cite{Badelek:1992gs}.
 Despite the success of such evolution equations, there are several popular phenomenological models owing to their simplicity. 
 
 \sout{\comment{Some more general talk like in the previous paper}}
@@ -167,7 +169,7 @@ where
 thus improving the description of data at higher $Q^2$.\\
 While these models enjoyed much success in phenomenology of DIS, including the diffractive and photo-production processes~\cite{Golec-Biernat:1998zce,Golec-Biernat:1999qor}, as later discussed in detail, derivation of the dipole-factorization formula from the $k_T$-factorization involves with certain simplification and introduction of massive light quarks. 
 
-Now let us introduce $q'\equiv q+x p$. 
+Now, let us introduce $q'\equiv q+x p$. 
 Then, one  decomposes $k$ and $\kappa$ (Fig.~\ref{fig:gluon-kinem}) as
 \begin{align}
     \kappa&=\alpha p-\beta q'+\kappa_t&&\mathrm{and}& k&=a p- bq'+k_T.
@@ -185,24 +187,9 @@ where
 	\label{eq:z}
 \end{equation}
 (see Ref.~\cite{ Kimber:2001uaa,Kwiecinski:1997ee} for detail.)
+\sout{{\color{red} We need an appendix with expressions for $I_i$}}
 %and
-%\begin{equation}
-%	\begin{split}
-%		\frac{I_1}{2\pi}=\frac{N_1N_2+N_3^2}{\left( N^2_1+2N_1N_2+N_3^2\right)^{3/2}}, &\hspace{1cm}
-%		\frac{I_2}{2\pi}=\frac{N_3-(1-2\beta)N_1}{(N_1+N_4)\sqrt{ N^2_1+2N_1N_2+N_3^2}},\\
-%		\frac{I_3}{2\pi}=\frac{N_1+N_2}{\left( N^2_1+2N_1N_2+N_3^2\right)^{3/2}},&\hspace{1cm}
-%		\frac{I_2}{2\pi}=\frac{(1-\beta)}{(N_1+N_4)\sqrt{ N^2_1+2N_1N_2+N_3^2}},
-%	\end{split}
-%\end{equation}
-%for
-%\begin{equation}
-%	\begin{split}
-%		N_1\equiv\beta(1-\beta)Q^2+m_f^2, &\hspace{2cm}
-%		N_2\equiv{\kappa'}_t^2+(1-\beta)^2k_T^2,\\
-%		N_3\equiv{\kappa'}_t^2-(1-\beta)^2k_T^2, &\hspace{2cm}
-%		N_4\equiv{\kappa'}_t^2+\beta(1-\beta)k_T^2.
-%	\end{split}
-%\end{equation}
+
 %Hereafter, we will call Eq.~(\ref{eq:angle-integrated}) $k_T$-factorizaton formula.
 One should note, that gluons are not probed directly, thus the argument of the gluon density is $x/z$ rather than $x$.
 If one, instead, uses $ 1/z=\left(1+4 m_f^2/Q^2\right)$ and assumes that $\mu$ is independent of $\kappa'$ and $k_T$, 
@@ -211,7 +198,7 @@ the above formula can be written in the impact parameter space~\cite{Golec-Biern
 F_2\left(x,Q^2\right)\sim\int^1_0d\beta \int d^2\mathbf{r}\left|\Psi\left(\tilde{x},\beta,Q^2\right)\right|^2\sigma_{\mathrm{dipole}}\left(\tilde{x},r\right),
 \label{eq:dipole-factorization}
 \end{equation}
-where the photon wave function, $\left|\Psi\left(x,\beta,Q^2\right)\right|^2$, describes splitting of the incoming photon into a $q\overline{q}$ pair with light-cone momenta fractions $\beta$ and $1-\beta$ respectively, and the dipole cross section, $\sigma_{\mathrm{dipole}}\left(x,r\right)$, describes the interaction of the colour dipole of the size $r$ with the proton. In Ref.~\cite{Golec-Biernat:1998zce}, $\tilde{x}=x(1+4m_f/Q^2)$ with nonzero vale of $m_f$ was used, even for light flavours, which is necessary to partially substitute $k_T$ and ${\kappa'}_T$ in Eq~(\ref{eq:z}). \\
+where the photon wave function, $\left|\Psi\left(x,\beta,Q^2\right)\right|^2$, describes splitting of the incoming photon into a $q\overline{q}$ pair with light-cone momenta fractions $\beta$ and $1-\beta$ respectively, and the dipole cross section, $\sigma_{\mathrm{dipole}}\left(x,r\right)$, describes the interaction of the colour dipole of the size $r$ with the proton. In Ref.~\cite{Golec-Biernat:1998zce}, $\tilde{x}=x(1+4m_f/Q^2)$ with nonzero vale of $m_f$ even for light flavours, which is necessary to partially substitute $k_T$ and ${\kappa'}_T$ in Eq~(\ref{eq:z}). \\
 
 The original GBW and BGK models were fitted in the dipole factorization, Eq.~(\ref{eq:dipole-factorization}). In this study, we use Eq.~(\ref{eq:angle-integrated}), where the gluon density is obtained by evaluating Eq.~(\ref{eq:dipole-gluon}).
 Comparing, the GBW and BGK models, one identifies that, the GBW model is effectively the BGK model with $\alpha_s(\mu^2)xg(x,\mu^2)\rightarrow \alpha_s(Q_0^2)xg(x,Q_0^2)$.
@@ -229,7 +216,7 @@ where %0.2 is an arbitrary normalization, and
 \end{equation}
 and  $\Lambda_{\mathrm{QCD}}^2=0.09\;\GeV^2$.
 The factor 0.2 is an arbitrary normalization and the effect is absorbed by $\sigma_0$ and hence, bears no importance.
-(For a more detailed analysis of the dipole gluon density from the BGK model see. Ref.~\cite{Luszczak:2022fkf}\footnote{In Ref.~\cite{Luszczak:2022fkf}, the coupling constant was treated differently, and the large $k_T$-region was matched to the derivative of $xg(x)$, while we have used series transformation to accelerate the high-$k_T$ integration. Their treatment is also different from the original BGK paper~\cite{Bartels:2002cj}. As a consequence their gluon density is positive in the large $k_T$-region and the overall large-$k_T$ behaviour is significantly different.}
+(For a more detailed analysis of dipole gluon density from the BGK model see. Ref.~\cite{Luszczak:2022fkf}\footnote{In Ref.~\cite{Luszczak:2022fkf}, the coupling constant was treated differently, and the large $k_T$-region was matched to the derivative of $xg(x)$, while we have used series transformation to accelerate the high-$k_T$ integration. Their treatment is also different from the original BGK paper~\cite{Bartels:2002cj}. As a consequence their gluon density is positive in the large $k_T$-region and the overall large-$k_T$ behaviour is significantly different.}
 )
 While there is some ambiguity on what the argument of $\alpha_s(\mu^2)$ should be, we follow Ref.~\cite{Kwiecinski:1997ee} and use
 \begin{equation}
@@ -369,7 +356,7 @@ Therefore, one can understand the change in $\sigma_0$ as a direct consequence o
     \begin{subfigure}{0.5\textwidth}
         \includegraphics[width=\textwidth]{plots/BGKWW2} 
     \end{subfigure}
-    \caption{\footnotesize Weizs\"acker-Williams gluon density at $x=10^{-3}$. Top row: comparison of the dipole-factorization fit and $k_T$-factorization fit results. Bottom row: comparison of the respective models with and without the Sudakov factor, at $\mu=17,\;67 \mathrm{GeV}$.  The green dotted line is the KS gluon~\cite{vanHameren:2021sqc}, and the green dashed line is the rcBK gluon~\cite{}. }
+    \caption{\footnotesize Weizs\"acker-Williams gluon density at $x=10^{-3}$. Top row: comparison of the dipole-factorization fit and $k_T$-factorization fit results. Bottom row: comparison of the respective models with and without the Sudakov factor, at $\mu=17,\;67 \mathrm{GeV}$. Green dashed line is the KS gluon~\cite{vanHameren:2021sqc}. }
     \label{fig:ww}
 \end{figure}
 
@@ -388,7 +375,6 @@ In the large-$N_c$ limit of the TMD factorization, there are two types of gluon 
 It was shown in Ref.~\cite{Dominguez:2011wm}, that the dijet process in DIS can directly probe the WW gluon,$\fww(x,k^2)$, where the differential cross section factorizes as
 \begin{equation}
 	\frac{d\sigma^{\gamma^*p\rightarrow q\overline{q}X}}{d \mathrm{P.S.}}=\fww(x,k_T^2)H_{\gamma^*g\rightarrow q\overline{q}},
-	\label{eq:TMD}
 \end{equation}
 with the hard function $H_{\gamma^*g\rightarrow q\overline{q}}$ describing interactions of an off-shell photon with an on-shell gluon producing a $q\overline{q}$ pair.
 $\fww(x,k^2)$, has an interpretation as a number density of gluons inside a proton, while $\fdp(x,k_T^2)$ does not have such an interpretation~\cite{Dominguez:2010xd,Dominguez:2011wm,Xiao:2017ggh}. 
@@ -420,7 +406,7 @@ in which $\gamma_E$ is the Euler-Mascheroni constant, and we use $\alpha_s=0.2$.
   
 The present study is carried out in the framework of small-$x$-Improved Transverse-Momentum-Dependent (ITMD) factorization~\cite{Kotko:2015ura,vanHameren:2016ftb}.
 ITMD factorization is implemented in the program KaTie~\cite{vanHameren:2016kkz}, which we will use to compute the cross section. 
-ITMD is an generalization of TMD, where the momentum imbalance in TMD is restricted to be small~\cite{Kotko:2015ura,vanHameren:2016ftb}. That is to say ITMD resums $(Q_s/k_T)^n$ and $(k_T/P_T)^n$~\cite{Kotko:2015ura,vanHameren:2016ftb}, thus extends the region of applicability up to $k_T\sim P_T$. In other words, the hard function in Eq.~(\ref{eq:TMD}) no longer has the on-shell gluon, but instead has an off-shell gluon $g^*$, thus rendering the $k_T$ dependence in the hard function as well~\cite{Kotko:2015ura}.
+ITMD is an generalization of TMD where the momentum imbalance in TMD is restricted to be small~\cite{Kotko:2015ura,vanHameren:2016ftb}. That is to say ITMD resums $(Q_s/k_T)^n$ and $(k_T/P_T)^n$~\cite{Kotko:2015ura,vanHameren:2016ftb}, thus extends the region of applicability up to $k_T\sim P_T$. In other words, the hard function in Eq.~(\ref{eq:TMD}) no longer has the on-shell gluon, but instead has an off-shell gluon $g^*$, thus rendering the $k_T$ dependence in the hard function as well~\cite{Kotko:2015ura}.
 
 %It was discussed in Ref.~\cite{vanHameren:2021sqc}, that with the above points and the fact that genuine twists are suppressed when transverse momenta are large \comment{Also, $Q$ but as it was also said, that Q is low here(p.5,\cite{vanHameren:2021sqc}. )  Also it was mentioned the cut on $p_T$ is selected for this. I assume it is $p_{1T}, p_{2T}$ that are relevant?}, ITMD is suitable for studying dijets.
 
@@ -465,7 +451,7 @@ The effects of the Sudakov factor is similar to those in Ref.~\cite{vanHameren:2
 	\begin{subfigure}{0.5\textwidth}
 	\includegraphics[width=\textwidth]{plots/plotBGK3}
 	\end{subfigure}
-	\caption{\footnotesize Azimuthal correlation of the jets and the scattered electron in the Breit frame. Top: Comparison of dipole-factorization fit and $k_T$-factorization fit. Middle \& Bottom: Effect of the Sudakov form factor.    The green dotted line is the KS gluon~\cite{vanHameren:2021sqc}, and the green dashed line is the rcBK gluon~\cite{}.}
+	\caption{\footnotesize Azimuthal correlation of the jets and the scattered electron in the Breit frame. Top: Comparison of dipole-factorization fit and $k_T$-factorization fit. Middle \& Bottom: Effect of the Sudakov form factor.   Green dashed line is the KS gluon~\cite{vanHameren:2021sqc}.}
 	\label{fig:je-breit}
 \end{figure}
 
@@ -490,11 +476,11 @@ The effects of the Sudakov factor is similar to those in Ref.~\cite{vanHameren:2
 	\begin{subfigure}{0.5\textwidth}
 		\includegraphics[width=\textwidth]{plots/plotBGK3Lab}
 	\end{subfigure}
-\caption{\footnotesize Azimuthal correlation of the jets and the scattered electron in the lab frame. Top: Comparison of dipole-factorization fit and $k_T$-factorization fit. Middle \& Bottom: Effect of the Sudakov form factor.  The green dotted line is the KS gluon~\cite{vanHameren:2021sqc}, and the green dashed line is the rcBK gluon~\cite{}.}
+\caption{\footnotesize Azimuthal correlation of the jets and the scattered electron in the lab frame. Top: Comparison of dipole-factorization fit and $k_T$-factorization fit. Middle \& Bottom: Effect of the Sudakov form factor.  Green dashed line is the KS gluon~\cite{vanHameren:2021sqc}.}
 \label{fig:je-lab}
 \end{figure}
 
-Finally, Fig.~\ref{fig:jj-breit} shows the jet-jet correlations in the Breit frame. Again, the GBW and BGK models show considerable deviation from the KS gluon. The difference from the previous plot is the disagreement of the GBW/BGK models and the rcBK in the small-$\delta\phi$ region. Similarly to the previous plots, the Sudakov factor affects the models somewhat differently from the KS gluon in Ref.~\cite{vanHameren:2021sqc}.
+Finally, Fig.~\ref{fig:jj-breit} shows the jet-jet correlations in the Breit frame. Again, the GBW and BGK models show considerable deviation from the KS gluon. The difference from the previous plot is the disagreement of the GBW/BGK models and the rcBK in the small-$\Delta\phi$ region. Similarly to the previous plots, the Sudakov factor affects the models somewhat differently from the KS gluon in Ref.~\cite{vanHameren:2021sqc}.
 The effect enhances the cross section considerably in the small-$\Delta\phi$ region, making it closer to KS gluon result.
 The results shown in Figs.~\ref{fig:je-lab} and~\ref{fig:jj-breit} are natural as back-to-back configuration in the respective observable corresponds to the small-$k_T$ region of gluon densities, and as it can be seen clearly in Fig.~\ref{fig:ww}, the GBW and BGK gluons do not fare well in the large-$k_T$ region. 
 That is to say that the enhancement in the small-$\Delta\phi$ region is a direct consequence of the broadening by the Sudakov factor. 
@@ -520,13 +506,13 @@ That is to say that the enhancement in the small-$\Delta\phi$ region is a direct
 	\begin{subfigure}{0.5\textwidth}
 		\includegraphics[width=\textwidth]{plots/plotBGK3Jets}
 	\end{subfigure}
-\caption{\footnotesize Azimuthal correlation of the jets in the Breit frame. Top: Comparison of dipole-factorization fit and $k_T$-factorization fit. Middle \& Bottom: Effect of the Sudakov form factor. The green dotted line is the KS gluon~\cite{vanHameren:2021sqc}, and the green dashed line is the rcBK gluon~\cite{}. }
+\caption{\footnotesize Azimuthal correlation of the jets in the Breit frame. Top: Comparison of dipole-factorization fit and $k_T$-factorization fit. Middle \& Bottom: Effect of the Sudakov form factor. Green dashed line is the KS gluon~\cite{vanHameren:2021sqc}. }
 \label{fig:jj-breit}
 \end{figure}
 
 \comment{Question: rcBK}
 
-\sout{\comment{Question: what about pieces of derivation removed from the main part?}}
+\comment{Question: what about pieces of derivation removed from the main part?}
 
 \section{Summary}
 We have fitted the GBW\cite{Golec-Biernat:1998zce}
@@ -551,6 +537,27 @@ TG and SS are partially supported by the Polish National Science Centre grant no
 KK acknowledges the support of The Kosciuszko Foundation for the Academic year 22/23 for the
 project ”Entropy of dense system of quarks and gluons”. Furthermore, KK  acknowledges the hospitality of the Nuclear Theory group at the BNL, where part of the  project was realized. 
 
+
+\appendix
+\section{$I_i$ in Eq.~(\ref{eq:angle-integrated})}
+$I_1,\, I_2,\,  I_3,\,  I_4$ in Eq.~(\ref{eq:angle-integrated}) are defined in Ref.~\cite{Kimber:2001uaa} as
+\begin{equation}
+	\begin{split}
+		\frac{I_1}{2\pi}=\frac{N_1N_2+N_3^2}{\left( N^2_1+2N_1N_2+N_3^2\right)^{3/2}}, &\hspace{1cm}
+		\frac{I_2}{2\pi}=\frac{N_3-(1-2\beta)N_1}{(N_1+N_4)\sqrt{ N^2_1+2N_1N_2+N_3^2}},\\
+		\frac{I_3}{2\pi}=\frac{N_1+N_2}{\left( N^2_1+2N_1N_2+N_3^2\right)^{3/2}},&\hspace{1cm}
+		\frac{I_2}{2\pi}=\frac{(1-\beta)}{(N_1+N_4)\sqrt{ N^2_1+2N_1N_2+N_3^2}},
+	\end{split}
+\end{equation}
+for
+\begin{equation}
+	\begin{split}
+		N_1\equiv\beta(1-\beta)Q^2+m_f^2, &\hspace{2cm}
+		N_2\equiv{\kappa'}_t^2+(1-\beta)^2k_T^2,\\
+		N_3\equiv{\kappa'}_t^2-(1-\beta)^2k_T^2, &\hspace{2cm}
+		N_4\equiv{\kappa'}_t^2+\beta(1-\beta)k_T^2.
+	\end{split}
+\end{equation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\clearpage
 %\printbibliography

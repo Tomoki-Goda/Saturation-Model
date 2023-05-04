@@ -78,9 +78,9 @@ call open_file ! == DO NOT TOUCH THIS LINE ==
 !  call h_pT(ii)%init( left=0d0 ,right=200d0 ,Nbins=100 )
 !  call h_y( ii)%init( left=-4.7d0 ,right=4.7d0 ,Nbins=100 )
 !enddo
-call h_Phi1(1)%init( left=0d0, right=3.14d0 , Nbins=50 )
-call h_Phi2(1)%init( left=0d0, right=3.14d0 , Nbins=50 )
-call h_Phi3(1)%init( left=1.5d0, right=3.14d0 , Nbins=50 )
+call h_Phi1(1)%init( left=0d0, right=3.13d0 , Nbins=50 )
+call h_Phi2(1)%init( left=0d0, right=3.13d0 , Nbins=50 )
+call h_Phi3(1)%init( left=1.5d0, right=3.13d0 , Nbins=50 )
 !call h_Phi1(1)%init( left=0d0, right=6.28d0 , Nbins=50 )
 !call h_Phi2(1)%init( left=0d0, right=6.28d0 , Nbins=50 )
 !call h_Phi3(1)%init( left=1.5d0, right=4.78d0 , Nbins=50 )

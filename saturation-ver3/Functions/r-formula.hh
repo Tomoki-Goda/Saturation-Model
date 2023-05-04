@@ -15,8 +15,6 @@
 //   GBW / BGK dipoles
 //   
 //   Usage::
-//   Sigma sigma // for BGK use Sigma<  (Cillinear_Gluon or Interpolate_Collinear_Gluon) >
-// !! init for Collinear Gluon has to be fixed...
 //   sigma.init(sigpar) //double* sigpar;
 //   sigma(x,r) // double x,r 
 //
@@ -32,13 +30,12 @@ typedef Collinear_Gluon ColGlu;
 
 
 class Sigma{
-// par and indivisual parameters are redundant. 
-		//Collinear_Gluon xgpdf;
+	//Abstract base class
 	protected:
-		double x2;
+		double x2,xmax;
 		double sigma_0,mu102,thresh_power;
 		const double *par;
-		
+		inline double freeze_x(const double);
 		virtual double Qs2(const double x,const double r)const=0;
 	public:
 		virtual void set_x(const double &x){}
@@ -53,7 +50,12 @@ class Sigma{
 		
 		void init(const double * const &sigpar);
 		double operator()(const double x, const double r) ;
+		double S(const double x, const double r) ;
 };
+
+///////////////////////////////////
+//
+///////////////////////////////////
 class Sigma_GBW:public Sigma{
 		double Qs2(const double x,const double r)const;
 		double lambda, x_0;
@@ -66,51 +68,33 @@ class Sigma_GBW:public Sigma{
 		void init(const double * const &sigpar);
 };
 
+///////////////////////////////////
+//
+///////////////////////////////////
 class Sigma_BGK:public  Sigma{
 		ColGlu xgpdf;
 		double Qs2(const double x,const double r)const;
 		double A_g,lambda_g,C,mu02;
+
+#if FREEZE_QS2>=1
+		const double xmax=0.5;
+#elif FREEZE_QS2==0
+	 	const double xmax=1;
+#endif		
+		
 		
 	public:
+		explicit Sigma_BGK(void){
 #if SIGMA_APPROX<0
-//		explicit Sigma_BGK(void):xgpdf(N_CHEB){ 
-		explicit Sigma_BGK(void){ 
 			xgpdf.allocate(N_CHEB);
-#else
-		explicit Sigma_BGK(void){ 
 #endif
-			//xgpdf.init(N_CHEB);
 		}
 		~Sigma_BGK(){
 		}
 		void set_x(const double &x);
 		void init(const double * const &sigpar);
 };
-/*class Sigma_BGK{
-		ColGlu xgpdf;
-		double A_g,lambda_g,C,mu02;
-		double x2;
-		double sigma_0,mu102,thresh_power;
-		const double *par;
-		double alpha(double mu2 )const{
-			const double b0= ((double)(33 -2*NF))/(12*PI);
-			return( 1/(b0* log(mu2/LQCD2)));//LQCD2 lambda_QCD ^2
-		}
-		double Qs2(const double x,const double r)const;
-	public:
-		void set_x(const double &x);
-		double operator()(const double x, const double r) ;
-#if SIGMA_APPROX<0
-		explicit Sigma_BGK(void):xgpdf(N_CHEB){ 
-#else
-		explicit Sigma_BGK(void){ 
-#endif
-			//xgpdf.init(N_CHEB);
-		}
-		~Sigma_BGK(){
-		}
-		void init(const double * const &sigpar);
-};*/
+
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 

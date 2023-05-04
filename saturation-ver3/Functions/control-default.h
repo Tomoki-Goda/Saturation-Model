@@ -75,7 +75,7 @@
 
 #ifndef N_CHEB_R
 //number of sampling for R integration, points are N divisible by 8
-	#define N_CHEB_R 250 
+	#define N_CHEB_R 100 
 #endif
 
 
@@ -146,16 +146,17 @@
 #endif
 
 #ifndef SECTOR_MAX
-	#define SECTOR_MAX 100
+	#define SECTOR_MAX 200
 #endif
 //////////////////////////////////////////////////////////////////
 /////////// not to be chaged without a good reason ...///////////////////
 //////////////////////////////////////////////////////////////////
 //N_PAR is number of fit parameters
 #if MODEL ==0 
-	#define N_PAR 5
+	#define N_PAR 4
 #elif MODEL==1
-	#define N_PAR 7
+	#define N_PAR 6
+	
 #elif (MODEL==2||MODEL==22)
 	#if SUDAKOV==0
 		#define N_PAR 3

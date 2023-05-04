@@ -33,16 +33,33 @@ double Sigma_BGK::Qs2(const double x,const double r)const{
 	return qs2;		
 }
 
+inline double Sigma::freeze_x(const double x){
+	double x2;
+#if FREEZE_QS2==1
+		x2=xmax*x/(xmax*(1-x)+x);
+#elif  FREEZE_QS2==2
+		x2=((x>xmax)?xmax:x);
+#else
+		x2=x;
+#endif
+/*
+	switch(FREEZE_QS2){
+	case 1:
+		x2=0.5*x/(0.5*(1-x)+x);
+		break;
+	case 2:
+		x2=((x>0.5)?0.5:x);
+		break;
+	default:
+		x2=x;
+	}
+*/
+	return x2;
+}
 //void Sigma::set_x(const double &x){
 void Sigma_BGK::set_x(const double &x){
 #if SIGMA_APPROX<0
-	#if FREEZE_QS2==1
-	x2=0.5*x/(0.5*(1-x)+x);
-	#elif FREEZE_QS2==2
-	x2=((x>0.5)?0.5:x);
-	#elif FREEZE_QS2==0
-	x2=x;
-	#endif
+	x2=freeze_x(x);
 	xgpdf.set_x(x2);
 #endif
 }
@@ -57,12 +74,6 @@ void Sigma_GBW::init(const double * const &sigpar){
 	#if MU02==0
 	i++;//mu102=sigpar[i++];
 	#endif
-	#if THRESHOLD==-1
-	this->thresh_power=sigpar[i++];
-	#else
-	this->thresh_power=THRESHOLD;
-	#endif
-	//sigpar=par;
 }
 void Sigma_BGK::init(const double * const &sigpar){
 	this->par=sigpar;
@@ -80,12 +91,6 @@ void Sigma_BGK::init(const double * const &sigpar){
 	this->xgpdf.init(mu02*0.5 , 2*(C/pow(R_MIN,2)+mu02),A_g,lambda_g);
 	#endif
 
-	#if THRESHOLD==-1
-	this->thresh_power=sigpar[i++];
-	#else
-	this->thresh_power=THRESHOLD;
-	#endif
-	//sigpar=par;
 }
 
 //inline double operator()(const double r)const {
@@ -93,22 +98,13 @@ void Sigma_BGK::init(const double * const &sigpar){
 //}
 //double Sigma::operator()(const double x, const double r) {//,const double Q2,const double*sigpar)const {
 double Sigma::operator()(const double x, const double r) {//,const double Q2,const double*sigpar)const {
-	#if FREEZE_QS2==1 ////Beware this transformation is also required in set_x()!!!!
-	double x1=0.5*x/(0.5*(1-x)+x);
-	#elif FREEZE_QS2==2
-	double x1=((x>0.5)?0.5:x);
-	#elif FREEZE_QS2==0
-	double x1=x;
-	#endif///////////////////////////////////////////////////////////////////////////
+	///Beware this transformation is also required in set_x()!!!!
+	double x1=freeze_x(x);
 	
 	double qs2=Qs2(x1,r);
 	#if ADJOINT==1
 	qs2*=9.0/4.0;
 	#endif
-
-	#if IBP==2&&R_FORMULA==0
-	double val=-sigma_0*exp(-pow(r,2)*qs2/4);
-	#else
 //	#if LAPLACIAN==0
 	double val,ex;
 	ex=pow(r,2)*qs2/4;
@@ -130,15 +126,23 @@ double Sigma::operator()(const double x, const double r) {//,const double Q2,con
 		printf("dp negative\n");
 		val=0;
 	}
-//	#elif LAPLACIAN==1
-//	double val=pow(r,2)*qs2/4;
-//	val=sigma_0*qs2*(1-val)*exp(-val);
-//	#endif//LAPLACIAN
-	#endif//IBP==2
-	#if THRESHOLD!=0 
-	//double thresh_power=THRESHOLD;
-	val*=pow(1-x1,thresh_power);
+	if(!std::isfinite(val)){
+		return(0);
+	}
+	return val;
+}
+double Sigma:: S(const double x, const double r) {
+	// S=sigma_0(1-sigma/sigma_0)
+	//,const double Q2,const double*sigpar)const {
+	///Beware this transformation is also required in set_x()!!!!
+	double x1=freeze_x(x);
+	
+	double qs2=Qs2(x1,r);
+	#if ADJOINT==1
+	qs2*=9.0/4.0;
 	#endif
+	double val=sigma_0*exp(-pow(r,2)*qs2/4);
+
 	if(!std::isfinite(val)){
 		return(0);
 	}

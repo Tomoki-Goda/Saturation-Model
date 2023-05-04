@@ -44,8 +44,8 @@ double Gluon_Integrand::operator()(const double rho, const std::vector<double> &
 			val*= kt*r*std::cyl_bessel_j(1,r *kt );
 #endif
 #elif IBP==2
-			val=(*sigma)(x,r);
-			val*=-kt*kt*r*std::cyl_bessel_j(0,r*kt);
+			val=(sigma->S)(x,r);
+			val*=kt*kt*r*std::cyl_bessel_j(0,r*kt);
 #else
 			//The following line is very inefficient!!
 			val=deriv<SIGMA>(*sigma,x,r,h,2);

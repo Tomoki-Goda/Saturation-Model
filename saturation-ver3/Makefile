@@ -30,15 +30,44 @@ main: $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipol
 		${DIR}/interpolation-gluon.o ${DIR}/main.o 
 	${CXX} $^ -o ${DIR}/main ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
+plot:ww sigma dp #plot-things
+
+ww:  ${DIR}/plot-ww.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+		${DIR}/interpolation-gluon.o 
+	${CXX} $^ -o ${DIR}/ww ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+
+dp: ${DIR}/plot-dp.o  $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+		${DIR}/interpolation-gluon.o 
+	${CXX} $^ -o ${DIR}/dp ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+
+sigma: ${DIR}/plot-sigma.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+		${DIR}/interpolation-gluon.o 
+	${CXX} $^ -o ${DIR}/sigma ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+
+#plot-things: ${DIR}/plot-things.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+#		${DIR}/interpolation-gluon.o 
+#		${CXX} $^ -o ${DIR}/plot ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+
+$(DIR)/plot-things.o: ${FUNCDIR}/plot/plot-things.cc ${DEPS} 
+		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
+
+$(DIR)/plot-ww.o: ${FUNCDIR}/plot/plot-ww.cc ${DEPS} 
+		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
+
+$(DIR)/plot-dp.o: ${FUNCDIR}/plot/plot-dp.cc ${DEPS} 
+		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
+
+$(DIR)/plot-sigma.o: ${FUNCDIR}/plot/plot-sigma.cc ${DEPS} 
+		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
 
 $(DIR)/%.o: ${FUNCDIR}/%.cc ${FUNCDIR}/%.hh ${DEPS} 
-		${CXX} -c -I${INCDIR} -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
+		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
 
 
 gluonsf.o:${FUNCDIR}/gluons.f
-		gfortran -c -I${INCDIR} -I${FUNCDIR} -I${FUNCDIR}/fortran ${OPT} ${LIBS} $< -o $@
+		gfortran -c -I${FUNCDIR} -I${FUNCDIR}/fortran ${OPT} ${LIBS} $< -o $@
 gluonsc.o:${FUNCDIR}/gluons.cc
-		${CXX} -c -I${INCDIR} -I${FUNCDIR}  ${OPT} ${LIBS} $< -o $@
+		${CXX} -c -I${FUNCDIR}  ${OPT} ${LIBS} $< -o $@
 
 test: gluonsf.o gluonsc.o
 	${CXX} -c test-gluons.cc -I${FUNCDIR}  -o test-gluons.o

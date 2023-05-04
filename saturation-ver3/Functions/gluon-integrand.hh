@@ -30,7 +30,7 @@
 #include"r-formula.hh"
 #if MODEL==0
 typedef Sigma_GBW SIGMA;
-#else
+#elif MODEL==1
 typedef Sigma_BGK SIGMA;
 #endif
 

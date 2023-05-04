@@ -6,8 +6,8 @@ double Sigma_GBW::Qs2(const double x,const double r)const{
 		getchar();
 	}
 	const double qs2=pow(x_0/x,lambda);//*pow(1-x,5.6); 
-	if(qs2<1.0e-25){
-		return 1.0e-25;
+	if(qs2<1.0e-50){
+		return 1.0e-50;
 	}
 	return qs2;		
 }
@@ -22,7 +22,8 @@ double Sigma_BGK::Qs2(const double x,const double r)const{
 	}
 	#endif
 	const double rrmax=pow(r,2)/C;
-	const double mu2=(r>1.0e-5)?(mu02/((1.0-exp(-mu02*rrmax) ))):(1/rrmax+mu02/2) ;
+	const double mu2=(rrmax>1.0e-6)?(mu02/((1.0-exp(-mu02*rrmax) ))):(1/rrmax+mu02/2+pow(mu02,2)*rrmax/12) ;
+	//const double mu2=mu02/(1.0-exp(-mu02*rrmax)) ;
 	const double al=alpha(mu2);
 	//const double al=0.2;
 	const double qs2=4*PI*PI*al*xgpdf(x,mu2,A_g,lambda_g)/(3*sigma_0); 
@@ -109,13 +110,19 @@ double Sigma::operator()(const double x, const double r) {//,const double Q2,con
 	double val=-sigma_0*exp(-pow(r,2)*qs2/4);
 	#else
 //	#if LAPLACIAN==0
-	double val;
-	val=pow(r,2)*qs2/4;
-	if(val<1.0e-4){
-		val*=(1-val/2+pow(val,2)/6-pow(val,3)/24);
+	double val,ex;
+	ex=pow(r,2)*qs2/4;
+	if(ex<5.0e-3){
+		//val*=(1-val/2+pow(val,2)/6-pow(val,3)/24);
+		val=ex*(1-ex*(1-ex*(1-ex*(1-ex/5)/4)/3)/2);
+		if(val>2.0e-3){
+			if(fabs((1-exp(-ex))-val)>1.0e-15){
+				printf("sigma discontinuous, %.2e %.2e \t %.3e\n",1-exp(-ex),val,val-(1-exp(-ex)));	
+			}
+		}
 //		//printf("%.4e %.4e %.4e\n",r,(1-exp(-val))/pow(r,2),val/pow(r,2));
 	}else{
-		val=(1-exp(-val));
+		val=(1-exp(-ex));
 	}
 	val*=sigma_0;
 

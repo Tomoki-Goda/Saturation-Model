@@ -252,13 +252,20 @@ template <typename Sig> class Integrand_r{
 			double 	Qsq_bar =  z*(1-z)*Q2+mf2;
 			double 	Qsq2 =  sqrt(Qsq_bar)*r;
 			//pow(r,2) is to suppress singularity at r=0, it is compensated by the sigma
-			if(Qsq2<1.0e-5){//small er approximation
-				value =   (z_bar + ( mf2+ pow(2*z*(1-z),2)* Q2 )*pow(r* log(Qsq2),2) );
-			}else{
+//			if(Qsq2<1.0e-5){//small er approximation
+//				value =   (z_bar + ( mf2+ pow(2*z*(1-z),2)* Q2 )*pow(r* log(Qsq2),2) );
+//			}else{
+
 				double 	bessel_k0_2 = pow(std::cyl_bessel_k(0,Qsq2),2);
 				double 	bessel_k1_2 = pow(std::cyl_bessel_k(1,Qsq2),2);
 				value = pow(r,2) * (z_bar * Qsq_bar * bessel_k1_2 + ( mf2 + pow(2*z*(1-z),2)* Q2 ) * bessel_k0_2);
-			}
+//				if(Qsq2<2.5e-5){
+//					if(fabs(value - (z_bar + ( mf2+ pow(2*z*(1-z),2)* Q2 )*pow(r* log(Qsq2),2) ))>1.0e-10*value ){
+//						printf("psisq_f discontinuous\n%2e %.2e\n",value, (z_bar + ( mf2+ pow(2*z*(1-z),2)* Q2 )*pow(r* log(Qsq2),2)) );
+//					}
+//				}
+//			}
+
 			double  result=(3*value)/(2*PI*PI);
 			if(std::isnan(result)+std::isinf(result)!=0){
  			 	printf("psiisq_f: %.3le encountered \n",(double)result);

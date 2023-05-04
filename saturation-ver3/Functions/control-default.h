@@ -139,7 +139,7 @@
 #endif
 
 #ifndef N_CHEB//variants of models. see r-formula.h
-	#define N_CHEB 25
+	#define N_CHEB 30
 #endif
 #ifndef CHEB_D//variants of models. see r-formula.h
 	#define CHEB_D 1

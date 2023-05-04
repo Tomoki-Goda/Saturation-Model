@@ -152,6 +152,8 @@ int main(int argc, char** argv){
 	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
 	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+	
+	
 	prec.SetPrecision(1.0e-6);
 	
 	INT_PREC=1.0e-3;
@@ -177,7 +179,7 @@ int main(int argc, char** argv){
 //					simplex1.Release(j);
 //				}
 //#endif
-				min=simplex1(50,50/(k+1));
+				min=simplex1(50,50/(i+1));
 				std::cout<<"Parameters "<<min.UserState()<<std::endl;
 				simplex1.Release(k);
 			}
@@ -208,7 +210,7 @@ int main(int argc, char** argv){
 	for(int i=0;i<(N_PAR-skip);i++ ){
 		migrad.RemoveLimits(i);
 	}
-	min=migrad(20,25);
+	min=migrad(pow(N_PAR-skip,2) ,25);
 }
 	
 	
@@ -236,7 +238,7 @@ int main(int argc, char** argv){
 			fix.push_back(free[fixone]);
 			free.erase(free.begin()+fixone);
 			
-			min=migrad(20,goal);
+			min=migrad( pow(N_PAR-skip,2) ,goal);
 			
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -251,11 +253,13 @@ int main(int argc, char** argv){
 		
 		for(int ii=0;ii<fix.size();++ii){
 			migrad.Release(fix[ii]);
+			//Hint... maybe inserting migrad here is a good idea...
+			//but for that, release in reverse order.
 		}
 		
 //////////////////////////////////////////////////////////////////////	
 //		for(int i=0;i<N_PAR-skip;++i){
-			min=migrad(50,goal);
+			min=migrad( pow(N_PAR-skip,2)*3 ,goal);
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 //			if(min.IsValid()){
 //				break;
@@ -312,7 +316,7 @@ int main(int argc, char** argv){
 			fix.push_back(free[fixone]);
 			free.erase(free.begin()+fixone);
 			
-			min=migrad(20,goal);
+			min=migrad( pow(N_PAR-skip,2) ,goal);
 			
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -329,7 +333,7 @@ int main(int argc, char** argv){
 			migrad.Release(fix[ii]);
 		}
 //		for(int i=0;i<N_PAR-skip;++i){
-			min=migrad(50,goal);
+			min=migrad( pow(N_PAR-skip,2) ,goal);
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 //		}
 

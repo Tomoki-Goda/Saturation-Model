@@ -220,7 +220,8 @@ printf("use with extra care\n");
 				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);
 			}
 			
-			if(flag==1){	
+			if(flag==1){
+				//This is for plotting F2 for each Q2.	
 				//FILE* file0=fopen((directory+"/aF.txt").c_str(),"w" );
 				FILE* file1=fopen((directory+"/data.txt").c_str(),"w" );
 				FILE* file2=fopen((directory+"/F2.txt").c_str(),"w" );

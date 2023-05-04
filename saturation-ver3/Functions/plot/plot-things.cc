@@ -86,7 +86,7 @@ int main(int argc , char** argv){
 		sprintf(outfilenames,"%s/saturation.txt",opt.path.c_str());
 		outfile=fopen(outfilenames,"w");
 		for(int i=0;i<10;i++){
-			x=1.0e-8*pow(0.01/1.0e-8,((double)i)/9);
+			x=5.0e-8*pow(0.01/1.0e-8,((double)i)/9);
 			val=gluon.saturation(x,0.1);
 			fprintf(outfile,"%.5e\t%.5e\n",x,val);
 		}
@@ -99,7 +99,7 @@ int main(int argc , char** argv){
 		outfile=fopen(outfilenames,"w");
 		x=1.0e-2;
 		for(int i=0;i<plot_pts;i++){
-			kt2=1.0e-3*pow(1.0e+6,((double)i)/(plot_pts-1));
+			kt2=1.0e-2*pow(1.0e+5,((double)i)/(plot_pts-1));
 			val=gluon(x,kt2,0);
 			fprintf(outfile,"%.5e\t%.5e\n",kt2,val/sigpar[0]);
 		}
@@ -108,7 +108,7 @@ int main(int argc , char** argv){
 		outfile=fopen(outfilenames,"w");
 		x=1.0e-6;
 		for(int i=0;i<plot_pts;i++){
-			kt2=1.0e-3*pow(1.0e+6,((double)i)/(plot_pts-1));
+			kt2=1.0e-2*pow(1.0e+3,((double)i)/(plot_pts-1));
 			val=gluon(x,kt2,0);
 			fprintf(outfile,"%.5e\t%.5e\n",kt2,val/sigpar[0]);
 		}
@@ -120,9 +120,9 @@ int main(int argc , char** argv){
 		x=1.0e-2;
 		sigma.set_x(x);
 		for(int i=0;i<plot_pts;i++){
-			r=1.0e-6*pow(5.0e+6,((double)i)/(plot_pts-1));
+			r=1.0e-2*pow(1.0e+3,((double)i)/(plot_pts-1));
 			val=sigma(x,r);
-			fprintf(outfile,"%.5e\t%.5e\n",x,val/sigpar[0]);
+			fprintf(outfile,"%.5e\t%.5e\n",r,val/sigpar[0]);
 		}
 		fclose(outfile);
 		sprintf(outfilenames,"%s/sigma-6.txt",opt.path.c_str());
@@ -130,9 +130,9 @@ int main(int argc , char** argv){
 		x=1.0e-6;
 		sigma.set_x(x);
 		for(int i=0;i<plot_pts;i++){
-			r=1.0e-6*pow(5.0e+6,((double)i)/(plot_pts-1));
+			r=1.0e-2*pow(1.0e+3,((double)i)/(plot_pts-1));
 			val=sigma(x,r);
-			fprintf(outfile,"%.5e\t%.5e\n",x,val/sigpar[0]);
+			fprintf(outfile,"%.5e\t%.5e\n",r,val/sigpar[0]);
 		}
 		fclose(outfile);
 		printf("SIGMA Plot end\n");

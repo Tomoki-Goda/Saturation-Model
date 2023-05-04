@@ -142,9 +142,12 @@ int main(int argc, char** argv){
 // Start fitting
 //////////////////////////////////////////////////////////
 	ROOT::Minuit2::MnMachinePrecision prec;
+	prec.SetPrecision(1.0e-6);
+	//INT_PREC=5.0e-4 ;
+	//N_APPROX=N_CHEB_R/2;
 	
-	INT_PREC=5.0e-4 ;
-	N_APPROX=N_CHEB_R/2;
+	INT_PREC=1.0e-4;
+	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
@@ -153,12 +156,10 @@ int main(int argc, char** argv){
 	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	
-	
-	prec.SetPrecision(1.0e-6);
-	
 	INT_PREC=1.0e-3;
 	N_APPROX=N_CHEB_R/3;
-	//min=simplex1(25,1);
+	//min=simplex1(pow(N_PAR-skip,2),20);
+	//std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	for(int i=0;i<2;++i){
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
@@ -168,24 +169,13 @@ int main(int argc, char** argv){
 			for(int k=0;k<N_PAR-skip;++k){
 				//min=simplex1(50,0);
 				simplex1.Fix(k);
-//#if MODEL==1
-//				for(int j=0;j<N_PAR-skip;++j){
-//					if(i==j){
-//						continue;
-//					}
-//					simplex1.Fix(j);
-//					min=simplex1(100,pow(10,1-i));
-//					std::cout<<"Parameters "<<min.UserState()<<std::endl;
-//					simplex1.Release(j);
-//				}
-//#endif
-				min=simplex1(50,50/(i+1));
+				min=simplex1(50,50/(2*i+1));
 				std::cout<<"Parameters "<<min.UserState()<<std::endl;
 				simplex1.Release(k);
 			}
 //		}
 		
-		min=simplex1(50,25);
+		min=simplex1(50,50/(2*i+1));
 		INT_PREC/=2;
 		N_APPROX=(int)(N_APPROX*2);
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
@@ -224,7 +214,7 @@ int main(int argc, char** argv){
 		for(int ii=0;ii<N_PAR-skip;++ii){
 			free.push_back(ii);
 		}
-		for(int j=0;j<N_PAR-skip-1;++j){
+		for(int j=0;j< (N_PAR-skip-1)/2+1;++j){
 			std::vector<double> cor=min.UserState().GlobalCC().GlobalCC();
 			for(int ii=0;ii<cor.size();++ii){
 				printf("cor %d = %f\n",ii,cor[ii]);
@@ -302,7 +292,7 @@ int main(int argc, char** argv){
 		for(int ii=0;ii<N_PAR-skip;++ii){
 			free.push_back(ii);
 		}
-		for(int j=0;j<N_PAR-skip-1;++j){
+		for(int j=0;j< (N_PAR-skip-1)/2+1;++j){
 			std::vector<double> cor=min.UserState().GlobalCC().GlobalCC();
 			for(int ii=0;ii<cor.size();++ii){
 				printf("cor %d = %f\n",ii,cor[ii]);

@@ -6,16 +6,7 @@ void Gluon_GBW::init(const double *par){
 		sigma_0 = par[count++];
 		lambda	= par[count++];
 		x_0	=par[count++];
-	#if MU02==0
-		mu02 = par[count++];
-	#else 
-		mu02 = MU02;
-	#endif
-	#if THRESHOLD==-1
-		thresh_power=par[count++];
-	#else
-		thresh_power=THRESHOLD;
-	#endif
+	
 }
 double Gluon_GBW::operator()(const double  x,const double k2,double mu2){
 	if(x_0<1.0e-5||x_0>1.0e-3){
@@ -25,9 +16,7 @@ double Gluon_GBW::operator()(const double  x,const double k2,double mu2){
 		return 0;
 	}
 	double Qs2=pow(x_0/x,lambda);
-	#if THRESHOLD==-2
-	Qs2*=pow(1-x,5);
-	#endif		
+		
 	#if WW==1
 	Qs2*=9.0/4.0;
 	gsl_sf_result result;
@@ -41,15 +30,7 @@ double Gluon_GBW::operator()(const double  x,const double k2,double mu2){
 	if(std::isnan(val)==1){
 		return(0);
 	}
-	#if ALPHA_RUN==1
-	val*=alpha(mu2+mu02)/0.2;
-	//val*=alpha((mu2>mu02)?(mu2):(mu02))/0.2;
-	//printf("%.2e %.2e\n",mu2,alpha(mu2));
-	#endif
-	#if THRESHOLD>0||THRESHOLD==-1 
-	//double thresh_power=THRESHOLD;
-	val*=pow(1-x,thresh_power);
-	#endif
+	
 	return (sigma_0*val) ;
 }
 //////////////////////////////////////////////////////////////////////

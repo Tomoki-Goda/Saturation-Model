@@ -142,8 +142,8 @@ int main(int argc, char** argv){
 // Start fitting
 //////////////////////////////////////////////////////////
 	ROOT::Minuit2::MnMachinePrecision prec;
+	prec.SetPrecision(1.0e-10);
 	std::cout<<"Prec= "<<prec<<std::endl;
-	//prec.SetPrecision(1.0e-5);
 	//INT_PREC=5.0e-4 ;
 	//N_APPROX=N_CHEB_R/2;
 	
@@ -161,7 +161,7 @@ int main(int argc, char** argv){
 	N_APPROX=N_CHEB_R/3;
 	//min=simplex1(pow(N_PAR-skip,2),20);
 	//std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	for(int i=0;i<1;++i){
+	for(int i=0;i<2;++i){
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 		printf("*****************************\n");
@@ -177,8 +177,8 @@ int main(int argc, char** argv){
 //		}
 		
 		min=simplex1(50,20/(2*i+1));
-		INT_PREC/=2;
-		N_APPROX=(int)(N_APPROX*2);
+		//INT_PREC/=2;
+		//N_APPROX=(int)(N_APPROX*2);
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 	}
 
@@ -208,59 +208,7 @@ int main(int argc, char** argv){
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	goal=25;
 	for(int k=0;k<5;k++){
-		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
-		//////// try fixing////////////
-		fix.clear();
-		free.clear();
-		for(int ii=0;ii<N_PAR-skip;++ii){
-			free.push_back(ii);
-		}
-		for(int j=0;j< (N_PAR-skip-1)/2+1;++j){
-			std::vector<double> cor=min.UserState().GlobalCC().GlobalCC();
-			for(int ii=0;ii<cor.size();++ii){
-				printf("cor %d = %f\n",ii,cor[ii]);
-			}
-			int fixone=std::distance(cor.begin(),std::max_element(cor.begin(),cor.end()));
-			
-			printf("Fix %d (st/nd/th) pos (%d) \n",free[fixone],fixone);
-			
-			migrad.Fix(free[fixone]);
-			
-			fix.push_back(free[fixone]);
-			free.erase(free.begin()+fixone);
-			
-			min=migrad( pow(N_PAR-skip+1,2) ,goal);
-			
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
-			printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
-			if(min.IsValid()){
-				printf("Fixing successful\n");
-				break;
-			}else{
-				printf("Fixing insufficient\n");
-			}
-		}
-		
-		for(int ii=0;ii<fix.size();++ii){
-			migrad.Release(fix[fix.size()-ii-1]);
-			if(fix.size()!=ii+1){
-				min=migrad( pow(N_PAR-skip+1,2)/2 ,goal);
-				std::cout<<"Parameters "<<min.UserState()<<std::endl;
-			}
-			//Hint... maybe inserting migrad here is a good idea...
-			//but for that, release in reverse order.
-		}
-		
-//////////////////////////////////////////////////////////////////////	
-//		for(int i=0;i<N_PAR-skip;++i){
-			min=migrad( pow(N_PAR-skip+1,2)*2 ,goal);
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-//			if(min.IsValid()){
-//				break;
-//			}
-//		}
-		
+		Fix_Release(min, theFCN, N_PAR-skip, 0, goal);	
 		
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
 		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
@@ -274,12 +222,6 @@ int main(int argc, char** argv){
 		N_APPROX=((int)(1.4142*N_APPROX));
 
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		
-		
-		//////////Try with simplex///////////////
-		//ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
-		//min=simplex(25,goal);
-		//std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	}
 	
 	INT_PREC=1.0e-4;
@@ -290,60 +232,16 @@ int main(int argc, char** argv){
 	printf("***************************\n");
 	goal=10;
 	for(int k=0;k<5;k++){
-		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),1);
-		//////// try fixing////////////
-		fix.clear();
-		free.clear();
-		for(int ii=0;ii<N_PAR-skip;++ii){
-			free.push_back(ii);
-		}
-		for(int j=0;j< (N_PAR-skip-1)/2+1;++j){
-			std::vector<double> cor=min.UserState().GlobalCC().GlobalCC();
-			for(int ii=0;ii<cor.size();++ii){
-				printf("cor %d = %f\n",ii,cor[ii]);
-			}
-			int fixone=std::distance(cor.begin(),std::max_element(cor.begin(),cor.end()));
-			
-			printf("Fix %d (st/nd/th) pos (%d) \n",free[fixone],fixone);
-			
-			migrad.Fix(free[fixone]);
-			
-			fix.push_back(free[fixone]);
-			free.erase(free.begin()+fixone);
-			
-			min=migrad( pow(N_PAR-skip+1,2) ,goal);
-			
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
-			printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
-			if(min.IsValid()){
-				printf("Fixing successful\n");
-				break;
-			}else{
-				printf("Fixing insufficient\n");
-			}
-		}
-		
-		for(int ii=0;ii<fix.size();++ii){
-			migrad.Release(fix[ii]);
-		}
-//		for(int i=0;i<N_PAR-skip;++i){
-			min=migrad( pow(N_PAR-skip+1,2)*2 ,goal);
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-//		}
+		Fix_Release(min, theFCN, N_PAR-skip, 0, goal);
 
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
-
 		INT_PREC/=1.41421356;//sqrt(2)
 		N_APPROX=((int)(1.41421356*N_APPROX));
 				
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		//
-		//ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
-		//min=simplex(30,goal);	
 	}
 
 	
@@ -357,7 +255,59 @@ int main(int argc, char** argv){
 	
 }
 
+int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN theFCN, int N, int str ,int goal){
+	std::vector<int> fix;
+	std::vector<int> free;
+	fix.reserve(10);
+	free.reserve(10);
+	ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),str);
+	//////// try fixing////////////
+	fix.clear();
+	free.clear();
+	for(int ii=0;ii<N;++ii){
+		free.push_back(ii);
+	}
+	for(int j=0;j< (N-1)/2+1;++j){
+		std::vector<double> cor=min.UserState().GlobalCC().GlobalCC();
+		for(int ii=0;ii<cor.size();++ii){
+			printf("cor %d = %f\n",ii,cor[ii]);
+		}
+		int fixone=std::distance(cor.begin(),std::max_element(cor.begin(),cor.end()));
+		
+		printf("Fix %d (st/nd/th) pos (%d) \n",free[fixone],fixone);
+		
+		migrad.Fix(free[fixone]);
+		
+		fix.push_back(free[fixone]);
+		free.erase(free.begin()+fixone);
+		
+		min=migrad( pow(N+1,2) ,goal);
+		
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
+		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
+		if(min.IsValid()){
+			printf("Fixing successful\n");
+			break;
+		}else{
+			printf("Fixing insufficient\n");
+		}
+	}
+	////////////then release///////////////
+	for(int ii=0;ii<fix.size();++ii){
+		migrad.Release(fix[fix.size()-ii-1]);
+		if(fix.size()!=ii+1){
+			min=migrad( pow(N+1,2)/2 ,goal);
+			std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		}
+	}
 	
-	
+
+	min=migrad( pow(N+1,2)*2 ,goal);
+	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+
+	return min.UserState().CovarianceStatus();
+}
+
 	
 	

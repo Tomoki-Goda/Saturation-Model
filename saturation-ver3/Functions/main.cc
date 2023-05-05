@@ -142,7 +142,8 @@ int main(int argc, char** argv){
 // Start fitting
 //////////////////////////////////////////////////////////
 	ROOT::Minuit2::MnMachinePrecision prec;
-	prec.SetPrecision(1.0e-5);
+	std::cout<<"Prec= "<<prec<<std::endl;
+	//prec.SetPrecision(1.0e-5);
 	//INT_PREC=5.0e-4 ;
 	//N_APPROX=N_CHEB_R/2;
 	
@@ -191,7 +192,7 @@ int main(int argc, char** argv){
 	
 	INT_PREC=5e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
-	prec.SetPrecision(INT_PREC);
+	//prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
@@ -282,7 +283,7 @@ int main(int argc, char** argv){
 	
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
-	prec.SetPrecision(INT_PREC);
+	//prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");

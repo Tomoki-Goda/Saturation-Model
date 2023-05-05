@@ -170,13 +170,13 @@ int main(int argc, char** argv){
 			for(int k=0;k<N_PAR-skip;++k){
 				//min=simplex1(50,0);
 				simplex1.Fix(k);
-				min=simplex1(50,50/(2*i+1));
+				min=simplex1(50,20/(2*i+1));
 				std::cout<<"Parameters "<<min.UserState()<<std::endl;
 				simplex1.Release(k);
 			}
 //		}
 		
-		min=simplex1(50,50/(2*i+1));
+		min=simplex1(50,20/(2*i+1));
 		INT_PREC/=2;
 		N_APPROX=(int)(N_APPROX*2);
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
@@ -243,9 +243,10 @@ int main(int argc, char** argv){
 		}
 		
 		for(int ii=0;ii<fix.size();++ii){
-			migrad.Release(fix[fix.size()-ii]);
+			migrad.Release(fix[fix.size()-ii-1]);
 			if(fix.size()!=ii+1){
 				min=migrad( pow(N_PAR-skip+1,2)/2 ,goal);
+				std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			}
 			//Hint... maybe inserting migrad here is a good idea...
 			//but for that, release in reverse order.

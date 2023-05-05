@@ -142,7 +142,7 @@ int main(int argc, char** argv){
 // Start fitting
 //////////////////////////////////////////////////////////
 	ROOT::Minuit2::MnMachinePrecision prec;
-	prec.SetPrecision(1.0e-6);
+	prec.SetPrecision(1.0e-5);
 	//INT_PREC=5.0e-4 ;
 	//N_APPROX=N_CHEB_R/2;
 	
@@ -160,7 +160,7 @@ int main(int argc, char** argv){
 	N_APPROX=N_CHEB_R/3;
 	//min=simplex1(pow(N_PAR-skip,2),20);
 	//std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	for(int i=0;i<2;++i){
+	for(int i=0;i<1;++i){
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 		printf("*****************************\n");
@@ -189,9 +189,9 @@ int main(int argc, char** argv){
 	fix.reserve(10);
 	free.reserve(10);
 	
-	INT_PREC=2.5e-4;
+	INT_PREC=5e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
-	//prec.SetPrecision(INT_PREC);
+	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
@@ -228,7 +228,7 @@ int main(int argc, char** argv){
 			fix.push_back(free[fixone]);
 			free.erase(free.begin()+fixone);
 			
-			min=migrad( pow(N_PAR-skip,2) ,goal);
+			min=migrad( pow(N_PAR-skip+1,2) ,goal);
 			
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -242,14 +242,17 @@ int main(int argc, char** argv){
 		}
 		
 		for(int ii=0;ii<fix.size();++ii){
-			migrad.Release(fix[ii]);
+			migrad.Release(fix[fix.size()-ii]);
+			if(fix.size()!=ii+1){
+				min=migrad( pow(N_PAR-skip+1,2)/2 ,goal);
+			}
 			//Hint... maybe inserting migrad here is a good idea...
 			//but for that, release in reverse order.
 		}
 		
 //////////////////////////////////////////////////////////////////////	
 //		for(int i=0;i<N_PAR-skip;++i){
-			min=migrad( pow(N_PAR-skip,2)*3 ,goal);
+			min=migrad( pow(N_PAR-skip+1,2)*2 ,goal);
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 //			if(min.IsValid()){
 //				break;
@@ -279,7 +282,7 @@ int main(int argc, char** argv){
 	
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
-
+	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
@@ -306,7 +309,7 @@ int main(int argc, char** argv){
 			fix.push_back(free[fixone]);
 			free.erase(free.begin()+fixone);
 			
-			min=migrad( pow(N_PAR-skip,2) ,goal);
+			min=migrad( pow(N_PAR-skip+1,2) ,goal);
 			
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 			printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -323,7 +326,7 @@ int main(int argc, char** argv){
 			migrad.Release(fix[ii]);
 		}
 //		for(int i=0;i<N_PAR-skip;++i){
-			min=migrad( pow(N_PAR-skip,2) ,goal);
+			min=migrad( pow(N_PAR-skip+1,2)*2 ,goal);
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;
 //		}
 
@@ -343,8 +346,8 @@ int main(int argc, char** argv){
 
 	
 	
-
-	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+	std::cout<<"***********Final Parameters*************\n"<<min.UserState()<<std::endl;
+	
 	std::cout<<"min= "<<min<<std::endl;
 	std::chrono::duration<double> time=walltime.now()-start;
 	std::cout<<time.count()<<" seconds"<<std::endl;

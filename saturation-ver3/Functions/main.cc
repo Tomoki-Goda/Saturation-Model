@@ -232,8 +232,9 @@ int main(int argc, char** argv){
 	printf("***************************\n");
 	goal=10;
 	for(int k=0;k<5;k++){
-		Fix_Release(min, theFCN, N_PAR-skip, 0, goal);
-
+		Fix_Release(min, theFCN, N_PAR-skip, 1, goal);
+		
+		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;

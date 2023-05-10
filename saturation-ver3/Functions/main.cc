@@ -142,56 +142,50 @@ int main(int argc, char** argv){
 // Start fitting
 //////////////////////////////////////////////////////////
 	ROOT::Minuit2::MnMachinePrecision prec;
-	prec.SetPrecision(1.0e-10);
-	std::cout<<"Prec= "<<prec<<std::endl;
+	
 	//INT_PREC=5.0e-4 ;
 	//N_APPROX=N_CHEB_R/2;
 	
-	INT_PREC=1.0e-4;
-	N_APPROX=N_CHEB_R;
+	INT_PREC=5.0e-4;
+	N_APPROX=N_CHEB_R/4;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
+	
 	ROOT::Minuit2::MnSimplex simplex1(theFCN,upar,0);
 	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
 	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	
-	INT_PREC=1.0e-3;
-	N_APPROX=N_CHEB_R/3;
-	//min=simplex1(pow(N_PAR-skip,2),20);
-	//std::cout<<"Parameters "<<min.UserState()<<std::endl;
+/*
+	INT_PREC=5.0e-3;
+	N_APPROX=N_CHEB_R/4;
+	min=simplex1(25,1);
+	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	for(int i=0;i<2;++i){
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 		printf("*****************************\n");
 		//min=simplex1(100,pow(10,1-i));
-//		if(i==1){		
-			for(int k=0;k<N_PAR-skip;++k){
-				//min=simplex1(50,0);
-				simplex1.Fix(k);
-				min=simplex1(50,20/(2*i+1));
-				std::cout<<"Parameters "<<min.UserState()<<std::endl;
-				simplex1.Release(k);
-			}
-//		}
-		
-		min=simplex1(50,20/(2*i+1));
+		for(int k1=0;k1<N_PAR-skip;++k1){
+			simplex1.Fix(k1);
+			min=simplex1(100,4.0/(2*i+1));
+		 	simplex1.Release(k1);
+		 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		}
+		min=simplex1(50,4.0/(2*i+1));
 		//INT_PREC/=2;
 		//N_APPROX=(int)(N_APPROX*2);
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 	}
-
+*/
 /////////////////////////////////////////////////////////////////
 // Try MiGrad
 //////////////////////////////////////////////////////////////////	
-	std::vector<int> fix;
-	std::vector<int> free;
-	fix.reserve(10);
-	free.reserve(10);
-	
 	INT_PREC=5e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
+	prec.SetPrecision(1.0e-5);
+	std::cout<<"Prec= "<<prec<<std::endl;
 	//prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
@@ -218,12 +212,12 @@ int main(int argc, char** argv){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
-		INT_PREC/=1.4142;//sqrt(2)
-		N_APPROX=((int)(1.4142*N_APPROX));
-
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		//INT_PREC/=1.4142;//sqrt(2)
+		//N_APPROX=((int)(1.4142*N_APPROX));
+		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
-	
+
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
@@ -232,16 +226,16 @@ int main(int argc, char** argv){
 	printf("***************************\n");
 	goal=10;
 	for(int k=0;k<5;k++){
-		Fix_Release(min, theFCN, N_PAR-skip, 0, goal);
+		Fix_Release(min, theFCN, N_PAR-skip, 1, goal);
 
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
-		INT_PREC/=1.41421356;//sqrt(2)
-		N_APPROX=((int)(1.41421356*N_APPROX));
-				
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		//INT_PREC/=1.41421356;//sqrt(2)
+		//N_APPROX=((int)(1.41421356*N_APPROX));
+		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
 
 	
@@ -255,7 +249,7 @@ int main(int argc, char** argv){
 	
 }
 
-int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN theFCN, int N, int str ,int goal){
+int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN& theFCN, int N, int str ,int goal){
 	std::vector<int> fix;
 	std::vector<int> free;
 	fix.reserve(10);
@@ -295,7 +289,8 @@ int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN theFCN, int N, int s
 	}
 	////////////then release///////////////
 	for(int ii=0;ii<fix.size();++ii){
-		migrad.Release(fix[fix.size()-ii-1]);
+		//migrad.Release(fix[fix.size()-ii-1]);
+		migrad.Release(fix[ii]);
 		if(fix.size()!=ii+1){
 			min=migrad( pow(N+1,2)/2 ,goal);
 			std::cout<<"Parameters "<<min.UserState()<<std::endl;

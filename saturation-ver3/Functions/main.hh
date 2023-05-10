@@ -2,6 +2,7 @@
 #include<fstream>
 #include<cmath>
 #include<string>
+#include<map>
 #include<vector>
 #include<ctime>
 #include<chrono>

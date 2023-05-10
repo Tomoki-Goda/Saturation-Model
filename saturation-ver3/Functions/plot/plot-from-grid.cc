@@ -7,7 +7,14 @@
 #include<gsl/gsl_spline.h>
 #include <gsl/gsl_interp2d.h>
 #include <gsl/gsl_spline2d.h>
-	
+
+/////////////////////////////////////////////
+//arguments are  
+//		directory/Name of gluon grid file
+//		directory/Name of sigma grid file
+//		directory to save the result
+////////////////////////////////////////////
+
 int main(int c , char** argv){
 		//std::string dir(argv[2]);
 		char filename[500];

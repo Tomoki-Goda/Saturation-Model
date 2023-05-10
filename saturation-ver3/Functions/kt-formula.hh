@@ -241,8 +241,8 @@ template <typename Sig> class Integrand_r{
 		//	}
 			this->x=modx(x,Q2,mf2);
 			//this->x=x;
-			if(this->x>1){
-				printf("set_kinem:: x toolarge %.3e\n",x);
+			if((this->x)>1){
+				printf("set_kinem:: x too large %.3e\n",x);
 			}
 			this->Q2=Q2;
 			this->mf2=mf2;

@@ -100,6 +100,7 @@ int main(int argc, char** argv){
 ////////////////////////////////////////////
 // Set up the parameters
 ////////////////////////////////////////////
+	//std::map<std::string,double> par_table;
 	for(unsigned i=0;i<N_PAR;i++){
 #if (ALPHA_RUN==0||MU02!=0)
 		if(par_name[i]=="mu02"){
@@ -108,14 +109,15 @@ int main(int argc, char** argv){
 			continue;
 		}
 #endif
-
+		//par_table[par_name[i]]=par_start[i];
+		
 		std::cout<<par_name[i]<<" = "<<par_start[i]<<std::endl;
 		//std::cout<<N_PAR<<"  "<<skip <<" : parameter position="<<i<<std::endl;
 		upar.Add(par_name[i], par_start[i],par_error[i]);
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
 #else//USE_RESULT==1
-		printf("USING PREVIOUS RESULT %d\n",USE_RESULT);
+	printf("USING PREVIOUS RESULT %d\n",USE_RESULT);
 	char resfile[100];
 	sprintf(resfile,"%s/result.txt",argv[1]);
 	
@@ -123,12 +125,14 @@ int main(int argc, char** argv){
 	double ival,ierr;
 	FILE* resinputfile=fopen(resfile,"r");
 	fscanf(resinputfile,"%s %le",name,&ival);
+	
 	for(unsigned i=0;i<N_PAR;i++){
 		fscanf(resinputfile,"%s %le %le",name,&ival,&ierr);
 		if(strcmp(name,"chisq")==0){
 			skip=N_PAR-i;
 			break;
 		}
+		//par_table[name]=ival;
 #if USE_RESULT>0
 		ival=double_round(ival,USE_RESULT);
 #endif
@@ -227,7 +231,8 @@ int main(int argc, char** argv){
 	goal=10;
 	for(int k=0;k<5;k++){
 		Fix_Release(min, theFCN, N_PAR-skip, 1, goal);
-
+		
+		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;

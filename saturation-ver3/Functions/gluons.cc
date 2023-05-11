@@ -135,6 +135,10 @@ double Chebyshev1D_Collinear_Gluon::operator()(const double x,const double Q2, d
 	//res=A_g*pow(x,-l_g);
 	return(res);
 }
+double Chebyshev1D_Collinear_Gluon::operator()(const double x,const double Q2)const{
+	double res=(*this)(x,Q2,A_g,l_g);
+	return(res);
+}
 
 
 //////////////////////////////////////////////////////////////////////

@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 from matplotlib import cm
@@ -20,8 +21,13 @@ def main():
     alpha=1
     rapidity=False
     logz=False
+    M=False
+    Mcolor=["red", "blue","cyan"]
+    Mstyle=["-","-.",":"]
+    labels=[""]
+    leg=[]
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:], "Yrdmhs:g:q:cl", ['Y','run','dipole','multiple','help',"save=","grid=","Q2=","contour","log"])
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "MYrdmhs:g:q:clL:", ['Y','run','dipole','multiple','help',"save=","grid=","Q2=","contour","log","Label"])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
@@ -42,6 +48,9 @@ def main():
             sys.exit()
         elif opt in ['-m','--multiple']:
             grids=args;
+        elif opt in ['-M','--Multiple']:
+            grids=args;
+            M=True
         elif opt in ['-c','--contour']:
             contour=True
         elif opt in ['-r','--run']:
@@ -50,25 +59,32 @@ def main():
             rapidity=True
         elif opt in ['-l', '--log']:
             logz=True
+        elif opt in ["-L","--Labels"]:
+            labels=arg.split(":")
+            print(labels)
     if grids=="N/A":
-        grids=args[0]
-
+        grids=[args[0]]
+    
+    if M:
+        glen=1
+    else: 
+        glen=len(grids)
     #DIR="../GKSgluon-1.1/grids/"
     #with open("./KSgluon-2.0/grids/KSnonlinear.dat","r") as fi:
     #with open("../Run/GBW/Mass0.0-Qup650-Model0-Sud0/gluon-grid.dat","r") as fi:
     #with open("../Run/GBWS-Fix-S/Mass0.0-Qup650-Model22-Sud1/gluon-grid.dat","r") as fi:
     #with open(DIR+"KSnonlinear.dat","r") as fi:
     if contour:
-        fig, ax =plt.subplots(1,len(grids), sharex=True,sharey=True,layout='constrained')
+        fig, ax =plt.subplots(1,glen, sharex=True,sharey=True,layout='constrained')
     else:
-        fig, ax =plt.subplots(1,len(grids),layout='constrained',subplot_kw={'projection':'3d'})
+        fig, ax =plt.subplots(1,glen,tight_layout=True,subplot_kw={'projection':'3d'})
+        #fig.subplots_adjust(hspace=0.1,wspace=0.1)
+    
+    #fig.get_layout_engine().set(w_pad=0.1, h_pad=0.1, hspace=0,wspace=0)
+    #fig.set_constrained_layout_pads(hspace=0,wspace=0,h_pad=0.02,w_pad=0.02)
     
     
-    fig.set_constrained_layout_pads(hspace=0,wspace=0,h_pad=0.025,w_pad=0.025)
-    fig.set_figheight(5)
-    fig.set_figwidth(6*(len(grids)+0.1))
-    
-    if len(grids)==1:
+    if glen==1:
         ax=[ax]
     for gpos in range(len(grids)):
         grid=grids[gpos]
@@ -149,59 +165,86 @@ def main():
             offset=-0.01
         if dipole :
             
-            lev=[i*0.1 for i in range(0,12)]
+            lev=[i*0.1 for i in range(0,11)]
         else:
-            lev=[(i-0.25)*0.00325 for i in range(-1,11)]
+            lev=[(i-0.5)*0.00325 for i in range(0,11)]
         if logz:
             #print(lev)
             lev=[(-10 if i<=0.0 else np.log10(i) )  for i in lev]
             print(lev)            
             #lev=list(set(lev))
+        cmap=mpl.cm.cool
+        #cmap=mpl.cm.PiYG
+        #cmap=mpl.cm.Greens
+        #cmap=mpl.cm.Spectral
+        #cmap=mpl.cm.bwr
+        bounds=lev
+        norm=mpl.colors.BoundaryNorm(bounds,cmap.N,extend='both')
+        
+        if M:
+            pos=0
+        else:
+            pos=gpos
+               
         if contour:
             
-            surf = ax[gpos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),levels=25,cmap=cm.coolwarm)
+            surf = ax[pos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),levels=25,cmap=cm.coolwarm)
         else:
-            ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=4, ccount=0,color="r",ls="-." )
-            ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=0, ccount=4,color="b",ls="-")
-            if dipole:
-                surf = ax[gpos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=lev,cmap=cm.cool)#,alpha=0.5)
-                #surf = ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=lev,colors='black',linewidths=0.5)
-                #surf = ax[gpos].contour(surf,levels=surf.levels[::2],colors='black',linewidths=0.5)
+            if M:
+                leg.append( ax[pos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=0, ccount=4,color=Mcolor[gpos],ls=Mstyle[gpos]))
             else:
-                surf = ax[gpos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=lev,cmap=cm.cool)#,alpha=0.5)
-                #surf = ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=5,colors='black',linewidths=0.5)
-                #surf = ax[gpos].contour(surf,levels=surf.levels[::2],colors='black',linewidths=0.5)
-            #surf = ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=-0.01,levels=10,,colors='black')
-            if logz:
-                ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Zn)),rcount=4, ccount=0,color="g",ls="-." )
-                ax[gpos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Zn)), rcount=0, ccount=4,color="y",ls="-")
+                ax[pos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=4, ccount=0,color="r",ls="-." )
+                ax[pos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Z)), rcount=0, ccount=4,color="b",ls="-")
+            
+            if not(M):
+                if dipole:
+                    #surf = ax[gpos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=lev,cmap=cm.cool)#,alpha=0.5)
+                    surf = ax[pos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=lev,cmap=cmap,norm=norm,alpha=0.75)
+                    #surf = ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=lev,colors='black',linewidths=0.5)
+                else:
+                    surf = ax[pos].contourf(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=lev,cmap=cmap,norm=norm,alpha=0.75)
+                    #surf = ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=offset,levels=5,colors='black',linewidths=0.5)
+                    #surf = ax[gpos].contour(surf,levels=surf.levels[::2],colors='black',linewidths=0.5)
+                #surf = ax[gpos].contour(np.array(X),np.array(Y),np.transpose(np.array(Z)),zdir='z',offset=-0.01,levels=10,,colors='black')
+                if logz:
+                    ax[pos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Zn)),rcount=4, ccount=0,color="g",ls="-." )
+                    ax[pos].plot_wireframe(np.array(X),np.array(Y),np.transpose(np.array(Zn)), rcount=0, ccount=4,color="y",ls="-")
+            
             if dipole:
                 if logz:
-                     ax[gpos].set(zlim=(offset,0))
-                     ax[gpos].set_zlabel("$\\log_{10}(\\sigma(x,r)/\\sigma_0)$",fontsize=15)
+                     ax[pos].set(zlim=(offset,0))
+                     ax[pos].set_zlabel("$\\log_{10}(\\sigma(x,r)/\\sigma_0)$",fontsize=12)
+                     ax[pos].zaxis.set_major_locator(plt.MultipleLocator(2))
+                     
                 else:
-                     ax[gpos].set(zlim=(offset,1.01))
-                     ax[gpos].set_zlabel("$\\sigma(x,r)/\\sigma_0$",fontsize=15)
-                ax[gpos].view_init(28, -28)
+                     ax[pos].set(zlim=(offset,1.01))
+                     ax[pos].set_zlabel("$\\sigma(x,r)/\\sigma_0$",fontsize=12)
+                     ax[pos].zaxis.set_major_locator(plt.MultipleLocator(0.2))
+                     
+                ax[pos].view_init(28, -28)
+                
                 #ax[gpos].set_ylabel('$\ln (r^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
             else:
                 if logz:
-                    ax[gpos].set(zlim=(-25,-1.5))
-                    ax[gpos].set_zlabel("$\\log_{10}(\\mathcal{F}(x,k^2)/\\sigma_0)$",fontsize=15)
+                    ax[pos].set(zlim=(-25,-1.5))
+                    ax[pos].set_zlabel("$\\log_{10}(\\mathcal{F}(x,k^2)/\\sigma_0)$",fontsize=12)
+                    ax[pos].zaxis.set_major_locator(plt.MultipleLocator(2))
                 else:
-                    ax[gpos].set(zlim=(-0.01,0.03))
-                    ax[gpos].set_zlabel("$\\mathcal{F}(x,k^2)/\\sigma_0$",fontsize=15)
-                ax[gpos].view_init(30, 25)
+                    ax[pos].set(zlim=(-0.01,0.03))
+                    ax[pos].set_zlabel("$\\mathcal{F}(x,k^2)/\\sigma_0$",fontsize=12)
+                    ax[pos].zaxis.set_major_locator(plt.MultipleLocator(0.01))
+                ax[pos].view_init(30, 25)
                 #ax[gpos].set_ylabel('$\ln (k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top')
-            ax[gpos].set_xlabel('$\\ln x$',loc='right',fontsize=15)
+            ax[pos].set_xlabel('$\\ln x$',loc='right',fontsize=15)
             if dipole:
-                ax[gpos].set_ylabel('$\\ln (r\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top',fontsize=15)
+                ax[pos].set_ylabel('$\\ln (r\\;[\\mathrm{GeV}^{-1}])$',rotation='vertical',loc='top',fontsize=12)
             else:
-                ax[gpos].set_ylabel('$\\ln (k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top',fontsize=15)
-            ax[gpos].yaxis.set_major_locator(plt.MultipleLocator(2))
-            ax[gpos].yaxis.set_minor_locator(plt.NullLocator())
-            ax[gpos].xaxis.set_major_locator(plt.MultipleLocator(4))
-            ax[gpos].xaxis.set_minor_locator(plt.NullLocator())
+                ax[pos].set_ylabel('$\\ln (k^2\\;[\\mathrm{GeV^2}])$',rotation='vertical',loc='top',fontsize=12)
+            ax[pos].yaxis.set_major_locator(plt.MultipleLocator(2))
+            ax[pos].yaxis.set_minor_locator(plt.NullLocator())
+            ax[pos].xaxis.set_major_locator(plt.MultipleLocator(4))
+            ax[pos].xaxis.set_minor_locator(plt.NullLocator())
+            ax[pos].zaxis.set_minor_locator(plt.NullLocator())
         #ax[gpos].set_xlim(-5,0)        
         #ax[gpos].set_ylim(-2, 2)  
         #ax[gpos].set_zlim(-20, 20)         
@@ -212,6 +255,16 @@ def main():
     #fig.set_figheight(2.75)
     #fig.set_figwidth(3*len(grids))
     #fig.colorbar(surf)
+    
+    print(len(leg)," ", labels)
+    if M:
+        if "" in labels:
+            labels.remove("")
+        if len(leg)>0:
+            ax[0].legend(leg,labels)
+       
+    fig.set_figheight(4)
+    fig.set_figwidth(4.8*(glen))
     if savefile!="":
         fig.savefig(savefile)
     else:

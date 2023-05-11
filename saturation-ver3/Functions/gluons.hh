@@ -111,6 +111,7 @@ class Chebyshev1D_Collinear_Gluon{
 		void set_x(const double &x);
 		
 		double operator()(const double x,const double Q2, double A_g,double l_g )const;
+		double operator()(const double x,const double Q2)const;
 };
 
 //////////////////////////////////////////

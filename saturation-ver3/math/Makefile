@@ -20,11 +20,14 @@ CXX=g++
 
 all : gluons-math levin
 
-gluons-math : gluons-math.o gluons.o
-	${CXX} gluons.o -I${INCDIR} gluons-math.o -L${LIBDIR} -l${WSTPLIB} -L/usr/lib/x86_64-linux-gnu ${EXTRALIBS} -o $@
+gluons-math : gluons-math.o gluons.o clenshaw.o
+	${CXX} gluons.o -I${INCDIR} gluons-math.o clenshaw.o -L${LIBDIR} -l${WSTPLIB} -L/usr/lib/x86_64-linux-gnu ${EXTRALIBS} -o $@
 
 gluons.o: ${FUNCDIR}/gluons.cc ${FUNCDIR}/gluons.hh
 	${CXX} -c ${FUNCDIR}/gluons.cc -o $@
+
+clenshaw.o: ${FUNCDIR}/clenshaw2.cc ${FUNCDIR}/clenshaw2.hh
+	${CXX} -c ${FUNCDIR}/clenshaw2.cc -o $@
 
 levin : levin.o 
 	${CXX} -I${INCDIR} levin.o -L${LIBDIR} -l${WSTPLIB} -L/usr/lib/x86_64-linux-gnu ${EXTRALIBS} -o $@

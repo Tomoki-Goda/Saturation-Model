@@ -31,6 +31,8 @@ double INT_PREC=1.0e-5;
 
 
 int main(int argc , char** argv){
+	printf("CURRENT DIRECTORY: %s\n",getenv("DIR"));
+	fflush(stdout);
 	options opt=read_options(argc, argv);
 	std::vector<double> param(10,0);
 
@@ -39,13 +41,15 @@ int main(int argc , char** argv){
 	if(opt.path==""){
 		opt.path=getenv("DIR");
 	}
+	printf("DIRECTORY: %s\n",opt.path.c_str());
+	
 	if(opt.input_file_name!="result.txt"){	
 		sprintf(infilenames,"%s",opt.input_file_name.c_str());
 	}else{
 		sprintf(infilenames,"%s/%s",opt.path.c_str(),opt.input_file_name.c_str());
 	}
 	
-	printf("%s\n",infilenames);
+	printf("INPUT: %s\n",infilenames);
 	FILE* infile=fopen(infilenames,"r");
 	read_parameters(infile,param);
 	fclose(infile);

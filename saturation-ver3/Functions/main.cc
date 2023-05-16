@@ -186,9 +186,10 @@ int main(int argc, char** argv){
 /////////////////////////////////////////////////////////////////
 // Try MiGrad
 //////////////////////////////////////////////////////////////////	
-	INT_PREC=5e-4;
+	
+	INT_PREC=1e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
-	prec.SetPrecision(1.0e-5);
+	prec.SetPrecision(1.0e-10);
 	std::cout<<"Prec= "<<prec<<std::endl;
 	//prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
@@ -218,9 +219,10 @@ int main(int argc, char** argv){
 		}
 		//INT_PREC/=1.4142;//sqrt(2)
 		//N_APPROX=((int)(1.4142*N_APPROX));
-		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+		//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
+	
 
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
@@ -239,7 +241,7 @@ int main(int argc, char** argv){
 		}
 		//INT_PREC/=1.41421356;//sqrt(2)
 		//N_APPROX=((int)(1.41421356*N_APPROX));
-		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+		//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
 

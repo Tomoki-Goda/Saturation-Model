@@ -8,10 +8,6 @@
 #define ALPHA_RUN 0
 #define MODX 0
 #define IBP 2 
-<<<<<<< HEAD
-#define USE_RESULT 0
-=======
 #define USE_RESULT 3 
->>>>>>> a6b99ec631fd08ef74e2e6585fdb9592dfcdeb96
 #define SIGMA_APPROX -1
 #define SECTOR_MAX 250

@@ -43,7 +43,9 @@ void Dipole_Gluon::init(const double * const &par ){
 void Dipole_Gluon::set_x(const double &x){
 	integrand->set_x(x);
 }
-
+double Dipole_Gluon::cc_integrand(const double x,const void*par)const{
+	return( (*integrand)(x,*(std::vector<double>*)par) );
+}
 double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2){
 	Kahn accum=Kahn_init(3);
 	const std::vector<double> par{kt2,x,mu2};
@@ -84,7 +86,9 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 			}
 		};
 		
-		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,INT_PREC*1.0e-3,10e-15);
+//		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,INT_PREC*1.0e-3,10e-15);
+		//val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
+		val=cc_integrate((void*)&par,imin,imax,pow(INT_PREC,2),10e-14);
 		
 		imin=imax;
 		if(val==0.0||sum+val==sum){

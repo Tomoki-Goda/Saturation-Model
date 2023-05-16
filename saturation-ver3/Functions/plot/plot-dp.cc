@@ -31,6 +31,8 @@ int N_APPROX=N_CHEB_R;
 double INT_PREC=1.0e-4;
 
 int main(int argc , char** argv){
+	printf("CURRENT DIRECTORY: %s\n",getenv("DIR"));
+	fflush(stdout);
 	options opt=read_options(argc, argv);
 	std::vector<double> param(10,0);
 
@@ -39,13 +41,14 @@ int main(int argc , char** argv){
 	if(opt.path==""){
 		opt.path=getenv("DIR");
 	}
+	printf("DIRECTORY: %s\n",opt.path.c_str());
 	if(opt.input_file_name!="result.txt"){	
 		sprintf(infilenames,"%s",opt.input_file_name.c_str());
 	}else{
 		sprintf(infilenames,"%s/%s",opt.path.c_str(),opt.input_file_name.c_str());
 	}
 	
-	printf("%s\n",infilenames);
+	printf("INPUT: %s\n",infilenames);
 	FILE* infile=fopen(infilenames,"r");
 	read_parameters(infile,param);
 	fclose(infile);
@@ -84,9 +87,11 @@ int main(int argc , char** argv){
 		//fclose(outfile);
 		double val=0,x=0;
 		double k2,mu2;
-		double arr[7000]={0};
-		for(int k=0; k<100;++k){
-			x=X_MIN*pow(X_MAX/X_MIN,((double)k)/99);
+		const int x_len=100,y_len=100,y2_len=20;
+		double arr[y2_len*y_len]={0};
+		for(int k=0; k<x_len;++k){
+			//x=X_MIN*pow(X_MAX/X_MIN,((double)k)/(x_len-1));
+			x=1.0e-8*pow(1.0e+7,((double)k)/(x_len-1));
 #if GLUON_APPROX==1
 			dipole_gluon.set_x(x);
 #endif
@@ -96,13 +101,14 @@ int main(int argc , char** argv){
 {
 			//double k2,mu2=0;
 #pragma omp for schedule(dynamic)
-			for(int j=0;j<100;++j){
-				k2=KT2_MIN*pow(kt2max/KT2_MIN,((double)j)/99);
+			for(int j=0;j<y_len;++j){
+				//k2=KT2_MIN*pow(kt2max/KT2_MIN,((double)j)/(y_len-1));
+				k2=1.0e-2*pow(1.0e+3/1.0e-2,((double)j)/(y_len-1));
 				printf("kt2= %.2e\n",k2);
 #if SUDAKOV>=1
-				for(int i=0;i<70;++i){
-					mu2=1.0e-1*pow(1.0e+5/1.0e-1,((double)i)/69);
-					arr[j*70+i]=dipole_gluon(x,k2,mu2);
+				for(int i=0;i<y2_len;++i){
+					mu2=1.0e-1*pow(1.0e+5/1.0e-1,((double)i)/(y2_len-1));
+					arr[j*y2_len+i]=dipole_gluon(x,k2,mu2);
 				}
 #else
 				mu2=0;
@@ -112,8 +118,8 @@ int main(int argc , char** argv){
 
 			}
 }
-			for(int j=0;j<100;++j){
-				k2=KT2_MIN*pow(kt2max/KT2_MIN,((double)j)/99);
+			for(int j=0;j<y_len;++j){
+				k2=1.0e-2*pow(1.0e+3/1.0e-2,((double)j)/(y_len-1));
 /*#if SUDAKOV>=1
 				for(int i=0;i<70;++i){
 					mu2=1.0e-1*pow(1.0e+5/1.0e-1,((double)i)/69);
@@ -128,6 +134,7 @@ int main(int argc , char** argv){
 				
 
 			}
+			//fprintf(outfile ,"\n");
 			printf("\033[1A\033[2K\r");
 			//gluon.set_max(kt2max,mu2);	
 			

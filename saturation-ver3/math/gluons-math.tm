@@ -1,16 +1,18 @@
 #include<wstp.h>
 #include"gluons.hh"
 Collinear_Gluon xgpdf;
+//double Ag,lg;
 double xg(const double x, const double QQ,const double A_g,const double l_g){
 	//Collinear_Gluon xgpdf;
 	return(xgpdf( x,  QQ, A_g,l_g));
 }
 
-Chebyshev1D_Collinear_Gluon xgpdf_cheb(25);
+Chebyshev1D_Collinear_Gluon xgpdf_cheb;
 int xg_cheb_init(const double min, const double max,const double Ag, const double lg,double xx){
 	static double x;
 	x=xx;
 	//Collinear_Gluon xgpdf;
+	xgpdf_cheb.allocate(25);
 	xgpdf_cheb.init(min,max, Ag,lg);
 	xgpdf_cheb.set_x(x);
 	return(0);

@@ -11,31 +11,37 @@
 //#include"control.h"
 //#include"control-default.h"
 #include"constants.h"
-#include"clenshaw.hh"
+#include"clenshaw2.hh"
 #include"polygamma.hh"
 #include<complex>
 #include<gsl/gsl_sf_gamma.h>
 #include"chebyshev.hh"
 //#define N_CHEB 25
 
-class Collinear_Gluon{
-	CCIntegral cc=CCprepare(256,"gluon",1,3);
+class Collinear_Gluon:private Clenshaw_Curtis{
+	//CCIntegral cc=CCprepare(256,"gluon",1,3);
+	
 	private:
 		const double	beta = 6.6;
 		double 			dgammafbeta;
 		const double	n_0 = 0.5;       /// Maximal singluraity of integrand 
 		std::complex<double> gammatilde(const std::complex<double>& n)const;
+		//std::vector<double>par;
 		
 	public:
 		explicit Collinear_Gluon(const Collinear_Gluon& init){
 			dgammafbeta=init.dgammafbeta;
+			cc_init(256,"gluon",1,3);
 		}
 		explicit Collinear_Gluon(){
 			dgammafbeta=gsl_sf_gamma(beta)/PI;
+			cc_init(256,"gluon",1,3);
 		}
 		~Collinear_Gluon(){
 		}
-		double operator()(const double y,const std::vector<double> &par)const;
+		
+		//int set_par(const std::vector<double> &par);
+		double cc_integrand(const double y,const void*par)const;
 		//MAIN FUNCTION
 		double operator()(const double x, const double QQ,const double A_g,const double l_g)const;
 };
@@ -105,6 +111,7 @@ class Chebyshev1D_Collinear_Gluon{
 		void set_x(const double &x);
 		
 		double operator()(const double x,const double Q2, double A_g,double l_g )const;
+		double operator()(const double x,const double Q2)const;
 };
 
 //////////////////////////////////////////

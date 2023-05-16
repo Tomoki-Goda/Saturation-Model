@@ -78,6 +78,16 @@ template<typename TYPE > class Integrand_kt{
 			betamin=sqrt(1-4*(mf2/((1-x)/x*Q2) )) ;
 			betamax=(1+betamin)/2;
 			betamin=(1-betamin)/2;
+			/*
+			if(betamin>betamax){
+				printf("beta range error: [%.2e, %.2e] x=%.2e Q2=%.2e mf2=%.2e\n",betamin betamax,x,Q2,mf2);
+			}
+			if(k2min>k2max){
+				printf("k2 range error: [%.2e, %.2e] x=%.2e Q2=%.2e mf2=%.2e\n",k2min k2max,x,Q2,mf2);
+			}
+			if(k2min>kappamax){
+				printf("kappa2 range error: [%.2e, %.2e] x=%.2e Q2=%.2e mf2=%.2e\n",k2min kappamax,x,Q2,mf2);
+			}*/
 			return 0;
 		}
 		
@@ -111,15 +121,18 @@ template<typename TYPE > class Integrand_kt{
 			if(betamin>=betamax){
 				return 0;
 			}
+			
 			change_var(beta,jac3,betamin,betamax,1);
 			change_var(kappa2,jac2,k2min,kappamax,1+kappamax/pow(1+Q2,0.5));
 
 			k2max=(1-x)/x*Q2-(kappa2+mf2)/(beta*(1-beta));
+			
 			if(k2max<=k2min){
 				return 0;
 			}
 
 			double val=0;
+					
 			if(kappa2<k2max){
 				k2=1-x1*x1;
 				change_var(k2,jac1,k2min,kappa2,1+kappa2/pow(1+Q2,0.25));
@@ -228,8 +241,8 @@ template <typename Sig> class Integrand_r{
 		//	}
 			this->x=modx(x,Q2,mf2);
 			//this->x=x;
-			if(this->x>1){
-				printf("set_kinem:: x toolarge %.3e\n",x);
+			if((this->x)>1){
+				printf("set_kinem:: x too large %.3e\n",x);
 			}
 			this->Q2=Q2;
 			this->mf2=mf2;

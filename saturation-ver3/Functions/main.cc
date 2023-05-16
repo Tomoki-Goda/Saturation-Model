@@ -142,12 +142,10 @@ int main(int argc, char** argv){
 // Start fitting
 //////////////////////////////////////////////////////////
 	ROOT::Minuit2::MnMachinePrecision prec;
-	prec.SetPrecision(1.0e-10);
-	std::cout<<"Prec= "<<prec<<std::endl;
 	//INT_PREC=5.0e-4 ;
 	//N_APPROX=N_CHEB_R/2;
 	
-	INT_PREC=1.0e-4;
+	INT_PREC=1.0e-5;
 	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
@@ -170,13 +168,13 @@ int main(int argc, char** argv){
 			for(int k=0;k<N_PAR-skip;++k){
 				//min=simplex1(50,0);
 				simplex1.Fix(k);
-				min=simplex1(50,20/(2*i+1));
+				min=simplex1(50,2/(2*i+1));
 				std::cout<<"Parameters "<<min.UserState()<<std::endl;
 				simplex1.Release(k);
 			}
 //		}
 		
-		min=simplex1(50,20/(2*i+1));
+		min=simplex1(50,2/(2*i+1));
 		//INT_PREC/=2;
 		//N_APPROX=(int)(N_APPROX*2);
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
@@ -185,13 +183,11 @@ int main(int argc, char** argv){
 /////////////////////////////////////////////////////////////////
 // Try MiGrad
 //////////////////////////////////////////////////////////////////	
-	std::vector<int> fix;
-	std::vector<int> free;
-	fix.reserve(10);
-	free.reserve(10);
 	
-	INT_PREC=5e-4;
+	INT_PREC=1e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
+	prec.SetPrecision(1.0e-10);
+	std::cout<<"Prec= "<<prec<<std::endl;
 	//prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
@@ -224,7 +220,7 @@ int main(int argc, char** argv){
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	}
 	
-	INT_PREC=1.0e-4;
+	INT_PREC=1.0e-5;
 	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
@@ -232,7 +228,7 @@ int main(int argc, char** argv){
 	printf("***************************\n");
 	goal=10;
 	for(int k=0;k<5;k++){
-		Fix_Release(min, theFCN, N_PAR-skip, 0, goal);
+		Fix_Release(min, theFCN, N_PAR-skip, 1, goal);
 
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
@@ -255,7 +251,7 @@ int main(int argc, char** argv){
 	
 }
 
-int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN theFCN, int N, int str ,int goal){
+int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN& theFCN, int N, int str ,int goal){
 	std::vector<int> fix;
 	std::vector<int> free;
 	fix.reserve(10);

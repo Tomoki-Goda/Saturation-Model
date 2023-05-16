@@ -84,7 +84,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 			}
 		};
 		
-		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
+		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,INT_PREC*1.0e-3,10e-15);
 		
 		imin=imax;
 		if(val==0.0||sum+val==sum){
@@ -101,7 +101,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 			
 			val1=lev.accel(i-accel_len,accel_len);
 			if(flag>=1){
-				if(fabs(2*(val1-val2)/(val1+val2))<INT_PREC/10||fabs(val2-val1)<pow(INT_PREC/5,2) ){
+				if(fabs(2*(val1-val2)/(val1+val2))<INT_PREC/100||fabs(val2-val1)<1.0e-14 ){
 					//++flag;
 					if(++flag==pass){
 						sectors=i+1;
@@ -127,10 +127,10 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 	}else if(sectors>=accel_min*accel_len){
 		val1=lev.accel(sectors-accel_len,accel_len);
 		val2=lev.accel(sectors-1-accel_len,accel_len);
-		if(fabs(2*(val1-val2)/(val1+val2))>INT_PREC/2&&fabs(val2-val1)>2*pow(INT_PREC/5,2) ){
-			printf("\n3: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n\n",
-			sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val,INT_PREC);
-		}
+//		if(fabs(2*(val1-val2)/(val1+val2))>INT_PREC/10&&fabs(val2-val1)>INT_PREC/100 ){
+//			printf("3: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n",
+//			sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val,INT_PREC);
+//		}
 		//val=val1;
 	}else{
 		val1=sum;

@@ -26,7 +26,7 @@ set linetype 6 lc rgbcolor '#008800' dt (6,1)	lw 4	#green
 
 set xrange[0.0:3.1]
 set output './plots/plotGBW1.tex' 
-set object rectangle from 0.1,0.018 to 1.75,0.09 fillcolor rgbcolor '#FFFFFF' fs solid noborder
+set object rectangle from 0.1,0.018 to 1.75,0.091 fillcolor rgbcolor '#FFFFFF' fs solid noborder
 set label "\\scriptsize\\colorbox{white}{$E_e=15\\mathrm{GeV}\\; E_p=135\\mathrm{GeV}$}\n \
 		\\scriptsize\\colorbox{white}{$Q^2>1\\mathrm{GeV}^2$}\n \
 		\\scriptsize\\colorbox{white}{$0.1<\\nu<0.85$}\n \

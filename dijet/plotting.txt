@@ -1,10 +1,18 @@
+######################################
+# Input for gnuplot
+#	TeX files are produced. 
+#	They have to be run to generate pdf puuctures
+#
+######################################
+
 set terminal epslatex standalone size 4in,3in  level3
 #set terminal cairolatex pdf size 3in,2in
 #set terminal epslatex input size 3in,2in
 #set terminal pslatex level3 size 3in,2in
 set logscale y
 
-set grid mytics xtics linecolor rgbcolor '#888888' lw 1 ,linecolor rgbcolor '#444444' lw 1
+set grid mytics xtics linecolor rgbcolor '#888888' lw 1 ,linecolor rgbcolor '#444444' lw 1 
+
 #set title '$\gamma $'
 set ylabel '\scriptsize $d\sigma/d\Delta \phi [\mathrm{nb}]$'
 set xlabel '\scriptsize $\Delta \phi^{\mathrm{Breit}}(J_1+J_2,e^-)$'
@@ -17,7 +25,18 @@ set linetype 5 lc rgbcolor '#FF0000' dt (2,2,3,2) lw 4	#red
 set linetype 6 lc rgbcolor '#008800' dt (6,1)	lw 4	#green
 
 set xrange[0.0:3.1]
-set output './plots/plotGBW1.tex'
+set output './plots/plotGBW1.tex' 
+set object rectangle from 0.1,0.018 to 1.75,0.09 fillcolor rgbcolor '#FFFFFF' fs solid noborder
+set label "\\scriptsize\\colorbox{white}{$E_e=15\\mathrm{GeV}\\; E_p=135\\mathrm{GeV}$}\n \
+		\\scriptsize\\colorbox{white}{$Q^2>1\\mathrm{GeV}^2$}\n \
+		\\scriptsize\\colorbox{white}{$0.1<\\nu<0.85$}\n \
+		\\scriptsize\\colorbox{white}{$\\Delta R_{\\mathrm{Breit}}<1$}\n \
+		\\scriptsize\\colorbox{white}{$p^{\\mathrm{Breit}}_{1,2\\,T}>3\\mathrm{GeV}$}\n \
+		\\scriptsize\\colorbox{white}{$-4<y_{1,2\\,\\mathrm{lab}}<-1$}" \
+	at 0.9,0.08 \
+	center \
+	front
+
 plot './KS/Phi1.hst' u ($1+$2)/2:3 		w lines ls 1 t "\\scriptsize KS", \
 		 './rcBK/Phi1.hst' u ($1+$2)/2:3 		w lines ls 6 t "\\scriptsize rcBK", \
 	'./GBW/Phi1.hst' u ($1+$2)/2:3 		w lines ls 4 t "\\scriptsize GBW $k_t$", \
@@ -59,7 +78,6 @@ plot  './KS/Phi1.hst' u ($1+$2)/2:3 	w lines ls 1 t "\\scriptsize KS", \
 #
 #################################
 set xlabel '\scriptsize $\Delta \phi^{\mathrm{Lab}}(J_1+J_2,e^-)$'
-
 
 set output './plots/plotGBW1Lab.tex'
 plot './KS/Phi2.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \
@@ -104,6 +122,19 @@ set xrange[1.5:3.1]
 #################################
 set xlabel '\scriptsize $\Delta \phi^{\mathrm{Breit}}(J_1,J_2)$'
 set yrange[0.0001:1]
+
+unset object
+unset label
+set object rectangle from 1.55,0.02 to 2.3,0.85 fillcolor rgbcolor '#FFFFFF' fs solid noborder
+set label "\\scriptsize $E_e=15\\mathrm{GeV}\\; E_p=135\\mathrm{GeV}$\n \
+		\\scriptsize $Q^2>1\\mathrm{GeV}^2$\n \
+		\\scriptsize $0.1<\\nu<0.85$\n \
+		\\scriptsize $\\Delta R_{\\mathrm{Breit}}<1$\n \
+		\\scriptsize $p^{\\mathrm{Breit}}_{1,2\\,T}>3\\mathrm{GeV}$\n \
+		\\scriptsize $-4<y_{1,2\\,\\mathrm{lab}}<-1$" \
+	at 1.97,0.6 \
+	center \
+	front
 
 set output './plots/plotGBW1Jets.tex'
 plot './KS/Phi3.hst' u ($1+$2)/2:3 w lines ls 1 t "\\scriptsize KS", \

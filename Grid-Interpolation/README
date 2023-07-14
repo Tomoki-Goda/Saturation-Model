@@ -1,0 +1,9 @@
+Use KS 3d interpolation to read grid to plot 2d. 
+
+makefile to build 
+
+plot-ww.sh is for ploatting
+
+run "gnuplot plotting.txt "
+ to make plots in tex format. 
+ then run those tex to obtain pdf pictures.

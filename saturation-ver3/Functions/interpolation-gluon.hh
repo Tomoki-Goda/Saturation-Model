@@ -21,7 +21,6 @@
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
-#include"clenshaw.hh"
 #include"dipole-gluon.hh"
 
 #if GLUON_APPROX==1
@@ -29,7 +28,11 @@ typedef Dipole_Gluon GLUON;
 #elif MODEL==0
 typedef Gluon_GBW GLUON;
 #endif
-
+///////////////////////////////////////////////////////
+//
+// dipole gluon is approximated by the GSI 2D spline.
+//
+///////////////////////////////////////////////////////
 
 class Approx_aF{
 	private:

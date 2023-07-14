@@ -1,0 +1,25 @@
+##################################
+# Configuration etc.
+##################################
+ In order to use this program, one needs to create a working directory 
+ 
+ mkdir ../Run
+ 
+ then in this directory, create a file called control.h
+ in this one defines macros whose default values are defined in the file 
+ control-default.h
+for example 
+	#define MODEL 0 
+to run GBW model fit
+##################################
+# RUN
+##################################
+ before use, do export DIR=<directory >
+ like 				                   
+	 export DIR				                    		
+	 for i in ./GBW/* ;  DIR=${i}; make ;done	            
+ 
+ Then run 
+ 	${DIR}/main.out ${DIR}
+ 	
+ this should produce result.txt 

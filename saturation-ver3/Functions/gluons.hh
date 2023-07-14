@@ -4,6 +4,12 @@
 // Modified by T. Goda
 // 
 // COLGLU Defined at the end
+//
+// Chebyshev_Collinear_Gluon
+//   approximate gluon by 2d chbyshev.
+// Chebyshev1D_Collinear_Gluon
+//   approximate gluon for a fixed value of x.
+//
  
 #ifndef GLUONS_HH
 #define GLUONS_HH

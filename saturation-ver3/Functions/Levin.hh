@@ -1,6 +1,21 @@
 #include<iostream>
 #include<cmath>
 #include"Kahn.hh"
+////////////////////////////////////
+//
+// This is Levin's  series acceleration algorithm.
+// Use is simple
+// Start with defining how many terms you want to keep in memory. 
+// Levin(N).
+// for terms in the series, use add_term(x) to add and record the term. 
+// sum(n) returns unaccelerated sum up to n th element.
+// and accel(n,j) returns n th accelerated sum using j last terms. 
+// (you need n+j terms in unaccelerated series)
+// Details are found in  H.H. Homeier E.J. Weniger 
+//
+////////////////////////////////////
+
+
 
 class Levin{
 	private:

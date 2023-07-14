@@ -7,7 +7,6 @@
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
-#include"clenshaw.hh"
 #include"gluons.hh"
 #include"miscellaneous.hh"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,7 +16,8 @@
 //   Usage::
 //   sigma.init(sigpar) //double* sigpar;
 //   sigma(x,r) // double x,r 
-//
+//   
+//   set_x( x ) can be used if gluon is approximated by chebyshev
 // SIGMA 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #if SIGMA_APPROX<0

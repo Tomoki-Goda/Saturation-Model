@@ -1,4 +1,3 @@
-#include"control.h"
 #include"interpolation-gluon.hh"
 
 

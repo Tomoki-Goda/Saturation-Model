@@ -9,6 +9,12 @@
 #ifndef PI
 #define PI 3.141592653589793238462643383279502884197
 #endif
+//
+//To use this, one needs to define cc_integrand in a drived class. 
+// then cc_integrate integrates cc_integrate between a and b with extra parameter par 
+// to the accuracy eps and absolute accuracy Aeps
+//
+
 class Clenshaw_Curtis{
 	private:
 		std::string tag;

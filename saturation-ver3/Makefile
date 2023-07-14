@@ -28,7 +28,7 @@ all: clean  main
 
 main: $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o ${DIR}/clenshaw2.o  \
 		${DIR}/interpolation-gluon.o ${DIR}/main.o 
-	${CXX} $^ -o ${DIR}/main ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+	${CXX} $^ -o ${DIR}/main.out ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
 plot:ww.out  sigma.out  dp.out 
 
@@ -76,5 +76,8 @@ test: gluonsf.o gluonsc.o
 clean: 
 	rm -f ${DIR}/*.o
 	rm -f ${FUNCDIR}/*.o
+	rm -f ${DIR}/*.out
+	rm -f ${FUNCDIR}/*.out
 	rm -f ${DIR}/main
+
 	 		

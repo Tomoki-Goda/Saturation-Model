@@ -1,3 +1,10 @@
+#################################
+#  Prerequisite
+#################################
+This program requires GNU scientific library (GSL),
+  Cuba integration library and ROOT::Minuit2 
+
+
 ##################################
 # Configuration etc.
 ##################################
@@ -23,3 +30,16 @@ to run GBW model fit
  	${DIR}/main.out ${DIR}
  	
  this should produce result.txt 
+ 
+ ################################
+ #Plotting etc.
+ ################################
+ Makefile produces extra executables ww.out  sigma.out  dp.out .
+ they generate grids, which can be plotted using files in Grid-Interpolation. 
+ (see plot-ww.sh)
+ KS-gluon programs are used to make 3d grids to 2d and Gnuplot  
+ For details, see README file in Grid-Interpolation.
+ 
+ all-table.sh and Functions/table.cc can be used to convert result file 
+ to LaTeX table.
+ 

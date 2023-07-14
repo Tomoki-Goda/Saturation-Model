@@ -64,14 +64,14 @@ $(DIR)/%.o: ${FUNCDIR}/%.cc ${FUNCDIR}/%.hh ${DEPS}
 		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
 
 
-gluonsf.o:${FUNCDIR}/gluons.f
-		gfortran -c -I${FUNCDIR} -I${FUNCDIR}/fortran ${OPT} ${LIBS} $< -o $@
-gluonsc.o:${FUNCDIR}/gluons.cc
-		${CXX} -c -I${FUNCDIR}  ${OPT} ${LIBS} $< -o $@
+#gluonsf.o:${FUNCDIR}/gluons.f
+#		gfortran -c -I${FUNCDIR} -I${FUNCDIR}/fortran ${OPT} ${LIBS} $< -o $@
+#gluonsc.o:${FUNCDIR}/gluons.cc
+#		${CXX} -c -I${FUNCDIR}  ${OPT} ${LIBS} $< -o $@
 
-test: gluonsf.o gluonsc.o
-	${CXX} -c test-gluons.cc -I${FUNCDIR}  -o test-gluons.o
-	${CXX} test-gluons.o -o test-gluons -I${INCDIR} -I${FUNCDIR} -I. -I${DIR} ${OPT} ${LIBS} $^ -lgfortran -lmathlib
+#test: gluonsf.o gluonsc.o
+#	${CXX} -c test-gluons.cc -I${FUNCDIR}  -o test-gluons.o
+#	${CXX} test-gluons.o -o test-gluons -I${INCDIR} -I${FUNCDIR} -I. -I${DIR} ${OPT} ${LIBS} $^ -lgfortran -lmathlib
 
 clean: 
 	rm -f ${DIR}/*.o

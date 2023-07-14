@@ -13,10 +13,16 @@
 #endif
 ////////////////// usage/////////////////
 // run
-//	cheb_coeff(func, par ,degree, dim ,coeff)
-// to produce coeff. 
+//	cheby PrepareChebyshev(const unsigned *degree,const unsigned dim)
+//  degree is a list specifing number of points in each dimension of dim.
+//  cheby class is the object
+// template<typename T, typename T2>static 
+//    void cheb_coeff(cheby & data, T& func, T2 par )
+//  to survey function(a,b) a is vector argument, and b vector parameter
 //then use  
-//	chebyshev(degree, dim,  coeff , args )
+//	chebyshev(chby, arg) 
+//    to get the value
+//  
 //////////////////////////////////////////
 
 ///////////////////////////Change of variables to -1 1 ///////////////////////

@@ -46,6 +46,12 @@ int save_res(std::string name, const ROOT::Minuit2::FunctionMinimum *min,const K
 	return 0;
 }
 
+
+//////////////////////////////////////////////////////////
+//
+// MAIN 
+//
+////////////////////////////////////////////////////////////
 int main(int argc, char** argv){
 	
 #if SCATTER==1
@@ -91,6 +97,10 @@ int main(int argc, char** argv){
 	int skip=0;
 #if USE_RESULT==0
 //	for(unsigned i=0;(i-skip)<N_PAR;i++){
+////////////////////////////////////////////
+// Set up the parameters
+////////////////////////////////////////////
+	//std::map<std::string,double> par_table;
 	for(unsigned i=0;i<N_PAR;i++){
 #if (ALPHA_RUN==0||MU02!=0)
 		if(par_name[i]=="mu02"){
@@ -99,20 +109,15 @@ int main(int argc, char** argv){
 			continue;
 		}
 #endif
-#if (THRESHOLD!=-1)
-		if(par_name[i]=="thresh"){
-			skip++;
-			//std::cout<<"Skip "<< par_name[i]<<" = "<< MU02<<std::endl;;
-			continue;
-		}
-#endif
+		//par_table[par_name[i]]=par_start[i];
+		
 		std::cout<<par_name[i]<<" = "<<par_start[i]<<std::endl;
 		//std::cout<<N_PAR<<"  "<<skip <<" : parameter position="<<i<<std::endl;
 		upar.Add(par_name[i], par_start[i],par_error[i]);
 		upar.SetLimits(par_name[i],par_min[i],par_max[i]);//use migrad.removeLimits(<name>);
 	}
 #else//USE_RESULT==1
-		printf("USING PREVIOUS RESULT %d\n",USE_RESULT);
+	printf("USING PREVIOUS RESULT %d\n",USE_RESULT);
 	char resfile[100];
 	sprintf(resfile,"%s/result.txt",argv[1]);
 	
@@ -120,71 +125,72 @@ int main(int argc, char** argv){
 	double ival,ierr;
 	FILE* resinputfile=fopen(resfile,"r");
 	fscanf(resinputfile,"%s %le",name,&ival);
+	
 	for(unsigned i=0;i<N_PAR;i++){
 		fscanf(resinputfile,"%s %le %le",name,&ival,&ierr);
 		if(strcmp(name,"chisq")==0){
 			skip=N_PAR-i;
 			break;
 		}
+		//par_table[name]=ival;
 #if USE_RESULT>0
 		ival=double_round(ival,USE_RESULT);
 #endif
 		printf("%s %le %le \n",name,ival,ierr*10);
-		//upar.Add(name, ival,(fabs(ierr)<fabs(ival/100))?(ival/50):(ierr*10));
-		//upar.Add(name, ival,(fabs(ierr)<1.0e-5)?(ival/50):(ierr*10));
-		//upar.Add(name, ival, ival/50);
 		upar.Add(name, ival, ival*5*pow(10,-USE_RESULT));
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT
+
+//////////////////////////////////////////////////////////
+// Start fitting
+//////////////////////////////////////////////////////////
 	ROOT::Minuit2::MnMachinePrecision prec;
 	
-	INT_PREC=5.0e-4 ;
-	N_APPROX=N_CHEB_R/2;
+	//INT_PREC=5.0e-4 ;
+	//N_APPROX=N_CHEB_R/2;
+	
+	INT_PREC=5.0e-4;
+	N_APPROX=N_CHEB_R/4;
 	//prec.SetPrecision(INT_PREC);
 	int flag=0;
 	double goal=1;
+	
 	ROOT::Minuit2::MnSimplex simplex1(theFCN,upar,0);
 	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
 	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-	prec.SetPrecision(1.0e-6);
-	
-	INT_PREC=1.0e-3;
-	N_APPROX=N_CHEB_R/3;
+/*
+	INT_PREC=5.0e-3;
+	N_APPROX=N_CHEB_R/4;
+	min=simplex1(25,1);
+	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	for(int i=0;i<2;++i){
-		prec.SetPrecision(INT_PREC*5);
 		printf("*****************************\n");
 		printf("*** Simplex: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 		printf("*****************************\n");
 		//min=simplex1(100,pow(10,1-i));
-		for(int i=0;i<N_PAR-skip;++i){
-			min=simplex1(50,25);
-			simplex1.Fix(i);
-#if MODEL==1
-			for(int j=0;j<N_PAR-skip;++j){
-				if(i==j){
-					continue;
-				}
-				simplex1.Fix(j);
-				min=simplex1(100,pow(10,1-i));
-				std::cout<<"Parameters "<<min.UserState()<<std::endl;
-				simplex1.Release(j);
-			}
-#endif
-			min=simplex1(50,25);
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-			simplex1.Release(i);
+		for(int k1=0;k1<N_PAR-skip;++k1){
+			simplex1.Fix(k1);
+			min=simplex1(100,4.0/(2*i+1));
+		 	simplex1.Release(k1);
+		 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		}
-		min=simplex1(50,25);
-		INT_PREC/=2;
-		N_APPROX=(int)(N_APPROX*2);
+		min=simplex1(50,4.0/(2*i+1));
+		//INT_PREC/=2;
+		//N_APPROX=(int)(N_APPROX*2);
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 	}
+*/
+/////////////////////////////////////////////////////////////////
+// Try MiGrad
+//////////////////////////////////////////////////////////////////	
 	
-	
-	INT_PREC=2.5e-4;
+	INT_PREC=1e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
+	prec.SetPrecision(1.0e-10);
+	std::cout<<"Prec= "<<prec<<std::endl;
 	//prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** First: eps=%.1e  N_APROX=%d***\n",(double)INT_PREC,N_APPROX);
@@ -194,98 +200,55 @@ int main(int argc, char** argv){
 	for(int i=0;i<(N_PAR-skip);i++ ){
 		migrad.RemoveLimits(i);
 	}
-	min=migrad(20,25);
+	min=migrad(pow(N_PAR-skip,2) ,25);
 }
+	
+	
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	goal=25;
 	for(int k=0;k<5;k++){
-		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),0);
-		for(int i=0;i<N_PAR-skip;++i){
-			migrad.Fix(i);
-/*#if MODEL==1
-			for(int j=0;j<N_PAR-skip;++j){
-				if(i==j){
-					continue;
-				}
-				migrad.Fix(j);
-				min=migrad(50,25);
-				std::cout<<"Parameters "<<min.UserState()<<std::endl;
-				migrad.Release(j);
-			}
-#endif*/
-			min=migrad(50,25);
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-			migrad.Release(i);
-		}
-		min=migrad(100,goal);
+		Fix_Release(min, theFCN, N_PAR-skip, 0, goal);	
 		
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
 		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
 		
 		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
-		if(min.IsValid()/*&&(min.UserState().CovarianceStatus()==3 )*/){
+		if(min.IsValid()){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
-		INT_PREC/=1.4142;//sqrt(2)
-		N_APPROX=((int)(1.4142*N_APPROX));
-		prec.SetPrecision(2*INT_PREC);
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		
-		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
-		min=simplex(25,goal);
-		//std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		//INT_PREC/=1.4142;//sqrt(2)
+		//N_APPROX=((int)(1.4142*N_APPROX));
+		//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
 	
+
 	INT_PREC=1.0e-4;
 	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
-	prec.SetPrecision(1.0e-6);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
 	goal=10;
 	for(int k=0;k<5;k++){
-		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),1);
-		for(int i=0;i<N_PAR-skip;++i){
-			migrad.Fix(i);
-/*#if MODEL==1
-			for(int j=0;j<N_PAR-skip;++j){
-				if(i==j){
-					continue;
-				}
-				migrad.Fix(j);
-				min=migrad(50,goal);
-				std::cout<<"Parameters "<<min.UserState()<<std::endl;
-				migrad.Release(j);
-			}
-#endif*/
-			min=migrad(50,goal);
-			std::cout<<"Parameters "<<min.UserState()<<std::endl;
-
-			migrad.Release(i);
-		}
-
-		min=migrad(100,goal);
-
+		Fix_Release(min, theFCN, N_PAR-skip, 1, goal);
+		
+		save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);	
 		if(min.IsValid()&&(min.UserState().CovarianceStatus()==3 )){
 			printf(" %.3e/%.3e = %.3e\n", min.UserState().Edm(),  (min.UserState().Fval()),min.UserState().Edm()/ (min.UserState().Fval()));
 			break;
 		}
-
-		INT_PREC/=1.41421356;//sqrt(2)
-		N_APPROX=((int)(1.41421356*N_APPROX));
-		prec.SetPrecision(2*INT_PREC);
-		std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		
-		ROOT::Minuit2::MnSimplex simplex(theFCN,min.UserParameters(),0);
-		min=simplex(30,goal);	
+		//INT_PREC/=1.41421356;//sqrt(2)
+		//N_APPROX=((int)(1.41421356*N_APPROX));
+		//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
+		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
 
 	
 	
-
-	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+	std::cout<<"***********Final Parameters*************\n"<<min.UserState()<<std::endl;
+	
 	std::cout<<"min= "<<min<<std::endl;
 	std::chrono::duration<double> time=walltime.now()-start;
 	std::cout<<time.count()<<" seconds"<<std::endl;
@@ -293,7 +256,60 @@ int main(int argc, char** argv){
 	
 }
 
+int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN& theFCN, int N, int str ,int goal){
+	std::vector<int> fix;
+	std::vector<int> free;
+	fix.reserve(10);
+	free.reserve(10);
+	ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),str);
+	//////// try fixing////////////
+	fix.clear();
+	free.clear();
+	for(int ii=0;ii<N;++ii){
+		free.push_back(ii);
+	}
+	for(int j=0;j< (N-1)/2+1;++j){
+		std::vector<double> cor=min.UserState().GlobalCC().GlobalCC();
+		for(int ii=0;ii<cor.size();++ii){
+			printf("cor %d = %f\n",ii,cor[ii]);
+		}
+		int fixone=std::distance(cor.begin(),std::max_element(cor.begin(),cor.end()));
+		
+		printf("Fix %d (st/nd/th) pos (%d) \n",free[fixone],fixone);
+		
+		migrad.Fix(free[fixone]);
+		
+		fix.push_back(free[fixone]);
+		free.erase(free.begin()+fixone);
+		
+		min=migrad( pow(N+1,2) ,goal);
+		
+		std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
+		printf("Valid: %d \tCovariance: %d\n",min.IsValid(),min.HasCovariance());
+		if(min.IsValid()){
+			printf("Fixing successful\n");
+			break;
+		}else{
+			printf("Fixing insufficient\n");
+		}
+	}
+	////////////then release///////////////
+	for(int ii=0;ii<fix.size();++ii){
+		//migrad.Release(fix[fix.size()-ii-1]);
+		migrad.Release(fix[ii]);
+		if(fix.size()!=ii+1){
+			min=migrad( pow(N+1,2)/2 ,goal);
+			std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		}
+	}
 	
-	
+
+	min=migrad( pow(N+1,2)*2 ,goal);
+	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+
+	return min.UserState().CovarianceStatus();
+}
+
 	
 	

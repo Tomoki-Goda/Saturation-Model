@@ -5,7 +5,7 @@
 #define PRINT_PROGRESS 1
 #define ALPHA_RUN 1 
 #define MODX 0
-#define USE_RESULT 1 
+#define USE_RESULT 4
 #define IBP 1
 #define MU02 4
 #define GLUON_APPROX 1

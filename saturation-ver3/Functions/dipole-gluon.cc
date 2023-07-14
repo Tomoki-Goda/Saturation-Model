@@ -6,16 +6,7 @@ void Gluon_GBW::init(const double *par){
 		sigma_0 = par[count++];
 		lambda	= par[count++];
 		x_0	=par[count++];
-	#if MU02==0
-		mu02 = par[count++];
-	#else 
-		mu02 = MU02;
-	#endif
-	#if THRESHOLD==-1
-		thresh_power=par[count++];
-	#else
-		thresh_power=THRESHOLD;
-	#endif
+	
 }
 double Gluon_GBW::operator()(const double  x,const double k2,double mu2){
 	if(x_0<1.0e-5||x_0>1.0e-3){
@@ -25,9 +16,7 @@ double Gluon_GBW::operator()(const double  x,const double k2,double mu2){
 		return 0;
 	}
 	double Qs2=pow(x_0/x,lambda);
-	#if THRESHOLD==-2
-	Qs2*=pow(1-x,5);
-	#endif		
+		
 	#if WW==1
 	Qs2*=9.0/4.0;
 	gsl_sf_result result;
@@ -41,15 +30,7 @@ double Gluon_GBW::operator()(const double  x,const double k2,double mu2){
 	if(std::isnan(val)==1){
 		return(0);
 	}
-	#if ALPHA_RUN==1
-	val*=alpha(mu2+mu02)/0.2;
-	//val*=alpha((mu2>mu02)?(mu2):(mu02))/0.2;
-	//printf("%.2e %.2e\n",mu2,alpha(mu2));
-	#endif
-	#if THRESHOLD>0||THRESHOLD==-1 
-	//double thresh_power=THRESHOLD;
-	val*=pow(1-x,thresh_power);
-	#endif
+	
 	return (sigma_0*val) ;
 }
 //////////////////////////////////////////////////////////////////////
@@ -62,7 +43,9 @@ void Dipole_Gluon::init(const double * const &par ){
 void Dipole_Gluon::set_x(const double &x){
 	integrand->set_x(x);
 }
-
+double Dipole_Gluon::cc_integrand(const double x,const void*par)const{
+	return( (*integrand)(x,*(std::vector<double>*)par) );
+}
 double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2){
 	Kahn accum=Kahn_init(3);
 	const std::vector<double> par{kt2,x,mu2};
@@ -82,7 +65,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 
 	double imax=PI/(sqrt(kt2)*4); //forJ0 integral, this is efficient
 				  
-	int flag=0,pass=5,accel_len=6,accel_min=3;
+	int flag=0,pass=5,accel_len=8,accel_min=3;
 	//flag=0 untested
 	//flag=1 tested without pass
 	//flag>1 passed flag-1 times consecutivel
@@ -103,7 +86,9 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 			}
 		};
 		
-		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
+//		val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,INT_PREC*1.0e-3,10e-15);
+		//val=dclenshaw<INTEG ,const std::vector<double>&>(cc,*integrand,par,imin,imax,pow(INT_PREC,2),10e-14);
+		val=cc_integrate((void*)&par,imin,imax,pow(INT_PREC,2),10e-14);
 		
 		imin=imax;
 		if(val==0.0||sum+val==sum){
@@ -120,7 +105,7 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 			
 			val1=lev.accel(i-accel_len,accel_len);
 			if(flag>=1){
-				if(fabs(2*(val1-val2)/(val1+val2))<INT_PREC/10||fabs(val2-val1)<pow(INT_PREC/5,2) ){
+				if(fabs(2*(val1-val2)/(val1+val2))<INT_PREC/100||fabs(val2-val1)<1.0e-14 ){
 					//++flag;
 					if(++flag==pass){
 						sectors=i+1;
@@ -146,10 +131,10 @@ double Dipole_Gluon::operator()(const double x,const double kt2,const double mu2
 	}else if(sectors>=accel_min*accel_len){
 		val1=lev.accel(sectors-accel_len,accel_len);
 		val2=lev.accel(sectors-1-accel_len,accel_len);
-		if(fabs(2*(val1-val2)/(val1+val2))>INT_PREC/2&&fabs(val2-val1)>2*pow(INT_PREC/5,2) ){
-			printf("\n3: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n\n",
-			sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val,INT_PREC);
-		}
+//		if(fabs(2*(val1-val2)/(val1+val2))>INT_PREC/10&&fabs(val2-val1)>INT_PREC/100 ){
+//			printf("3: sum=%.3e \t lev=%.1e %.1e\t diff= %.2e\t %d rmax= %.1e x=%.1e kt2=%.1e last term=%.1e, INT_PREC=%.1e\n",
+//			sum,val1,val2,fabs(val1-val2),sectors,imax,x,kt2,val,INT_PREC);
+//		}
 		//val=val1;
 	}else{
 		val1=sum;

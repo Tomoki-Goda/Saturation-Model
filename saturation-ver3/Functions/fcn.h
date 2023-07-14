@@ -7,6 +7,7 @@
 #include"Minuit2/MnEigen.h"
 #include"Minuit2/FCNBase.h"
 #include"Minuit2/MnMachinePrecision.h"
+#include"Minuit2/MnGlobalCorrelationCoeff.h"
 
 //#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
 //#include"./clenshaw-curtis.hh"
@@ -15,7 +16,7 @@
 //extern double F2_kt(const  double,const  double,const double, const double(&)[]);
 //extern double F2_r(const double,double,double,double*);
 class KtFCN : public ROOT::Minuit2::FCNBase {
-	
+//This class is described in Minuit user's guide
 	
 	private:	
 		double *__restrict Q2_DATA=(double*)malloc(0);
@@ -36,14 +37,9 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 	public:
 		unsigned MAX_N=0;
 		int flag=0;
+		
 		explicit KtFCN(std::string data_file,std::string dir ){
-			
-				//std::string file_name=dir+"/log.txt";
-				//file=fopen(file_name.c_str(),"a");
-				directory=dir;
-			
-
-		//KtFCN(char* data_file){
+			directory=dir;
 			data_alloc(500);
 			const double alpha =1.0/137 ;//fine structure const 1/137;
 			const double xmp0 = 0.93827;//proton mass in GeV
@@ -51,16 +47,14 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 			unsigned i=0;
 			unsigned j=0;
 			double fac;
-			//std::fstream file;
-			//file.open(data_file, std::fstream::in);
 			FILE* file=fopen(data_file.c_str(),"r");
 			double wdata;
-			//while((!file.eof())&&(j<597)){
 			if(file==NULL){
 				printf("file not found.\n");
 				exit(1);
 			}
 			while((!feof(file))&&(j<597)){
+				//see Abt et al. where the data come from 
 				fscanf(file,"%lf %lf %lf %lf %lf", (Q2_DATA+i),(X_DATA+i),&wdata,(CS_DATA+i),(ERR_DATA+i)); 
 				if((X_DATA[i]<=X_DATA_MAX)&&( Q2_DATA[i]<=Q2_MAX)){
 					fac = pow(Q2_DATA[i],2)*(1-X_DATA[i])/ (4*pow(PI,2)*alpha*(Q2_DATA[i]+pow(2*X_DATA[i]*xmp0,2)));
@@ -148,7 +142,7 @@ class KtFCN : public ROOT::Minuit2::FCNBase {
 ///////////////////////////////////////////////////////////////////////////////////////////		
 			double arr[MAX_N];
 			double *arr1,*arr2;
-			if(flag==1){
+			if(flag==1){//for plotting at neighbouring x
 				arr1=(double*)malloc(MAX_N*sizeof(double));
 				arr2=(double*)malloc(MAX_N*sizeof(double));
 			}
@@ -204,7 +198,7 @@ printf("use with extra care\n");
 			for(int i=0;i<MAX_N;++i){
 				//F2_kt F2(sigpar);
 				arr[i]=F2(X_DATA[i],Q2_DATA[i],0);//summation over flavour is done at the level of integrand.
-				if(flag==1){
+				if(flag==1){//for plotting 
 					arr1[i]=F2(X_DATA[i]*0.75,Q2_DATA[i],0);//don't forget to match fprintf below
 					arr2[i]=F2(X_DATA[i]*1.25,Q2_DATA[i],0);
 				}
@@ -219,35 +213,21 @@ printf("use with extra care\n");
 				chisq+=pow((arr[i]-CS_DATA[i])/ERR_DATA[i],2);
 			}
 			
-			if(flag==1){	
-				//FILE* file0=fopen((directory+"/aF.txt").c_str(),"w" );
+			if(flag==1){
+				//This is for plotting F2 for each Q2.	
 				FILE* file1=fopen((directory+"/data.txt").c_str(),"w" );
 				FILE* file2=fopen((directory+"/F2.txt").c_str(),"w" );
-				//gluon.export_grid(file0);
 				for(int i=0;i<MAX_N;++i){
 					fprintf(file1, "%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],CS_DATA[i],ERR_DATA[i],arr[i]);
-					
 					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*0.75,Q2_DATA[i],arr1[i]);
 					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i],Q2_DATA[i],arr[i]);
 					fprintf(file2, "%.5e\t%.5e\t%.5e\n",X_DATA[i]*1.25,Q2_DATA[i],arr2[i]);
 				}
-				//fclose(file0);
 				fclose(file1);
 				fclose(file2);
 				free(arr1);
 				free(arr2);
-			}/*}else{
-				//if(file==NULL){
-					FILE* file=fopen((directory+"/log.txt").c_str(),"a");
-				//}
-				for(int i =0;i<len;++i){
-					fprintf(file,"%.5e\t",par[i]);
-				}
-				fprintf(file,"%.5e\n",chisq);
-				fflush(file);
-				fclose(file);
-			}*/
-						
+			}		
 			
 			std::chrono::duration<double> interval=walltime.now()-start;
 			time-=clock();

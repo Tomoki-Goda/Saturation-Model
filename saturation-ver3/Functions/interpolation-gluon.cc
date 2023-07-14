@@ -1,4 +1,3 @@
-#include"control.h"
 #include"interpolation-gluon.hh"
 
 
@@ -147,13 +146,8 @@ void Approx_aF::init(const int npts1, const int npts2, const double * const &par
 	alloc(x_npts,kt2_npts);
 	
 	sigma_0=par[0];
-#if ALPHA_RUN==1
-#if MU02==0
-	mu02 = par[3];
-#else 
-	mu02 = MU02;
-#endif
-#endif
+
+
 }
 
 double Approx_aF::operator()(const double x,const double kt2,const double mu2)const{
@@ -168,8 +162,6 @@ double Approx_aF::operator()(const double x,const double kt2,const double mu2)co
 	if(x<X_MIN){printf("Approx_aF:: x too small xmin= %.1e x= %.1e diff=%.1e\n",1.0e-8,x,x-1.0e-8);}			
 	double val = 0;
 	val=gsl_spline2d_eval(spline_ptr,kt2, x,kt2_accel_ptr, x_accel_ptr);
-#if ALPHA_RUN==1
-	val*=alpha(mu2+mu02)/0.2;
-#endif
+
 	return(val);
 }

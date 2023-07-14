@@ -21,7 +21,6 @@ typedef struct{
 options read_options(int argc, char** argv  ){
 	int c, indexptr;
 	options data={"result.txt","out.txt","","",0,0,0,0,0,0,0,0};
-
 	struct option long_options[]={
 		{"Q2",required_argument,0,'q'},
 		{"k",required_argument,0,'k'},
@@ -37,12 +36,12 @@ options read_options(int argc, char** argv  ){
 		{"path",required_argument,0,'p'}
 
 	};
-	char shortopts[]="q:k:x:f:i:o:w:d:M:m:b:";
+	char shortopts[]="q:k:x:f:i:o:w:d:M:m:b:p:";
 	
 	while(1){
 		c=getopt_long_only(argc, argv,shortopts,long_options,&indexptr );
 		if(c==-1){break;}
-
+		printf("%s\n",optarg);
 		switch(c){
 			case 'q':
 				data.Q2=atof(optarg);
@@ -88,6 +87,7 @@ options read_options(int argc, char** argv  ){
 		};
 
 	}
+	printf("Options ready\n");
 	return(data);
 }
 

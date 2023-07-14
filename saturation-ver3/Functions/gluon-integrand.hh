@@ -4,9 +4,9 @@
 //
 // USAGE 
 // Gluon_Integrand integ
-// integ.init(sigpar, mode, sig)// double*sigpar, mode is 'l' or 's' , Sigma sig
-// integ(r, par) // double r is integ variable ch.var. is possible with R_CHANGE_VAR, doube* par={kt2,x}
-// integ.constant(rmax,par)  // additional term for IBP  
+// integ.init(sigpar, mode)// double*sigpar, mode is 'l','s' or  'w'
+// integ(r, par) // double r is integ variable ch.var. is possible with R_CHANGE_VAR, std::vector<doube> par={kt2,x}
+// set_x() is used to approximate what are necessary (collinear gluon) at given x.
 //
 // DSIGMA define at the end
 //
@@ -24,9 +24,7 @@
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
-#include"clenshaw.hh"
 #include"miscellaneous.hh"
-
 #include"r-formula.hh"
 #if MODEL==0
 typedef Sigma_GBW SIGMA;
@@ -36,7 +34,7 @@ typedef Sigma_BGK SIGMA;
 
 class Gluon_Integrand{
 		SIGMA *sigma;
-		char mode='l';//l or s
+		char mode='l';//l, s or w
 		double ns_pow=500;
 		const double *fixx;
 		
@@ -58,8 +56,12 @@ class Gluon_Integrand{
 		double operator()(const double rho, const std::vector<double> &par);
 		//double constant(double r , const std::vector<double> &par);
 };
+/*
+#if GLUON_INTEGRAND_HH==2
+////////////////////////////////////////////////////////////
+//no longer supported
+///////////////////////////////////////////////////////////
 
-#if GLUON_INTEGRAND_HH==2//no longer supported
 template <typename Sig>  class Laplacian_Sigma{
 	private:
 		Sig *sigma;
@@ -67,7 +69,7 @@ template <typename Sig>  class Laplacian_Sigma{
 		double *r_array=NULL,*sigma_array=NULL;
 		gsl_interp_accel *  r_accel_ptr;
 		gsl_spline *  spline_ptr;
-		char mode='l';//l or s
+		char mode='l';//l, s or w
 		int r_npts=0;
 		int counter=0;
 		const double *fixx;
@@ -101,4 +103,5 @@ template <typename Sig>  class Laplacian_Sigma{
 		//double constant(double r , const std::vector<double> &par)const ;
 };
 #endif
+*/
 #endif

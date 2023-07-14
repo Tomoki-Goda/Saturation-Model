@@ -139,7 +139,7 @@
 #endif
 
 #ifndef N_CHEB//variants of models. see r-formula.h
-	#define N_CHEB 25
+	#define N_CHEB 30
 #endif
 #ifndef CHEB_D//variants of models. see r-formula.h
 	#define CHEB_D 1
@@ -153,9 +153,10 @@
 //////////////////////////////////////////////////////////////////
 //N_PAR is number of fit parameters
 #if MODEL ==0 
-	#define N_PAR 5
+	#define N_PAR 4
 #elif MODEL==1
-	#define N_PAR 7
+	#define N_PAR 6
+	
 #elif (MODEL==2||MODEL==22)
 	#if SUDAKOV==0
 		#define N_PAR 3

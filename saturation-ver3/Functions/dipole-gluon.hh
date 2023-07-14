@@ -24,9 +24,9 @@
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
-#include"clenshaw.hh"
 #include <gsl/gsl_sf.h>
 #include"Levin.hh"
+#include"clenshaw2.hh"
 #include"gluon-integrand.hh"
 
 typedef Gluon_Integrand INTEG ;
@@ -50,18 +50,20 @@ class Gluon_GBW{
 //Dipole gluon
 //
 /////////////////////////////////////////////////////////////////////
-class Dipole_Gluon{
+class Dipole_Gluon:private Clenshaw_Curtis{
 //class Dipole_Gluon{
 		const double *par;
 		INTEG *integrand;
-		CCIntegral cc=CCprepare(64,"dipole",1,5);
+		//CCIntegral cc=CCprepare(64,"dipole",1,5);
 	public: 
 		Dipole_Gluon(INTEG & integ){
 			integrand =& integ;
+			cc_init(64,"dipole",1,5);
 		}
 		~Dipole_Gluon(){
 			
 		}
+		double cc_integrand(const double x,const void*par)const ;
 		void init(const double * const &par );
 		void set_x(const double &x);
 		double operator()(const double x,const double kt2,const double mu2);

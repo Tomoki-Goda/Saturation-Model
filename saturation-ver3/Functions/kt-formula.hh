@@ -3,22 +3,10 @@
 #include<fstream>
 #include<vector>
 #include<chrono>
-#include <gsl/gsl_errno.h> 
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_interp2d.h>
-#include <gsl/gsl_spline2d.h>
-#include<gsl/gsl_dht.h>
-#include<gsl/gsl_deriv.h>
-#include<gsl/gsl_chebyshev.h>
-
-#include<pthread.h>
 #include<cuba.h>
 #include"control.h"
 #include"control-default.h"
 #include"constants.h"
-#include"clenshaw.hh"
-#include"gauss.hh"
-
 #include"gluons.hh"
 #include"r-formula.hh"
 #include"gluon-integrand.hh"
@@ -31,13 +19,10 @@ typedef Approx_aF aF;
 typedef Gluon_GBW aF;
 #endif
 
-
-
-
-//extern double  INT_PREC ;
-//extern int N_APPROX;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
+//
+//  Factorization formula of F2 in Kimber's PhD Thesis at Durham
 //  phi integrated 
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,11 +58,22 @@ template<typename TYPE > class Integrand_kt{
 			x=a;
 			Q2=b;
 			mf2=c;
+			//some restrictions due to the theta function.
 			k2max=(1-x)/x *Q2-4*mf2;
 			kappamax=k2max/4;//just it is
 			betamin=sqrt(1-4*(mf2/((1-x)/x*Q2) )) ;
 			betamax=(1+betamin)/2;
 			betamin=(1-betamin)/2;
+			/*
+			if(betamin>betamax){
+				printf("beta range error: [%.2e, %.2e] x=%.2e Q2=%.2e mf2=%.2e\n",betamin betamax,x,Q2,mf2);
+			}
+			if(k2min>k2max){
+				printf("k2 range error: [%.2e, %.2e] x=%.2e Q2=%.2e mf2=%.2e\n",k2min k2max,x,Q2,mf2);
+			}
+			if(k2min>kappamax){
+				printf("kappa2 range error: [%.2e, %.2e] x=%.2e Q2=%.2e mf2=%.2e\n",k2min kappamax,x,Q2,mf2);
+			}*/
 			return 0;
 		}
 		
@@ -111,16 +107,22 @@ template<typename TYPE > class Integrand_kt{
 			if(betamin>=betamax){
 				return 0;
 			}
+			
 			change_var(beta,jac3,betamin,betamax,1);
 			change_var(kappa2,jac2,k2min,kappamax,1+kappamax/pow(1+Q2,0.5));
 
 			k2max=(1-x)/x*Q2-(kappa2+mf2)/(beta*(1-beta));
+			
 			if(k2max<=k2min){
 				return 0;
 			}
 
 			double val=0;
+					
 			if(kappa2<k2max){
+				//cutting space along kappa2=k2.
+				// not strictly necesssary but possiblly advantageous.
+				// there is a ridge at kappa2=k2 .
 				k2=1-x1*x1;
 				change_var(k2,jac1,k2min,kappa2,1+kappa2/pow(1+Q2,0.25));
 				val+=jac1*integrand(kappa2,k2,beta);//+integrand(kappa2,k2,1-beta);
@@ -165,6 +167,9 @@ template<typename TYPE > class Integrand_kt{
 			val+=(mf2+4*Q2*beta*beta*pow(1-beta,2) )*(I[2]-I[3]);
 			double mu2=kt2+kappa_t_prime2+mf2;
 			val*=(*gluptr)(xz,kt2,mu2);
+#if ALPHA_RUN!=0
+			val*=alpha(mu2+MU02)/0.2;
+#endif
 			//val*=(*gluptr)(kt2,mu2);
 			
 		
@@ -200,6 +205,7 @@ template <typename Gluon> int F2_integrand_A(const int  *ndim,const  double  *in
 		const double  kappa_t_prime2=intv[1];
 		const double  kt2=intv[2];
 		double  val=0;
+		//sum over flavours
 		val+= (2.0/3.0)*integrand[0]( kt2, kappa_t_prime2, beta);
 		val+= (4.0/9.0)*integrand[1]( kt2, kappa_t_prime2, beta);
 		val+= (1.0/9.0)*integrand[2]( kt2, kappa_t_prime2, beta);
@@ -210,6 +216,14 @@ template <typename Gluon> int F2_integrand_A(const int  *ndim,const  double  *in
 		}
 		return 0;
 }
+
+////////////////////////////////////////////////////////////////////
+//
+//
+//  Dipole factorization formula (See Golec-Biernat Wusthoff etc)
+//
+//
+/////////////////////////////////////////////////////////////////////
 
 #elif R_FORMULA==1
 template <typename Sig> class Integrand_r{
@@ -225,8 +239,8 @@ template <typename Sig> class Integrand_r{
 		//	}
 			this->x=modx(x,Q2,mf2);
 			//this->x=x;
-			if(this->x>1){
-				printf("set_kinem:: x toolarge %.3e\n",x);
+			if((this->x)>1){
+				printf("set_kinem:: x too large %.3e\n",x);
 			}
 			this->Q2=Q2;
 			this->mf2=mf2;
@@ -252,13 +266,20 @@ template <typename Sig> class Integrand_r{
 			double 	Qsq_bar =  z*(1-z)*Q2+mf2;
 			double 	Qsq2 =  sqrt(Qsq_bar)*r;
 			//pow(r,2) is to suppress singularity at r=0, it is compensated by the sigma
-			if(Qsq2<1.0e-5){//small er approximation
-				value =   (z_bar + ( mf2+ pow(2*z*(1-z),2)* Q2 )*pow(r* log(Qsq2),2) );
-			}else{
+//			if(Qsq2<1.0e-5){//small er approximation
+//				value =   (z_bar + ( mf2+ pow(2*z*(1-z),2)* Q2 )*pow(r* log(Qsq2),2) );
+//			}else{
+
 				double 	bessel_k0_2 = pow(std::cyl_bessel_k(0,Qsq2),2);
 				double 	bessel_k1_2 = pow(std::cyl_bessel_k(1,Qsq2),2);
 				value = pow(r,2) * (z_bar * Qsq_bar * bessel_k1_2 + ( mf2 + pow(2*z*(1-z),2)* Q2 ) * bessel_k0_2);
-			}
+//				if(Qsq2<2.5e-5){
+//					if(fabs(value - (z_bar + ( mf2+ pow(2*z*(1-z),2)* Q2 )*pow(r* log(Qsq2),2) ))>1.0e-10*value ){
+//						printf("psisq_f discontinuous\n%2e %.2e\n",value, (z_bar + ( mf2+ pow(2*z*(1-z),2)* Q2 )*pow(r* log(Qsq2),2)) );
+//					}
+//				}
+//			}
+
 			double  result=(3*value)/(2*PI*PI);
 			if(std::isnan(result)+std::isinf(result)!=0){
  			 	printf("psiisq_f: %.3le encountered \n",(double)result);
@@ -276,6 +297,7 @@ template <typename Sig>int F2_integrand_B(const int *__restrict ndim, const doub
 	double  z=intv[0];
 	double  r=intv[1];
 	double  res=0;
+	//sum over flavours
 	res+=(2.0/3.0)*integrand[0](z,r);
 	res+=(4.0/9.0)*integrand[1](z,r);
 	res+=(1.0/9.0)*integrand[2](z,r);
@@ -302,6 +324,12 @@ void llTest(const int ndim, const int ncomp,
   printf("calling\n");
   
   }
+  
+///////////////////////////////////////////////////////
+//
+// Integration is pertformed by the 'Cuba' library
+//
+//////////////////////////////////////////////////////
 template <typename T> class F2_kt{
 			T *integrands;
 #if R_FORMULA==1

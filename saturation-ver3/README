@@ -1,0 +1,45 @@
+#################################
+#  Prerequisite
+#################################
+This program requires GNU scientific library (GSL),
+  Cuba integration library and ROOT::Minuit2 
+
+
+##################################
+# Configuration etc.
+##################################
+ In order to use this program, one needs to create a working directory 
+ 
+ mkdir ../Run
+ 
+ then in this directory, create a file called control.h
+ in this one defines macros whose default values are defined in the file 
+ control-default.h
+for example 
+	#define MODEL 0 
+to run GBW model fit
+##################################
+# RUN
+##################################
+ before use, do export DIR=<directory >
+ like 				                   
+	 export DIR				                    		
+	 for i in ./GBW/* ;  DIR=${i}; make ;done	            
+ 
+ Then run 
+ 	${DIR}/main.out ${DIR}
+ 	
+ this should produce result.txt 
+ 
+ ################################
+ #Plotting etc.
+ ################################
+ Makefile produces extra executables ww.out  sigma.out  dp.out .
+ they generate grids, which can be plotted using files in Grid-Interpolation. 
+ (see plot-ww.sh)
+ KS-gluon programs are used to make 3d grids to 2d and Gnuplot  
+ For details, see README file in Grid-Interpolation.
+ 
+ all-table.sh and Functions/table.cc can be used to convert result file 
+ to LaTeX table.
+ 

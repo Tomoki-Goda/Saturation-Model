@@ -28,11 +28,12 @@ std::complex<double> Collinear_Gluon::gammatilde(const std::complex<double>& n)c
 	return value;
 }
 //double Collinear_Gluon::integrand(const double y,const std::vector<double> &par)const {
-double Collinear_Gluon::operator()(const double y,const std::vector<double>&par)const {
+//double Collinear_Gluon::operator()(const double y,const std::vector<double>&par)const {
+double Collinear_Gluon::cc_integrand(const double y,const void* param)const{
 	std::complex<double> n0,n1,n2,g1,g2,gt,ex,l;
 	double val;
 	double m;
-
+	const std::vector<double>& par=*((std::vector<double>*)param);
 	const double Yg=par[0], tg=par[1];
 	const double lambda_g=par[2];
 	gsl_sf_result resr,resi;
@@ -59,17 +60,18 @@ double Collinear_Gluon::operator()(const double y,const std::vector<double>&par)
 //////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////
-double Collinear_Gluon::operator()(const double x, const double QQ,const double A_g,const double l_g)const  {
+
+double Collinear_Gluon::operator()(const double x, const double QQ,const double A_g,const double l_g)const{
 	
 	double value;
 	const double bprim = 33.0/6.0-NF/3.0;
-	const std::vector<double> par={
-		log(1/x),
-		(1/bprim)*log(log(QQ/LQCD2)/log(Q0/LQCD2)),
-		l_g
-	};
+	const std::vector<double> par={log(1/x),
+	(1/bprim)*log(log(QQ/LQCD2)/log(Q0/LQCD2)),
+	l_g};
+	
 	const double normalization=A_g*exp(n_0* par[0] )*dgammafbeta;
-	value=dclenshaw<const Collinear_Gluon&,const std::vector<double>&>(cc,*this,par,0,150,1.0e-10,1.0e-15);  
+	//value=dclenshaw<const Collinear_Gluon&,const std::vector<double>&>(cc,*this,par,0,150,1.0e-10,1.0e-15); 
+	value=cc_integrate((void*)&par,0,150,1.0e-10,1.0e-15) ;
 	value=normalization*value;
 	if(!std::isfinite(value)){
 		return 0;
@@ -131,6 +133,10 @@ double Chebyshev1D_Collinear_Gluon::operator()(const double x,const double Q2, d
 	
 	res=chebyshev(cheb[0],arg);
 	//res=A_g*pow(x,-l_g);
+	return(res);
+}
+double Chebyshev1D_Collinear_Gluon::operator()(const double x,const double Q2)const{
+	double res=(*this)(x,Q2,A_g,l_g);
 	return(res);
 }
 

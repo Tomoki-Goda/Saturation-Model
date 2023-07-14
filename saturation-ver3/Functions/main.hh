@@ -2,6 +2,7 @@
 #include<fstream>
 #include<cmath>
 #include<string>
+#include<map>
 #include<vector>
 #include<ctime>
 #include<chrono>
@@ -14,3 +15,5 @@ double INT_PREC=1;
 int N_APPROX=N_CHEB_R;
 #include"kt-formula.hh"
 #include"fcn.h"
+
+int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN& theFCN, int N, int str ,int goal);

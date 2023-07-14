@@ -26,25 +26,25 @@ CXX=g++
 ########################################################################################################
 all: clean  main
 
-main: $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+main: $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o ${DIR}/clenshaw2.o  \
 		${DIR}/interpolation-gluon.o ${DIR}/main.o 
-	${CXX} $^ -o ${DIR}/main ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+	${CXX} $^ -o ${DIR}/main.out ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
-plot:ww sigma dp #plot-things
+plot:ww.out  sigma.out  dp.out 
 
-ww:  ${DIR}/plot-ww.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+ww.out :  ${DIR}/plot-ww.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o  ${DIR}/dipole-gluon.o ${DIR}/clenshaw2.o \
 		${DIR}/interpolation-gluon.o 
-	${CXX} $^ -o ${DIR}/ww ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+	${CXX} $^ -o ${DIR}/ww.out  ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
-dp: ${DIR}/plot-dp.o  $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+dp.out : ${DIR}/plot-dp.o  $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o ${DIR}/clenshaw2.o  \
 		${DIR}/interpolation-gluon.o 
-	${CXX} $^ -o ${DIR}/dp ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+	${CXX} $^ -o ${DIR}/dp.out  ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
-sigma: ${DIR}/plot-sigma.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+sigma.out : ${DIR}/plot-sigma.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o ${DIR}/clenshaw2.o  \
 		${DIR}/interpolation-gluon.o 
-	${CXX} $^ -o ${DIR}/sigma ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
+	${CXX} $^ -o ${DIR}/sigma.out ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
-#plot-things: ${DIR}/plot-things.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o \
+#plot-things: ${DIR}/plot-things.o $(DIR)/gluons.o ${DIR}/r-formula.o ${DIR}/gluon-integrand.o   ${DIR}/dipole-gluon.o ${DIR}/clenshaw2.o  \
 #		${DIR}/interpolation-gluon.o 
 #		${CXX} $^ -o ${DIR}/plot ${INC} ${OPT} ${LIBS} -I${FUNCDIR} 
 
@@ -64,17 +64,20 @@ $(DIR)/%.o: ${FUNCDIR}/%.cc ${FUNCDIR}/%.hh ${DEPS}
 		${CXX} -c -I${FUNCDIR} -I${DIR} ${OPT} ${LIBS} $< -o $@
 
 
-gluonsf.o:${FUNCDIR}/gluons.f
-		gfortran -c -I${FUNCDIR} -I${FUNCDIR}/fortran ${OPT} ${LIBS} $< -o $@
-gluonsc.o:${FUNCDIR}/gluons.cc
-		${CXX} -c -I${FUNCDIR}  ${OPT} ${LIBS} $< -o $@
+#gluonsf.o:${FUNCDIR}/gluons.f
+#		gfortran -c -I${FUNCDIR} -I${FUNCDIR}/fortran ${OPT} ${LIBS} $< -o $@
+#gluonsc.o:${FUNCDIR}/gluons.cc
+#		${CXX} -c -I${FUNCDIR}  ${OPT} ${LIBS} $< -o $@
 
-test: gluonsf.o gluonsc.o
-	${CXX} -c test-gluons.cc -I${FUNCDIR}  -o test-gluons.o
-	${CXX} test-gluons.o -o test-gluons -I${INCDIR} -I${FUNCDIR} -I. -I${DIR} ${OPT} ${LIBS} $^ -lgfortran -lmathlib
+#test: gluonsf.o gluonsc.o
+#	${CXX} -c test-gluons.cc -I${FUNCDIR}  -o test-gluons.o
+#	${CXX} test-gluons.o -o test-gluons -I${INCDIR} -I${FUNCDIR} -I. -I${DIR} ${OPT} ${LIBS} $^ -lgfortran -lmathlib
 
 clean: 
 	rm -f ${DIR}/*.o
 	rm -f ${FUNCDIR}/*.o
+	rm -f ${DIR}/*.out
+	rm -f ${FUNCDIR}/*.out
 	rm -f ${DIR}/main
+
 	 		

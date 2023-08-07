@@ -40,7 +40,9 @@ class unintegrated_quark{
 	gsl_interp_accel *x_accel_ptr, *k2_accel_ptr;
 	gsl_spline2d *  spline_ptr;
 	double x, Q2, d2, k2_min, k2_max;
-	double as=0.2,nf=5,PI=3.14159265359;
+	double as=0.2,nf=0.5,PI=3.14159265359;
+	//nf=0.5 is because we want q(x,k,mu) 
+	//see Eellis, Webber, Sterling Eq.4.99
 	inline double split_qg(double z, double kd);
 	
 	public:
@@ -117,12 +119,13 @@ void unintegrated_quark::load(std::string s){
 	gsl_spline2d_init (spline_ptr,k2_array, x_array, aF_array, k2_npts, x_npts);	
 }
 inline double unintegrated_quark::gluon(double x, double k2){
- 	if(x<x_array[0]||x>x_array[x_npts-1]||k2<k2_array[0]||k2>k2_array[k2_npts-1]){
- 		printf("taking x= %.2e [%.2e, %.2e], k2=%.2e ,[%.2e, %.2e] \n",x,x_array[0],x_array[x_npts-1],k2,k2_array[0],k2_array[k2_npts-1]);
- 		return 0;
- 	}
- 	return	gsl_spline2d_eval(spline_ptr ,k2, x, k2_accel_ptr, x_accel_ptr);
- 	//return	gsl_spline2d_eval(spline_ptr , x,k2, x_accel_ptr, k2_accel_ptr);
+	return	gsl_spline2d_eval_extrap(spline_ptr ,k2, x, k2_accel_ptr, x_accel_ptr);
+ 	//if(x<x_array[0]||x>x_array[x_npts-1]||k2<k2_array[0]||k2>k2_array[k2_npts-1]){
+ 	//	printf("taking x= %.2e [%.2e, %.2e], k2=%.2e ,[%.2e, %.2e] \n",x,x_array[0],x_array[x_npts-1],k2,k2_array[0],k2_array[k2_npts-1]);
+ 	//	return 0;
+ 	//}
+ 	//return	gsl_spline2d_eval(spline_ptr ,k2, x, k2_accel_ptr, x_accel_ptr);
+ 	
 }
 
 inline double unintegrated_quark::split_qg(double z, double kd2){
@@ -130,7 +133,7 @@ inline double unintegrated_quark::split_qg(double z, double kd2){
 	// there is typo in 2110.06156
 	double result;
 	double z2=pow(z,2),z12=pow(1-z,2);
-	result=(as*nf)/(2*PI)*pow(kd2/(kd2+z*(1-z)),2)*(z2+z12+4*z2*z12*kd2);
+	result=(as*nf)/(2*PI)*pow((1+z*(1-z)*kd2),-2)*(z2+z12+4*z2*z12*kd2);
 	return(result);
 }
 inline double unintegrated_quark::integrand( double x1, double x2){
@@ -138,8 +141,8 @@ inline double unintegrated_quark::integrand( double x1, double x2){
 	change_var(k2,jac1,k2_min, k2_max,fabs(k2_max-k2_min));
 	change_var(z,jac2,this->x, 1 ,1-(this->x));
 	//printf("k2: %.2e->%.2e  [%.2e, %.2e]\n",x2,k2,k2_min, k2_max);
-	//result= ((Q2-d2/(1-z)-z*k2)<0)?(0):(jac1*jac2*split_qg(z,k2/d2)*gluon(x/z,k2));
-	result= ((Q2-d2/(1-z)-z*k2)<0)?(0):(jac1*jac2*split_qg(z,k2/d2)*gluon(x,k2));
+	result= ((Q2-d2/(1-z)-z*k2)<0)?(0):(jac1*jac2*split_qg(z,k2/d2)*gluon(x/z,k2));
+	//result= ((Q2-d2/(1-z)-z*k2)<0)?(0):(jac1*jac2*split_qg(z,k2/d2)*gluon(x,k2));
 	if(std::isnan(result)){
 		printf("res=%.2e, z=%.2e k2=%.2e, Q2=%.2e x=%.2e Delta^2=%.2e\n",result,z,k2,Q2,x,d2);
 	}
@@ -180,12 +183,16 @@ int main(int argc, char** argv){
  double x=0 ,k2=0 ,q2=100;
  FILE* file=fopen(argv[2],"w");
  
- for(int i=0;i<sigma.x_npts;i++){
- 	x=sigma.x_array[i];
- 	for(int j=0;j<sigma.k2_npts;j++){
- 		k2=sigma.k2_array[j];
- 		fprintf(file,"%.5e\t%.5e\t%.5e\n",log(x),log(k2),sigma(x,k2,q2)/k2 );
- 	}fprintf(file,"\n" );
+for(int k=0;k<25;k++){
+	q2=0.2*pow(1e+5/0.2,((double)k)/2.4e+1);
+
+	for(int i=0;i<sigma.x_npts;i++){
+		x=sigma.x_array[i];
+		for(int j=0;j<sigma.k2_npts;j++){
+			k2=sigma.k2_array[j];
+			fprintf(file,"%.5e\t%.5e\t%.5e\t%.5e\n",log(x),log(k2),log(q2),sigma(x,k2,q2)/k2 );
+		}//fprintf(file,"\n" );
+	}
  }
  fclose(file);
 }

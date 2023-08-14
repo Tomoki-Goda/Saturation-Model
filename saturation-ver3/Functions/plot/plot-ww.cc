@@ -19,8 +19,8 @@
 #include<cuba.h>
 
 extern double  INT_PREC;
-#include"clenshaw.hh"
-#include"gauss.hh"
+//#include"clenshaw.hh"
+//#include"gauss.hh"
 
 
 #include"kt-formula.hh"

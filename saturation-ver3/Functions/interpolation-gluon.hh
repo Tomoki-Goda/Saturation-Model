@@ -22,7 +22,7 @@
 #include"constants.h"
 #include"dipole-gluon.hh"
 
-#if GLUON_APPROX==1
+#if GLUON_APPROX==1||(WW!=0)
 typedef Dipole_Gluon GLUON;
 #elif MODEL==0
 typedef Gluon_GBW GLUON;

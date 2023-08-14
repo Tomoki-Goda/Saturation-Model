@@ -183,13 +183,14 @@ int main(int argc, char** argv){
  double x=0 ,k2=0 ,q2=100;
  FILE* file=fopen(argv[2],"w");
  
-for(int k=0;k<25;k++){
-	q2=0.2*pow(1e+5/0.2,((double)k)/2.4e+1);
+
 
 	for(int i=0;i<sigma.x_npts;i++){
 		x=sigma.x_array[i];
 		for(int j=0;j<sigma.k2_npts;j++){
 			k2=sigma.k2_array[j];
+		for(int k=0;k<25;k++){
+			q2=0.2*pow(1e+5/0.2,((double)k)/2.4e+1);
 			fprintf(file,"%.5e\t%.5e\t%.5e\t%.5e\n",log(x),log(k2),log(q2),sigma(x,k2,q2)/k2 );
 		}//fprintf(file,"\n" );
 	}

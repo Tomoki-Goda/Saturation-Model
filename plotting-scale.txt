@@ -1,0 +1,5 @@
+gnuplot -p
+plot 'BGKktfig161.step' using 1:4:3 with filledcurves lt rgb "#FF0000" fs transparent pattern 5, \ 
+	 'BGKrfig161.step' using 1:4:3 with filledcurves lt rgb "#0000FF" fs transparent pattern 4, \
+	 'BGKktfig161.step' using 1:2 with lines lt rgb "#880000" lw 1.5 , \
+	 'BGKrfig161.step' using 1:2 with lines lt rgb "#000088" lw 1.5

@@ -1,10 +1,11 @@
 #! /usr/bin/env bash
 
-
-for i in GBWS GBW BGKS BGKS
+mkdir dijet-HERA-plot
+for i in GBWS GBW BGKS BGK
 do 
 	for j in r kt
 	do
+		mkdir dijet-HERA-plot/${i}${j}
 		for k in {1..8}
 		do
 			./a.out ./dijet-HERA/${i}${j}/fig16${k}.hst \

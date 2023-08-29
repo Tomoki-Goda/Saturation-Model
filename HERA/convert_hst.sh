@@ -1,10 +1,9 @@
 #! /usr/bin/env bash
 
 mkdir dijet-HERA-plot
+gfortran hst_to_step.f90 -o conv.out
+
 for i in BGKS BGK GBWS GBW
-
-gfortran convert_hst_to_step.f90 -o conv.out
-
 do 
 	for j in  kt r
 	do

@@ -1,5 +1,6 @@
 #! /usr/bin/env bash 
 
+mkdir ./dijet-HERA-plot/plots
 rm ./dijet-HERA-plot/plots/*
 rm ./dijet-HERA-plot/*.pdf
 

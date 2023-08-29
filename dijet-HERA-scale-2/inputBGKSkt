@@ -34,7 +34,7 @@ leadingColor = yes
 
 # Read TMDs from grid files
 tmdTableDir = /home/tomoki/Saturation-Model/gluon-grids/
-tmdpdf = gg3  BGKSkt.dat
+tmdpdf = gg3  BGKSkt2.dat
 #TMDlibSet = 400101
 # Phase space cuts. angle and theta are in degrees
 xAlimits = 1.0d-8 2.5d-1

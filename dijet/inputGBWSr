@@ -32,9 +32,12 @@ offshell = 1
 
 lhaSet = CT10nlo
 
+itmdf = yes
+leadingColor = no
+
 # Read TMDs from grid files
 tmdTableDir = /home/tomoki/Saturation-Model/gluon-grids/
-tmdpdf = g  GBWSr.dat
+tmdpdf = gg3  GBWSr.dat
 
 # Phase space cuts. angle and theta are in degrees
 xAlimits = 0.0d0 0.01d0

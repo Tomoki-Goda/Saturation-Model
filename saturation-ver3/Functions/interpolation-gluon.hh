@@ -10,10 +10,9 @@
 #include<string>
 #include<complex>
 #include<chrono>
-#include<gsl/gsl_interp.h>
-#include<gsl/gsl_spline.h>
-#include <gsl/gsl_errno.h> 
+#include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
+#include <gsl/gsl_errno.h> 
 #include <gsl/gsl_interp2d.h>
 #include <gsl/gsl_spline2d.h>
 #include<gsl/gsl_dht.h>
@@ -23,7 +22,7 @@
 #include"constants.h"
 #include"dipole-gluon.hh"
 
-#if GLUON_APPROX==1
+#if GLUON_APPROX==1||(WW!=0)
 typedef Dipole_Gluon GLUON;
 #elif MODEL==0
 typedef Gluon_GBW GLUON;

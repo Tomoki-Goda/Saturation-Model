@@ -27,35 +27,17 @@ process = DIS g  -> d~ d  , factor = 1
 process = DIS g  -> c~ c  , factor = 1
 process = DIS g  -> s~ s  , factor = 1
 process = DIS g  -> b~ b  , factor = 1
-#process = DIS g  -> u u~  , factor = 1
-#process = DIS g  -> d d~  , factor = 1
-#process = DIS g  -> c c~  , factor = 1
-#process = DIS g  -> s s~  , factor = 1
-#process = DIS g  -> b b~  , factor = 1
-
-#W
-#process = DIS g  -> d~ u  , factor = 1
-#process = DIS g  -> u~ d  , factor = 1
-#process = DIS g  -> c~ s  , factor = 1
-#process = DIS g  -> s~ c  , factor = 1
-
-#process = DIS g  -> d~ c  , factor = 1
-#process = DIS g  -> u~ s  , factor = 1
-#process = DIS g  -> c~ d  , factor = 1
-#process = DIS g  -> s~ u  , factor = 1
-#process = DIS g  -> b~ c  , factor = 1
-#process = DIS g  -> c~ b  , factor = 1
-
-#process = DIS g  -> b~ u  , factor = 1
-#process = DIS g  -> u~ b  , factor = 1
 
 offshell = 1
 
 lhaSet = CT10nlo
 
+itmdf = yes
+leadingColor = no
+
 # Read TMDs from grid files
 tmdTableDir = /usr/local/share/tmdlib/KS-WeizWill-2017/
-tmdpdf = g  KS-WeizWill-2017_0000.dat
+tmdpdf = gg3  KS-WeizWill-2017_0000.dat
 
 # Phase space cuts. angle and theta are in degrees
 xAlimits = 0.0d0 0.01d0

@@ -1,0 +1,141 @@
+#! /usr/bin/env bash
+
+gnuplot -persist <<EOF
+#set terminal png      
+set terminal epslatex standalone size 2.75in,2.5in  level3
+
+set logscale xy
+set xrange [5:50]
+set yrange [1e-4:1e+2]
+#set grid ytics xtics
+#set ylabel "\$\\\\log \\\\frac{d\\\\sigma}{dQ^2d\\\\left<p_T\\\\right>_2}\\\\;\\\\left[\\\\mathrm{pb}/\\\\mathrm{GeV}^3\\\\right]\$"
+#set ylabel "\$\\\\log {d\\\\sigma}/{dQ^2d\\\\left<p_T\\\\right>_2}\\\\;\\\\left[\\\\mathrm{pb}/\\\\mathrm{GeV}^3\\\\right]\$"
+
+set format y "%T"
+
+
+set rmargin 0.5
+set tmargin 0.5
+#set lmargin 5.5
+#set bmargin 3
+set lmargin 2.5
+set bmargin 1.5
+
+
+##################################
+#unset border
+unset label
+set object rectangle from 5.1,1.1e-4 to 15,5e-4 fillcolor rgbcolor '#FFFFFF' fs solid noborder front
+set output './plots/${5}figure16-1.tex'
+#set title "\$5.5<Q^2<8\\\\;\\\\mathrm{GeV}^2\$"
+
+set label "\\\\small \$5.5<Q^2<8\\\\;\\\\mathrm{GeV}^2\$" at  5.5,2e-4  front
+plot '${1}/fig161.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${2}' \
+			lt rgb 'blue', \
+	 '${3}/fig161.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${4}' \
+			lt rgb 'red', \
+     './subtable-1.txt' using (\$1+\$2)/2:6:(\$6*(1+0.01*\$4)):(\$6*(1+0.01*\$5)) with yerrorbars t 'Data' \
+		lt rgb 'green' 
+
+
+unset label
+set output './plots/${5}figure16-4.tex'
+#set title "\$16<Q^2<22\\\\;\\\\mathrm{GeV}^2\$"
+set label "\\\\small\$16<Q^2<22\\\\;\\\\mathrm{GeV}^2\$" at  5.5,2e-4  front
+plot '${1}/fig164.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${2}' \
+			lt rgb 'blue', \
+	'${3}/fig164.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${4}' \
+			lt rgb 'red', \
+     './subtable-4.txt' using (\$1+\$2)/2:6:(\$6*(1+0.01*\$4)):(\$6*(1+0.01*\$5)) with yerrorbars t 'Data' \
+		lt rgb 'green'  
+
+#########################
+set xlabel "\$\\\\left<p_T\\\\right>_2\\\\;\\\\left[\\\\mathrm{GeV}^2\\\\right]\$"
+#########################
+unset label
+set output './plots/${5}figure16-7.tex'
+#set title "\$42<Q^2<60\\\\;\\\\mathrm{GeV}^2\$"
+set label "\\\\small\$42<Q^2<60\\\\;\\\\mathrm{GeV}^2\$" at  5.5,2e-4  front
+plot '${1}/fig167.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${2}' \
+			lt rgb 'blue', \
+	'${3}/fig167.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${4}' \
+			lt rgb 'red', \
+     './subtable-7.txt' using (\$1+\$2)/2:6:(\$6*(1+0.01*\$4)):(\$6*(1+0.01*\$5)) with yerrorbars t 'Data' \
+		lt rgb 'green'
+unset label		
+
+##########################
+unset ylabel
+##########################
+
+set output './plots/${5}figure16-8.tex'
+#set title "\$60<Q^2<80\\\\;\\\\mathrm{GeV}^2\$"
+set label "\\\\small\$60<Q^2<80\\\\;\\\\mathrm{GeV}^2\$" at  5.5,2e-4  front
+plot '${1}/fig168.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${2}' \
+			lt rgb 'blue', \
+	'${3}/fig168.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${4}' \
+			lt rgb 'red', \
+     './subtable-8.txt' using (\$1+\$2)/2:6:(\$6*(1+0.01*\$4)):(\$6*(1+0.01*\$5)) with yerrorbars t 'Data' \
+		lt rgb 'green'
+unset label
+
+
+unset label
+set output './plots/${5}figure16-6.tex'
+#set title "\$30<Q^2<42\\\\;\\\\mathrm{GeV}^2\$"
+set label "\\\\small\$30<Q^2<42\\\\;\\\\mathrm{GeV}^2\$" at  5.5,2e-4  front
+plot '${1}/fig166.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${2}' \
+			lt rgb 'blue', \
+	'${3}/fig166.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${4}' \
+			lt rgb 'red', \
+     './subtable-6.txt' using (\$1+\$2)/2:6:(\$6*(1+0.01*\$4)):(\$6*(1+0.01*\$5)) with yerrorbars t 'Data' \
+		lt rgb 'green' 
+##########################
+unset xlabel
+##########################
+#################################################################
+
+unset label
+set output './plots/${5}figure16-2.tex'
+#set title "\$8<Q^2<11\\\\;\\\\mathrm{GeV}^2\$"
+set label "\\\\small\$8<Q^2<11\\\\;\\\\mathrm{GeV}^2\$" at  5.5,2e-4  front
+plot '${1}/fig162.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${2}' \
+			lt rgb 'blue', \
+	'${3}/fig162.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${4}' \
+			lt rgb 'red', \
+     './subtable-2.txt' using (\$1+\$2)/2:6:(\$6*(1+0.01*\$4)):(\$6*(1+0.01*\$5)) with yerrorbars t 'Data' \
+		lt rgb 'green' 
+
+unset label
+set output './plots/${5}figure16-3.tex'
+#set title "\$11<Q^2<16\\\\;\\\\mathrm{GeV}^2\$"
+set label "\\\\small\$11<Q^2<16\\\\;\\\\mathrm{GeV}^2\$" at  5.5,2e-4  front
+plot '${1}/fig163.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${2}' \
+			lt rgb 'blue', \
+	'${3}/fig163.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${4}' \
+			lt rgb 'red', \
+     './subtable-3.txt' using (\$1+\$2)/2:6:(\$6*(1+0.01*\$4)):(\$6*(1+0.01*\$5)) with yerrorbars t 'Data' \
+		lt rgb 'green' 
+
+
+unset label
+set output './plots/${5}figure16-5.tex'
+#set title "\$22<Q^2<30\\\\;\\\\mathrm{GeV}^2\$"
+set label "\\\\small\$22<Q^2<30\\\\;\\\\mathrm{GeV}^2\$" at  5.5,2e-4  front
+plot '${1}/fig165.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${2}' \
+			lt rgb 'blue', \
+	'${3}/fig165.hst' using (\$1+\$2)/2:3:(\$2-\$1) with boxes t '${4}' \
+			lt rgb 'red', \
+     './subtable-5.txt' using (\$1+\$2)/2:6:(\$6*(1+0.01*\$4)):(\$6*(1+0.01*\$5)) with yerrorbars t 'Data' \
+		lt rgb 'green' 
+
+
+
+
+EOF
+
+for i in ./plots/${5}*tex
+do 
+pdflatex ${i} --output-directory=./plots
+done
+

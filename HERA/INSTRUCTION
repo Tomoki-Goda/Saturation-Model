@@ -1,0 +1,24 @@
+Prerequisite,
+you need to run rescale.f90
+
+compile and run
+./rescale.out ./gluon-grids/BGKSkt.dat ./gluon-grids/BGKSkt
+
+run 
+./read-data.py
+ in dijet-HERA
+
+
+When ready, 
+
+In dijet-HERA, dijet-HERA-scale-05, dijet-HERA-scale-2,
+run ./plot1.sh 
+wait till processes in the background end. check with "top".
+then run ./plot2.sh 
+
+when all done run 
+./convert_hst.sh
+
+then ./plot.sh
+
+plots should be in dijet-HERA-plot

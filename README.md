@@ -1,7 +1,7 @@
 # Saturation-Model
-
+</h3> Saturation-Model version-3 </h3>
 it is a folder for the project on the GBW/ BGK models.
-Written by Tomoki Goda
+Written by Tomoki Goda. 
 Most functions are in "Function".
 
 To use one needs to write "control.h", in which control macros are defined. 

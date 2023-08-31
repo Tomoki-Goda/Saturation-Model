@@ -31,7 +31,7 @@ KaTie (A.van Hameren,2016) is required for the contents of "dijet", and gluplot 
 Grid-Interpolation is just a copy of KS gluon.
 </p>
 
-Folders may contain INSTRUCTION files to tell you how to use them.
+Folders may contain INSTRUCTION or README files to tell you how to use them.
 <p>
   For fitting, read README in saturation-ver3
 </p>

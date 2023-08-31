@@ -32,3 +32,7 @@ Grid-Interpolation is just a copy of KS gluon.
 </p>
 
 Folders may contain INSTRUCTION files to tell you how to use them.
+<p>
+  For fitting, read README in saturation-ver3
+</p>
+ 

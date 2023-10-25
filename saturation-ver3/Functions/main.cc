@@ -187,7 +187,7 @@ int main(int argc, char** argv){
 /////////////////////////////////////////////////////////////////
 // Try MiGrad
 //////////////////////////////////////////////////////////////////	
-	
+/*	
 	INT_PREC=1e-4;
 	N_APPROX=(2*N_CHEB_R)/3;
 	prec.SetPrecision(1.0e-10);
@@ -203,7 +203,7 @@ int main(int argc, char** argv){
 	}
 	min=migrad(pow(N_PAR-skip,2) ,25);
 }
-	
+
 	
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 	goal=25;
@@ -224,8 +224,8 @@ int main(int argc, char** argv){
 		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
 	
-
-	INT_PREC=1.0e-4;
+*/
+	INT_PREC=1.0e-5;
 	N_APPROX=N_CHEB_R;
 	//prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
@@ -245,14 +245,15 @@ int main(int argc, char** argv){
 		//save_res(((std::string)argv[1])+"/result.txt",&min,&theFCN,N_PAR-skip);
 		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
-
+	
+	std::cout<<"MINOS "<<std::endl;
 	ROOT::Minuit2::MnMinos minos(theFCN,min,1);
 	std::vector<std::pair<double,double>> v;
 	
 	char errorfile[500];
 	sprintf(errorfile,"%s/error_estim.txt",argv[1]);
 	std::fstream efile;
-	efile.open(errorfile,std::fstream::in);
+	efile.open(errorfile,std::fstream::out);
 	for(int i=0;i<N_PAR-skip;i++){
 		v.push_back(minos(i,200));
 		//std::cout<<"***********Parameters*************\n"<<min.UserState()<<std::endl;

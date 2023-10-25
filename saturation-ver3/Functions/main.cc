@@ -137,7 +137,7 @@ int main(int argc, char** argv){
 		ival=double_round(ival,USE_RESULT);
 #endif
 		printf("%s %le %le \n",name,ival,ierr*10);
-		upar.Add(name, ival, ival*5*pow(10,-USE_RESULT));
+		upar.Add(name, ival, ival*5*pow(10,-abs(USE_RESULT)));
 	}printf("\n");
 	fclose(resinputfile);
 #endif//USE_RESULT
@@ -160,6 +160,7 @@ int main(int argc, char** argv){
 	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
 	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
+
 /*
 	INT_PREC=5.0e-3;
 	N_APPROX=N_CHEB_R/4;
@@ -245,7 +246,20 @@ int main(int argc, char** argv){
 		std::cout<<k<<": Parameters "<<min.UserState()<<std::endl;
 	}
 
+	ROOT::Minuit2::MnMinos minos(theFCN,min,1);
+	std::vector<std::pair<double,double>> v;
 	
+	char errorfile[500];
+	sprintf(errorfile,"%s/error_estim.txt",argv[1]);
+	std::fstream efile;
+	efile.open(errorfile,std::fstream::in);
+	for(int i=0;i<N_PAR-skip;i++){
+		v.push_back(minos(i,200));
+		//std::cout<<"***********Parameters*************\n"<<min.UserState()<<std::endl;
+		std::cout<<" MINOS ERRORS "<<std::get<0>(v[i])<<" "<<std::get<1>(v[i])<<std::endl;
+		efile<<min.UserState().Name(i)<<"\t"<<min.UserState().Value(i)<<"\t"<<std::get<0>(v[i])<<" "<<std::get<1>(v[i])<<std::endl;
+	}
+	efile.close();
 	
 	std::cout<<"***********Final Parameters*************\n"<<min.UserState()<<std::endl;
 	

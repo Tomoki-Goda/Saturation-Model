@@ -8,7 +8,7 @@
 #include"Minuit2/FCNBase.h"
 #include"Minuit2/MnMachinePrecision.h"
 #include"Minuit2/MnGlobalCorrelationCoeff.h"
-
+#include"Minuit2/MnMinos.h"
 //#include"/home/tomoki/Numerics/clenshaw-curtis-gauss-legendre.hh"
 //#include"./clenshaw-curtis.hh"
 //#include"./kt-formula.hh"

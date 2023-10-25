@@ -3,7 +3,7 @@
 #include<math.h>
 #include<stdio.h>
 #include<string>
-#include"./Kahn.hh"
+//#include"./Kahn.hh"
 //#include<stdlib.h>
 
 #ifndef PI
@@ -29,7 +29,7 @@ class Clenshaw_Curtis{
 			return( (i==0)?(1): (i/abs(i)));
 		}
 
-		double fixed_cc(const void* par,const double smin,const double smax, Kahn &full, Kahn &half)const;
+		double fixed_cc(const void* par,const double smin,const double smax, double &full, double &half)const;
 	protected:		
 		int cc_init(const int N);
 		int cc_init(const int N, const std::string& name,int max_rec);

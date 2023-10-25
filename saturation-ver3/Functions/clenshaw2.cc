@@ -1,7 +1,8 @@
 #include"clenshaw2.hh"
 int  Clenshaw_Curtis::cc_init(const int N){
 	this->N=N;
-	Kahn vec[N/4+1];
+	//Kahn vec[N/4+1];
+	double vec[N/4+1];
 	double t[N/4+1];
 	double c[N/2+1];
 	if((N/8)*8!=N || N>256){
@@ -22,8 +23,9 @@ int  Clenshaw_Curtis::cc_init(const int N){
 	}
 	//double *__restrict__ t=(double*)calloc((N/4+1),sizeof(double));
 	//double accum[3]={0};
-	Kahn accum=Kahn_init(4);
-
+	//Kahn accum=Kahn_init(4);
+	double accum=0;
+	
 	for(int j=0;j<N/4+1;j++){
 		if(j==0){
 			t[j]=0;
@@ -38,12 +40,14 @@ int  Clenshaw_Curtis::cc_init(const int N){
 	int pos;
 	//Kahn * vec=(Kahn*)malloc((N/4+1)*sizeof(Kahn));
 	for(int j=0;j<N/4+1;j++){
-		vec[j]=Kahn_init(4);
-		Kahn_clear(vec[j]);
+		//vec[j]=Kahn_init(4);
+		vec[j]=0;
+		//Kahn_clear(vec[j]);
 	}
 
 	for(int i=0;i<N/2+1;i++){
-		Kahn_clear(accum);
+		//Kahn_clear(accum);
+		accum=0;
 		wfull[i]=0;
 		for(int j=0;j<N/2+1;j++){
 			pos=t_pos(i,j,N);
@@ -54,10 +58,12 @@ int  Clenshaw_Curtis::cc_init(const int N){
 		for(int j=0;j<N/4+1;j++){
 			vec[j]*=t[j];
 			accum+=vec[j];
-			Kahn_clear(vec[j]);
+			//Kahn_clear(vec[j]);
+			vec[j]=0;
 		}
 		
-		wfull[i]=Kahn_total(accum);
+		wfull[i]=accum;//Kahn_total(accum);
+		
 		if(i==0){
 			wfull[i]/=2;
 		}
@@ -66,7 +72,8 @@ int  Clenshaw_Curtis::cc_init(const int N){
 
 	//t[0]=1;
 	for(int i=0;i<N/4+1;i++){
-		Kahn_clear(accum);
+		//Kahn_clear(accum);
+		accum=0;
 		whalf[i]=0;
 		for(int j=0;j<N/4+1;j++){
 			//t[j]=cos(i*j*4*PI/N);
@@ -77,9 +84,10 @@ int  Clenshaw_Curtis::cc_init(const int N){
 		for(int j=0;j<N/8+1;j++){
 			vec[2*j]*=t[2*j];
 			accum+=vec[2*j];
-			Kahn_clear(vec[2*j]);
+			//Kahn_clear(vec[2*j]);
+			vec[2*j]=0;
 		}
-		whalf[i]=Kahn_total(accum);
+		whalf[i]=accum;//Kahn_total(accum);
 		
 		//whalf[i]+=accum;
 		if(i==0){
@@ -90,15 +98,15 @@ int  Clenshaw_Curtis::cc_init(const int N){
 
 	//free(c);
 	//free(t);
-	Kahn_free(accum);
-	for(int j=0;j<N/4+1;j++){
-		Kahn_free(vec[j]);
-	}
+	//Kahn_free(accum);
+	//for(int j=0;j<N/4+1;j++){
+	//	Kahn_free(vec[j]);
+	//}
 	//free(vec);
 	//getchar();
 
-	Kahn sum1=Kahn_init(2),sum2=Kahn_init(2);
-
+	//Kahn sum1=Kahn_init(2),sum2=Kahn_init(2);
+/*	double sum1=0;sum2=0;
 	for(int i=0;i<N/2;i++){
 		sum1+=2*wfull[i];
 		if((i/2)*2==i){
@@ -107,14 +115,17 @@ int  Clenshaw_Curtis::cc_init(const int N){
 	}
 	sum1+=wfull[N/2];
 	sum2+=whalf[N/4];
-	double sum11=Kahn_total(sum1),sum22=Kahn_total(sum2);
+	//double sum11=Kahn_total(sum1),sum22=Kahn_total(sum2);
+	double sum11=sum1,sum22=sum2;
 
 	sum2*=-2;
 	sum2+=sum1;
 
-	if( fabs(Kahn_total(sum2)/(std::min(fabs(sum11),fabs(sum22))))>1.0e-15){
+	//if( fabs(Kahn_total(sum2)/(std::min(fabs(sum11),fabs(sum22))))>1.0e-15){
+	if( fabs(sum2/(std::min(fabs(sum11),fabs(sum22))))>1.0e-15){
 	//if( (sum1-2*sum2)!=0.0){
-		printf("Factor array may be problematic, N = %d, %.3e - %.3e = %.3e\n",N,sum11,2*sum22,Kahn_total(sum2) );
+		//printf("Factor array may be problematic, N = %d, %.3e - %.3e = %.3e\n",N,sum11,2*sum22,Kahn_total(sum2) );
+		printf("Factor array may be problematic, N = %d, %.3e - %.3e = %.3e\n",N,sum11,2*sum22,sum2 );
 		for(int i=0;i<N/2;i++){
 			printf("%.3e ",wfull[i]);
 			if((i/2)*2==i){
@@ -124,9 +135,10 @@ int  Clenshaw_Curtis::cc_init(const int N){
 		}
 		getchar();
 	}	
-	Kahn_free(sum1);
-	Kahn_free(sum2);
+	//Kahn_free(sum1);
+	//Kahn_free(sum2);
 	//getchar();
+	*/
 	return 0;
 }
 
@@ -142,7 +154,7 @@ int Clenshaw_Curtis::cc_init(const int N, const std::string& name,int InitDiv,in
 			return 0;
 		};
 
-double Clenshaw_Curtis::fixed_cc(const void * par, const double smin,const double smax, Kahn &full, Kahn &half)const{
+double Clenshaw_Curtis::fixed_cc(const void * par, const double smin,const double smax, double &full, double &half)const{
 	const double (&x16)[129]=x;
 	const double (&w16)[129]=wfull;
 	const double (&w8)[65]=whalf;
@@ -157,8 +169,10 @@ double Clenshaw_Curtis::fixed_cc(const void * par, const double smin,const doubl
 	}
 
 	f[N]=cc_integrand(mid,par);
-	Kahn_clear(full);
-	Kahn_clear(half);
+	//Kahn_clear(full);
+	//Kahn_clear(half);
+	full=0;
+	half=0;
 	for(int i=0;i<N/2;i++){
 		full+=f[2*i]*w16[i];
 		full+=f[2*i+1]*w16[i];
@@ -171,7 +185,8 @@ double Clenshaw_Curtis::fixed_cc(const void * par, const double smin,const doubl
 	half+=f[N]*w8[N/4];
 	full*=2*scale/N;
 	half*=4*scale/N;
-	return Kahn_total(full);
+	return(full);
+	//return Kahn_total(full);
 }
 
 double Clenshaw_Curtis::cc_integrate(const void * par,const double a, const double b, const double eps, const double Aeps)const{
@@ -199,9 +214,10 @@ double Clenshaw_Curtis::cc_integrate(const void * par,const double a, const doub
 	double arg;
 	double total=0;//,total2=0;
 	double arr[257];
-	Kahn accum=Kahn_init(3);
-	Kahn accumfull=Kahn_init(3);
-	Kahn accumhalf=Kahn_init(3);//, accum2=Kahn_init(3);
+	//Kahn accum=Kahn_init(3);
+	//Kahn accumfull=Kahn_init(3);
+	//Kahn accumhalf=Kahn_init(3);//, accum2=Kahn_init(3);
+	double accum=0,accumfull=0,accumhalf=0;
 	double increase;
 	smin=min;
 	smax=(min-min/InitDiv)+max/InitDiv;//init_div;
@@ -222,8 +238,10 @@ double Clenshaw_Curtis::cc_integrate(const void * par,const double a, const doub
 	scale=(smax-smin)/2;
 	
 	fixed_cc(par,smin,smax,accumfull,accumhalf);
-	valfull=Kahn_total(accumfull);
-	valhalf=Kahn_total(accumhalf);
+	//valfull=Kahn_total(accumfull);
+	//valhalf=Kahn_total(accumhalf);
+	valfull=accumfull;
+	valhalf=accumhalf;
 #if integrate_HH==1		
 	if(not(std::isfinite(valfull)&&std::isfinite(valhalf))){
 		printf("Clenshaw_Curtis:: in \"%s\" %.3e  %.3e encountered\n",(tag).c_str(),valfull,valhalf);
@@ -239,10 +257,11 @@ double Clenshaw_Curtis::cc_integrate(const void * par,const double a, const doub
 		++licz;
 		counter=0;
 		if(fabs(smax-max)==0.0){
-			total=sign*Kahn_total(accum);
-			Kahn_free(accum);
-			Kahn_free(accumfull);
-			Kahn_free(accumhalf);
+			//total=sign*Kahn_total(accum);
+			total=sign*accum;
+			//Kahn_free(accum);
+			//Kahn_free(accumfull);
+			//Kahn_free(accumhalf);
 			return(total );
 		}
 		smin=smax;
@@ -281,9 +300,9 @@ double Clenshaw_Curtis::cc_integrate(const void * par,const double a, const doub
 			printf("%.3e\t%.3e\n",arg,cc_integrand(arg,par));
 		}
 		printf("\n");
-		Kahn_free(accum);
-		Kahn_free(accumfull);
-		Kahn_free(accumhalf);
+		//Kahn_free(accum);
+		//Kahn_free(accumfull);
+		//Kahn_free(accumhalf);
 		exit(1);
 		//getchar();
 		return 0;

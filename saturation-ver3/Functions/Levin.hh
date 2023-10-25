@@ -29,18 +29,20 @@ class Levin{
 			val=pow(val,j-1);
 			return(val);	
 		}
-		Kahn accum;
+		//Kahn accum;
+		double accum=0;
 		int clen=0;//length of record
 	public:
 		int reset(){
 			position=0;
-			Kahn_clear(accum);
+			//Kahn_clear(accum);
+			accum=0;
 			return 0;
 		}
 		int add_term(double term){
 			a[position-clen*(position/clen)]=term;
 			accum+=term;
-			s[position-clen*(position/clen)]=Kahn_total(accum);
+			s[position-clen*(position/clen)]=accum;//Kahn_total(accum);
 			++position;	
 			return(position-1);	
 		}
@@ -56,13 +58,14 @@ class Levin{
 				fact[i]=i*fact[i-1];
 			}
 			position=0;
-			accum=Kahn_init(3);
+			//accum=Kahn_init(3);
+			accum=0;
 		}
 		~Levin(){
 			free(a);
 			free(s);
 			free(fact);
-			Kahn_free(accum);
+			//Kahn_free(accum);
 		}
 		inline double sum(int n)const{
 			
@@ -80,7 +83,8 @@ class Levin{
 			}
 			double num=0,den=0;
 			double val=0;
-			Kahn de=Kahn_init(3),nu=Kahn_init(3);
+			//Kahn de=Kahn_init(3),nu=Kahn_init(3);
+			//double de=0,nu=0;
 			int b=1,cyc=0;
 			
 			for(int i=0;i<=j;++i){
@@ -98,14 +102,14 @@ class Levin{
 					printf("\n");
 					getchar();
 				}
-				de+=val;	
-				nu+=s[cyc]*val;	
+				den+=val;	
+				num+=s[cyc]*val;	
 				
 			}
-			den=Kahn_total(de);
-			num=Kahn_total(nu);
-			Kahn_free(de);
-			Kahn_free(nu);
+			//den=Kahn_total(de);
+			//num=Kahn_total(nu);
+			//Kahn_free(de);
+			//Kahn_free(nu);
 		    if(den==0.0||!std::isfinite(num)||!std::isfinite(den)){
 				printf("Levin:: denominator=%.3e, numerator=%.3e\n",den,num );
 			}	

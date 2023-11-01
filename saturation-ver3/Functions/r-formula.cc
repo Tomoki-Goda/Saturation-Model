@@ -37,11 +37,13 @@ inline double Sigma::freeze_x(const double x){
 	double x2;
 #if FREEZE_QS2==1
 		x2=xmax*x/(xmax*(1-x)+x);
+		//x2=x;
 #elif  FREEZE_QS2==2
 		x2=((x>xmax)?xmax:x);
 #else
 		x2=x;
 #endif
+//if(fabs(x-x2)>1.0e-10) printf("x=%.2e %.2e %.2e\n",x,x2,xmax);
 /*
 	switch(FREEZE_QS2){
 	case 1:

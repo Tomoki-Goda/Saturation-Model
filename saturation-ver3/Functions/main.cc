@@ -151,14 +151,14 @@ int main(int argc, char** argv){
 	//N_APPROX=N_CHEB_R/2;
 	
 	INT_PREC=5.0e-4;
-	N_APPROX=N_CHEB_R/4;
-	//prec.SetPrecision(INT_PREC);
+	N_APPROX=N_CHEB_R/5;
+	prec.SetPrecision(INT_PREC*10);
 	int flag=0;
 	double goal=1;
 	
 	ROOT::Minuit2::MnSimplex simplex1(theFCN,upar,0);
 	std::cout<<"TEST RUN 5, eps = "<<INT_PREC<<" N_APROX ="<<N_APPROX<<std::endl;	
-	ROOT::Minuit2::FunctionMinimum min=simplex1(5,1);//Just initialization /check.
+	ROOT::Minuit2::FunctionMinimum min=simplex1(3*(N_PAR-skip),1);//Just initialization /check.
 	std::cout<<"Parameters "<<min.UserState()<<std::endl;
 
 /*
@@ -225,9 +225,10 @@ int main(int argc, char** argv){
 	}
 	
 */
-	INT_PREC=5.0e-5;
-	N_APPROX=N_CHEB_R;
-	//prec.SetPrecision(INT_PREC);
+	INT_PREC=1e-4;
+	//N_APPROX=N_CHEB_R/2;
+	N_APPROX=150;//N_CHEB_R;
+	prec.SetPrecision(INT_PREC*10);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
@@ -297,15 +298,16 @@ int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN& theFCN, int N, int 
 		std::cout<<"HESSE"<<std::endl;
 		ROOT::Minuit2::MnUserParameterState parstat=min.UserParameters();
 		parstat.Fix(free[fixone]);
-		parstat=hess(theFCN,parstat,50);
-		std::cout<<"MIGRAD"<<std::endl;
+		parstat=hess(theFCN,parstat,100);
+		
+		std::cout<<"Start MIGRAD"<<parstat<<std::endl;
 		ROOT::Minuit2::MnMigrad migrad(theFCN,parstat.Parameters()/*min.UserParameters()*/,str);
 		//migrad.Fix(free[fixone]);
 		
 		fix.push_back(free[fixone]);
 		free.erase(free.begin()+fixone);
 		
-		min=migrad( pow(N+1,2) ,goal);
+		min=migrad( 2*pow(N+1,2) ,goal);
 		
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -323,19 +325,19 @@ int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN& theFCN, int N, int 
 	
 	////////////then release///////////////
 	std::cout<<"Release"<<std::endl;
-	ROOT::Minuit2::MnUserParameterState parstat=min.UserParameters();
+	//ROOT::Minuit2::MnUserParameterState parstat=min.UserParameters();
 	//parstat=hess(theFCN,parstat,50);
 	
 	for(int ii=0;ii<fix.size();++ii){
 		ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),str);
-		//migrad.Release(fix[fix.size()-ii-1]);
-		parstat.Release(fix[ii]);
-		//if(fix.size()!=ii+1){
-		//	min=migrad( pow(N+1,2)/2 ,goal);
-		//	std::cout<<"Parameters "<<min.UserState()<<std::endl;
-		//}
+		migrad.Release(fix[fix.size()-ii-1]);
+		//parstat.Release(fix[ii]);
+		if(fix.size()!=ii+1){
+			min=migrad( 2*pow(N+1,2) ,goal);
+			std::cout<<"Parameters "<<min.UserState()<<std::endl;
+		}
 	}
-	
+	ROOT::Minuit2::MnUserParameterState parstat=min.UserParameters();
 	std::cout<<"HESSE"<<std::endl;
 	//ROOT::Minuit2::MnUserParameterState parstat=min.UserParameters();
 	parstat=hess(theFCN,parstat,50);

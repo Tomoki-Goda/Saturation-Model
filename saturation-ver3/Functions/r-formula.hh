@@ -32,10 +32,12 @@ typedef Collinear_Gluon ColGlu;
 class Sigma{
 	//Abstract base class
 	protected:
-		double x2,xmax;
+		double x2;
+		double xmax=1;
 		double sigma_0,mu102,thresh_power;
 		const double *par;
-		inline double freeze_x(const double);
+		//virtual
+		 inline double freeze_x(const double);
 		virtual double Qs2(const double x,const double r)const=0;
 	public:
 		virtual void set_x(const double &x){}
@@ -76,11 +78,11 @@ class Sigma_BGK:public  Sigma{
 		double Qs2(const double x,const double r)const;
 		double A_g,lambda_g,C,mu02;
 
-#if FREEZE_QS2>=1
-		const double xmax=0.5;
-#elif FREEZE_QS2==0
-	 	const double xmax=1;
-#endif		
+//#if FREEZE_QS2>=1
+//		const double xmax=0.8;
+//#elif FREEZE_QS2==0
+//	 	const double xmax=1;
+//#endif		
 		
 		
 	public:
@@ -88,6 +90,11 @@ class Sigma_BGK:public  Sigma{
 #if SIGMA_APPROX<0
 			xgpdf.allocate(N_CHEB);
 #endif
+#if FREEZE_QS2>=1
+		xmax=0.98;
+#elif FREEZE_QS2==0
+	 	xmax=1;
+#endif	
 		}
 		~Sigma_BGK(){
 		}

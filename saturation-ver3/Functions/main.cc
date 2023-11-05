@@ -136,7 +136,7 @@ int main(int argc, char** argv){
 #if USE_RESULT>0
 		ival=double_round(ival,USE_RESULT);
 #endif
-		printf("%s %le %le \n",name,ival,ierr*10);
+		printf("%s %le %le \n",name,ival,ival*5*pow(10,-abs(USE_RESULT)));
 		upar.Add(name, ival, ival*5*pow(10,-abs(USE_RESULT)));
 	}printf("\n");
 	fclose(resinputfile);
@@ -146,13 +146,13 @@ int main(int argc, char** argv){
 // Start fitting
 //////////////////////////////////////////////////////////
 	ROOT::Minuit2::MnMachinePrecision prec;
-	
+	prec.SetPrecision(1.0e-5);
 	//INT_PREC=5.0e-4 ;
 	//N_APPROX=N_CHEB_R/2;
 	
-	INT_PREC=5.0e-4;
-	N_APPROX=N_CHEB_R/5;
-	prec.SetPrecision(INT_PREC*10);
+	INT_PREC=1.0e-3;
+	N_APPROX=N_CHEB_R/6;
+	//prec.SetPrecision(INT_PREC*5);
 	int flag=0;
 	double goal=1;
 	
@@ -227,8 +227,8 @@ int main(int argc, char** argv){
 */
 	INT_PREC=1e-4;
 	//N_APPROX=N_CHEB_R/2;
-	N_APPROX=150;//N_CHEB_R;
-	prec.SetPrecision(INT_PREC*10);
+	N_APPROX=120;//N_CHEB_R;
+	prec.SetPrecision(INT_PREC);
 	printf("***************************\n");
 	printf("*** Second: eps=%.1e  N_APPROX=%d***\n",(double)INT_PREC,N_APPROX);
 	printf("***************************\n");
@@ -285,29 +285,48 @@ int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN& theFCN, int N, int 
 		free.push_back(ii);
 	}
 	ROOT::Minuit2::MnHesse hess(0);
+	//std::cout<<"Loop"<<std::endl<<std::flush;	
 	for(int j=0;j< (N-1)/2+1;++j){
-	
-		std::vector<double> cor=min.UserState().GlobalCC().GlobalCC();
-		for(int ii=0;ii<cor.size();++ii){
-			printf("cor %d = %f\n",ii,cor[ii]);
+		
+		if(min.HasCovariance()){
+			std::vector<double> cor=min.UserState().GlobalCC().GlobalCC();
+			//std::cout<<"cor"<<std::endl<<std::flush;
+			for(int ii=0;ii<cor.size();++ii){
+				printf("cor %d = %f\n",ii,cor[ii]);
+			}
+			//std::cout.flush();
+			//fflush(stdout);
+			
+			const int fixone=std::distance(cor.begin(),std::max_element(cor.begin(),cor.end()));
+			//std::cout<<"fixone "<<fixone<<std::endl<<std::flush;
+			ROOT::Minuit2::MnUserParameterState parstat=min.UserParameters();
+			//std::cout.flush();
+			//fflush(stdout);
+			
+			if(cor.size()>0&&cor[fixone]>0.9){
+				printf("Fix %d (st/nd/th) pos (%d) cor=%f\n",free[fixone],fixone,cor[fixone]);
+				//min.Fix(free[fixone]);
+				std::cout<<"HESSE"<<std::endl;
+				parstat.Fix(free[fixone]);
+				fix.push_back(free[fixone]);
+				free.erase(free.begin()+fixone);
+				parstat=hess(theFCN,parstat,100);
+			}	
+			std::cout.flush();
+			fflush(stdout);
+			std::cout<<"Start MIGRAD"<<parstat<<std::endl;
+//		if(parstat.HasCovariance()){
+			ROOT::Minuit2::MnStrategy strat(str);
+			ROOT::Minuit2::MnMigrad migrad(theFCN,parstat,strat);
+			min=migrad( 2*pow(N+1,2) ,goal);
+		}else{
+			std::cout<<"Start MIGRAD"<<min<<std::endl;
+			ROOT::Minuit2::MnMigrad migrad(theFCN,min.UserParameters(),str);
+			min=migrad( 2*pow(N+1,2) ,goal);
 		}
-		int fixone=std::distance(cor.begin(),std::max_element(cor.begin(),cor.end()));
-		
-		printf("Fix %d (st/nd/th) pos (%d) \n",free[fixone],fixone);
-		//min.Fix(free[fixone]);
-		std::cout<<"HESSE"<<std::endl;
-		ROOT::Minuit2::MnUserParameterState parstat=min.UserParameters();
-		parstat.Fix(free[fixone]);
-		parstat=hess(theFCN,parstat,100);
-		
-		std::cout<<"Start MIGRAD"<<parstat<<std::endl;
-		ROOT::Minuit2::MnMigrad migrad(theFCN,parstat.Parameters()/*min.UserParameters()*/,str);
 		//migrad.Fix(free[fixone]);
 		
-		fix.push_back(free[fixone]);
-		free.erase(free.begin()+fixone);
-		
-		min=migrad( 2*pow(N+1,2) ,goal);
+		//min=migrad( 2*pow(N+1,2) ,goal);
 		
 		std::cout<<"Parameters "<<min.UserState()<<std::endl;
 		printf("Cov= %d\n",min.UserState().CovarianceStatus() );
@@ -317,9 +336,9 @@ int Fix_Release(ROOT::Minuit2::FunctionMinimum & min, KtFCN& theFCN, int N, int 
 			break;
 		}else{
 			printf("Fixing insufficient\n");
-			std::cout<<"SIMPLEX"<<std::endl;
-			ROOT::Minuit2::MnSimplex simp(theFCN,min.UserParameters(),str);
-			min=simp( pow(N+1,2) ,goal);
+			//std::cout<<"SIMPLEX"<<std::endl;
+			//ROOT::Minuit2::MnSimplex simp(theFCN,min.UserParameters(),str);
+			//min=simp( pow(N+1,2) ,goal);
 		}
 	}
 	

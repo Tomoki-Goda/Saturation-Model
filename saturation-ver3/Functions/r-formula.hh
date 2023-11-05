@@ -91,7 +91,7 @@ class Sigma_BGK:public  Sigma{
 			xgpdf.allocate(N_CHEB);
 #endif
 #if FREEZE_QS2>=1
-		xmax=0.98;
+		xmax=0.8;
 #elif FREEZE_QS2==0
 	 	xmax=1;
 #endif	
